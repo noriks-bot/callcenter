@@ -231,8 +231,8 @@ app.get('/api/stores', (req, res) => {
   })));
 });
 
-// Serve the main app
-app.get('*', (req, res) => {
+// Serve the main app (Express 5 syntax)
+app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
