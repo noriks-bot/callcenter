@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noriks Call Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #334155;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+        
+        .light-theme {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .logo-text span {
+            color: var(--accent);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--border);
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem 2rem;
+            background: var(--bg-secondary);
+            margin: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .stat-card {
+            flex: 1;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 1rem;
+            padding: 0 2rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        select, input[type="text"], input[type="date"] {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .main-content {
+            padding: 0 2rem 2rem;
+        }
+        
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+        
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            vertical-align: top;
+        }
+        
+        tr:hover td {
+            background: var(--bg-tertiary);
+        }
+        
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .customer-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .customer-contact {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .customer-contact a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .customer-contact a:hover {
+            text-decoration: underline;
+        }
+        
+        .country-flag {
+            font-size: 1.25rem;
+        }
+        
+        .cart-items {
+            font-size: 0.85rem;
+            max-width: 250px;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+            border-bottom: 1px dashed var(--border);
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .cart-value {
+            font-weight: 700;
+            color: var(--success);
+            font-size: 1.1rem;
+        }
+        
+        .timestamp {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-not_called {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        .status-called_no_answer {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .status-callback_scheduled {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent);
+        }
+        
+        .status-converted {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+        
+        .status-not_interested {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            background: var(--bg-tertiary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .action-btn.call {
+            background: var(--success);
+            color: white;
+        }
+        
+        .action-btn.call:hover {
+            background: #16a34a;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        textarea {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 1200px) {
+            .stats-bar {
+                flex-wrap: wrap;
+            }
+            
+            .stat-card {
+                min-width: calc(50% - 0.5rem);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .stats-bar, .main-content, .tabs, .filters {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">📞</div>
+            <div class="logo-text">Noriks <span>Call Center</span></div>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">🌙</span>
+                <span id="theme-text">Dark</span>
+            </button>
+        </div>
+    </header>
+    
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-value" id="stat-total">-</div>
+            <div class="stat-label">Total Contacts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-not-called">-</div>
+            <div class="stat-label">Not Called</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-pending">-</div>
+            <div class="stat-label">Callback Pending</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-converted">-</div>
+            <div class="stat-label">Converted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-value">-</div>
+            <div class="stat-label">Total Value</div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" data-tab="abandoned">🛒 Abandoned Carts</button>
+        <button class="tab" data-tab="suppressed">🚫 Suppressed Profiles</button>
+    </div>
+    
+    <div class="filters">
+        <div class="filter-group">
+            <span class="filter-label">Status:</span>
+            <select id="filter-status">
+                <option value="">All Statuses</option>
+                <option value="not_called">Not Called</option>
+                <option value="called_no_answer">Called - No Answer</option>
+                <option value="callback_scheduled">Callback Scheduled</option>
+                <option value="converted">Converted</option>
+                <option value="not_interested">Not Interested</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Country:</span>
+            <select id="filter-country">
+                <option value="">All Countries</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Search:</span>
+            <input type="text" id="filter-search" placeholder="Name, email, phone...">
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Min Value:</span>
+            <input type="text" id="filter-min-value" placeholder="0" style="width: 80px;">
+        </div>
+    </div>
+    
+    <main class="main-content">
+        <div id="abandoned-tab">
+            <div class="table-container">
+                <table id="abandoned-table">
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Customer</th>
+                            <th>Cart Contents</th>
+                            <th>Value</th>
+                            <th>Abandoned</th>
+                            <th>Call Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="abandoned-body">
+                        <tr><td colspan="8" class="loading"><div class="spinner"></div> Loading abandoned carts...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="suppressed-tab" style="display: none;">
+            <div class="table-container">
+                <table id="suppressed-table">
+                    <thead>
+                        <tr>
+                            <th>Profile</th>
+                            <th>Suppression Reason</th>
+                            <th>Suppressed Date</th>
+                            <th>Call Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suppressed-body">
+                        <tr><td colspan="6" class="loading"><div class="spinner"></div> Loading suppressed profiles...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Contact</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label>Call Status</label>
+                    <select id="edit-status">
+                        <option value="not_called">Not Called</option>
+                        <option value="called_no_answer">Called - No Answer</option>
+                        <option value="callback_scheduled">Callback Scheduled</option>
+                        <option value="converted">Converted</option>
+                        <option value="not_interested">Not Interested</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="edit-notes" placeholder="Add notes about this call..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="saveChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let abandonedCarts = [];
+        let suppressedProfiles = [];
+        let currentTab = 'abandoned';
+        
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            document.getElementById('theme-icon').textContent = isLight ? '☀️' : '🌙';
+            document.getElementById('theme-text').textContent = isLight ? 'Light' : 'Dark';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+        
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-theme');
+            document.getElementById('theme-icon').textContent = '☀️';
+            document.getElementById('theme-text').textContent = 'Light';
+        }
+        
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                
+                document.getElementById('abandoned-tab').style.display = currentTab === 'abandoned' ? 'block' : 'none';
+                document.getElementById('suppressed-tab').style.display = currentTab === 'suppressed' ? 'block' : 'none';
+                
+                updateStats();
+            });
+        });
+        
+        // Load stores for filter
+        async function loadStores() {
+            try {
+                const res = await fetch('/api/stores');
+                const stores = await res.json();
+                const select = document.getElementById('filter-country');
+                stores.forEach(store => {
+                    const option = document.createElement('option');
+                    option.value = store.code;
+                    option.textContent = `${store.flag} ${store.name}`;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Failed to load stores:', err);
+            }
+        }
+        
+        // Load abandoned carts
+        async function loadAbandonedCarts() {
+            try {
+                const res = await fetch('/api/abandoned-carts');
+                abandonedCarts = await res.json();
+                renderAbandonedCarts();
+                updateStats();
+            } catch (err) {
+                console.error('Failed to load abandoned carts:', err);
+                document.getElementById('abandoned-body').innerHTML = 
+                    '<tr><td colspan="8" class="empty-state"><div class="empty-state-icon">❌</div>Failed to load data</td></tr>';
+            }
+        }
+        
+        // Load suppressed profiles
+        async function loadSuppressedProfiles() {
+            try {
+                const res = await fetch('/api/suppressed-profiles');
+                suppressedProfiles = await res.json();
+                renderSuppressedProfiles();
+            } catch (err) {
+                console.error('Failed to load suppressed profiles:', err);
+                document.getElementById('suppressed-body').innerHTML = 
+                    '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">❌</div>Failed to load data</td></tr>';
+            }
+        }
+        
+        // Filter abandoned carts
+        function getFilteredCarts() {
+            const status = document.getElementById('filter-status').value;
+            const country = document.getElementById('filter-country').value;
+            const search = document.getElementById('filter-search').value.toLowerCase();
+            const minValue = parseFloat(document.getElementById('filter-min-value').value) || 0;
+            
+            return abandonedCarts.filter(cart => {
+                if (status && cart.callStatus !== status) return false;
+                if (country && cart.storeCode !== country) return false;
+                if (minValue && cart.cartValue < minValue) return false;
+                if (search) {
+                    const searchStr = `${cart.customerName} ${cart.email} ${cart.phone}`.toLowerCase();
+                    if (!searchStr.includes(search)) return false;
+                }
+                return true;
+            });
+        }
+        
+        // Render abandoned carts table
+        function renderAbandonedCarts() {
+            const filtered = getFilteredCarts();
+            const tbody = document.getElementById('abandoned-body');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="empty-state-icon">📭</div>No abandoned carts found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(cart => `
+                <tr>
+                    <td><span class="country-flag">${cart.storeFlag}</span></td>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-name">${escapeHtml(cart.customerName)}</div>
+                            <div class="customer-contact">
+                                ${cart.email ? `<a href="mailto:${cart.email}">✉️ ${cart.email}</a>` : ''}
+                            </div>
+                            <div class="customer-contact">
+                                ${cart.phone ? `<a href="tel:${cart.phone}">📱 ${cart.phone}</a>` : '<span style="color: var(--danger)">No phone</span>'}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="cart-items">
+                            ${cart.cartContents.slice(0, 3).map(item => `
+                                <div class="cart-item">
+                                    <span>${escapeHtml(item.name.substring(0, 30))}${item.name.length > 30 ? '...' : ''} x${item.quantity}</span>
+                                </div>
+                            `).join('')}
+                            ${cart.cartContents.length > 3 ? `<div style="color: var(--text-muted)">+${cart.cartContents.length - 3} more items</div>` : ''}
+                        </div>
+                    </td>
+                    <td><span class="cart-value">${formatCurrency(cart.cartValue, cart.currency)}</span></td>
+                    <td><span class="timestamp">${formatDate(cart.abandonedAt)}</span></td>
+                    <td><span class="status-badge status-${cart.callStatus}">${formatStatus(cart.callStatus)}</span></td>
+                    <td style="max-width: 150px; font-size: 0.8rem; color: var(--text-secondary);">${escapeHtml(cart.notes || '-')}</td>
+                    <td>
+                        <div class="actions">
+                            ${cart.phone ? `<a href="tel:${cart.phone}" class="action-btn call">📞 Call</a>` : ''}
+                            <button class="action-btn" onclick="openEditModal('${cart.id}', '${cart.callStatus}', '${escapeHtml(cart.notes || '')}')">✏️ Update</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Render suppressed profiles table
+        function renderSuppressedProfiles() {
+            const tbody = document.getElementById('suppressed-body');
+            
+            if (suppressedProfiles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">✅</div>No suppressed profiles</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = suppressedProfiles.map(profile => `
+                <tr>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-name">${escapeHtml(profile.firstName)} ${escapeHtml(profile.lastName)}</div>
+                            <div class="customer-contact">
+                                ${profile.email ? `<a href="mailto:${profile.email}">✉️ ${profile.email}</a>` : ''}
+                            </div>
+                            <div class="customer-contact">
+                                ${profile.phone ? `<a href="tel:${profile.phone}">📱 ${profile.phone}</a>` : '<span style="color: var(--text-muted)">No phone</span>'}
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge status-not_interested">${escapeHtml(profile.suppressionReason)}</span></td>
+                    <td><span class="timestamp">${formatDate(profile.suppressedAt)}</span></td>
+                    <td><span class="status-badge status-${profile.callStatus}">${formatStatus(profile.callStatus)}</span></td>
+                    <td style="max-width: 150px; font-size: 0.8rem; color: var(--text-secondary);">${escapeHtml(profile.notes || '-')}</td>
+                    <td>
+                        <div class="actions">
+                            ${profile.phone ? `<a href="tel:${profile.phone}" class="action-btn call">📞 Call</a>` : ''}
+                            <button class="action-btn" onclick="openEditModal('${profile.id}', '${profile.callStatus}', '${escapeHtml(profile.notes || '')}')">✏️ Update</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Update stats
+        function updateStats() {
+            if (currentTab === 'abandoned') {
+                const filtered = getFilteredCarts();
+                document.getElementById('stat-total').textContent = filtered.length;
+                document.getElementById('stat-not-called').textContent = filtered.filter(c => c.callStatus === 'not_called').length;
+                document.getElementById('stat-pending').textContent = filtered.filter(c => c.callStatus === 'callback_scheduled').length;
+                document.getElementById('stat-converted').textContent = filtered.filter(c => c.callStatus === 'converted').length;
+                
+                const totalValue = filtered.reduce((sum, c) => sum + c.cartValue, 0);
+                document.getElementById('stat-value').textContent = formatCurrency(totalValue, 'EUR');
+            } else {
+                document.getElementById('stat-total').textContent = suppressedProfiles.length;
+                document.getElementById('stat-not-called').textContent = suppressedProfiles.filter(p => p.callStatus === 'not_called').length;
+                document.getElementById('stat-pending').textContent = suppressedProfiles.filter(p => p.callStatus === 'callback_scheduled').length;
+                document.getElementById('stat-converted').textContent = suppressedProfiles.filter(p => p.callStatus === 'converted').length;
+                document.getElementById('stat-value').textContent = '-';
+            }
+        }
+        
+        // Modal functions
+        function openEditModal(id, status, notes) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-status').value = status;
+            document.getElementById('edit-notes').value = notes;
+            document.getElementById('edit-modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+        }
+        
+        async function saveChanges() {
+            const id = document.getElementById('edit-id').value;
+            const callStatus = document.getElementById('edit-status').value;
+            const notes = document.getElementById('edit-notes').value;
+            
+            try {
+                const res = await fetch('/api/update-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, callStatus, notes })
+                });
+                
+                if (res.ok) {
+                    // Update local data
+                    const cart = abandonedCarts.find(c => c.id === id);
+                    if (cart) {
+                        cart.callStatus = callStatus;
+                        cart.notes = notes;
+                    }
+                    
+                    const profile = suppressedProfiles.find(p => p.id === id);
+                    if (profile) {
+                        profile.callStatus = callStatus;
+                        profile.notes = notes;
+                    }
+                    
+                    renderAbandonedCarts();
+                    renderSuppressedProfiles();
+                    updateStats();
+                    closeModal();
+                }
+            } catch (err) {
+                console.error('Failed to save:', err);
+                alert('Failed to save changes');
+            }
+        }
+        
+        // Helper functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatCurrency(value, currency) {
+            return new Intl.NumberFormat('en-EU', {
+                style: 'currency',
+                currency: currency || 'EUR'
+            }).format(value);
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function formatStatus(status) {
+            const statusMap = {
+                'not_called': 'Not Called',
+                'called_no_answer': 'No Answer',
+                'callback_scheduled': 'Callback',
+                'converted': 'Converted',
+                'not_interested': 'Not Interested'
+            };
+            return statusMap[status] || status;
+        }
+        
+        // Filter event listeners
+        document.getElementById('filter-status').addEventListener('change', () => { renderAbandonedCarts(); updateStats(); });
+        document.getElementById('filter-country').addEventListener('change', () => { renderAbandonedCarts(); updateStats(); });
+        document.getElementById('filter-search').addEventListener('input', () => { renderAbandonedCarts(); updateStats(); });
+        document.getElementById('filter-min-value').addEventListener('input', () => { renderAbandonedCarts(); updateStats(); });
+        
+        // Close modal on overlay click
+        document.getElementById('edit-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('edit-modal')) {
+                closeModal();
+            }
+        });
+        
+        // Initialize
+        loadStores();
+        loadAbandonedCarts();
+        loadSuppressedProfiles();
+    </script>
+</body>
+</html>
