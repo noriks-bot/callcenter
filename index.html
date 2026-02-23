@@ -3085,7 +3085,7 @@ Available variables:
             document.getElementById('smsEditMessage').value = message || '';
             document.getElementById('smsEditCustomerName').textContent = customerName || 'Unknown';
             document.getElementById('smsEditAvatar').textContent = (customerName || '?')[0].toUpperCase();
-            openModal('smsEditModal');
+            document.getElementById('smsEditModal').classList.add('open');
         }
         
         // Confirm and send SMS with (potentially edited) phone number
