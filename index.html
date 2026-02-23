@@ -889,6 +889,72 @@
         }
         .theme-toggle:hover { background: var(--bg-hover); transform: scale(1.1); }
         
+        /* Sortable Table Headers */
+        .data-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .data-table th.sortable:hover {
+            background: var(--bg-hover);
+        }
+        .data-table th.sortable::after {
+            content: ' ↕';
+            opacity: 0.3;
+            font-size: 10px;
+        }
+        .data-table th.sortable.asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+        .data-table th.sortable.desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .pagination-info {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .pagination-btn {
+            width: 36px; height: 36px;
+            background: var(--bg-hover);
+            border: none;
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .pagination-btn:hover:not(:disabled) { background: var(--accent); color: white; }
+        .pagination-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .pagination-btn.active { background: var(--accent); color: white; }
+        .pagination-select {
+            padding: 8px 12px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 13px;
+        }
+        
         /* Light Theme */
         body.light {
             --bg-dark: #f8fafc;
@@ -1625,7 +1691,7 @@
         let smsLog = [];
         let smsAutomation = [];
         let currentStore = 'all';
-        let currentTab = 'carts';
+        let currentTab = 'dashboard';
         let editId = null;
         let orderCartId = null;
         let orderCart = null;
@@ -1633,6 +1699,12 @@
         let freeShipping = false;
         let smsTarget = null;
         let pushTarget = null;
+        
+        // Pagination & Sorting State
+        let currentPage = 1;
+        let itemsPerPage = 25;
+        let sortColumn = 'abandonedAt';
+        let sortDirection = 'desc';
         
         const SHIPPING_COST = 5.00;
         
@@ -1837,7 +1909,7 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const status = document.getElementById('statusFilter').value;
             
-            let data = currentTab === 'carts' ? carts : currentTab === 'pending' ? pending : buyers;
+            let data = currentTab === 'carts' ? [...carts] : currentTab === 'pending' ? [...pending] : [...buyers];
             
             if (currentStore !== 'all') data = data.filter(d => d.storeCode === currentStore);
             if (status) data = data.filter(d => d.callStatus === status);
@@ -1847,30 +1919,133 @@
                 (d.phone || '').includes(search)
             );
             
-            const container = document.getElementById('tableContainer');
+            // Sort data
+            data.sort((a, b) => {
+                let valA = a[sortColumn] || '';
+                let valB = b[sortColumn] || '';
+                
+                if (sortColumn === 'cartValue' || sortColumn === 'orderTotal' || sortColumn === 'totalSpent') {
+                    valA = parseFloat(valA) || 0;
+                    valB = parseFloat(valB) || 0;
+                } else if (sortColumn === 'abandonedAt' || sortColumn === 'createdAt' || sortColumn === 'registeredAt') {
+                    valA = new Date(valA).getTime() || 0;
+                    valB = new Date(valB).getTime() || 0;
+                } else {
+                    valA = String(valA).toLowerCase();
+                    valB = String(valB).toLowerCase();
+                }
+                
+                if (sortDirection === 'asc') {
+                    return valA > valB ? 1 : valA < valB ? -1 : 0;
+                } else {
+                    return valA < valB ? 1 : valA > valB ? -1 : 0;
+                }
+            });
             
-            if (!data.length) {
+            const container = document.getElementById('tableContainer');
+            const totalItems = data.length;
+            
+            if (!totalItems) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-inbox"></i><p>No data found</p></div>';
                 return;
             }
             
-            if (currentTab === 'carts') renderCartsTable(data);
-            else if (currentTab === 'pending') renderPendingTable(data);
-            else renderBuyersTable(data);
+            // Pagination
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const paginatedData = data.slice(startIdx, startIdx + itemsPerPage);
+            
+            if (currentTab === 'carts') renderCartsTable(paginatedData, totalItems, totalPages);
+            else if (currentTab === 'pending') renderPendingTable(paginatedData, totalItems, totalPages);
+            else renderBuyersTable(paginatedData, totalItems, totalPages);
         }
         
-        function renderCartsTable(data) {
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'desc';
+            }
+            currentPage = 1;
+            renderTable();
+        }
+        
+        function goToPage(page) {
+            currentPage = page;
+            renderTable();
+        }
+        
+        function changeItemsPerPage(val) {
+            itemsPerPage = parseInt(val) || 25;
+            currentPage = 1;
+            renderTable();
+        }
+        
+        function renderPagination(totalItems, totalPages) {
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, totalItems);
+            
+            let pageButtons = '';
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            if (endPage - startPage < maxButtons - 1) startPage = Math.max(1, endPage - maxButtons + 1);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                pageButtons += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            
+            return `
+                <div class="pagination">
+                    <div class="pagination-info">
+                        Prikazujem <strong>${start}-${end}</strong> od <strong>${totalItems}</strong> vnosov
+                    </div>
+                    <div class="pagination-controls">
+                        <select class="pagination-select" onchange="changeItemsPerPage(this.value)">
+                            <option value="10" ${itemsPerPage === 10 ? 'selected' : ''}>10 / stran</option>
+                            <option value="25" ${itemsPerPage === 25 ? 'selected' : ''}>25 / stran</option>
+                            <option value="50" ${itemsPerPage === 50 ? 'selected' : ''}>50 / stran</option>
+                            <option value="100" ${itemsPerPage === 100 ? 'selected' : ''}>100 / stran</option>
+                        </select>
+                        <button class="pagination-btn" onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''}>
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                        <button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                            <i class="fas fa-angle-left"></i>
+                        </button>
+                        ${pageButtons}
+                        <button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                            <i class="fas fa-angle-right"></i>
+                        </button>
+                        <button class="pagination-btn" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderCartsTable(data, totalItems, totalPages) {
+            const getSortClass = (col) => sortColumn === col ? sortDirection : '';
             document.getElementById('tableContainer').innerHTML = `
                 <div class="table-wrapper">
                 <table class="data-table">
                     <thead><tr>
-                        <th>Customer</th><th>Store</th><th>Value</th><th>Phone</th><th>Status</th><th>Time</th><th>Actions</th>
+                        <th class="sortable ${getSortClass('customerName')}" onclick="sortTable('customerName')">Customer</th>
+                        <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
+                        <th class="sortable ${getSortClass('cartValue')}" onclick="sortTable('cartValue')">Value</th>
+                        <th>Phone</th>
+                        <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
+                        <th class="sortable ${getSortClass('abandonedAt')}" onclick="sortTable('abandonedAt')">Time</th>
+                        <th>Actions</th>
                     </tr></thead>
                     <tbody>
                         ${data.map(c => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[c.currency] || '€';
                             return `<tr>
-                                <td><div class="customer-cell"><div class="avatar">${initials(c.customerName)}</div><div><div class="customer-name">${esc(c.customerName)}</div><div class="customer-email">${esc(c.email)}</div></div></div></td>
+                                <td><div class="customer-cell" onclick="openCustomer360(carts.find(x=>x.id==='${c.id}'))" style="cursor:pointer;"><div class="avatar">${initials(c.customerName)}</div><div><div class="customer-name">${esc(c.customerName)}</div><div class="customer-email">${esc(c.email)}</div></div></div></td>
                                 <td>${c.storeFlag} ${c.storeName}</td>
                                 <td><strong>${sym}${(c.cartValue||0).toFixed(2)}</strong></td>
                                 <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '—'}</td>
@@ -1887,15 +2062,23 @@
                         }).join('')}
                     </tbody>
                 </table>
-                </div>`;
+                </div>
+                ${renderPagination(totalItems, totalPages)}`;
         }
         
-        function renderPendingTable(data) {
+        function renderPendingTable(data, totalItems, totalPages) {
+            const getSortClass = (col) => sortColumn === col ? sortDirection : '';
             document.getElementById('tableContainer').innerHTML = `
                 <div class="table-wrapper">
                 <table class="data-table">
                     <thead><tr>
-                        <th>Customer</th><th>Store</th><th>Order #</th><th>Total</th><th>Phone</th><th>Status</th><th>Actions</th>
+                        <th class="sortable ${getSortClass('customerName')}" onclick="sortTable('customerName')">Customer</th>
+                        <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
+                        <th class="sortable ${getSortClass('orderId')}" onclick="sortTable('orderId')">Order #</th>
+                        <th class="sortable ${getSortClass('orderTotal')}" onclick="sortTable('orderTotal')">Total</th>
+                        <th>Phone</th>
+                        <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
+                        <th>Actions</th>
                     </tr></thead>
                     <tbody>
                         ${data.map(o => {
@@ -1917,15 +2100,23 @@
                         }).join('')}
                     </tbody>
                 </table>
-                </div>`;
+                </div>
+                ${renderPagination(totalItems, totalPages)}`;
         }
         
-        function renderBuyersTable(data) {
+        function renderBuyersTable(data, totalItems, totalPages) {
+            const getSortClass = (col) => sortColumn === col ? sortDirection : '';
             document.getElementById('tableContainer').innerHTML = `
                 <div class="table-wrapper">
                 <table class="data-table">
                     <thead><tr>
-                        <th>Customer</th><th>Store</th><th>Spent</th><th>Phone</th><th>Registered</th><th>Status</th><th>Actions</th>
+                        <th class="sortable ${getSortClass('customerName')}" onclick="sortTable('customerName')">Customer</th>
+                        <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
+                        <th class="sortable ${getSortClass('totalSpent')}" onclick="sortTable('totalSpent')">Spent</th>
+                        <th>Phone</th>
+                        <th class="sortable ${getSortClass('registeredAt')}" onclick="sortTable('registeredAt')">Registered</th>
+                        <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
+                        <th>Actions</th>
                     </tr></thead>
                     <tbody>
                         ${data.map(b => {
@@ -1947,7 +2138,8 @@
                         }).join('')}
                     </tbody>
                 </table>
-                </div>`;
+                </div>
+                ${renderPagination(totalItems, totalPages)}`;
         }
         
         // Status Modal
