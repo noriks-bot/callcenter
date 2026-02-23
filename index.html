@@ -2067,10 +2067,10 @@ Available variables:
             });
             
             if (result.success && result.data) {
-                smsTemplates = result.data;
-                console.log('[SMS] ✓ Templates loaded');
+                smsTemplatesData = result.data;  // FIX: was smsTemplates, should be smsTemplatesData
+                console.log('[SMS] ✓ Templates loaded:', Object.keys(result.data.templates || {}).length, 'templates');
             } else {
-                smsTemplates = {};
+                smsTemplatesData = { templates: {} };  // FIX: proper empty structure
                 console.warn('[SMS] ✗ Templates failed, using empty object');
             }
         }
