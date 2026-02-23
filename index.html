@@ -1418,6 +1418,155 @@ Available variables:
             document.body.classList.add('is-admin');
         }
         
+        // ========== BULLETPROOF API UTILITIES ==========
+        const API_CONFIG = {
+            timeout: 15000,      // 15 second timeout
+            retries: 3,          // Retry 3 times
+            retryDelay: 1000,    // 1 second between retries
+            backoffMultiplier: 2 // Exponential backoff
+        };
+        
+        // Loading state management
+        const loadingState = {
+            active: new Set(),
+            show(component) {
+                this.active.add(component);
+                this.updateGlobalLoader();
+            },
+            hide(component) {
+                this.active.delete(component);
+                this.updateGlobalLoader();
+            },
+            updateGlobalLoader() {
+                const loader = document.getElementById('globalLoader');
+                if (loader) {
+                    loader.style.display = this.active.size > 0 ? 'flex' : 'none';
+                }
+            }
+        };
+        
+        // Bulletproof fetch with retry, timeout, and error handling
+        async function apiFetch(url, options = {}) {
+            const { 
+                retries = API_CONFIG.retries,
+                timeout = API_CONFIG.timeout,
+                silent = false,
+                component = 'api'
+            } = options;
+            
+            let lastError;
+            let delay = API_CONFIG.retryDelay;
+            
+            for (let attempt = 1; attempt <= retries; attempt++) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+                
+                try {
+                    console.log(`[API] ${component} - Attempt ${attempt}/${retries}: ${url}`);
+                    
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Check for API-level errors
+                    if (data && data.error) {
+                        console.warn(`[API] ${component} - API error:`, data.error);
+                        return { success: false, error: data.error, data: null };
+                    }
+                    
+                    console.log(`[API] ${component} - Success:`, Array.isArray(data) ? `${data.length} items` : 'object');
+                    return { success: true, data, error: null };
+                    
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    lastError = error;
+                    
+                    const isTimeout = error.name === 'AbortError';
+                    const errorMsg = isTimeout ? 'Timeout' : error.message;
+                    
+                    console.warn(`[API] ${component} - Attempt ${attempt} failed: ${errorMsg}`);
+                    
+                    if (attempt < retries) {
+                        console.log(`[API] ${component} - Retrying in ${delay}ms...`);
+                        await new Promise(r => setTimeout(r, delay));
+                        delay *= API_CONFIG.backoffMultiplier;
+                    }
+                }
+            }
+            
+            // All retries failed
+            const errorMsg = lastError?.name === 'AbortError' 
+                ? 'Request timed out' 
+                : lastError?.message || 'Unknown error';
+            
+            console.error(`[API] ${component} - All ${retries} attempts failed:`, errorMsg);
+            
+            if (!silent) {
+                showToast(`⚠️ ${component}: ${errorMsg}`, 'error');
+            }
+            
+            return { success: false, error: errorMsg, data: null };
+        }
+        
+        // Show loading skeleton in a container
+        function showLoadingSkeleton(containerId, rows = 5) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = `
+                <tr>
+                    <td colspan="10" style="padding:40px;text-align:center;">
+                        <div class="spinner" style="margin:0 auto 16px;"></div>
+                        <div style="color:var(--text-muted);">Nalagam podatke...</div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Show error state in a container
+        function showErrorState(containerId, message, retryFn = null) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = `
+                <tr>
+                    <td colspan="10" style="padding:40px;text-align:center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size:32px;color:var(--red);margin-bottom:12px;display:block;"></i>
+                        <div style="color:var(--red);margin-bottom:12px;">${message}</div>
+                        ${retryFn ? `<button class="btn btn-save" onclick="${retryFn}" style="margin-top:8px;">
+                            <i class="fas fa-redo"></i> Poskusi znova
+                        </button>` : ''}
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Show empty state in a container
+        function showEmptyState(containerId, message, icon = 'fa-inbox') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = `
+                <tr>
+                    <td colspan="10" style="padding:40px;text-align:center;color:var(--text-muted);">
+                        <i class="fas ${icon}" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>
+                        <div>${message}</div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // ========== END BULLETPROOF UTILITIES ==========
+        
         // Theme Toggle (Dark/Light Mode)
         function initTheme() {
             const savedTheme = localStorage.getItem('callcenter_theme') || 'light';
@@ -1690,40 +1839,93 @@ Available variables:
             document.getElementById('contentCount-paketomati').textContent = paketCount;
         }
         
-        // Init
+        // Init - Bulletproof version
         async function init() {
-            const res = await fetch('api.php?action=stores');
-            stores = await res.json();
-            renderCountryTabs();
-            setupContentTabs();
-            await loadSmsData();
-            await loadSmsTemplates();
-            await loadAllData();
+            console.log('[Init] Starting application...');
+            const startTime = Date.now();
             
-            // Also load paketomati count
+            // Show global loading state
+            loadingState.show('init');
+            
             try {
-                const paketRes = await fetch('api.php?action=paketomati');
-                paketomatiData = await paketRes.json();
+                // 1. Load stores (critical - app won't work without it)
+                console.log('[Init] Loading stores...');
+                const storesResult = await apiFetch('api.php?action=stores', { 
+                    component: 'Stores',
+                    retries: 3 
+                });
+                
+                if (!storesResult.success || !storesResult.data) {
+                    throw new Error('Napaka pri nalaganju trgovin');
+                }
+                stores = storesResult.data;
+                console.log('[Init] Stores loaded:', stores.length);
+                
+                // 2. Render UI components
+                renderCountryTabs();
+                setupContentTabs();
+                
+                // 3. Load all data in parallel with graceful degradation
+                console.log('[Init] Loading all data in parallel...');
+                const results = await Promise.allSettled([
+                    loadAllDataBulletproof(),
+                    loadSmsDataBulletproof(),
+                    loadSmsTemplatesBulletproof(),
+                    loadPaketomatiBulletproof()
+                ]);
+                
+                // Log results
+                const labels = ['MainData', 'SmsData', 'SmsTemplates', 'Paketomati'];
+                results.forEach((result, i) => {
+                    if (result.status === 'fulfilled') {
+                        console.log(`[Init] ✓ ${labels[i]} loaded successfully`);
+                    } else {
+                        console.error(`[Init] ✗ ${labels[i]} failed:`, result.reason);
+                    }
+                });
+                
+                // Update counts after all data loaded
                 updateContentTabCounts();
-            } catch(e) {}
-            
-            // Show carts tab by default (not dashboard)
-            currentTab = 'carts';
-            currentContentTab = 'carts';
-            document.getElementById('pageTitle').textContent = 'Abandoned Carts';
-            
-            // Show the main content area
-            document.getElementById('dashboardContent').style.display = 'none';
-            document.querySelector('.stats-grid').style.display = 'grid';
-            document.querySelector('.country-tabs').style.display = 'flex';
-            document.getElementById('contentTabs').style.display = 'flex';
-            document.querySelector('.content').style.display = 'block';
-            
-            // Update sidebar
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.querySelector('.nav-item[data-tab="carts"]')?.classList.add('active');
-            
-            renderTable();
+                
+                // 4. Set default view
+                currentTab = 'carts';
+                currentContentTab = 'carts';
+                document.getElementById('pageTitle').textContent = 'Abandoned Carts';
+                
+                // Show the main content area
+                document.getElementById('dashboardContent').style.display = 'none';
+                document.querySelector('.stats-grid').style.display = 'grid';
+                document.querySelector('.country-tabs').style.display = 'flex';
+                document.getElementById('contentTabs').style.display = 'flex';
+                document.querySelector('.content').style.display = 'block';
+                
+                // Update sidebar
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelector('.nav-item[data-tab="carts"]')?.classList.add('active');
+                
+                renderTable();
+                
+                const loadTime = Date.now() - startTime;
+                console.log(`[Init] ✓ Application ready in ${loadTime}ms`);
+                
+            } catch (error) {
+                console.error('[Init] Critical error:', error);
+                showToast(`❌ Napaka pri zagonu: ${error.message}`, 'error');
+                
+                // Show error state in main content
+                document.querySelector('.content').innerHTML = `
+                    <div style="padding:60px;text-align:center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:var(--red);margin-bottom:20px;display:block;"></i>
+                        <h3 style="margin-bottom:12px;">Napaka pri nalaganju aplikacije</h3>
+                        <p style="color:var(--text-muted);margin-bottom:20px;">${error.message}</p>
+                        <button class="btn btn-save" onclick="location.reload()">
+                            <i class="fas fa-redo"></i> Ponovno naloži
+                        </button>
+                    </div>
+                `;
+            } finally {
+                loadingState.hide('init');
+            }
         }
         
         function renderCountryTabs() {
@@ -1785,58 +1987,138 @@ Available variables:
             });
         }
         
-        async function loadAllData() {
-            try {
-                const [cartsRes, pendingRes, buyersRes] = await Promise.all([
-                    fetch('api.php?action=abandoned-carts'),
-                    fetch('api.php?action=pending-orders'),
-                    fetch('api.php?action=one-time-buyers')
-                ]);
-                
-                carts = await cartsRes.json() || [];
-                pending = await pendingRes.json() || [];
-                
-                // Handle buyers response - might be array or error object
-                const buyersData = await buyersRes.json();
-                if (Array.isArray(buyersData)) {
-                    buyers = buyersData;
-                    console.log('[One-time Buyers] Loaded', buyers.length, 'buyers:', buyers.slice(0, 3));
-                } else if (buyersData && buyersData.error) {
-                    console.warn('[One-time Buyers] API error:', buyersData.error);
-                    buyers = [];
-                } else {
-                    console.log('[One-time Buyers] Empty or unexpected response:', buyersData);
-                    buyers = [];
-                }
-                
-                console.log('[Data] Loaded totals:', {carts: carts.length, pending: pending.length, buyers: buyers.length});
-                
-                updateCounts();
-                updateStats();
-                renderTable();
-            } catch (e) {
-                console.error('Error loading data:', e);
-                showToast('Error loading data: ' + e.message, true);
+        // Bulletproof data loading with graceful degradation
+        async function loadAllDataBulletproof() {
+            console.log('[Data] Loading main data...');
+            
+            // Load all in parallel - each can fail independently
+            const [cartsResult, pendingResult, buyersResult] = await Promise.allSettled([
+                apiFetch('api.php?action=abandoned-carts', { component: 'Carts', silent: true }),
+                apiFetch('api.php?action=pending-orders', { component: 'Pending', silent: true }),
+                apiFetch('api.php?action=one-time-buyers', { component: 'Buyers', silent: true })
+            ]);
+            
+            // Process carts
+            if (cartsResult.status === 'fulfilled' && cartsResult.value.success) {
+                carts = Array.isArray(cartsResult.value.data) ? cartsResult.value.data : [];
+                console.log('[Data] ✓ Carts:', carts.length);
+            } else {
+                console.error('[Data] ✗ Carts failed:', cartsResult.reason || cartsResult.value?.error);
+                carts = [];
             }
+            
+            // Process pending
+            if (pendingResult.status === 'fulfilled' && pendingResult.value.success) {
+                pending = Array.isArray(pendingResult.value.data) ? pendingResult.value.data : [];
+                console.log('[Data] ✓ Pending:', pending.length);
+            } else {
+                console.error('[Data] ✗ Pending failed:', pendingResult.reason || pendingResult.value?.error);
+                pending = [];
+            }
+            
+            // Process buyers
+            if (buyersResult.status === 'fulfilled' && buyersResult.value.success) {
+                buyers = Array.isArray(buyersResult.value.data) ? buyersResult.value.data : [];
+                console.log('[Data] ✓ Buyers:', buyers.length);
+            } else {
+                console.error('[Data] ✗ Buyers failed:', buyersResult.reason || buyersResult.value?.error);
+                buyers = [];
+            }
+            
+            console.log('[Data] Totals:', { carts: carts.length, pending: pending.length, buyers: buyers.length });
+            
+            updateCounts();
+            updateStats();
+            renderTable();
+            
+            // Show warning if any failed
+            const failures = [
+                cartsResult.status !== 'fulfilled' || !cartsResult.value?.success ? 'Carts' : null,
+                pendingResult.status !== 'fulfilled' || !pendingResult.value?.success ? 'Pending' : null,
+                buyersResult.status !== 'fulfilled' || !buyersResult.value?.success ? 'Buyers' : null
+            ].filter(Boolean);
+            
+            if (failures.length > 0) {
+                showToast(`⚠️ Nekateri podatki niso bili naloženi: ${failures.join(', ')}`, 'warning');
+            }
+        }
+        
+        // Bulletproof SMS data loading
+        async function loadSmsDataBulletproof() {
+            const result = await apiFetch('api.php?action=sms-queue', { 
+                component: 'SMS Queue', 
+                silent: true 
+            });
+            
+            if (result.success && Array.isArray(result.data)) {
+                smsLog = result.data;
+                console.log('[SMS] ✓ Queue loaded:', smsLog.length);
+            } else {
+                smsLog = [];
+                console.warn('[SMS] ✗ Queue failed, using empty array');
+            }
+        }
+        
+        // Bulletproof SMS templates loading
+        async function loadSmsTemplatesBulletproof() {
+            const result = await apiFetch('api.php?action=sms-templates', { 
+                component: 'SMS Templates', 
+                silent: true 
+            });
+            
+            if (result.success && result.data) {
+                smsTemplates = result.data;
+                console.log('[SMS] ✓ Templates loaded');
+            } else {
+                smsTemplates = {};
+                console.warn('[SMS] ✗ Templates failed, using empty object');
+            }
+        }
+        
+        // Bulletproof Paketomati loading
+        async function loadPaketomatiBulletproof() {
+            const result = await apiFetch('api.php?action=paketomati', { 
+                component: 'Paketomati', 
+                silent: true 
+            });
+            
+            if (result.success && Array.isArray(result.data)) {
+                paketomatiData = result.data;
+                console.log('[Paketomati] ✓ Loaded:', paketomatiData.length);
+            } else {
+                paketomatiData = [];
+                console.warn('[Paketomati] ✗ Failed, using empty array');
+            }
+        }
+        
+        // Legacy loadAllData for backwards compatibility
+        async function loadAllData() {
+            return loadAllDataBulletproof();
         }
         
         async function refreshData() {
+            console.log('[Refresh] Starting data refresh...');
             document.getElementById('tableContainer').innerHTML = renderSkeletonTable(8);
-            await fetch('api.php?action=clear-cache');
-            await loadAllData();
-            showToast('Data refreshed!');
+            
+            try {
+                // Clear cache first
+                await apiFetch('api.php?action=clear-cache', { 
+                    component: 'ClearCache', 
+                    silent: true,
+                    retries: 1 
+                });
+                
+                // Reload all data
+                await loadAllDataBulletproof();
+                showToast('✓ Podatki osveženi!');
+            } catch (e) {
+                console.error('[Refresh] Error:', e);
+                showToast('⚠️ Napaka pri osvežitvi podatkov', 'error');
+            }
         }
         
         async function loadSmsData() {
-            try {
-                // Load SMS queue from API
-                const res = await fetch('api.php?action=sms-queue');
-                smsLog = await res.json();
-                console.log('[SMS] Loaded from API:', smsLog.length, 'items');
-            } catch (e) {
-                console.error('[SMS] Failed to load from API:', e);
-                smsLog = [];
-            }
+            return loadSmsDataBulletproof();
             
             // Automation rules still in localStorage (not critical)
             smsAutomation = JSON.parse(localStorage.getItem('sms_automation') || '[]');
@@ -2741,6 +3023,9 @@ Available variables:
                                             </td>
                                             <td>${store?.flag || '🌍'} ${(sms.storeCode || '').toUpperCase()}</td>
                                             <td style="white-space:nowrap;">
+                                                <button class="action-btn order" onclick="sendSmsFromDashboard('${sms.id}')" title="Pošlji SMS" style="background:var(--accent-green);color:white;">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </button>
                                                 <button class="action-btn" onclick="removeFromQueueApi('${sms.id}')" title="Odstrani">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
@@ -2751,9 +3036,46 @@ Available variables:
                             </tbody>
                         </table>
                     </div>
+                    <div style="margin-top:16px;padding:12px;background:rgba(34,197,94,0.1);border:1px solid var(--accent-green);border-radius:8px;">
+                        <i class="fas fa-info-circle" style="color:var(--accent-green);"></i>
+                        <strong style="color:var(--accent-green);">Pošlji SMS:</strong> Klikni zeleni gumb <i class="fas fa-paper-plane"></i> za pošiljanje SMS-a preko MetaKocka.
+                    </div>
                 `;
             } catch (e) {
-                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka: ${e.message}</p></div>`;
+                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka: ${e.message}</p><button class="btn btn-save" style="margin-top:12px;" onclick="loadSmsDashboardQueue()"><i class="fas fa-redo"></i> Poskusi znova</button></div>`;
+            }
+        }
+        
+        // Send SMS from Dashboard Queue
+        async function sendSmsFromDashboard(smsId) {
+            if (!confirm('Ali si prepričan, da želiš poslati ta SMS?\\n\\n⚠️ SMS bo poslan preko MetaKocka API!')) {
+                return;
+            }
+            
+            // Show loading state
+            showToast('📤 Pošiljam SMS...', false, 'info');
+            
+            try {
+                const res = await fetch('api.php?action=sms-send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: smsId })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast('✅ SMS uspešno poslan!');
+                    // Refresh both queues
+                    await loadSmsDashboardQueue();
+                    await loadSmsData();
+                    renderSmsQueueManagement();
+                    updateStats();
+                } else {
+                    showToast(`❌ Napaka: ${result.error || 'Neznana napaka'}`, true);
+                }
+            } catch (e) {
+                console.error('[SMS] Send failed:', e);
+                showToast('❌ Napaka pri pošiljanju: ' + e.message, true);
             }
         }
         
@@ -2885,17 +3207,25 @@ Available variables:
         let smsTemplatesData = null;
         
         async function loadSmsTemplates() {
-            try {
-                const res = await fetch('api.php?action=sms-templates');
-                smsTemplatesData = await res.json();
+            const result = await apiFetch('api.php?action=sms-templates', {
+                component: 'SMS Templates',
+                silent: true
+            });
+            
+            if (result.success && result.data) {
+                smsTemplatesData = result.data;
+                console.log('[SMS] ✓ Templates loaded');
                 
                 // Populate preview country dropdown
                 const previewCountry = document.getElementById('previewCountry');
-                stores.forEach(s => {
-                    previewCountry.innerHTML += `<option value="${s.code}">${s.flag} ${s.name}</option>`;
-                });
-            } catch (e) {
-                console.error('Failed to load SMS templates:', e);
+                if (previewCountry && stores) {
+                    stores.forEach(s => {
+                        previewCountry.innerHTML += `<option value="${s.code}">${s.flag} ${s.name}</option>`;
+                    });
+                }
+            } else {
+                console.warn('[SMS] ✗ Templates failed:', result.error);
+                smsTemplatesData = {};
             }
         }
         
@@ -5171,17 +5501,38 @@ ${esc(previewBody)}
         async function loadPaketomati() {
             const filter = document.getElementById('paketomatFilter')?.value || 'all';
             console.log('[Paketomati] Loading with filter:', filter);
-            document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam naročila iz MetaKocka...</td></tr>';
             
-            try {
-                const res = await fetch(`api.php?action=paketomati&filter=${filter}`);
-                paketomatiData = await res.json();
-                console.log('[Paketomati] Loaded', paketomatiData.length, 'orders:', paketomatiData);
+            // Show loading state
+            document.getElementById('paketomatiTableBody').innerHTML = `
+                <tr><td colspan="9" style="padding:40px;text-align:center;">
+                    <div class="spinner" style="margin:0 auto 16px;"></div>
+                    <div style="color:var(--text-muted);">Nalagam podatke iz MetaKocka...</div>
+                </td></tr>
+            `;
+            
+            const result = await apiFetch(`api.php?action=paketomati&filter=${filter}`, {
+                component: 'Paketomati',
+                timeout: 30000, // 30s timeout for MetaKocka
+                retries: 2
+            });
+            
+            if (result.success && Array.isArray(result.data)) {
+                paketomatiData = result.data;
+                console.log('[Paketomati] ✓ Loaded', paketomatiData.length, 'orders');
                 renderPaketomatiTable();
                 updatePaketomatiCount();
-            } catch (e) {
-                console.error('[Paketomati] Error loading:', e);
-                document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" style="color:var(--red);">Napaka pri nalaganju podatkov</td></tr>';
+            } else {
+                console.error('[Paketomati] ✗ Failed:', result.error);
+                paketomatiData = [];
+                document.getElementById('paketomatiTableBody').innerHTML = `
+                    <tr><td colspan="9" style="padding:40px;text-align:center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size:32px;color:var(--red);margin-bottom:12px;display:block;"></i>
+                        <div style="color:var(--red);margin-bottom:12px;">Napaka pri nalaganju: ${result.error || 'Unknown error'}</div>
+                        <button class="btn btn-save" onclick="loadPaketomati()" style="margin-top:8px;">
+                            <i class="fas fa-redo"></i> Poskusi znova
+                        </button>
+                    </td></tr>
+                `;
             }
         }
         
@@ -5341,9 +5692,10 @@ ${esc(previewBody)}
         }
         
         async function refreshPaketomati() {
-            await fetch('api.php?action=clear-cache');
+            console.log('[Paketomati] Refreshing...');
+            await apiFetch('api.php?action=clear-cache', { component: 'ClearCache', silent: true, retries: 1 });
             await loadPaketomati();
-            showToast('Paketomati osveženi!');
+            showToast('✓ Paketomati osveženi!');
         }
         
         function updatePaketomatiCount() {

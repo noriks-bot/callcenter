@@ -666,17 +666,30 @@ function fetchOneTimeBuyers($storeFilter = null) {
     foreach ($storesToFetch as $storeCode => $config) {
         if (!$config) continue;
         
-        // Fetch completed/processing orders from last 90 days
-        $orders = wcApiRequest($storeCode, 'orders', [
-            'per_page' => 100,
-            'status' => 'processing,completed',
-            'orderby' => 'date',
-            'order' => 'desc',
-            'after' => date('Y-m-d\TH:i:s', strtotime('-90 days'))
-        ]);
+        // FIX: Fetch MORE orders - pagination up to 5 pages (500 orders)
+        // NO date filter to get maximum data
+        $allOrders = [];
+        $maxPages = 5;
         
-        // Skip if not array or if it's an error response
-        if (!is_array($orders) || isset($orders['error'])) continue;
+        for ($page = 1; $page <= $maxPages; $page++) {
+            $orders = wcApiRequest($storeCode, 'orders', [
+                'per_page' => 100,
+                'status' => 'processing,completed',
+                'orderby' => 'date',
+                'order' => 'desc',
+                'page' => $page
+            ]);
+            
+            // Skip if not array or if it's an error response
+            if (!is_array($orders) || isset($orders['error']) || empty($orders)) break;
+            
+            $allOrders = array_merge($allOrders, $orders);
+            
+            // If we got less than 100, there are no more pages
+            if (count($orders) < 100) break;
+        }
+        
+        $orders = $allOrders;
         
         // Group orders by email
         $customerOrders = [];
