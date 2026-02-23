@@ -1,0 +1,116 @@
+{
+  "templates": [
+    {
+      "id": "abandoned_cart_hr",
+      "storeCode": "hr",
+      "type": "abandoned_cart",
+      "subject": "Zaboravili ste nešto u košarici! 🛒",
+      "template": "Poštovani {ime},\n\nPrimijetili smo da ste ostavili {produkt} u svojoj košarici.\n\nNemojte propustiti - završite svoju narudžbu danas i uživajte u kvalitetnim Noriks proizvodima!\n\n👉 {link}\n\nAko imate pitanja, slobodno nas kontaktirajte.\n\nSrdačan pozdrav,\nNoriks Tim",
+      "language": "hr"
+    },
+    {
+      "id": "abandoned_cart_cz",
+      "storeCode": "cz",
+      "type": "abandoned_cart",
+      "subject": "Zapomněli jste něco v košíku! 🛒",
+      "template": "Vážený/á {ime},\n\nVšimli jsme si, že jste nechali {produkt} v košíku.\n\nNezmeškejte to – dokončete svou objednávku ještě dnes!\n\n👉 {link}\n\nMáte-li jakékoliv dotazy, neváhejte nás kontaktovat.\n\nS pozdravem,\nTým Noriks",
+      "language": "cs"
+    },
+    {
+      "id": "abandoned_cart_pl",
+      "storeCode": "pl",
+      "type": "abandoned_cart",
+      "subject": "Zostawiłeś coś w koszyku! 🛒",
+      "template": "Szanowny/a {ime},\n\nZauważyliśmy, że zostawiłeś {produkt} w koszyku.\n\nNie przegap okazji – dokończ swoje zamówienie już dziś!\n\n👉 {link}\n\nJeśli masz pytania, skontaktuj się z nami.\n\nPozdrawiamy,\nZespół Noriks",
+      "language": "pl"
+    },
+    {
+      "id": "abandoned_cart_gr",
+      "storeCode": "gr",
+      "type": "abandoned_cart",
+      "subject": "Ξεχάσατε κάτι στο καλάθι σας! 🛒",
+      "template": "Αγαπητέ/ή {ime},\n\nΠαρατηρήσαμε ότι αφήσατε {produkt} στο καλάθι σας.\n\nΜην το χάσετε – ολοκληρώστε την παραγγελία σας σήμερα!\n\n👉 {link}\n\nΑν έχετε ερωτήσεις, επικοινωνήστε μαζί μας.\n\nΜε εκτίμηση,\nΟμάδα Noriks",
+      "language": "el"
+    },
+    {
+      "id": "abandoned_cart_sk",
+      "storeCode": "sk",
+      "type": "abandoned_cart",
+      "subject": "Zabudli ste niečo v košíku! 🛒",
+      "template": "Vážený/á {ime},\n\nVšimli sme si, že ste nechali {produkt} v košíku.\n\nNezmeškajte to – dokončite svoju objednávku ešte dnes!\n\n👉 {link}\n\nAk máte akékoľvek otázky, neváhajte nás kontaktovať.\n\nS pozdravom,\nTím Noriks",
+      "language": "sk"
+    },
+    {
+      "id": "abandoned_cart_it",
+      "storeCode": "it",
+      "type": "abandoned_cart",
+      "subject": "Hai dimenticato qualcosa nel carrello! 🛒",
+      "template": "Gentile {ime},\n\nAbbiamo notato che hai lasciato {produkt} nel tuo carrello.\n\nNon lasciarti sfuggire questa opportunità – completa il tuo ordine oggi!\n\n👉 {link}\n\nSe hai domande, non esitare a contattarci.\n\nCordiali saluti,\nTeam Noriks",
+      "language": "it"
+    },
+    {
+      "id": "abandoned_cart_hu",
+      "storeCode": "hu",
+      "type": "abandoned_cart",
+      "subject": "Elfelejtettél valamit a kosaradban! 🛒",
+      "template": "Kedves {ime}!\n\nÉszrevettük, hogy a {produkt} a kosaradban maradt.\n\nNe hagyd ki – fejezd be a rendelésedet még ma!\n\n👉 {link}\n\nHa kérdésed van, fordulj hozzánk bizalommal.\n\nÜdvözlettel,\nNoriks Csapat",
+      "language": "hu"
+    },
+    {
+      "id": "winback_hr",
+      "storeCode": "hr",
+      "type": "winback",
+      "subject": "Nedostajete nam! 💚 Specijalna ponuda samo za vas",
+      "template": "Poštovani {ime},\n\nProšlo je već neko vrijeme od vaše zadnje kupovine kod nas i nedostajete nam!\n\nKao poseban znak zahvalnosti, pripremili smo ekskluzivnu ponudu samo za vas.\n\n👉 {link}\n\nVidimo se uskoro!\n\nSrdačan pozdrav,\nNoriks Tim",
+      "language": "hr"
+    },
+    {
+      "id": "winback_cz",
+      "storeCode": "cz",
+      "type": "winback",
+      "subject": "Chybíte nám! 💚 Speciální nabídka jen pro vás",
+      "template": "Vážený/á {ime},\n\nUž je to nějaký čas od vašeho posledního nákupu a chybíte nám!\n\nJako zvláštní poděkování jsme pro vás připravili exkluzivní nabídku.\n\n👉 {link}\n\nTěšíme se na vás!\n\nS pozdravem,\nTým Noriks",
+      "language": "cs"
+    },
+    {
+      "id": "winback_pl",
+      "storeCode": "pl",
+      "type": "winback",
+      "subject": "Tęsknimy za Tobą! 💚 Specjalna oferta tylko dla Ciebie",
+      "template": "Szanowny/a {ime},\n\nMinęło już trochę czasu od Twojego ostatniego zakupu i tęsknimy!\n\nJako specjalne podziękowanie przygotowaliśmy ekskluzywną ofertę tylko dla Ciebie.\n\n👉 {link}\n\nDo zobaczenia!\n\nPozdrawiamy,\nZespół Noriks",
+      "language": "pl"
+    },
+    {
+      "id": "winback_gr",
+      "storeCode": "gr",
+      "type": "winback",
+      "subject": "Μας λείπετε! 💚 Ειδική προσφορά μόνο για εσάς",
+      "template": "Αγαπητέ/ή {ime},\n\nΠέρασε αρκετός καιρός από την τελευταία σας αγορά και μας λείπετε!\n\nΩς ειδική ευχαριστία, ετοιμάσαμε μια αποκλειστική προσφορά μόνο για εσάς.\n\n👉 {link}\n\nΣας περιμένουμε!\n\nΜε εκτίμηση,\nΟμάδα Noriks",
+      "language": "el"
+    },
+    {
+      "id": "winback_sk",
+      "storeCode": "sk",
+      "type": "winback",
+      "subject": "Chýbate nám! 💚 Špeciálna ponuka len pre vás",
+      "template": "Vážený/á {ime},\n\nUž je to nejaký čas od vášho posledného nákupu a chýbate nám!\n\nAko zvláštne poďakovanie sme pre vás pripravili exkluzívnu ponuku.\n\n👉 {link}\n\nTešíme sa na vás!\n\nS pozdravom,\nTím Noriks",
+      "language": "sk"
+    },
+    {
+      "id": "winback_it",
+      "storeCode": "it",
+      "type": "winback",
+      "subject": "Ci manchi! 💚 Offerta speciale solo per te",
+      "template": "Gentile {ime},\n\nÈ passato un po' di tempo dal tuo ultimo acquisto e ci manchi!\n\nCome ringraziamento speciale, abbiamo preparato un'offerta esclusiva solo per te.\n\n👉 {link}\n\nA presto!\n\nCordiali saluti,\nTeam Noriks",
+      "language": "it"
+    },
+    {
+      "id": "winback_hu",
+      "storeCode": "hu",
+      "type": "winback",
+      "subject": "Hiányolunk! 💚 Különleges ajánlat csak neked",
+      "template": "Kedves {ime}!\n\nMár eltelt egy kis idő az utolsó vásárlásod óta, és hiányzol nekünk!\n\nKülönleges köszönetként egy exkluzív ajánlatot készítettünk csak neked.\n\n👉 {link}\n\nVárunk vissza!\n\nÜdvözlettel,\nNoriks Csapat",
+      "language": "hu"
+    }
+  ]
+}

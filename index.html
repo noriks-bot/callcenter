@@ -1409,7 +1409,7 @@
             </div>
             
             <div class="nav-section">
-                <div class="nav-title">SMS</div>
+                <div class="nav-title">Messaging</div>
                 <div class="nav-item" data-tab="sms-dashboard">
                     <i class="fas fa-comment-sms"></i>
                     <span>SMS Dashboard</span>
@@ -1418,6 +1418,10 @@
                 <div class="nav-item" data-tab="sms-settings">
                     <i class="fas fa-cog"></i>
                     <span>SMS Settings</span>
+                </div>
+                <div class="nav-item" data-tab="email-templates">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email Templates</span>
                 </div>
             </div>
             
@@ -2113,6 +2117,75 @@
         </div>
     </div>
     
+    <!-- Email Templates Content -->
+    <div id="emailTemplatesContent" style="display:none;padding:24px;">
+        <div style="max-width:1000px;">
+            <div class="table-card" style="padding:24px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                    <div>
+                        <h3 style="margin-bottom:8px;">📧 Email Templates</h3>
+                        <p style="color:var(--text-muted);">Urejaj email predloge za abandoned cart in winback kampanje.</p>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <select class="filter-select" id="emailTemplateTypeFilter" onchange="filterEmailTemplates()">
+                            <option value="">All Types</option>
+                            <option value="abandoned_cart">Abandoned Cart</option>
+                            <option value="winback">Winback</option>
+                        </select>
+                        <select class="filter-select" id="emailTemplateCountryFilter" onchange="filterEmailTemplates()">
+                            <option value="">All Countries</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="emailTemplatesContainer">
+                    <div class="loading"><div class="spinner"></div>Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Email Template Edit Modal -->
+    <div class="modal-bg" id="emailTemplateModal">
+        <div class="modal" style="max-width:600px;">
+            <div class="modal-header">
+                <div class="modal-title">✏️ Edit Email Template</div>
+                <button class="modal-close" onclick="closeModal('emailTemplateModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="emailTemplateId">
+                
+                <div class="form-group">
+                    <label class="form-label">Subject Line</label>
+                    <input type="text" class="form-input" id="emailTemplateSubject" placeholder="Email subject...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Body</label>
+                    <textarea class="form-textarea" id="emailTemplateBody" rows="12" placeholder="Email content...
+                    
+Available variables:
+{ime} - Customer first name
+{produkt} - Product name
+{link} - Store link"></textarea>
+                </div>
+                
+                <div style="background:var(--bg-dark);padding:12px;border-radius:8px;font-size:12px;color:var(--text-muted);">
+                    <strong>Dostopne spremenljivke:</strong><br>
+                    <code>{ime}</code> - Ime stranke<br>
+                    <code>{produkt}</code> - Ime produkta<br>
+                    <code>{link}</code> - Link do trgovine
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('emailTemplateModal')">Prekliči</button>
+                <button class="btn btn-save" onclick="saveEmailTemplate()">
+                    <i class="fas fa-save"></i> Shrani
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Call Log Modal -->
     <div class="modal-bg" id="callLogModal">
         <div class="modal">
@@ -2316,6 +2389,7 @@
                     buyers: 'Enkratni kupci',
                     'sms-dashboard': 'SMS Dashboard',
                     'sms-settings': 'SMS Provider Settings',
+                    'email-templates': 'Email Templates',
                     'agents': 'Agent Management',
                     'followups': 'My Follow-ups',
                     'analytics': 'Analytics'
@@ -2323,10 +2397,11 @@
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
                 
                 // Show/hide content based on tab
-                const hideTabs = ['sms-dashboard', 'sms-settings', 'dashboard', 'agents', 'followups', 'analytics'];
+                const hideTabs = ['sms-dashboard', 'sms-settings', 'email-templates', 'dashboard', 'agents', 'followups', 'analytics'];
                 document.getElementById('dashboardContent').style.display = currentTab === 'dashboard' ? 'block' : 'none';
                 document.getElementById('smsDashboardContent').style.display = currentTab === 'sms-dashboard' ? 'block' : 'none';
                 document.getElementById('smsSettingsContent').style.display = currentTab === 'sms-settings' ? 'block' : 'none';
+                document.getElementById('emailTemplatesContent').style.display = currentTab === 'email-templates' ? 'block' : 'none';
                 document.getElementById('agentsContent').style.display = currentTab === 'agents' ? 'block' : 'none';
                 document.getElementById('followupsContent').style.display = currentTab === 'followups' ? 'block' : 'none';
                 document.getElementById('analyticsContent').style.display = currentTab === 'analytics' ? 'block' : 'none';
@@ -2340,6 +2415,8 @@
                     renderSmsTable();
                 } else if (currentTab === 'sms-settings') {
                     loadSmsSettingsUI();
+                } else if (currentTab === 'email-templates') {
+                    loadEmailTemplatesUI();
                 } else if (currentTab === 'agents') {
                     loadAgents();
                 } else if (currentTab === 'followups') {
@@ -5436,6 +5513,208 @@
                 }
             }, 100);
         };
+        
+        // ========== EMAIL TEMPLATES ==========
+        let emailTemplates = [];
+        let editingEmailTemplateId = null;
+        
+        async function loadEmailTemplatesUI() {
+            const container = document.getElementById('emailTemplatesContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+            
+            try {
+                const res = await fetch('api.php?action=email-templates');
+                const data = await res.json();
+                emailTemplates = data.templates || [];
+                
+                // Populate country filter
+                const countryFilter = document.getElementById('emailTemplateCountryFilter');
+                const countrySet = new Set(emailTemplates.map(t => t.storeCode));
+                countryFilter.innerHTML = '<option value="">All Countries</option>' +
+                    Array.from(countrySet).map(code => {
+                        const store = stores.find(s => s.code === code);
+                        return `<option value="${code}">${store?.flag || ''} ${code.toUpperCase()}</option>`;
+                    }).join('');
+                
+                filterEmailTemplates();
+            } catch (e) {
+                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
+            }
+        }
+        
+        function filterEmailTemplates() {
+            const typeFilter = document.getElementById('emailTemplateTypeFilter').value;
+            const countryFilter = document.getElementById('emailTemplateCountryFilter').value;
+            
+            let filtered = emailTemplates;
+            if (typeFilter) filtered = filtered.filter(t => t.type === typeFilter);
+            if (countryFilter) filtered = filtered.filter(t => t.storeCode === countryFilter);
+            
+            renderEmailTemplates(filtered);
+        }
+        
+        function renderEmailTemplates(templates) {
+            const container = document.getElementById('emailTemplatesContainer');
+            
+            if (templates.length === 0) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-envelope-open"></i><p>No email templates found</p></div>';
+                return;
+            }
+            
+            const typeIcons = {
+                abandoned_cart: '🛒',
+                winback: '💚',
+                order_confirmation: '✅'
+            };
+            
+            const typeLabels = {
+                abandoned_cart: 'Abandoned Cart',
+                winback: 'Winback',
+                order_confirmation: 'Order Confirmation'
+            };
+            
+            container.innerHTML = `
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Country</th>
+                                <th>Type</th>
+                                <th>Subject</th>
+                                <th>Preview</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${templates.map(t => {
+                                const store = stores.find(s => s.code === t.storeCode);
+                                return `
+                                    <tr>
+                                        <td>${store?.flag || ''} ${t.storeCode.toUpperCase()}</td>
+                                        <td>
+                                            <span class="badge" style="background:rgba(59,130,246,0.2);color:var(--accent);">
+                                                ${typeIcons[t.type] || '📧'} ${typeLabels[t.type] || t.type}
+                                            </span>
+                                        </td>
+                                        <td><strong>${esc(t.subject)}</strong></td>
+                                        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-muted);font-size:13px;">
+                                            ${esc(t.template.substring(0, 80))}...
+                                        </td>
+                                        <td>
+                                            <button class="action-btn" onclick="editEmailTemplate('${t.id}')" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="previewEmailTemplate('${t.id}')" title="Preview" style="background:rgba(168,85,247,0.2);color:var(--purple);">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function editEmailTemplate(templateId) {
+            const template = emailTemplates.find(t => t.id === templateId);
+            if (!template) return;
+            
+            editingEmailTemplateId = templateId;
+            document.getElementById('emailTemplateId').value = templateId;
+            document.getElementById('emailTemplateSubject').value = template.subject;
+            document.getElementById('emailTemplateBody').value = template.template;
+            
+            document.getElementById('emailTemplateModal').classList.add('open');
+        }
+        
+        async function saveEmailTemplate() {
+            const templateId = document.getElementById('emailTemplateId').value;
+            const subject = document.getElementById('emailTemplateSubject').value;
+            const body = document.getElementById('emailTemplateBody').value;
+            
+            if (!subject || !body) {
+                showToast('Please fill in all fields', true);
+                return;
+            }
+            
+            // Update in local array
+            const idx = emailTemplates.findIndex(t => t.id === templateId);
+            if (idx >= 0) {
+                emailTemplates[idx].subject = subject;
+                emailTemplates[idx].template = body;
+            }
+            
+            // Save to server
+            try {
+                const res = await fetch('api.php?action=email-templates-save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ templates: emailTemplates })
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    showToast('Email template saved!');
+                    closeModal('emailTemplateModal');
+                    filterEmailTemplates();
+                } else {
+                    showToast(result.error || 'Failed to save template', true);
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, true);
+            }
+        }
+        
+        function previewEmailTemplate(templateId) {
+            const template = emailTemplates.find(t => t.id === templateId);
+            if (!template) return;
+            
+            // Sample data for preview
+            const previewData = {
+                ime: 'Marko',
+                produkt: 'Noriks Ortopedski Čevlji',
+                link: 'https://noriks.com/' + template.storeCode
+            };
+            
+            let previewSubject = template.subject;
+            let previewBody = template.template;
+            
+            // Replace variables
+            Object.entries(previewData).forEach(([key, value]) => {
+                previewSubject = previewSubject.replace(new RegExp(`{${key}}`, 'g'), value);
+                previewBody = previewBody.replace(new RegExp(`{${key}}`, 'g'), value);
+            });
+            
+            // Show in alert or modal
+            const store = stores.find(s => s.code === template.storeCode);
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-bg open';
+            modal.id = 'emailPreviewModal';
+            modal.innerHTML = `
+                <div class="modal" style="max-width:600px;">
+                    <div class="modal-header">
+                        <div class="modal-title">📧 Email Preview - ${store?.flag || ''} ${template.storeCode.toUpperCase()}</div>
+                        <button class="modal-close" onclick="document.getElementById('emailPreviewModal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="background:var(--bg-dark);padding:16px;border-radius:8px;margin-bottom:16px;">
+                            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">Subject:</div>
+                            <div style="font-weight:600;font-size:16px;">${esc(previewSubject)}</div>
+                        </div>
+                        <div style="background:white;color:#333;padding:24px;border-radius:8px;white-space:pre-wrap;line-height:1.6;font-size:14px;">
+${esc(previewBody)}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-cancel" onclick="document.getElementById('emailPreviewModal').remove()">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
         
         init();
     </script>

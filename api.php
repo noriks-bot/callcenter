@@ -1229,6 +1229,28 @@ try {
             }
             break;
             
+        case 'email-templates':
+            $templatesFile = __DIR__ . '/email-templates.json';
+            if (file_exists($templatesFile)) {
+                $templates = json_decode(file_get_contents($templatesFile), true);
+                echo json_encode($templates);
+            } else {
+                echo json_encode(['error' => 'Email templates file not found']);
+            }
+            break;
+            
+        case 'email-templates-save':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $templatesFile = __DIR__ . '/email-templates.json';
+            file_put_contents($templatesFile, json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            echo json_encode(['success' => true]);
+            break;
+            
         case 'clear-cache':
             global $cacheDir;
             if (is_dir($cacheDir)) array_map('unlink', glob($cacheDir . '*.json'));
