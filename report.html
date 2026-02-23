@@ -5,329 +5,419 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report - Noriks Call Center</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        :root {
-            --radius: 6px;
-            --radius-lg: 8px;
-            --radius-xl: 12px;
-        }
-
-        .sidebar { transition: transform 0.3s ease; }
-        .sidebar.collapsed { transform: translateX(-100%); }
-        .main { transition: margin-left 0.3s ease; }
-        .main.expanded { margin-left: 0; }
-
-        .sidebar-toggle-wrapper {
-            padding: 12px 16px;
-            border-top: 1px solid var(--border-subtle);
-            margin-top: auto;
-        }
-
-        .sidebar-toggle {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--bg-overlay);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-
-        .sidebar-toggle:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        .sidebar-expand-btn {
-            position: fixed;
-            left: 12px;
-            bottom: 12px;
-            z-index: 101;
-            width: 40px;
-            height: 40px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius);
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: var(--text-muted);
-        }
-
-        .sidebar-expand-btn.visible { display: flex; }
-
-        .content { padding: 20px 24px 40px !important; }
-        .topbar { height: 56px !important; padding: 0 24px !important; }
-        .page-title { font-size: 17px !important; }
-
-        .table-card { border-radius: var(--radius-lg) !important; }
-        .table-header { padding: 12px 16px !important; }
-        .table-title { font-size: 13px !important; }
-        th { padding: 10px 14px !important; font-size: 10px !important; }
-        td { padding: 10px 14px !important; font-size: 13px !important; }
-
-        .stat-row td { font-weight: 600; }
-        .stat-row.total { background: var(--accent-primary-soft); }
-        .stat-row.total td { font-weight: 700; }
-
-        .text-green { color: var(--accent-green); }
-        .text-amber { color: var(--accent-amber); }
-        .text-red { color: var(--accent-red); }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
-    <button class="sidebar-expand-btn" onclick="toggleSidebarCollapse()" id="sidebarExpand">☰</button>
-    <nav class="sidebar" id="sidebar">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-brand">
-                <div class="sidebar-logo">N</div>
-                <div>
-                    <div class="sidebar-title">Noriks</div>
-                    <div class="sidebar-subtitle">Call Center</div>
+            <div class="sidebar-logo">N</div>
+            <span class="sidebar-title">Call Center</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main Menu</div>
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Abandoned Carts</span>
+                </a>
+                <a href="report.html" class="nav-item active">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">N</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Noriks</div>
+                    <div class="user-role" id="userRole">Admin</div>
                 </div>
-            </div>
-        </div>
-        <div class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">Menu</div>
-                <a href="/callcenter/" class="nav-item">
-                    <span class="nav-icon">📞</span>
-                    Contacts
-                </a>
-                <a href="/callcenter/report" class="nav-item active">
-                    <span class="nav-icon">📊</span>
-                    Report
-                </a>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Account</div>
-                <a href="#" class="nav-item" onclick="logout(); return false;">
-                    <span class="nav-icon">🚪</span>
-                    Logout
-                </a>
-            </div>
-        </div>
-        <div class="sidebar-toggle-wrapper">
-            <button class="sidebar-toggle" onclick="toggleSidebarCollapse()">
-                <span>◀</span> Hide Sidebar
-            </button>
-        </div>
-    </nav>
-
-    <main class="main">
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
-                <h1 class="page-title">Report</h1>
-            </div>
-            <div class="topbar-right">
-                <span id="userBadge" style="font-size: 13px; color: var(--text-muted);"></span>
-                <button class="theme-toggle" onclick="toggleTheme()">
-                    <span id="themeIcon">🌙</span>
-                    <span id="themeText">Dark</span>
+                <button onclick="logout()" style="background: none; border: none; color: var(--sidebar-text); cursor: pointer; padding: 8px;">
+                    <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
-        </header>
-
-        <div class="content">
-            <div class="table-card">
-                <div class="table-header">
-                    <div class="table-title">
-                        <span>📊</span>
-                        Call Statistics by Country
-                    </div>
-                </div>
-                <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Country</th>
-                                <th>Total</th>
-                                <th>Not Called</th>
-                                <th>No Answer</th>
-                                <th>Callback</th>
-                                <th>Converted</th>
-                                <th>Not Interested</th>
-                                <th>Conv. Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody id="statsBody">
-                            <tr><td colspan="8"><div class="loading"><span class="spinner"></span> Loading...</div></td></tr>
-                        </tbody>
-                    </table>
+        </div>
+    </aside>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <a href="index.html">Call Center</a>
+                    <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+                    <span class="current">Statistics</span>
                 </div>
             </div>
-
-            <div class="table-card" style="margin-top: 20px;">
-                <div class="table-header">
-                    <div class="table-title">
-                        <span>🚫</span>
-                        Suppressed Profiles Statistics
+            <div class="header-right">
+                <button class="header-btn" onclick="loadStats()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <div class="header-avatar" id="headerAvatar">N</div>
+            </div>
+        </header>
+        
+        <!-- Page Content -->
+        <div class="page-content">
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statCountries">0</div>
+                    <div class="stat-label">Active Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statTotalCarts">0</div>
+                    <div class="stat-label">Total Abandoned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statConverted">0</div>
+                    <div class="stat-label">Converted</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statConvRate">0%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                </div>
+            </div>
+            
+            <!-- Country Stats Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Call Statistics by Country
+                    </h2>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary" onclick="loadStats()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
                     </div>
                 </div>
-                <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Metric</th>
-                                <th>Count</th>
-                            </tr>
-                        </thead>
-                        <tbody id="suppressedStats">
-                            <tr><td colspan="2"><div class="loading"><span class="spinner"></span> Loading...</div></td></tr>
-                        </tbody>
-                    </table>
+                
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Country</th>
+                                    <th>Total</th>
+                                    <th>Not Called</th>
+                                    <th>Called</th>
+                                    <th>Answered</th>
+                                    <th>No Answer</th>
+                                    <th>Converted</th>
+                                    <th>Not Interested</th>
+                                    <th>Conv. Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="countryStats">
+                                <tr>
+                                    <td colspan="9">
+                                        <div class="loading">
+                                            <div class="loading-spinner"></div>
+                                            Loading statistics...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suppressed Profiles Stats -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-user-slash"></i>
+                        Suppressed Profiles Statistics
+                    </h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suppressedStats">
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="loading">
+                                            <div class="loading-spinner"></div>
+                                            Loading...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Orders Stats -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-clock"></i>
+                        Pending Orders Statistics
+                    </h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Country</th>
+                                    <th>Pending</th>
+                                    <th>Cancelled</th>
+                                    <th>Failed</th>
+                                    <th>On Hold</th>
+                                    <th>Total Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingStats">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="loading">
+                                            <div class="loading-spinner"></div>
+                                            Loading...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
-
+    
     <script>
-        // Check auth
-        const user = JSON.parse(localStorage.getItem('callcenter-user') || 'null');
+        // Check auth - use same key as index.html
+        const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
         if (!user) {
-            window.location.href = '/callcenter/login';
+            window.location.href = 'login.html';
         } else {
-            document.getElementById('userBadge').textContent = `👤 ${user.username}`;
+            document.getElementById('userName').textContent = user.username;
+            document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Agent';
+            document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
+            document.getElementById('headerAvatar').textContent = user.username[0].toUpperCase();
         }
-
+        
+        // Mobile sidebar
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        });
+        
+        document.getElementById('sidebarOverlay').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        });
+        
         function logout() {
-            localStorage.removeItem('callcenter-user');
-            window.location.href = '/callcenter/login';
+            localStorage.removeItem('callcenter_user');
+            window.location.href = 'login.html';
         }
-
-        // Theme
-        function toggleTheme() {
-            const html = document.documentElement;
-            const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('callcenter-theme', newTheme);
-            document.getElementById('themeIcon').textContent = newTheme === 'light' ? '☀️' : '🌙';
-            document.getElementById('themeText').textContent = newTheme === 'light' ? 'Light' : 'Dark';
-        }
-
-        const savedTheme = localStorage.getItem('callcenter-theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.getElementById('themeIcon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
-        document.getElementById('themeText').textContent = savedTheme === 'light' ? 'Light' : 'Dark';
-
-        // Sidebar
-        function toggleMobileSidebar() {
-            document.querySelector('.sidebar').classList.toggle('open');
-            document.querySelector('.sidebar-overlay').classList.toggle('open');
-        }
-
-        function toggleSidebarCollapse() {
-            const sidebar = document.getElementById('sidebar');
-            const main = document.querySelector('.main');
-            const expandBtn = document.getElementById('sidebarExpand');
-            const isCollapsed = sidebar.classList.toggle('collapsed');
-            main.classList.toggle('expanded', isCollapsed);
-            expandBtn.classList.toggle('visible', isCollapsed);
-            localStorage.setItem('sidebar-collapsed', isCollapsed);
-        }
-
-        if (localStorage.getItem('sidebar-collapsed') === 'true') {
-            document.getElementById('sidebar').classList.add('collapsed');
-            document.querySelector('.main').classList.add('expanded');
-            document.getElementById('sidebarExpand').classList.add('visible');
-        }
-
-        // Load stats
+        
+        // Load statistics
         async function loadStats() {
-            const [carts, profiles] = await Promise.all([
-                fetch('/callcenter/api/abandoned-carts').then(r => r.json()),
-                fetch('/callcenter/api/suppressed-profiles').then(r => r.json())
-            ]);
-
-            // Filter by user countries
-            let filteredCarts = carts;
-            if (!user.countries.includes('all')) {
-                filteredCarts = carts.filter(c => user.countries.includes(c.storeCode));
+            try {
+                const [carts, profiles, orders] = await Promise.all([
+                    fetch('api.php?action=abandoned-carts').then(r => r.json()).catch(() => []),
+                    fetch('api.php?action=suppressed-profiles').then(r => r.json()).catch(() => []),
+                    fetch('api.php?action=pending-orders').then(r => r.json()).catch(() => [])
+                ]);
+                
+                // Filter by user countries if not admin
+                let filteredCarts = carts;
+                let filteredOrders = orders;
+                if (user && !user.countries.includes('all')) {
+                    filteredCarts = carts.filter(c => user.countries.includes(c.storeCode));
+                    filteredOrders = orders.filter(o => user.countries.includes(o.storeCode));
+                }
+                
+                renderCountryStats(filteredCarts);
+                renderSuppressedStats(profiles);
+                renderPendingStats(filteredOrders);
+                
+            } catch (e) {
+                console.error('Failed to load stats:', e);
             }
-
-            // Group by country
+        }
+        
+        function renderCountryStats(carts) {
             const byCountry = {};
             const flags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', gr: '🇬🇷', it: '🇮🇹', hu: '🇭🇺' };
-
-            filteredCarts.forEach(c => {
+            
+            carts.forEach(c => {
                 if (!byCountry[c.storeCode]) {
                     byCountry[c.storeCode] = {
                         flag: flags[c.storeCode] || '🌍',
-                        name: c.storeName,
+                        name: c.storeName || c.storeCode.toUpperCase(),
                         total: 0,
                         not_called: 0,
-                        called_no_answer: 0,
-                        callback_scheduled: 0,
+                        called: 0,
+                        answered: 0,
+                        no_answer: 0,
                         converted: 0,
                         not_interested: 0
                     };
                 }
                 byCountry[c.storeCode].total++;
-                byCountry[c.storeCode][c.callStatus]++;
+                const status = c.callStatus || 'not_called';
+                if (byCountry[c.storeCode][status] !== undefined) {
+                    byCountry[c.storeCode][status]++;
+                }
             });
-
-            // Render country stats
-            const totals = { total: 0, not_called: 0, called_no_answer: 0, callback_scheduled: 0, converted: 0, not_interested: 0 };
+            
+            const totals = { total: 0, not_called: 0, called: 0, answered: 0, no_answer: 0, converted: 0, not_interested: 0 };
             let html = '';
-
-            Object.entries(byCountry).forEach(([code, s]) => {
+            
+            Object.entries(byCountry).sort((a, b) => b[1].total - a[1].total).forEach(([code, s]) => {
                 const rate = s.total > 0 ? ((s.converted / s.total) * 100).toFixed(1) : '0.0';
-                html += `<tr class="stat-row">
-                    <td>${s.flag} ${s.name}</td>
-                    <td>${s.total}</td>
+                const rateClass = parseFloat(rate) >= 10 ? 'converted' : parseFloat(rate) >= 5 ? 'answered' : '';
+                
+                html += `<tr>
+                    <td><span class="store-badge"><span class="store-flag">${s.flag}</span> ${s.name}</span></td>
+                    <td><strong>${s.total}</strong></td>
                     <td>${s.not_called}</td>
-                    <td>${s.called_no_answer}</td>
-                    <td>${s.callback_scheduled}</td>
-                    <td class="text-green">${s.converted}</td>
-                    <td class="text-red">${s.not_interested}</td>
-                    <td class="${parseFloat(rate) >= 10 ? 'text-green' : parseFloat(rate) >= 5 ? 'text-amber' : ''}">${rate}%</td>
+                    <td>${s.called}</td>
+                    <td>${s.answered}</td>
+                    <td>${s.no_answer}</td>
+                    <td><span class="status-badge converted">${s.converted}</span></td>
+                    <td><span class="status-badge not_interested">${s.not_interested}</span></td>
+                    <td><span class="status-badge ${rateClass}">${rate}%</span></td>
                 </tr>`;
                 
-                Object.keys(totals).forEach(k => totals[k] += s[k]);
+                Object.keys(totals).forEach(k => totals[k] += (s[k] || 0));
             });
-
+            
             const totalRate = totals.total > 0 ? ((totals.converted / totals.total) * 100).toFixed(1) : '0.0';
-            html += `<tr class="stat-row total">
-                <td>📊 TOTAL</td>
-                <td>${totals.total}</td>
+            html += `<tr style="background: var(--bg-hover); font-weight: 600;">
+                <td>📊 <strong>TOTAL</strong></td>
+                <td><strong>${totals.total}</strong></td>
                 <td>${totals.not_called}</td>
-                <td>${totals.called_no_answer}</td>
-                <td>${totals.callback_scheduled}</td>
-                <td class="text-green">${totals.converted}</td>
-                <td class="text-red">${totals.not_interested}</td>
-                <td class="${parseFloat(totalRate) >= 10 ? 'text-green' : parseFloat(totalRate) >= 5 ? 'text-amber' : ''}">${totalRate}%</td>
+                <td>${totals.called}</td>
+                <td>${totals.answered}</td>
+                <td>${totals.no_answer}</td>
+                <td><span class="status-badge converted">${totals.converted}</span></td>
+                <td><span class="status-badge not_interested">${totals.not_interested}</span></td>
+                <td><span class="status-badge ${parseFloat(totalRate) >= 10 ? 'converted' : ''}">${totalRate}%</span></td>
             </tr>`;
-
-            document.getElementById('statsBody').innerHTML = html || '<tr><td colspan="8">No data</td></tr>';
-
-            // Suppressed stats
-            const suppStats = {
-                total: profiles.length,
+            
+            document.getElementById('countryStats').innerHTML = html || '<tr><td colspan="9">No data available</td></tr>';
+            
+            // Update top stats
+            document.getElementById('statCountries').textContent = Object.keys(byCountry).length;
+            document.getElementById('statTotalCarts').textContent = totals.total.toLocaleString();
+            document.getElementById('statConverted').textContent = totals.converted.toLocaleString();
+            document.getElementById('statConvRate').textContent = totalRate + '%';
+        }
+        
+        function renderSuppressedStats(profiles) {
+            const total = profiles.length;
+            const stats = {
                 not_called: profiles.filter(p => p.callStatus === 'not_called').length,
-                called: profiles.filter(p => p.callStatus !== 'not_called').length,
+                called: profiles.filter(p => p.callStatus === 'called').length,
+                answered: profiles.filter(p => p.callStatus === 'answered').length,
+                no_answer: profiles.filter(p => p.callStatus === 'no_answer').length,
                 converted: profiles.filter(p => p.callStatus === 'converted').length,
-                with_orders: profiles.filter(p => p.lastOrder).length
+                not_interested: profiles.filter(p => p.callStatus === 'not_interested').length
             };
-
+            
+            const pct = (n) => total > 0 ? ((n / total) * 100).toFixed(1) + '%' : '0%';
+            
             document.getElementById('suppressedStats').innerHTML = `
-                <tr><td>Total Suppressed</td><td>${suppStats.total}</td></tr>
-                <tr><td>Not Called</td><td>${suppStats.not_called}</td></tr>
-                <tr><td>Called</td><td>${suppStats.called}</td></tr>
-                <tr><td>Converted</td><td class="text-green">${suppStats.converted}</td></tr>
-                <tr><td>With Previous Orders</td><td>${suppStats.with_orders}</td></tr>
+                <tr><td><strong>Total Suppressed Profiles</strong></td><td><strong>${total}</strong></td><td>100%</td></tr>
+                <tr><td>Not Called</td><td>${stats.not_called}</td><td>${pct(stats.not_called)}</td></tr>
+                <tr><td>Called</td><td>${stats.called}</td><td>${pct(stats.called)}</td></tr>
+                <tr><td>Answered</td><td>${stats.answered}</td><td>${pct(stats.answered)}</td></tr>
+                <tr><td>No Answer</td><td>${stats.no_answer}</td><td>${pct(stats.no_answer)}</td></tr>
+                <tr><td><span class="status-badge converted">Converted</span></td><td><strong>${stats.converted}</strong></td><td><strong>${pct(stats.converted)}</strong></td></tr>
+                <tr><td><span class="status-badge not_interested">Not Interested</span></td><td>${stats.not_interested}</td><td>${pct(stats.not_interested)}</td></tr>
             `;
         }
-
+        
+        function renderPendingStats(orders) {
+            const byCountry = {};
+            const flags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', gr: '🇬🇷', it: '🇮🇹', hu: '🇭🇺' };
+            
+            orders.forEach(o => {
+                if (!byCountry[o.storeCode]) {
+                    byCountry[o.storeCode] = {
+                        flag: flags[o.storeCode] || '🌍',
+                        name: o.storeName || o.storeCode.toUpperCase(),
+                        pending: 0,
+                        cancelled: 0,
+                        failed: 0,
+                        'on-hold': 0,
+                        totalValue: 0,
+                        currency: o.currency || 'EUR'
+                    };
+                }
+                const status = o.orderStatus || 'pending';
+                if (byCountry[o.storeCode][status] !== undefined) {
+                    byCountry[o.storeCode][status]++;
+                }
+                byCountry[o.storeCode].totalValue += parseFloat(o.orderTotal || 0);
+            });
+            
+            let html = '';
+            Object.entries(byCountry).forEach(([code, s]) => {
+                const symbols = { EUR: '€', CZK: 'Kč', PLN: 'zł', HUF: 'Ft' };
+                const sym = symbols[s.currency] || s.currency;
+                html += `<tr>
+                    <td><span class="store-badge"><span class="store-flag">${s.flag}</span> ${s.name}</span></td>
+                    <td>${s.pending}</td>
+                    <td>${s.cancelled}</td>
+                    <td>${s.failed}</td>
+                    <td>${s['on-hold']}</td>
+                    <td><strong>${sym} ${s.totalValue.toFixed(2)}</strong></td>
+                </tr>`;
+            });
+            
+            document.getElementById('pendingStats').innerHTML = html || '<tr><td colspan="6">No pending orders</td></tr>';
+        }
+        
+        // Initialize
         loadStats();
     </script>
 </body>
