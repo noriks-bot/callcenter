@@ -34,12 +34,175 @@ $dataFile = __DIR__ . '/data/call_data.json';
 $smsQueueFile = __DIR__ . '/data/sms_queue.json';
 $cacheDir = __DIR__ . '/data/cache/';
 
-// MetaKocka config (for SMS - NOT USED FOR SENDING!)
+// MetaKocka config (for SMS)
 $metakocka = [
     'company_id' => 6371,
     'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
-    'api_url' => 'https://main.metakocka.si/rest/eshop/v1'
+    'api_url' => 'https://main.metakocka.si/rest/eshop/send_message'
 ];
+
+$smsSettingsFile = __DIR__ . '/data/sms-settings.json';
+
+function loadSmsSettings() {
+    global $smsSettingsFile;
+    if (file_exists($smsSettingsFile)) {
+        return json_decode(file_get_contents($smsSettingsFile), true) ?: [];
+    }
+    return [
+        'providers' => [
+            'hr' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
+            'cz' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
+            'pl' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
+            'gr' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
+            'sk' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
+            'it' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
+            'hu' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null]
+        ]
+    ];
+}
+
+function saveSmsSettings($data) {
+    global $smsSettingsFile;
+    $dir = dirname($smsSettingsFile);
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    file_put_contents($smsSettingsFile, json_encode($data, JSON_PRETTY_PRINT));
+}
+
+// MetaKocka SMS Functions
+function testSmsConnection($storeCode) {
+    global $metakocka;
+    
+    $settings = loadSmsSettings();
+    $eshopSyncId = $settings['providers'][$storeCode]['eshop_sync_id'] ?? '';
+    
+    if (empty($eshopSyncId)) {
+        return ['success' => false, 'error' => 'Eshop Sync ID ni nastavljen za to državo'];
+    }
+    
+    // Test connection by sending a test request (without actually sending SMS)
+    $payload = [
+        'secret_key' => $metakocka['secret_key'],
+        'company_id' => $metakocka['company_id'],
+        'eshop_sync_id' => $eshopSyncId,
+        'test_connection' => true
+    ];
+    
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $metakocka['api_url'],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_SSL_VERIFYPEER => true
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+    
+    if ($error) {
+        return ['success' => false, 'error' => 'Connection error: ' . $error];
+    }
+    
+    // Update last test timestamp
+    $settings['providers'][$storeCode]['lastTest'] = date('c');
+    $settings['providers'][$storeCode]['lastTestResult'] = $httpCode < 400;
+    saveSmsSettings($settings);
+    
+    if ($httpCode >= 400) {
+        $data = json_decode($response, true);
+        return ['success' => false, 'error' => $data['error'] ?? 'API Error (HTTP ' . $httpCode . ')'];
+    }
+    
+    return ['success' => true, 'message' => 'Connection OK'];
+}
+
+function sendQueuedSms($smsId) {
+    global $metakocka;
+    
+    $queue = loadSmsQueue();
+    $sms = null;
+    $smsIndex = -1;
+    
+    foreach ($queue as $i => $item) {
+        if ($item['id'] === $smsId) {
+            $sms = $item;
+            $smsIndex = $i;
+            break;
+        }
+    }
+    
+    if (!$sms) {
+        return ['success' => false, 'error' => 'SMS not found in queue'];
+    }
+    
+    if ($sms['status'] !== 'queued') {
+        return ['success' => false, 'error' => 'SMS already processed'];
+    }
+    
+    $settings = loadSmsSettings();
+    $storeCode = $sms['storeCode'];
+    $eshopSyncId = $settings['providers'][$storeCode]['eshop_sync_id'] ?? '';
+    
+    if (empty($eshopSyncId)) {
+        return ['success' => false, 'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode)];
+    }
+    
+    // Prepare MetaKocka SMS payload
+    $payload = [
+        'secret_key' => $metakocka['secret_key'],
+        'company_id' => $metakocka['company_id'],
+        'eshop_sync_id' => $eshopSyncId,
+        'message_type' => 'SMS',
+        'recipient' => $sms['recipient'],
+        'message' => $sms['message']
+    ];
+    
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $metakocka['api_url'],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => true
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+    
+    if ($error) {
+        $queue[$smsIndex]['status'] = 'failed';
+        $queue[$smsIndex]['error'] = 'Connection error: ' . $error;
+        $queue[$smsIndex]['sentAt'] = date('c');
+        saveSmsQueue($queue);
+        return ['success' => false, 'error' => 'Connection error: ' . $error];
+    }
+    
+    $data = json_decode($response, true);
+    
+    if ($httpCode >= 400) {
+        $queue[$smsIndex]['status'] = 'failed';
+        $queue[$smsIndex]['error'] = $data['error'] ?? 'API Error (HTTP ' . $httpCode . ')';
+        $queue[$smsIndex]['sentAt'] = date('c');
+        saveSmsQueue($queue);
+        return ['success' => false, 'error' => $queue[$smsIndex]['error']];
+    }
+    
+    // Success
+    $queue[$smsIndex]['status'] = 'sent';
+    $queue[$smsIndex]['sentAt'] = date('c');
+    $queue[$smsIndex]['metakockaResponse'] = $data;
+    saveSmsQueue($queue);
+    
+    return ['success' => true, 'message' => 'SMS sent successfully', 'smsId' => $smsId];
+}
 
 function loadCallData() {
     global $dataFile;
@@ -721,6 +884,48 @@ try {
             echo json_encode(removeSmsFromQueue($input['id'] ?? ''));
             break;
             
+        case 'sms-settings':
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                echo json_encode(loadSmsSettings());
+            } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                saveSmsSettings($input);
+                echo json_encode(['success' => true]);
+            }
+            break;
+            
+        case 'sms-test-connection':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $storeCode = $input['storeCode'] ?? '';
+            if (!$storeCode || !isset($stores[$storeCode])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid store code']);
+                break;
+            }
+            echo json_encode(testSmsConnection($storeCode));
+            break;
+            
+        case 'sms-send':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $smsId = $input['id'] ?? '';
+            if (!$smsId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Missing SMS ID']);
+                break;
+            }
+            echo json_encode(sendQueuedSms($smsId));
+            break;
+            
         case 'search-products':
             $storeCode = $_GET['store'] ?? null;
             $query = $_GET['q'] ?? '';
@@ -833,14 +1038,16 @@ try {
         case 'health':
             echo json_encode([
                 'status' => 'ok', 
-                'version' => '4.0', 
+                'version' => '5.0', 
                 'timestamp' => date('c'),
                 'features' => [
                     'enhanced_order_creation' => true,
                     'editable_items' => true,
                     'free_shipping' => true,
                     'sms_queue' => true,
-                    'sms_sending' => false // NEVER sends SMS automatically!
+                    'sms_sending' => true, // Manual only via sms-send endpoint
+                    'metakocka_integration' => true,
+                    'sms_settings' => true
                 ]
             ]);
             break;
@@ -860,6 +1067,9 @@ try {
                     'sms-queue',
                     'sms-add',
                     'sms-remove',
+                    'sms-settings',
+                    'sms-test-connection',
+                    'sms-send',
                     'clear-cache', 
                     'login', 
                     'health'

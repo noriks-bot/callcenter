@@ -771,7 +771,7 @@
                 </div>
                 <div class="nav-item" data-tab="sms-settings">
                     <i class="fas fa-cog"></i>
-                    <span>SMS Automation</span>
+                    <span>SMS Settings</span>
                 </div>
             </div>
             
@@ -1031,12 +1031,12 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Predloga</label>
+                    <label class="form-label">Predloga (avtomatski prevod za državo)</label>
                     <select class="form-select" id="smsTemplate" onchange="applySmsTemplate()">
                         <option value="">-- Izberi predlogo --</option>
-                        <option value="reminder">🔔 Opomnik za košarico</option>
-                        <option value="discount">💰 Popust ponudba</option>
-                        <option value="lastchance">⏰ Zadnja priložnost</option>
+                        <option value="abandoned_cart">🛒 Opuščena košarica</option>
+                        <option value="winback">💙 Povratek kupca</option>
+                        <option value="last_chance">⏰ Zadnja prilika</option>
                         <option value="custom">✏️ Prilagojeno sporočilo</option>
                     </select>
                 </div>
@@ -1129,26 +1129,45 @@
         </div>
     </div>
     
-    <!-- SMS Automation Settings (shown when tab selected) -->
+    <!-- SMS Settings (shown when tab selected) -->
     <div id="smsSettingsContent" style="display:none;">
-        <div style="max-width:900px;">
-            <div class="table-card" style="padding:24px;">
-                <h3 style="margin-bottom:20px;">⚙️ SMS Automation Pravila</h3>
+        <div style="max-width:1000px;padding:24px;">
+            <!-- SMS Provider Settings -->
+            <div class="table-card" style="padding:24px;margin-bottom:20px;">
+                <h3 style="margin-bottom:8px;">📱 MetaKocka SMS Provider Settings</h3>
                 <p style="color:var(--text-muted);margin-bottom:24px;">
-                    Nastavi avtomatska SMS sporočila za opuščene košarice. SMS-e pošilja Dejan ročno iz čakalne vrste.
+                    Nastavi <code>eshop_sync_id</code> za vsako državo. SMS-e pošilja Dejan ročno iz čakalne vrste.
                 </p>
                 
-                <div id="automationRules">
-                    <!-- Rules will be rendered here -->
+                <div class="table-wrapper">
+                    <table class="data-table" id="smsProviderTable">
+                        <thead>
+                            <tr>
+                                <th>Država</th>
+                                <th>Eshop Sync ID</th>
+                                <th>Status</th>
+                                <th>Zadnji test</th>
+                                <th>Akcije</th>
+                            </tr>
+                        </thead>
+                        <tbody id="smsProviderRows">
+                            <!-- Rows will be rendered by JS -->
+                        </tbody>
+                    </table>
                 </div>
                 
-                <button class="btn btn-save" style="margin-top:20px;" onclick="addAutomationRule()">
-                    <i class="fas fa-plus"></i> Dodaj pravilo
-                </button>
+                <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn btn-save" onclick="saveSmsSettings()">
+                        <i class="fas fa-save"></i> Shrani nastavitve
+                    </button>
+                    <button class="btn btn-cancel" onclick="loadSmsSettingsUI()">
+                        <i class="fas fa-undo"></i> Razveljavi
+                    </button>
+                </div>
             </div>
             
             <!-- Template Preview Section -->
-            <div class="table-card" style="padding:24px;margin-top:20px;">
+            <div class="table-card" style="padding:24px;margin-bottom:20px;">
                 <h3 style="margin-bottom:20px;">📝 Predogled predlog</h3>
                 <p style="color:var(--text-muted);margin-bottom:16px;">
                     Preveri kako izgledajo SMS sporočila v različnih jezikih. Variabele: <code>{ime}</code>, <code>{produkt}</code>, <code>{cena}</code>, <code>{link}</code>
@@ -1198,6 +1217,18 @@
                             <input type="text" class="form-input" id="samplePrice" value="€29.99" oninput="updateTemplatePreview()" style="padding:8px;">
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- SMS Queue Management -->
+            <div class="table-card" style="padding:24px;">
+                <h3 style="margin-bottom:8px;">📤 Čakalna vrsta za pošiljanje</h3>
+                <p style="color:var(--text-muted);margin-bottom:24px;">
+                    ⚠️ <strong>Samo Dejan</strong> lahko ročno pošlje SMS iz čakalne vrste!
+                </p>
+                
+                <div id="smsQueueManagement">
+                    <!-- Queue items will be rendered here -->
                 </div>
             </div>
         </div>
@@ -1278,7 +1309,7 @@
                     pending: 'Pending Orders',
                     buyers: 'Enkratni kupci',
                     'sms-dashboard': 'SMS Dashboard',
-                    'sms-settings': 'SMS Automation Settings'
+                    'sms-settings': 'SMS Provider Settings'
                 };
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
                 
@@ -1292,7 +1323,7 @@
                 if (currentTab === 'sms-dashboard') {
                     renderSmsTable();
                 } else if (currentTab === 'sms-settings') {
-                    renderAutomationRules();
+                    loadSmsSettingsUI();
                 } else {
                     renderTable();
                 }
@@ -1946,23 +1977,34 @@
             const tpl = document.getElementById('smsTemplate').value;
             if (!tpl || tpl === 'custom') {
                 document.getElementById('smsMessage').value = '';
+                updateCharCount();
                 return;
             }
             
-            const template = smsTemplates[tpl];
-            if (!template) return;
+            // Get template from loaded data (per country)
+            const storeCode = smsTarget?.storeCode || 'hr';
+            let text = '';
+            
+            if (smsTemplatesData?.templates?.[tpl]?.[storeCode]) {
+                text = smsTemplatesData.templates[tpl][storeCode].message;
+            } else if (smsTemplates[tpl]) {
+                // Fallback to hardcoded templates
+                text = smsTemplates[tpl].text;
+            } else {
+                return;
+            }
             
             // Replace variables
-            let text = template.text;
-            const firstName = smsTarget.firstName || smsTarget.customerName.split(' ')[0] || 'Stranka';
-            const product = smsTarget.cartContents?.[0]?.name || 'vaš izdelek';
-            const price = smsTarget.cartValue?.toFixed(2) || '0.00';
-            const storeUrl = `https://noriks.com/${smsTarget.storeCode}/checkout`;
+            const firstName = smsTarget?.firstName || smsTarget?.customerName?.split(' ')[0] || 'Stranka';
+            const product = smsTarget?.cartContents?.[0]?.name || 'vaš izdelek';
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[smsTarget?.currency] || '€';
+            const price = sym + (smsTarget?.cartValue?.toFixed(2) || '0.00');
+            const storeUrl = `noriks.com/${storeCode}/checkout`;
             
-            text = text.replace('{ime}', firstName)
-                       .replace('{produkt}', product)
-                       .replace('{cena}', price)
-                       .replace('{link}', storeUrl);
+            text = text.replace(/{ime}/g, firstName)
+                       .replace(/{produkt}/g, product)
+                       .replace(/{cena}/g, price)
+                       .replace(/{link}/g, storeUrl);
             
             document.getElementById('smsMessage').value = text;
             updateCharCount();
@@ -2310,6 +2352,256 @@
         document.getElementById('smsDateTo').addEventListener('change', renderSmsTable);
         document.getElementById('smsCountryFilter').addEventListener('change', renderSmsTable);
         document.getElementById('smsStatusFilter').addEventListener('change', renderSmsTable);
+        
+        // ========== SMS PROVIDER SETTINGS ==========
+        let smsProviderSettings = null;
+        
+        async function loadSmsSettingsUI() {
+            try {
+                const res = await fetch('api.php?action=sms-settings');
+                smsProviderSettings = await res.json();
+                renderSmsProviderTable();
+                renderSmsQueueManagement();
+            } catch (e) {
+                console.error('Failed to load SMS settings:', e);
+                showToast('Napaka pri nalaganju SMS nastavitev', true);
+            }
+        }
+        
+        function renderSmsProviderTable() {
+            const tbody = document.getElementById('smsProviderRows');
+            if (!tbody) return;
+            
+            const countries = [
+                { code: 'hr', flag: '🇭🇷', name: 'Croatia' },
+                { code: 'cz', flag: '🇨🇿', name: 'Czech' },
+                { code: 'pl', flag: '🇵🇱', name: 'Poland' },
+                { code: 'gr', flag: '🇬🇷', name: 'Greece' },
+                { code: 'sk', flag: '🇸🇰', name: 'Slovakia' },
+                { code: 'it', flag: '🇮🇹', name: 'Italy' },
+                { code: 'hu', flag: '🇭🇺', name: 'Hungary' }
+            ];
+            
+            tbody.innerHTML = countries.map(c => {
+                const provider = smsProviderSettings?.providers?.[c.code] || {};
+                const hasId = !!provider.eshop_sync_id;
+                const lastTest = provider.lastTest ? new Date(provider.lastTest).toLocaleString('sl-SI') : 'Nikoli';
+                const testResult = provider.lastTestResult;
+                
+                return `
+                    <tr>
+                        <td><span style="font-size:18px;">${c.flag}</span> <strong>${c.name}</strong> (${c.code.toUpperCase()})</td>
+                        <td>
+                            <input type="text" 
+                                   class="form-input" 
+                                   id="eshop_${c.code}" 
+                                   value="${provider.eshop_sync_id || ''}" 
+                                   placeholder="Vnesi eshop_sync_id..."
+                                   style="max-width:200px;">
+                        </td>
+                        <td>
+                            <span class="badge ${hasId ? (testResult === true ? 'converted' : testResult === false ? 'not_interested' : 'called') : 'not_called'}">
+                                ${hasId ? (testResult === true ? '✅ OK' : testResult === false ? '❌ Napaka' : '⏳ Ni testirano') : '❌ Ni nastavljeno'}
+                            </span>
+                        </td>
+                        <td style="font-size:12px;color:var(--text-muted);">${lastTest}</td>
+                        <td>
+                            <button class="action-btn ${hasId ? 'order' : ''}" 
+                                    onclick="testSmsConnection('${c.code}')" 
+                                    title="Test Connection"
+                                    ${!hasId ? 'disabled style="opacity:0.5;"' : ''}>
+                                <i class="fas fa-plug"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        async function saveSmsSettings() {
+            const countries = ['hr', 'cz', 'pl', 'gr', 'sk', 'it', 'hu'];
+            const providers = {};
+            
+            countries.forEach(code => {
+                const input = document.getElementById(`eshop_${code}`);
+                const existing = smsProviderSettings?.providers?.[code] || {};
+                providers[code] = {
+                    eshop_sync_id: input?.value?.trim() || '',
+                    enabled: !!input?.value?.trim(),
+                    lastTest: existing.lastTest || null,
+                    lastTestResult: existing.lastTestResult
+                };
+            });
+            
+            try {
+                const res = await fetch('api.php?action=sms-settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ providers })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    smsProviderSettings = { providers };
+                    showToast('✅ SMS nastavitve shranjene!');
+                    renderSmsProviderTable();
+                } else {
+                    showToast(result.error || 'Napaka pri shranjevanju', true);
+                }
+            } catch (e) {
+                showToast('Napaka pri povezavi', true);
+            }
+        }
+        
+        async function testSmsConnection(storeCode) {
+            const btn = event.target.closest('button');
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch('api.php?action=sms-test-connection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ storeCode })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast(`✅ ${storeCode.toUpperCase()}: Connection OK!`);
+                    if (smsProviderSettings?.providers?.[storeCode]) {
+                        smsProviderSettings.providers[storeCode].lastTest = new Date().toISOString();
+                        smsProviderSettings.providers[storeCode].lastTestResult = true;
+                    }
+                } else {
+                    showToast(`❌ ${storeCode.toUpperCase()}: ${result.error}`, true);
+                    if (smsProviderSettings?.providers?.[storeCode]) {
+                        smsProviderSettings.providers[storeCode].lastTest = new Date().toISOString();
+                        smsProviderSettings.providers[storeCode].lastTestResult = false;
+                    }
+                }
+                renderSmsProviderTable();
+            } catch (e) {
+                showToast('Napaka pri testiranju', true);
+            }
+            
+            btn.innerHTML = originalIcon;
+            btn.disabled = false;
+        }
+        
+        // ========== SMS QUEUE MANAGEMENT ==========
+        async function renderSmsQueueManagement() {
+            const container = document.getElementById('smsQueueManagement');
+            if (!container) return;
+            
+            try {
+                const res = await fetch('api.php?action=sms-queue&status=queued');
+                const queue = await res.json();
+                
+                if (!queue.length) {
+                    container.innerHTML = `
+                        <div class="empty" style="padding:40px;">
+                            <i class="fas fa-inbox"></i>
+                            <p>Čakalna vrsta je prazna</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Datum</th>
+                                    <th>Prejemnik</th>
+                                    <th>Sporočilo</th>
+                                    <th>Država</th>
+                                    <th>Akcije</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${queue.map(sms => {
+                                    const store = stores.find(s => s.code === sms.storeCode);
+                                    const hasProvider = smsProviderSettings?.providers?.[sms.storeCode]?.eshop_sync_id;
+                                    return `
+                                        <tr>
+                                            <td style="font-size:12px;">${new Date(sms.date).toLocaleString('sl-SI')}</td>
+                                            <td>
+                                                <div style="font-weight:500;">${esc(sms.customerName)}</div>
+                                                <div style="font-size:12px;color:var(--text-muted);">${sms.recipient}</div>
+                                            </td>
+                                            <td style="max-width:300px;">
+                                                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(sms.message)}">${esc(sms.message)}</div>
+                                            </td>
+                                            <td>${store?.flag || '🌍'} ${sms.storeCode?.toUpperCase() || ''}</td>
+                                            <td style="white-space:nowrap;">
+                                                <button class="action-btn ${hasProvider ? 'order' : ''}" 
+                                                        onclick="sendSingleSms('${sms.id}')" 
+                                                        title="Pošlji SMS"
+                                                        ${!hasProvider ? 'disabled style="opacity:0.5;" title="Provider ni nastavljen"' : ''}>
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="removeFromQueue('${sms.id}')" title="Odstrani">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top:16px;padding:12px;background:rgba(249,115,22,0.1);border-radius:8px;color:var(--orange);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Opozorilo:</strong> SMS-e lahko pošlje samo Dejan! Prepričaj se, da je prejemnik pravilen preden pošlješ.
+                    </div>
+                `;
+            } catch (e) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Napaka pri nalaganju</p></div>';
+            }
+        }
+        
+        async function sendSingleSms(smsId) {
+            if (!confirm('Ali si prepričan, da želiš poslati ta SMS? To akcijo lahko izvede samo Dejan!')) {
+                return;
+            }
+            
+            try {
+                const res = await fetch('api.php?action=sms-send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: smsId })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast('✅ SMS uspešno poslan!');
+                    renderSmsQueueManagement();
+                    renderSmsTable();
+                    updateStats();
+                } else {
+                    showToast(`❌ Napaka: ${result.error}`, true);
+                }
+            } catch (e) {
+                showToast('Napaka pri pošiljanju', true);
+            }
+        }
+        
+        async function removeFromQueue(smsId) {
+            try {
+                await fetch('api.php?action=sms-remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: smsId })
+                });
+                showToast('SMS odstranjen iz čakalne vrste');
+                renderSmsQueueManagement();
+                updateStats();
+            } catch (e) {
+                showToast('Napaka pri odstranjevanju', true);
+            }
+        }
         
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
         function call(phone) { window.open('tel:'+phone, '_self'); }
