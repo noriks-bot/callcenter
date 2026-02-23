@@ -2419,15 +2419,16 @@ body.is-admin .admin-only {
 #analyticsContent,
 #emailTemplatesContent {
     position: fixed;
-    top: var(--header-height);
+    top: 0;
     left: var(--sidebar-width);
     right: 0;
     bottom: 0;
     padding: 24px;
+    padding-top: calc(var(--header-height) + 24px);
     overflow-y: auto;
     background: var(--bg-body);
     transition: left var(--transition-slow);
-    z-index: 10;
+    z-index: 100;
 }
 
 /* When sidebar is collapsed */
