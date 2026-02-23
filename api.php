@@ -1813,6 +1813,15 @@ try {
             $filter = $_GET['filter'] ?? 'all';
             echo json_encode(fetchPaketomatOrders($filter));
             break;
+        
+        case 'paketomati-debug':
+            // Show ALL orders for debugging
+            echo json_encode([
+                'all_orders' => fetchPaketomatOrders('all_orders'),
+                'paketomat_only' => fetchPaketomatOrders('all'),
+                'cache_info' => 'Cache TTL: 60 seconds'
+            ]);
+            break;
             
         case 'paketomati-update':
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
