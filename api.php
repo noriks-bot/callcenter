@@ -339,7 +339,15 @@ function testSmsConnection($storeCode) {
 function sendQueuedSms($smsId) {
     global $metakocka;
     
-    error_log("[SMS-SEND] Starting for smsId: $smsId");
+    // File-based logging for debugging
+    $logFile = __DIR__ . '/data/sms-debug.log';
+    $logMsg = function($msg) use ($logFile) {
+        $line = '[' . date('Y-m-d H:i:s') . '] ' . $msg . "\n";
+        file_put_contents($logFile, $line, FILE_APPEND);
+        error_log($msg);
+    };
+    
+    $logMsg("[SMS-SEND] ========== START smsId: $smsId ==========");
     
     $queue = loadSmsQueue();
     $sms = null;
@@ -354,23 +362,29 @@ function sendQueuedSms($smsId) {
     }
     
     if (!$sms) {
-        error_log("[SMS-SEND] SMS not found in queue: $smsId");
-        return ['success' => false, 'error' => 'SMS not found in queue'];
+        $logMsg("[SMS-SEND] ERROR: SMS not found in queue: $smsId");
+        return ['success' => false, 'error' => 'SMS not found in queue', 'debug' => 'smsId not in queue'];
     }
     
     if ($sms['status'] !== 'queued') {
-        error_log("[SMS-SEND] SMS already processed: $smsId (status: {$sms['status']})");
-        return ['success' => false, 'error' => 'SMS already processed (status: ' . $sms['status'] . ')'];
+        $logMsg("[SMS-SEND] ERROR: SMS already processed: $smsId (status: {$sms['status']})");
+        return ['success' => false, 'error' => 'SMS already processed (status: ' . $sms['status'] . ')', 'debug' => 'already_processed'];
     }
     
     $settings = loadSmsSettings();
     $storeCode = $sms['storeCode'];
     $eshopSyncId = $settings['providers'][$storeCode]['eshop_sync_id'] ?? '';
     
-    error_log("[SMS-SEND] Store: $storeCode, eshop_sync_id: " . ($eshopSyncId ?: 'NOT SET'));
+    $logMsg("[SMS-SEND] Store: $storeCode, eshop_sync_id: " . ($eshopSyncId ?: 'EMPTY!'));
     
     if (empty($eshopSyncId)) {
-        return ['success' => false, 'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode) . '. Nastavi ga v SMS Settings!'];
+        $logMsg("[SMS-SEND] ERROR: Missing eshop_sync_id for $storeCode");
+        return [
+            'success' => false, 
+            'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode) . '. Nastavi ga v SMS Settings!',
+            'debug' => 'missing_eshop_sync_id',
+            'storeCode' => $storeCode
+        ];
     }
     
     // Prepare MetaKocka SMS payload (correct format per API docs)
@@ -387,8 +401,10 @@ function sendQueuedSms($smsId) {
         ]
     ];
     
-    error_log("[SMS-SEND] Sending to MetaKocka: " . $metakocka['api_url']);
-    error_log("[SMS-SEND] Recipient: {$sms['recipient']}, Message length: " . strlen($sms['message']));
+    $logMsg("[SMS-SEND] API URL: " . $metakocka['api_url']);
+    $logMsg("[SMS-SEND] Recipient: {$sms['recipient']}");
+    $logMsg("[SMS-SEND] Message: " . substr($sms['message'], 0, 50) . '...');
+    $logMsg("[SMS-SEND] Payload: " . json_encode($payload));
     
     $ch = curl_init();
     curl_setopt_array($ch, [
@@ -403,46 +419,69 @@ function sendQueuedSms($smsId) {
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $error = curl_error($ch);
+    $curlError = curl_error($ch);
     curl_close($ch);
     
-    error_log("[SMS-SEND] MetaKocka response: HTTP $httpCode");
+    $logMsg("[SMS-SEND] HTTP Code: $httpCode");
+    $logMsg("[SMS-SEND] Response: $response");
+    if ($curlError) $logMsg("[SMS-SEND] CURL Error: $curlError");
     
-    if ($error) {
-        error_log("[SMS-SEND] CURL error: $error");
+    if ($curlError) {
         $queue[$smsIndex]['status'] = 'failed';
-        $queue[$smsIndex]['error'] = 'Connection error: ' . $error;
+        $queue[$smsIndex]['error'] = 'Connection error: ' . $curlError;
         $queue[$smsIndex]['sentAt'] = date('c');
         saveSmsQueue($queue);
-        return ['success' => false, 'error' => 'Connection error: ' . $error];
+        return [
+            'success' => false, 
+            'error' => 'Connection error: ' . $curlError,
+            'debug' => 'curl_error',
+            'httpCode' => $httpCode
+        ];
     }
     
     $data = json_decode($response, true);
-    error_log("[SMS-SEND] MetaKocka response body: " . substr($response, 0, 500));
     
     // Check for MetaKocka specific error response
     if (isset($data['opr_code']) && $data['opr_code'] !== '0') {
-        error_log("[SMS-SEND] MetaKocka error: opr_code={$data['opr_code']}, opr_desc=" . ($data['opr_desc'] ?? 'N/A'));
+        $errorMsg = $data['opr_desc'] ?? 'MetaKocka error (code: ' . $data['opr_code'] . ')';
+        $logMsg("[SMS-SEND] MK ERROR: opr_code={$data['opr_code']}, opr_desc=$errorMsg");
+        
         $queue[$smsIndex]['status'] = 'failed';
-        $queue[$smsIndex]['error'] = $data['opr_desc'] ?? 'MetaKocka error (code: ' . $data['opr_code'] . ')';
+        $queue[$smsIndex]['error'] = $errorMsg;
         $queue[$smsIndex]['sentAt'] = date('c');
         $queue[$smsIndex]['metakockaResponse'] = $data;
         saveSmsQueue($queue);
-        return ['success' => false, 'error' => $queue[$smsIndex]['error']];
+        
+        return [
+            'success' => false, 
+            'error' => $errorMsg,
+            'debug' => 'mk_opr_code_error',
+            'metakockaResponse' => $data,
+            'httpCode' => $httpCode
+        ];
     }
     
     if ($httpCode >= 400) {
-        error_log("[SMS-SEND] HTTP error: $httpCode");
+        $errorMsg = $data['error'] ?? $data['opr_desc'] ?? 'API Error (HTTP ' . $httpCode . ')';
+        $logMsg("[SMS-SEND] HTTP ERROR: $httpCode - $errorMsg");
+        
         $queue[$smsIndex]['status'] = 'failed';
-        $queue[$smsIndex]['error'] = $data['error'] ?? $data['opr_desc'] ?? 'API Error (HTTP ' . $httpCode . ')';
+        $queue[$smsIndex]['error'] = $errorMsg;
         $queue[$smsIndex]['sentAt'] = date('c');
         $queue[$smsIndex]['metakockaResponse'] = $data;
         saveSmsQueue($queue);
-        return ['success' => false, 'error' => $queue[$smsIndex]['error']];
+        
+        return [
+            'success' => false, 
+            'error' => $errorMsg,
+            'debug' => 'http_error',
+            'metakockaResponse' => $data,
+            'httpCode' => $httpCode
+        ];
     }
     
     // Success!
-    error_log("[SMS-SEND] SUCCESS! SMS sent to {$sms['recipient']}");
+    $logMsg("[SMS-SEND] ✅ SUCCESS! SMS sent to {$sms['recipient']}");
     $queue[$smsIndex]['status'] = 'sent';
     $queue[$smsIndex]['sentAt'] = date('c');
     $queue[$smsIndex]['metakockaResponse'] = $data;
@@ -453,7 +492,8 @@ function sendQueuedSms($smsId) {
         'message' => 'SMS uspešno poslan na ' . $sms['recipient'], 
         'smsId' => $smsId,
         'recipient' => $sms['recipient'],
-        'metakockaResponse' => $data
+        'metakockaResponse' => $data,
+        'httpCode' => $httpCode
     ];
 }
 

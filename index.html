@@ -3043,7 +3043,7 @@ Available variables:
             }
             
             // Show loading state
-            showToast('📤 Pošiljam SMS...', false, 'info');
+            showToast('📤 Pošiljam SMS preko MetaKocka...', false, 'info');
             
             try {
                 const res = await fetch('api.php?action=sms-send', {
@@ -3053,19 +3053,35 @@ Available variables:
                 });
                 const result = await res.json();
                 
+                // Log full response for debugging
+                console.log('[SMS] MetaKocka response:', result);
+                
                 if (result.success) {
-                    showToast('✅ SMS uspešno poslan!');
+                    let msg = `✅ SMS uspešno poslan na ${result.recipient || 'prejemnika'}!`;
+                    if (result.metakockaResponse) {
+                        msg += `\n\n📊 MK Response: ${JSON.stringify(result.metakockaResponse)}`;
+                    }
+                    showToast(msg);
                     // Refresh both queues
                     await loadSmsDashboardQueue();
                     await loadSmsData();
                     renderSmsQueueManagement();
                     updateStats();
                 } else {
-                    showToast(`❌ Napaka: ${result.error || 'Neznana napaka'}`, true);
+                    let errorMsg = `❌ Napaka: ${result.error || 'Neznana napaka'}`;
+                    if (result.debug) errorMsg += ` [${result.debug}]`;
+                    if (result.httpCode) errorMsg += ` (HTTP ${result.httpCode})`;
+                    if (result.metakockaResponse) {
+                        console.error('[SMS] MK Error Response:', result.metakockaResponse);
+                        errorMsg += `\n\n📊 MK: ${JSON.stringify(result.metakockaResponse)}`;
+                    }
+                    showToast(errorMsg, true);
+                    alert('🚨 SMS NAPAKA!\n\n' + errorMsg);
                 }
             } catch (e) {
                 console.error('[SMS] Send failed:', e);
                 showToast('❌ Napaka pri pošiljanju: ' + e.message, true);
+                alert('🚨 SMS NAPAKA!\n\n' + e.message);
             }
         }
         
@@ -3607,7 +3623,7 @@ Available variables:
             }
             
             // Show loading
-            showToast('📤 Pošiljam SMS...', false, 'info');
+            showToast('📤 Pošiljam SMS preko MetaKocka...', false, 'info');
             
             try {
                 const res = await fetch('api.php?action=sms-send', {
@@ -3617,19 +3633,35 @@ Available variables:
                 });
                 const result = await res.json();
                 
+                // Log for debugging
+                console.log('[SMS] MetaKocka response:', result);
+                
                 if (result.success) {
-                    showToast('✅ SMS uspešno poslan!');
+                    let msg = `✅ SMS uspešno poslan na ${result.recipient || 'prejemnika'}!`;
+                    if (result.metakockaResponse) {
+                        msg += `\n\n📊 MK: ${JSON.stringify(result.metakockaResponse)}`;
+                    }
+                    showToast(msg);
                     renderSmsQueueManagement();
                     loadSmsDashboardQueue();
                     await renderSmsTable();
                     await loadSmsData();
                     updateStats();
                 } else {
-                    showToast(`❌ Napaka: ${result.error || 'Neznana napaka'}`, true);
+                    let errorMsg = `❌ Napaka: ${result.error || 'Neznana napaka'}`;
+                    if (result.debug) errorMsg += ` [${result.debug}]`;
+                    if (result.httpCode) errorMsg += ` (HTTP ${result.httpCode})`;
+                    if (result.metakockaResponse) {
+                        console.error('[SMS] MK Error:', result.metakockaResponse);
+                        errorMsg += `\n\n📊 MK: ${JSON.stringify(result.metakockaResponse)}`;
+                    }
+                    showToast(errorMsg, true);
+                    alert('🚨 SMS NAPAKA!\n\n' + errorMsg);
                 }
             } catch (e) {
                 console.error('[SMS] Send error:', e);
                 showToast('❌ Napaka pri pošiljanju: ' + e.message, true);
+                alert('🚨 SMS NAPAKA!\n\n' + e.message);
             }
         }
         
