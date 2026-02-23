@@ -106,7 +106,8 @@ function formatPhoneForSms($phone, $storeCode) {
         $phone = $countryCode . $phone;
     }
     
-    return $phone;
+    // MetaKocka REQUIRES + prefix - always ensure it's there
+    return '+' . $phone;
 }
 
 // ========== AGENT MANAGEMENT FUNCTIONS ==========
