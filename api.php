@@ -661,42 +661,68 @@ function fetchOneTimeBuyers($storeFilter = null) {
     
     $storesToFetch = $storeFilter ? [$storeFilter => $stores[$storeFilter]] : $stores;
     
+    // Use orders API and group by email to find one-time buyers
+    // (WooCommerce customers API doesn't work reliably)
     foreach ($storesToFetch as $storeCode => $config) {
         if (!$config) continue;
         
-        $customers = wcApiRequest($storeCode, 'customers', [
+        // Fetch completed/processing orders from last 90 days
+        $orders = wcApiRequest($storeCode, 'orders', [
             'per_page' => 100,
-            'orderby' => 'registered_date',
+            'status' => 'processing,completed',
+            'orderby' => 'date',
             'order' => 'desc',
-            'role' => 'customer'
+            'after' => date('Y-m-d\TH:i:s', strtotime('-90 days'))
         ]);
         
         // Skip if not array or if it's an error response
-        if (!is_array($customers) || isset($customers['error'])) continue;
+        if (!is_array($orders) || isset($orders['error'])) continue;
         
-        foreach ($customers as $customer) {
-            // Skip if customer is not an array (might be error)
-            if (!is_array($customer)) continue;
+        // Group orders by email
+        $customerOrders = [];
+        foreach ($orders as $order) {
+            if (!is_array($order)) continue;
             
-            $orderCount = intval($customer['orders_count'] ?? 0);
-            if ($orderCount !== 1) continue;
+            $email = strtolower($order['billing']['email'] ?? '');
+            if (empty($email)) continue;
             
-            $customerId = $storeCode . '_customer_' . ($customer['id'] ?? 'unknown');
+            if (!isset($customerOrders[$email])) {
+                $customerOrders[$email] = [
+                    'orders' => [],
+                    'billing' => $order['billing'] ?? [],
+                    'firstOrder' => $order
+                ];
+            }
+            $customerOrders[$email]['orders'][] = $order;
+        }
+        
+        // Filter to customers with exactly 1 order
+        foreach ($customerOrders as $email => $data) {
+            if (count($data['orders']) !== 1) continue;
+            
+            $order = $data['firstOrder'];
+            $billing = $data['billing'];
+            
+            $customerId = $storeCode . '_buyer_' . md5($email);
             $savedData = $callData[$customerId] ?? [];
+            
+            // Skip if already marked as converted
+            if (($savedData['callStatus'] ?? '') === 'converted') continue;
             
             $allBuyers[] = [
                 'id' => $customerId,
                 'storeCode' => $storeCode,
                 'storeName' => $config['name'],
                 'storeFlag' => $config['flag'],
-                'customerId' => $customer['id'] ?? null,
-                'customerName' => trim(($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? '')) ?: 'Unknown',
-                'email' => $customer['email'] ?? '',
-                'phone' => $customer['billing']['phone'] ?? '',
-                'location' => trim(($customer['billing']['city'] ?? '') . ', ' . ($customer['billing']['country'] ?? ''), ', '),
-                'totalSpent' => floatval($customer['total_spent'] ?? 0),
-                'currency' => $storeCurrencies[$storeCode] ?? 'EUR',
-                'registeredAt' => $customer['date_created'] ?? '',
+                'orderId' => $order['id'] ?? null,
+                'customerName' => trim(($billing['first_name'] ?? '') . ' ' . ($billing['last_name'] ?? '')) ?: 'Unknown',
+                'email' => $email,
+                'phone' => $billing['phone'] ?? '',
+                'location' => trim(($billing['city'] ?? '') . ', ' . ($billing['country'] ?? ''), ', '),
+                'totalSpent' => floatval($order['total'] ?? 0),
+                'currency' => $order['currency'] ?? $storeCurrencies[$storeCode] ?? 'EUR',
+                'registeredAt' => $order['date_created'] ?? '',
+                'orderStatus' => $order['status'] ?? '',
                 'callStatus' => $savedData['callStatus'] ?? 'not_called',
                 'notes' => $savedData['notes'] ?? ''
             ];

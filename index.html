@@ -1767,14 +1767,16 @@ Available variables:
                 const buyersData = await buyersRes.json();
                 if (Array.isArray(buyersData)) {
                     buyers = buyersData;
+                    console.log('[One-time Buyers] Loaded', buyers.length, 'buyers:', buyers.slice(0, 3));
                 } else if (buyersData && buyersData.error) {
-                    console.warn('One-time buyers error:', buyersData.error);
+                    console.warn('[One-time Buyers] API error:', buyersData.error);
                     buyers = [];
                 } else {
+                    console.log('[One-time Buyers] Empty or unexpected response:', buyersData);
                     buyers = [];
                 }
                 
-                console.log('Data loaded:', {carts: carts.length, pending: pending.length, buyers: buyers.length});
+                console.log('[Data] Loaded totals:', {carts: carts.length, pending: pending.length, buyers: buyers.length});
                 
                 updateCounts();
                 updateStats();
@@ -1907,7 +1909,12 @@ Available variables:
             const totalItems = data.length;
             
             if (!totalItems) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-inbox"></i><p>No data found</p></div>';
+                const emptyMessages = {
+                    'carts': '<div class="empty"><i class="fas fa-shopping-cart"></i><p>Ni zapuščenih košaric</p><small style="color:var(--text-muted);">Vse košarice so bile pretvorjene ali filtrirane</small></div>',
+                    'pending': '<div class="empty"><i class="fas fa-clock"></i><p>Ni čakajočih naročil</p><small style="color:var(--text-muted);">Vsa naročila so bila obdelana</small></div>',
+                    'buyers': '<div class="empty"><i class="fas fa-user"></i><p>Ni enkratnih kupcev</p><small style="color:var(--text-muted);">Trenutno ni kupcev z natanko 1 naročilom v zadnjih 90 dneh</small></div>'
+                };
+                container.innerHTML = emptyMessages[currentTab] || '<div class="empty"><i class="fas fa-inbox"></i><p>Ni podatkov za prikaz</p></div>';
                 return;
             }
             
@@ -4991,14 +4998,17 @@ ${esc(previewBody)}
         
         async function loadPaketomati() {
             const filter = document.getElementById('paketomatFilter')?.value || 'all';
+            console.log('[Paketomati] Loading with filter:', filter);
             document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam iz MetaKocka...</td></tr>';
             
             try {
                 const res = await fetch(`api.php?action=paketomati&filter=${filter}`);
                 paketomatiData = await res.json();
+                console.log('[Paketomati] Loaded', paketomatiData.length, 'orders:', paketomatiData);
                 renderPaketomatiTable();
                 updatePaketomatiCount();
             } catch (e) {
+                console.error('[Paketomati] Error loading:', e);
                 document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" style="color:var(--red);">Napaka pri nalaganju podatkov</td></tr>';
             }
         }
@@ -5012,7 +5022,11 @@ ${esc(previewBody)}
             }
             
             if (filtered.length === 0) {
-                document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;">Ni naročil za prikaz</td></tr>';
+                console.log('[Paketomati] No orders found. Total data:', paketomatiData.length, 'Filter:', statusFilter);
+                const msg = paketomatiData.length === 0 
+                    ? '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;"><i class="fas fa-box" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>Ni naročil ki čakajo na prevzem<br><small style="font-size:12px;">MetaKocka trenutno nima orderjev s statusom "čaka na prevzem v paketomatu"</small></td></tr>'
+                    : '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;">Ni naročil za izbran filter</td></tr>';
+                document.getElementById('paketomatiTableBody').innerHTML = msg;
                 return;
             }
             
