@@ -1445,10 +1445,17 @@ Available variables:
         // Initialize theme on load
         initTheme();
         
+        console.log('[Auth] User:', user);
+        console.log('[Auth] isAdmin:', isAdmin);
+        console.log('[Auth] userCountries:', userCountries);
+        
         // Hide SMS Settings for non-admins
         if (!isAdmin) {
+            console.log('[Auth] Hiding SMS Settings nav for non-admin');
             const smsSettingsNav = document.querySelector('[data-tab="sms-settings"]');
             if (smsSettingsNav) smsSettingsNav.style.display = 'none';
+        } else {
+            console.log('[Auth] Admin user - showing all settings');
         }
         
         // State
