@@ -1770,6 +1770,51 @@ Available variables:
             }
         };
         
+        // ========== UNIFIED CONTENT VISIBILITY CONTROL ==========
+        function hideAllContent() {
+            // Hide all special content areas
+            const specialAreas = [
+                'dashboardContent', 'smsDashboardContent', 'smsSettingsContent',
+                'emailTemplatesContent', 'agentsContent', 'followupsContent',
+                'analyticsContent', 'paketomatiContent'
+            ];
+            specialAreas.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            
+            // Also ensure main content area is in correct state
+            const mainContent = document.querySelector('.content');
+            if (mainContent) mainContent.style.display = 'none';
+        }
+        
+        function showMainView() {
+            const main = document.getElementById('main');
+            if (main) main.style.display = 'block';
+            
+            const statsGrid = document.querySelector('.stats-grid');
+            if (statsGrid) statsGrid.style.display = 'grid';
+            
+            const countryTabs = document.querySelector('.country-tabs');
+            if (countryTabs) countryTabs.style.display = 'flex';
+            
+            const contentTabs = document.getElementById('contentTabs');
+            if (contentTabs) contentTabs.style.display = 'flex';
+            
+            const content = document.querySelector('.content');
+            if (content) content.style.display = 'block';
+        }
+        
+        function showSpecialView(contentId) {
+            // Hide main completely
+            const main = document.getElementById('main');
+            if (main) main.style.display = 'none';
+            
+            // Show specific content
+            const el = document.getElementById(contentId);
+            if (el) el.style.display = 'block';
+        }
+        
         // Sidebar toggle
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
@@ -1816,31 +1861,15 @@ Available variables:
                 };
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
                 
-                // Show/hide content based on tab
-                const otherTabs = ['sms-dashboard', 'sms-settings', 'email-templates', 'dashboard', 'agents', 'followups', 'analytics'];
+                // FIRST: Hide ALL content areas to prevent overlap
+                hideAllContent();
                 
-                // Hide all special content areas
-                document.getElementById('dashboardContent').style.display = 'none';
-                document.getElementById('smsDashboardContent').style.display = 'none';
-                document.getElementById('smsSettingsContent').style.display = 'none';
-                document.getElementById('emailTemplatesContent').style.display = 'none';
-                document.getElementById('agentsContent').style.display = 'none';
-                document.getElementById('followupsContent').style.display = 'none';
-                document.getElementById('analyticsContent').style.display = 'none';
-                document.getElementById('paketomatiContent').style.display = 'none';
-                
-                // Content tabs visibility
+                // Content tabs element
                 const contentTabs = document.getElementById('contentTabs');
-                const mainElement = document.getElementById('main');
                 
                 if (isDataTab) {
-                    // Show main element for data views
-                    mainElement.style.display = 'block';
-                    
-                    // Show country tabs and content tabs for data views
-                    document.querySelector('.stats-grid').style.display = 'grid';
-                    document.querySelector('.country-tabs').style.display = 'flex';
-                    contentTabs.style.display = 'flex';
+                    // Show main view with stats, country tabs, content tabs
+                    showMainView();
                     
                     // Sync content tab state
                     currentContentTab = currentTab;
@@ -1853,8 +1882,6 @@ Available variables:
                         document.getElementById('paketomatiContent').style.display = 'block';
                         loadPaketomati();
                     } else {
-                        document.querySelector('.content').style.display = 'block';
-                        document.getElementById('paketomatiContent').style.display = 'none';
                         currentPage = 1;
                         renderTable();
                         setTimeout(addCustomerClickHandlers, 100);
@@ -1863,31 +1890,28 @@ Available variables:
                     // Update country tab counts to reflect current content type
                     updateCounts();
                 } else {
-                    // HIDE main element entirely for special tabs (dashboard, analytics, etc.)
-                    mainElement.style.display = 'none';
-                    
-                    // Show specific content
+                    // Show specific special content
                     if (currentTab === 'dashboard') {
-                        document.getElementById('dashboardContent').style.display = 'block';
+                        showSpecialView('dashboardContent');
                         renderDashboard();
                     } else if (currentTab === 'sms-dashboard') {
-                        document.getElementById('smsDashboardContent').style.display = 'block';
+                        showSpecialView('smsDashboardContent');
                         loadSmsDashboardQueue();
                         renderSmsTable();
                     } else if (currentTab === 'sms-settings') {
-                        document.getElementById('smsSettingsContent').style.display = 'block';
+                        showSpecialView('smsSettingsContent');
                         loadSmsSettingsUI();
                     } else if (currentTab === 'email-templates') {
-                        document.getElementById('emailTemplatesContent').style.display = 'block';
+                        showSpecialView('emailTemplatesContent');
                         loadEmailTemplatesUI();
                     } else if (currentTab === 'agents') {
-                        document.getElementById('agentsContent').style.display = 'block';
+                        showSpecialView('agentsContent');
                         loadAgents();
                     } else if (currentTab === 'followups') {
-                        document.getElementById('followupsContent').style.display = 'block';
+                        showSpecialView('followupsContent');
                         renderFollowups();
                     } else if (currentTab === 'analytics') {
-                        document.getElementById('analyticsContent').style.display = 'block';
+                        showSpecialView('analyticsContent');
                         renderAnalytics();
                     }
                 }
@@ -1928,15 +1952,11 @@ Available variables:
                     const sidebarItem = document.querySelector(`.nav-item[data-tab="${newTab}"]`);
                     if (sidebarItem) sidebarItem.classList.add('active');
                     
-                    // Hide ALL special content areas first (prevents overlap)
-                    document.getElementById('dashboardContent').style.display = 'none';
-                    document.getElementById('smsDashboardContent').style.display = 'none';
-                    document.getElementById('smsSettingsContent').style.display = 'none';
-                    document.getElementById('emailTemplatesContent').style.display = 'none';
-                    document.getElementById('agentsContent').style.display = 'none';
-                    document.getElementById('followupsContent').style.display = 'none';
-                    document.getElementById('analyticsContent').style.display = 'none';
-                    document.getElementById('paketomatiContent').style.display = 'none';
+                    // Hide ALL content areas first (prevents overlap)
+                    hideAllContent();
+                    
+                    // Show main view elements
+                    showMainView();
                     
                     // Show appropriate content
                     if (newTab === 'paketomati') {
@@ -1944,7 +1964,6 @@ Available variables:
                         document.getElementById('paketomatiContent').style.display = 'block';
                         loadPaketomati();
                     } else {
-                        document.querySelector('.content').style.display = 'block';
                         currentPage = 1;
                         renderTable();
                     }
