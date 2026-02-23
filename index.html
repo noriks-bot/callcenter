@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
+            --sidebar-width: 260px;
+            --header-height: 60px;
             --bg-dark: #0f172a;
             --bg-card: #1e293b;
             --bg-hover: #334155;
@@ -18,33 +20,133 @@
             --green: #22c55e;
             --orange: #f97316;
             --purple: #a855f7;
+            --red: #ef4444;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text); }
         
-        /* Header with Country Tabs */
-        .top-header {
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
-            padding: 16px 24px;
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+        .sidebar.collapsed { transform: translateX(-100%); }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
+            gap: 12px;
         }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo-icon {
+        .logo {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px;
+        }
+        .brand { font-size: 18px; font-weight: 700; }
+        .brand span { display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); }
+        
+        .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; padding: 0 12px; margin-bottom: 8px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+        .nav-item:hover { background: var(--bg-hover); color: var(--text); }
+        .nav-item.active { background: rgba(59,130,246,0.15); color: var(--accent); }
+        .nav-item i { width: 20px; text-align: center; }
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--bg-hover);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .nav-item.active .badge { background: var(--accent); color: white; }
+        
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .user-card {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+        .user-avatar {
             width: 40px; height: 40px;
             background: var(--accent);
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 18px;
+            font-weight: 600;
         }
-        .logo-text { font-size: 18px; font-weight: 700; }
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .header-btn {
-            background: rgba(255,255,255,0.1);
+        .user-info { flex: 1; }
+        .user-name { font-weight: 600; font-size: 14px; }
+        .user-role { font-size: 12px; color: var(--text-muted); }
+        .logout-btn {
+            background: none; border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .logout-btn:hover { background: var(--bg-hover); color: var(--red); }
+        
+        /* Main Content */
+        .main {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s;
+        }
+        .main.expanded { margin-left: 0; }
+        
+        .top-bar {
+            height: var(--header-height);
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .menu-btn {
+            background: none; border: none;
+            color: var(--text);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            display: none;
+        }
+        .menu-btn:hover { background: var(--bg-hover); }
+        .page-title { font-size: 18px; font-weight: 600; }
+        .top-bar-actions { margin-left: auto; display: flex; gap: 8px; }
+        .action-btn-header {
+            background: var(--bg-hover);
             border: none;
-            color: white;
+            color: var(--text);
             padding: 10px 16px;
             border-radius: 8px;
             cursor: pointer;
@@ -53,20 +155,20 @@
             align-items: center;
             gap: 8px;
         }
-        .header-btn:hover { background: rgba(255,255,255,0.2); }
+        .action-btn-header:hover { background: var(--border); }
+        .action-btn-header.primary { background: var(--accent); }
         
-        /* Country Tabs Bar */
-        .country-tabs-bar {
-            background: var(--bg-card);
-            padding: 0 24px;
+        /* Country Tabs */
+        .country-tabs {
             display: flex;
-            align-items: center;
             gap: 0;
+            background: var(--bg-card);
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
+            padding: 0 24px;
         }
         .country-tab {
-            padding: 16px 24px;
+            padding: 14px 20px;
             background: none;
             border: none;
             color: var(--text-muted);
@@ -75,29 +177,18 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             border-bottom: 3px solid transparent;
-            transition: all 0.2s;
             white-space: nowrap;
         }
-        .country-tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-        .country-tab.active {
-            color: var(--accent);
-            border-bottom-color: var(--accent);
-            background: rgba(59,130,246,0.1);
-        }
-        .country-tab .flag { font-size: 20px; }
-        .country-tab .count {
-            background: var(--bg-hover);
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-        }
+        .country-tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+        .country-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .country-tab .flag { font-size: 18px; }
+        .country-tab .count { background: var(--bg-hover); padding: 2px 8px; border-radius: 8px; font-size: 12px; }
         .country-tab.active .count { background: var(--accent); color: white; }
         
-        /* Stats Row */
-        .stats-row {
+        /* Stats */
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
@@ -117,43 +208,16 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 20px;
         }
-        .stat-icon.blue { background: rgba(59,130,246,0.2); color: var(--accent); }
-        .stat-icon.green { background: rgba(34,197,94,0.2); color: var(--green); }
-        .stat-icon.orange { background: rgba(249,115,22,0.2); color: var(--orange); }
-        .stat-icon.purple { background: rgba(168,85,247,0.2); color: var(--purple); }
-        .stat-info .value { font-size: 28px; font-weight: 700; }
-        .stat-info .label { font-size: 13px; color: var(--text-muted); }
+        .stat-icon.blue { background: rgba(59,130,246,0.15); color: var(--accent); }
+        .stat-icon.green { background: rgba(34,197,94,0.15); color: var(--green); }
+        .stat-icon.orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+        .stat-icon.purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+        .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-label { font-size: 13px; color: var(--text-muted); }
         
-        /* Content Tabs */
-        .content-area { padding: 0 24px 24px; }
-        .content-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .content-tab {
-            padding: 12px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .content-tab:hover { border-color: var(--accent); color: var(--text); }
-        .content-tab.active { background: var(--accent); border-color: var(--accent); color: white; }
-        .content-tab .badge {
-            background: rgba(255,255,255,0.2);
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-size: 12px;
-        }
+        /* Content Area */
+        .content { padding: 0 24px 24px; }
         
-        /* Search & Filters */
         .filters-bar {
             display: flex;
             gap: 12px;
@@ -175,15 +239,17 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--text);
-            font-size: 14px;
+            min-width: 150px;
         }
         
         /* Table */
-        .data-table {
-            width: 100%;
+        .table-card {
             background: var(--bg-card);
             border-radius: 12px;
             overflow: hidden;
+        }
+        .data-table {
+            width: 100%;
             border-collapse: collapse;
         }
         .data-table th {
@@ -213,7 +279,7 @@
         .customer-name { font-weight: 600; }
         .customer-email { font-size: 12px; color: var(--text-muted); }
         
-        .phone-link { color: var(--green); text-decoration: none; }
+        .phone-link { color: var(--green); text-decoration: none; display: flex; align-items: center; gap: 6px; }
         .phone-link:hover { text-decoration: underline; }
         
         .badge {
@@ -239,6 +305,8 @@
         }
         .action-btn:hover { background: var(--border); color: white; }
         .action-btn.call { background: rgba(34,197,94,0.2); color: var(--green); }
+        .action-btn.order { background: rgba(59,130,246,0.2); color: var(--accent); }
+        .action-btn.order:hover { background: var(--accent); color: white; }
         
         .empty { text-align: center; padding: 60px; color: var(--text-muted); }
         .empty i { font-size: 48px; opacity: 0.3; margin-bottom: 16px; display: block; }
@@ -248,16 +316,25 @@
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.8);
             display: none; align-items: center; justify-content: center;
-            z-index: 1000;
+            z-index: 200;
         }
         .modal-bg.open { display: flex; }
         .modal {
             background: var(--bg-card);
             border-radius: 16px;
-            width: 100%; max-width: 400px;
-            padding: 24px;
+            width: 100%; max-width: 450px;
+            margin: 20px;
         }
-        .modal h3 { margin-bottom: 20px; }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-title { font-size: 18px; font-weight: 700; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        .modal-body { padding: 24px; }
         .form-group { margin-bottom: 16px; }
         .form-label { display: block; font-size: 14px; margin-bottom: 8px; color: var(--text-muted); }
         .form-input, .form-select, .form-textarea {
@@ -266,119 +343,141 @@
             border-radius: 8px; color: var(--text); font-size: 14px;
         }
         .form-textarea { min-height: 100px; resize: vertical; }
-        .modal-btns { display: flex; gap: 12px; margin-top: 20px; }
-        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; flex: 1; }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex; gap: 12px;
+        }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; flex: 1; font-size: 14px; }
         .btn-cancel { background: var(--bg-hover); color: var(--text); }
         .btn-save { background: var(--accent); color: white; }
+        .btn-success { background: var(--green); color: white; }
         
-        /* Loading */
         .loading { text-align: center; padding: 40px; }
         .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 12px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        @media (max-width: 768px) {
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .country-tabs-bar { padding: 0 12px; }
-            .country-tab { padding: 12px 16px; }
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            background: var(--green);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: none;
+            z-index: 300;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .toast.show { display: block; animation: slideIn 0.3s; }
+        .toast.error { background: var(--red); }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } }
+        
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .menu-btn { display: block; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Top Header -->
-    <div class="top-header">
-        <div class="logo">
-            <div class="logo-icon">N</div>
-            <div class="logo-text">Call Center</div>
-        </div>
-        <div class="header-actions">
-            <button class="header-btn" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            <button class="header-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
-        </div>
-    </div>
-    
-    <!-- Country Tabs -->
-    <div class="country-tabs-bar" id="countryTabs">
-        <button class="country-tab active" data-store="all">
-            <span class="flag">🌍</span>
-            <span>All</span>
-            <span class="count" id="count-all">0</span>
-        </button>
-    </div>
-    
-    <!-- Stats -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
-            <div class="stat-info">
-                <div class="value" id="statCarts">0</div>
-                <div class="label">Abandoned Carts</div>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">N</div>
+            <div class="brand">
+                Noriks
+                <span>Call Center</span>
             </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon green"><i class="fas fa-euro-sign"></i></div>
-            <div class="stat-info">
-                <div class="value" id="statValue">€0</div>
-                <div class="label">Total Value</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
-            <div class="stat-info">
-                <div class="value" id="statPending">0</div>
-                <div class="label">Pending Orders</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon purple"><i class="fas fa-user"></i></div>
-            <div class="stat-info">
-                <div class="value" id="statBuyers">0</div>
-                <div class="label">Enkratni kupci</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Content -->
-    <div class="content-area">
-        <div class="content-tabs">
-            <button class="content-tab active" data-tab="carts">
-                <i class="fas fa-shopping-cart"></i> Abandoned Carts
-                <span class="badge" id="tabCarts">0</span>
-            </button>
-            <button class="content-tab" data-tab="pending">
-                <i class="fas fa-clock"></i> Pending Orders
-                <span class="badge" id="tabPending">0</span>
-            </button>
-            <button class="content-tab" data-tab="buyers">
-                <i class="fas fa-user"></i> Enkratni kupci
-                <span class="badge" id="tabBuyers">0</span>
-            </button>
         </div>
         
-        <div class="filters-bar">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone...">
-            <select class="filter-select" id="statusFilter">
-                <option value="">All Status</option>
-                <option value="not_called">Not Called</option>
-                <option value="called">Called</option>
-                <option value="answered">Answered</option>
-                <option value="no_answer">No Answer</option>
-                <option value="converted">Converted</option>
-                <option value="not_interested">Not Interested</option>
-            </select>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-title">Menu</div>
+                <div class="nav-item active" data-tab="carts">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Abandoned Carts</span>
+                    <span class="badge" id="navCarts">0</span>
+                </div>
+                <div class="nav-item" data-tab="pending">
+                    <i class="fas fa-clock"></i>
+                    <span>Pending Orders</span>
+                    <span class="badge" id="navPending">0</span>
+                </div>
+                <div class="nav-item" data-tab="buyers">
+                    <i class="fas fa-user"></i>
+                    <span>Enkratni kupci</span>
+                    <span class="badge" id="navBuyers">0</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Reports</div>
+                <a href="report.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">N</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Noriks</div>
+                    <div class="user-role" id="userRole">Admin</div>
+                </div>
+                <button class="logout-btn" onclick="logout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main -->
+    <main class="main" id="main">
+        <div class="top-bar">
+            <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+            <div class="page-title" id="pageTitle">Abandoned Carts</div>
+            <div class="top-bar-actions">
+                <button class="action-btn-header" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
         </div>
         
-        <div id="tableContainer">
-            <div class="loading"><div class="spinner"></div>Loading...</div>
+        <div class="country-tabs" id="countryTabs"></div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
+                <div><div class="stat-value" id="statCarts">0</div><div class="stat-label">Abandoned Carts</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-euro-sign"></i></div>
+                <div><div class="stat-value" id="statValue">€0</div><div class="stat-label">Total Value</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                <div><div class="stat-value" id="statPending">0</div><div class="stat-label">Pending Orders</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fas fa-user"></i></div>
+                <div><div class="stat-value" id="statBuyers">0</div><div class="stat-label">Enkratni kupci</div></div>
+            </div>
         </div>
-    </div>
-    
-    <!-- Modal -->
-    <div class="modal-bg" id="modal">
-        <div class="modal">
-            <h3>Update Status</h3>
-            <div class="form-group">
-                <label class="form-label">Status</label>
-                <select class="form-select" id="modalStatus">
+        
+        <div class="content">
+            <div class="filters-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone...">
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
                     <option value="not_called">Not Called</option>
                     <option value="called">Called</option>
                     <option value="answered">Answered</option>
@@ -387,21 +486,84 @@
                     <option value="not_interested">Not Interested</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label class="form-label">Notes</label>
-                <textarea class="form-textarea" id="modalNotes" placeholder="Notes..."></textarea>
+            
+            <div class="table-card">
+                <div id="tableContainer">
+                    <div class="loading"><div class="spinner"></div>Loading...</div>
+                </div>
             </div>
-            <div class="modal-btns">
-                <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-save" onclick="saveStatus()">Save</button>
+        </div>
+    </main>
+    
+    <!-- Status Modal -->
+    <div class="modal-bg" id="statusModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Update Status</div>
+                <button class="modal-close" onclick="closeModal('statusModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="modalStatus">
+                        <option value="not_called">Not Called</option>
+                        <option value="called">Called</option>
+                        <option value="answered">Answered</option>
+                        <option value="no_answer">No Answer</option>
+                        <option value="converted">Converted</option>
+                        <option value="not_interested">Not Interested</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="modalNotes" placeholder="Add notes..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('statusModal')">Cancel</button>
+                <button class="btn btn-save" onclick="saveStatus()">Save Changes</button>
             </div>
         </div>
     </div>
+    
+    <!-- Create Order Modal -->
+    <div class="modal-bg" id="orderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">🛒 Create Order</div>
+                <button class="modal-close" onclick="closeModal('orderModal')">×</button>
+            </div>
+            <div class="modal-body" id="orderModalBody">
+                <p style="margin-bottom:16px;">Create WooCommerce order from this abandoned cart?</p>
+                <div style="background:var(--bg-dark);padding:16px;border-radius:8px;margin-bottom:16px;">
+                    <div style="margin-bottom:8px;"><strong id="orderCustomer">Customer Name</strong></div>
+                    <div style="font-size:13px;color:var(--text-muted);" id="orderEmail">email@example.com</div>
+                    <div style="font-size:13px;color:var(--text-muted);" id="orderPhone">+123456789</div>
+                    <div style="margin-top:12px;font-size:20px;font-weight:700;color:var(--green);" id="orderValue">€0.00</div>
+                </div>
+                <p style="font-size:13px;color:var(--text-muted);">
+                    <i class="fas fa-info-circle"></i> Order will be created with status "Processing" and meta tag "_call_center".
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('orderModal')">Cancel</button>
+                <button class="btn btn-success" onclick="confirmCreateOrder()">
+                    <i class="fas fa-check"></i> Create Order
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
     
     <script>
         // Auth
         const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
         if (!user) window.location.href = 'login.html';
+        document.getElementById('userName').textContent = user.username;
+        document.getElementById('userRole').textContent = user.role === 'admin' ? 'Administrator' : 'Agent';
+        document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
         
         // State
         let stores = [];
@@ -411,6 +573,26 @@
         let currentStore = 'all';
         let currentTab = 'carts';
         let editId = null;
+        let orderCartId = null;
+        let orderCart = null;
+        
+        // Sidebar toggle
+        document.getElementById('menuBtn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // Nav items
+        document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
+            item.addEventListener('click', () => {
+                currentTab = item.dataset.tab;
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                document.getElementById('pageTitle').textContent = 
+                    currentTab === 'carts' ? 'Abandoned Carts' : 
+                    currentTab === 'pending' ? 'Pending Orders' : 'Enkratni kupci';
+                renderTable();
+            });
+        });
         
         // Init
         async function init() {
@@ -424,14 +606,12 @@
             const container = document.getElementById('countryTabs');
             container.innerHTML = `
                 <button class="country-tab active" data-store="all">
-                    <span class="flag">🌍</span>
-                    <span>All</span>
+                    <span class="flag">🌍</span> All
                     <span class="count" id="count-all">0</span>
                 </button>
             ` + stores.map(s => `
                 <button class="country-tab" data-store="${s.code}">
-                    <span class="flag">${s.flag}</span>
-                    <span>${s.name}</span>
+                    <span class="flag">${s.flag}</span> ${s.name}
                     <span class="count" id="count-${s.code}">0</span>
                 </button>
             `).join('');
@@ -463,50 +643,37 @@
         }
         
         async function refreshData() {
+            document.getElementById('tableContainer').innerHTML = '<div class="loading"><div class="spinner"></div>Refreshing...</div>';
             await fetch('api.php?action=clear-cache');
             await loadAllData();
+            showToast('Data refreshed!');
         }
         
         function updateCounts() {
-            // All count
             document.getElementById('count-all').textContent = carts.length;
+            document.getElementById('navCarts').textContent = carts.length;
+            document.getElementById('navPending').textContent = pending.length;
+            document.getElementById('navBuyers').textContent = buyers.length;
             
-            // Per-store counts
             stores.forEach(s => {
-                const count = carts.filter(c => c.storeCode === s.code).length;
                 const el = document.getElementById(`count-${s.code}`);
-                if (el) el.textContent = count;
+                if (el) el.textContent = carts.filter(c => c.storeCode === s.code).length;
             });
         }
         
         function updateStats() {
-            const filteredCarts = currentStore === 'all' ? carts : carts.filter(c => c.storeCode === currentStore);
-            const filteredPending = currentStore === 'all' ? pending : pending.filter(p => p.storeCode === currentStore);
-            const filteredBuyers = currentStore === 'all' ? buyers : buyers.filter(b => b.storeCode === currentStore);
+            const fc = currentStore === 'all' ? carts : carts.filter(c => c.storeCode === currentStore);
+            const fp = currentStore === 'all' ? pending : pending.filter(p => p.storeCode === currentStore);
+            const fb = currentStore === 'all' ? buyers : buyers.filter(b => b.storeCode === currentStore);
             
-            const totalValue = filteredCarts.reduce((sum, c) => sum + (c.cartValue || 0), 0);
-            const currency = filteredCarts[0]?.currency || 'EUR';
-            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[currency] || '€';
+            const totalValue = fc.reduce((sum, c) => sum + (c.cartValue || 0), 0);
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[fc[0]?.currency] || '€';
             
-            document.getElementById('statCarts').textContent = filteredCarts.length;
+            document.getElementById('statCarts').textContent = fc.length;
             document.getElementById('statValue').textContent = sym + Math.round(totalValue).toLocaleString();
-            document.getElementById('statPending').textContent = filteredPending.length;
-            document.getElementById('statBuyers').textContent = filteredBuyers.length;
-            
-            document.getElementById('tabCarts').textContent = filteredCarts.length;
-            document.getElementById('tabPending').textContent = filteredPending.length;
-            document.getElementById('tabBuyers').textContent = filteredBuyers.length;
+            document.getElementById('statPending').textContent = fp.length;
+            document.getElementById('statBuyers').textContent = fb.length;
         }
-        
-        // Content tabs
-        document.querySelectorAll('.content-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                currentTab = tab.dataset.tab;
-                document.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                renderTable();
-            });
-        });
         
         // Filters
         document.getElementById('searchInput').addEventListener('input', renderTable);
@@ -518,161 +685,90 @@
             
             let data = currentTab === 'carts' ? carts : currentTab === 'pending' ? pending : buyers;
             
-            if (currentStore !== 'all') {
-                data = data.filter(d => d.storeCode === currentStore);
-            }
-            if (status) {
-                data = data.filter(d => d.callStatus === status);
-            }
-            if (search) {
-                data = data.filter(d => 
-                    (d.customerName || '').toLowerCase().includes(search) ||
-                    (d.email || '').toLowerCase().includes(search) ||
-                    (d.phone || '').includes(search)
-                );
-            }
+            if (currentStore !== 'all') data = data.filter(d => d.storeCode === currentStore);
+            if (status) data = data.filter(d => d.callStatus === status);
+            if (search) data = data.filter(d => 
+                (d.customerName || '').toLowerCase().includes(search) ||
+                (d.email || '').toLowerCase().includes(search) ||
+                (d.phone || '').includes(search)
+            );
             
             const container = document.getElementById('tableContainer');
             
             if (!data.length) {
-                container.innerHTML = `<div class="empty"><i class="fas fa-inbox"></i><p>No data found</p></div>`;
+                container.innerHTML = '<div class="empty"><i class="fas fa-inbox"></i><p>No data found</p></div>';
                 return;
             }
             
-            if (currentTab === 'carts') {
-                renderCartsTable(data);
-            } else if (currentTab === 'pending') {
-                renderPendingTable(data);
-            } else {
-                renderBuyersTable(data);
-            }
+            if (currentTab === 'carts') renderCartsTable(data);
+            else if (currentTab === 'pending') renderPendingTable(data);
+            else renderBuyersTable(data);
         }
         
         function renderCartsTable(data) {
-            const container = document.getElementById('tableContainer');
-            container.innerHTML = `
+            document.getElementById('tableContainer').innerHTML = `
                 <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Customer</th>
-                            <th>Store</th>
-                            <th>Value</th>
-                            <th>Products</th>
-                            <th>Phone</th>
-                            <th>Status</th>
-                            <th>Time</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+                    <thead><tr>
+                        <th>Customer</th><th>Store</th><th>Value</th><th>Phone</th><th>Status</th><th>Time</th><th>Actions</th>
+                    </tr></thead>
                     <tbody>
                         ${data.map(c => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[c.currency] || '€';
-                            return `
-                            <tr>
-                                <td>
-                                    <div class="customer-cell">
-                                        <div class="avatar">${initials(c.customerName)}</div>
-                                        <div>
-                                            <div class="customer-name">${esc(c.customerName)}</div>
-                                            <div class="customer-email">${esc(c.email)}</div>
-                                        </div>
-                                    </div>
-                                </td>
+                            return `<tr>
+                                <td><div class="customer-cell"><div class="avatar">${initials(c.customerName)}</div><div><div class="customer-name">${esc(c.customerName)}</div><div class="customer-email">${esc(c.email)}</div></div></div></td>
                                 <td>${c.storeFlag} ${c.storeName}</td>
                                 <td><strong>${sym}${(c.cartValue||0).toFixed(2)}</strong></td>
-                                <td style="font-size:12px;max-width:180px;">
-                                    ${(c.cartContents||[]).slice(0,2).map(i=>`${i.quantity}x ${esc((i.name||'').substring(0,25))}`).join('<br>')}
-                                </td>
                                 <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '—'}</td>
                                 <td><span class="badge ${c.callStatus}">${statusLabel(c.callStatus)}</span></td>
                                 <td style="font-size:12px;">${timeAgo(c.abandonedAt)}</td>
                                 <td>
-                                    ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')"><i class="fas fa-phone"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openModal('${c.id}','${c.callStatus}','${esc(c.notes||'')}')"><i class="fas fa-edit"></i></button>
+                                    ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
+                                    <button class="action-btn order" onclick="openOrderModal('${c.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i></button>
+                                    <button class="action-btn" onclick="openStatusModal('${c.id}','${c.callStatus}','${esc(c.notes||'')}')" title="Edit"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
                     </tbody>
-                </table>
-            `;
+                </table>`;
         }
         
         function renderPendingTable(data) {
-            const container = document.getElementById('tableContainer');
-            container.innerHTML = `
+            document.getElementById('tableContainer').innerHTML = `
                 <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Customer</th>
-                            <th>Store</th>
-                            <th>Order #</th>
-                            <th>Total</th>
-                            <th>Phone</th>
-                            <th>Order Status</th>
-                            <th>Call Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+                    <thead><tr>
+                        <th>Customer</th><th>Store</th><th>Order #</th><th>Total</th><th>Phone</th><th>Status</th><th>Actions</th>
+                    </tr></thead>
                     <tbody>
                         ${data.map(o => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[o.currency] || '€';
-                            return `
-                            <tr>
-                                <td>
-                                    <div class="customer-cell">
-                                        <div class="avatar">${initials(o.customerName)}</div>
-                                        <div>
-                                            <div class="customer-name">${esc(o.customerName)}</div>
-                                            <div class="customer-email">${esc(o.email)}</div>
-                                        </div>
-                                    </div>
-                                </td>
+                            return `<tr>
+                                <td><div class="customer-cell"><div class="avatar">${initials(o.customerName)}</div><div><div class="customer-name">${esc(o.customerName)}</div><div class="customer-email">${esc(o.email)}</div></div></div></td>
                                 <td>${o.storeFlag} ${o.storeName}</td>
                                 <td><strong>#${o.orderId}</strong></td>
                                 <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
                                 <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '—'}</td>
-                                <td><span class="badge" style="background:rgba(249,115,22,0.2);color:#f97316;">${o.orderStatus}</span></td>
                                 <td><span class="badge ${o.callStatus}">${statusLabel(o.callStatus)}</span></td>
                                 <td>
                                     ${o.phone ? `<button class="action-btn call" onclick="call('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openModal('${o.id}','${o.callStatus}','${esc(o.notes||'')}')"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn" onclick="openStatusModal('${o.id}','${o.callStatus}','${esc(o.notes||'')}')"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
                     </tbody>
-                </table>
-            `;
+                </table>`;
         }
         
         function renderBuyersTable(data) {
-            const container = document.getElementById('tableContainer');
-            container.innerHTML = `
+            document.getElementById('tableContainer').innerHTML = `
                 <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Customer</th>
-                            <th>Store</th>
-                            <th>Total Spent</th>
-                            <th>Phone</th>
-                            <th>Registered</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+                    <thead><tr>
+                        <th>Customer</th><th>Store</th><th>Spent</th><th>Phone</th><th>Registered</th><th>Status</th><th>Actions</th>
+                    </tr></thead>
                     <tbody>
                         ${data.map(b => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[b.currency] || '€';
-                            return `
-                            <tr>
-                                <td>
-                                    <div class="customer-cell">
-                                        <div class="avatar">${initials(b.customerName)}</div>
-                                        <div>
-                                            <div class="customer-name">${esc(b.customerName)}</div>
-                                            <div class="customer-email">${esc(b.email)}</div>
-                                        </div>
-                                    </div>
-                                </td>
+                            return `<tr>
+                                <td><div class="customer-cell"><div class="avatar">${initials(b.customerName)}</div><div><div class="customer-name">${esc(b.customerName)}</div><div class="customer-email">${esc(b.email)}</div></div></div></td>
                                 <td>${b.storeFlag} ${b.storeName}</td>
                                 <td><strong>${sym}${(b.totalSpent||0).toFixed(2)}</strong></td>
                                 <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '—'}</td>
@@ -680,23 +776,22 @@
                                 <td><span class="badge ${b.callStatus}">${statusLabel(b.callStatus)}</span></td>
                                 <td>
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openModal('${b.id}','${b.callStatus}','${esc(b.notes||'')}')"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn" onclick="openStatusModal('${b.id}','${b.callStatus}','${esc(b.notes||'')}')"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
                     </tbody>
-                </table>
-            `;
+                </table>`;
         }
         
-        // Modal
-        function openModal(id, status, notes) {
+        // Status Modal
+        function openStatusModal(id, status, notes) {
             editId = id;
             document.getElementById('modalStatus').value = status || 'not_called';
             document.getElementById('modalNotes').value = notes || '';
-            document.getElementById('modal').classList.add('open');
+            document.getElementById('statusModal').classList.add('open');
         }
-        function closeModal() { document.getElementById('modal').classList.remove('open'); }
+        
         async function saveStatus() {
             const status = document.getElementById('modalStatus').value;
             const notes = document.getElementById('modalNotes').value;
@@ -709,19 +804,76 @@
                 const item = arr.find(i => i.id === editId);
                 if (item) { item.callStatus = status; item.notes = notes; }
             });
-            closeModal();
+            closeModal('statusModal');
             renderTable();
+            showToast('Status updated!');
         }
         
+        // Order Modal
+        function openOrderModal(cartId) {
+            orderCartId = cartId;
+            orderCart = carts.find(c => c.id === cartId);
+            if (!orderCart) return;
+            
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
+            document.getElementById('orderCustomer').textContent = orderCart.customerName;
+            document.getElementById('orderEmail').textContent = orderCart.email;
+            document.getElementById('orderPhone').textContent = orderCart.phone || 'No phone';
+            document.getElementById('orderValue').textContent = sym + (orderCart.cartValue||0).toFixed(2);
+            document.getElementById('orderModal').classList.add('open');
+        }
+        
+        async function confirmCreateOrder() {
+            if (!orderCartId) return;
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            
+            try {
+                const res = await fetch('api.php?action=create-order', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ cartId: orderCartId, agent: user.username })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    closeModal('orderModal');
+                    showToast(`✅ Order #${result.orderNumber} created!`);
+                    // Remove from carts list
+                    carts = carts.filter(c => c.id !== orderCartId);
+                    updateCounts();
+                    updateStats();
+                    renderTable();
+                } else {
+                    showToast(result.error || 'Failed to create order', true);
+                }
+            } catch (e) {
+                showToast('Error creating order', true);
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check"></i> Create Order';
+        }
+        
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
         function call(phone) { window.open('tel:'+phone, '_self'); }
         function logout() { localStorage.removeItem('callcenter_user'); window.location.href = 'login.html'; }
+        
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
         
         // Helpers
         function initials(n) { return (n||'?').split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase(); }
         function esc(t) { const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
         function statusLabel(s) { return {not_called:'Not Called',called:'Called',answered:'Answered',no_answer:'No Answer',converted:'Converted',not_interested:'Not Interested'}[s]||s; }
         function formatDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
-        function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+        function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
         
         init();
     </script>

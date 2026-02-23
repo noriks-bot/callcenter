@@ -1,9 +1,8 @@
 <?php
 /**
- * Noriks Call Center - PHP API v2
- * - Parallel loading + caching
- * - Filter abandoned carts (remove if order exists)
- * - One-time buyers from WooCommerce (replaces Klaviyo)
+ * Noriks Call Center - PHP API v3
+ * + Create orders from abandoned carts
+ * + Meta tags for call center orders
  */
 
 error_reporting(E_ALL);
@@ -85,13 +84,13 @@ function curlMultiGet($urls) {
     return $results;
 }
 
-function wcApiRequest($storeCode, $endpoint, $params = []) {
+function wcApiRequest($storeCode, $endpoint, $params = [], $method = 'GET', $body = null) {
     global $stores;
     $config = $stores[$storeCode] ?? null;
-    if (!$config) return [];
+    if (!$config) return ['error' => 'Invalid store'];
     
     $url = $config['url'] . '/wp-json/wc/v3/' . $endpoint;
-    if ($params) $url .= '?' . http_build_query($params);
+    if ($params && $method === 'GET') $url .= '?' . http_build_query($params);
     
     $ch = curl_init();
     curl_setopt_array($ch, [
@@ -101,15 +100,31 @@ function wcApiRequest($storeCode, $endpoint, $params = []) {
         CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
         CURLOPT_SSL_VERIFYPEER => true
     ]);
+    
+    if ($method === 'POST') {
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+    }
+    
     $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
     curl_close($ch);
-    return json_decode($response, true) ?: [];
+    
+    if ($error) return ['error' => $error];
+    
+    $data = json_decode($response, true);
+    if ($httpCode >= 400) {
+        return ['error' => $data['message'] ?? 'API Error', 'code' => $httpCode];
+    }
+    
+    return $data ?: [];
 }
 
-// Get all completed order emails for a store (to filter abandoned carts)
 function getCompletedOrderEmails($storeCode) {
     $cacheKey = "completed_emails_{$storeCode}";
-    $cached = getCache($cacheKey, 600); // 10 min cache
+    $cached = getCache($cacheKey, 600);
     if ($cached !== null) return $cached;
     
     $emails = [];
@@ -119,9 +134,11 @@ function getCompletedOrderEmails($storeCode) {
         'after' => date('Y-m-d\TH:i:s', strtotime('-30 days'))
     ]);
     
-    foreach ($orders as $order) {
-        if (!empty($order['billing']['email'])) {
-            $emails[] = strtolower($order['billing']['email']);
+    if (is_array($orders)) {
+        foreach ($orders as $order) {
+            if (!empty($order['billing']['email'])) {
+                $emails[] = strtolower($order['billing']['email']);
+            }
         }
     }
     
@@ -144,7 +161,6 @@ function fetchAbandonedCarts() {
     $allCarts = [];
     $responses = curlMultiGet($endpoints);
     
-    // Get completed order emails for filtering
     $completedEmails = [];
     foreach ($stores as $code => $config) {
         $completedEmails[$code] = getCompletedOrderEmails($code);
@@ -162,14 +178,18 @@ function fetchAbandonedCarts() {
         foreach ($carts as $cart) {
             if (!is_array($cart)) continue;
             
-            // Skip if this email has completed an order
             $cartEmail = strtolower($cart['email'] ?? '');
             if ($cartEmail && in_array($cartEmail, $storeCompletedEmails)) {
-                continue; // Skip - customer already ordered
+                continue;
             }
             
             $cartId = $storeCode . '_' . ($cart['id'] ?? 'unknown');
             $savedData = $callData[$cartId] ?? [];
+            
+            // Skip if already converted to order
+            if (($savedData['callStatus'] ?? '') === 'converted' && !empty($savedData['orderId'])) {
+                continue;
+            }
             
             $cartContents = [];
             $cartData = $cart['cart_contents'] ?? [];
@@ -182,7 +202,8 @@ function fetchAbandonedCarts() {
                         'name' => $name,
                         'quantity' => intval($item['quantity'] ?? 1),
                         'price' => floatval($item['line_total'] ?? 0),
-                        'productId' => $item['product_id'] ?? null
+                        'productId' => $item['product_id'] ?? null,
+                        'variationId' => $item['variation_id'] ?? null
                     ];
                 }
             }
@@ -196,8 +217,13 @@ function fetchAbandonedCarts() {
                 'storeFlag' => $config['flag'],
                 'cartDbId' => $cart['id'] ?? null,
                 'customerName' => trim(($fields['wcf_first_name'] ?? '') . ' ' . ($fields['wcf_last_name'] ?? '')) ?: 'Unknown',
+                'firstName' => $fields['wcf_first_name'] ?? '',
+                'lastName' => $fields['wcf_last_name'] ?? '',
                 'email' => $cart['email'] ?? '',
                 'phone' => $fields['wcf_phone_number'] ?? '',
+                'address' => $fields['wcf_billing_address_1'] ?? '',
+                'city' => trim(str_replace(',', '', $fields['wcf_location'] ?? '')),
+                'postcode' => $fields['wcf_billing_postcode'] ?? '',
                 'location' => ltrim($fields['wcf_location'] ?? '', ', '),
                 'cartContents' => $cartContents,
                 'cartValue' => floatval($cart['cart_total'] ?? 0),
@@ -206,7 +232,8 @@ function fetchAbandonedCarts() {
                 'status' => $cart['order_status'] ?? '',
                 'callStatus' => $savedData['callStatus'] ?? 'not_called',
                 'notes' => $savedData['notes'] ?? '',
-                'lastUpdated' => $savedData['lastUpdated'] ?? null
+                'lastUpdated' => $savedData['lastUpdated'] ?? null,
+                'orderId' => $savedData['orderId'] ?? null
             ];
         }
     }
@@ -219,12 +246,11 @@ function fetchAbandonedCarts() {
     return $allCarts;
 }
 
-// NEW: Fetch one-time buyers from WooCommerce (replaces Klaviyo suppressed profiles)
 function fetchOneTimeBuyers($storeFilter = null) {
     global $stores, $storeCurrencies;
     
     $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all');
-    $cached = getCache($cacheKey, 600); // 10 min cache
+    $cached = getCache($cacheKey, 600);
     if ($cached !== null) return $cached;
     
     $callData = loadCallData();
@@ -235,7 +261,6 @@ function fetchOneTimeBuyers($storeFilter = null) {
     foreach ($storesToFetch as $storeCode => $config) {
         if (!$config) continue;
         
-        // Get customers with order_count = 1
         $customers = wcApiRequest($storeCode, 'customers', [
             'per_page' => 100,
             'orderby' => 'registered_date',
@@ -243,8 +268,9 @@ function fetchOneTimeBuyers($storeFilter = null) {
             'role' => 'customer'
         ]);
         
+        if (!is_array($customers)) continue;
+        
         foreach ($customers as $customer) {
-            // Filter: only customers with exactly 1 order
             $orderCount = intval($customer['orders_count'] ?? 0);
             if ($orderCount !== 1) continue;
             
@@ -264,15 +290,12 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 'totalSpent' => floatval($customer['total_spent'] ?? 0),
                 'currency' => $storeCurrencies[$storeCode] ?? 'EUR',
                 'registeredAt' => $customer['date_created'] ?? '',
-                'lastOrderAt' => $customer['date_modified'] ?? '',
                 'callStatus' => $savedData['callStatus'] ?? 'not_called',
-                'notes' => $savedData['notes'] ?? '',
-                'lastUpdated' => $savedData['lastUpdated'] ?? null
+                'notes' => $savedData['notes'] ?? ''
             ];
         }
     }
     
-    // Sort by registration date (newest first)
     usort($allBuyers, function($a, $b) {
         return strtotime($b['registeredAt'] ?: '1970-01-01') - strtotime($a['registeredAt'] ?: '1970-01-01');
     });
@@ -290,7 +313,6 @@ function fetchPendingOrders() {
     $callData = loadCallData();
     $allOrders = [];
     
-    // Parallel fetch
     $mh = curl_multi_init();
     $handles = [];
     
@@ -350,8 +372,7 @@ function fetchPendingOrders() {
                 'createdAt' => $order['date_created'] ?? '',
                 'items' => $items,
                 'callStatus' => $savedData['callStatus'] ?? 'not_called',
-                'notes' => $savedData['notes'] ?? '',
-                'lastUpdated' => $savedData['lastUpdated'] ?? null
+                'notes' => $savedData['notes'] ?? ''
             ];
         }
     }
@@ -363,6 +384,116 @@ function fetchPendingOrders() {
     
     setCache('pending_orders', $allOrders);
     return $allOrders;
+}
+
+// CREATE ORDER FROM ABANDONED CART
+function createOrderFromCart($cartId, $agentName = 'Call Center') {
+    global $stores, $storeCurrencies;
+    
+    // Find the cart
+    $carts = fetchAbandonedCarts();
+    $cart = null;
+    foreach ($carts as $c) {
+        if ($c['id'] === $cartId) {
+            $cart = $c;
+            break;
+        }
+    }
+    
+    if (!$cart) {
+        return ['error' => 'Cart not found'];
+    }
+    
+    $storeCode = $cart['storeCode'];
+    $config = $stores[$storeCode] ?? null;
+    if (!$config) {
+        return ['error' => 'Invalid store'];
+    }
+    
+    // Build order data
+    $lineItems = [];
+    foreach ($cart['cartContents'] as $item) {
+        $lineItem = [
+            'product_id' => $item['productId'],
+            'quantity' => $item['quantity']
+        ];
+        if (!empty($item['variationId'])) {
+            $lineItem['variation_id'] = $item['variationId'];
+        }
+        $lineItems[] = $lineItem;
+    }
+    
+    // Parse name
+    $nameParts = explode(' ', $cart['customerName'], 2);
+    $firstName = $cart['firstName'] ?: ($nameParts[0] ?? '');
+    $lastName = $cart['lastName'] ?: ($nameParts[1] ?? '');
+    
+    $orderData = [
+        'payment_method' => 'cod',
+        'payment_method_title' => 'Cash on Delivery',
+        'set_paid' => false,
+        'status' => 'processing',
+        'billing' => [
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $cart['email'],
+            'phone' => $cart['phone'],
+            'address_1' => $cart['address'],
+            'city' => $cart['city'],
+            'postcode' => $cart['postcode'],
+            'country' => strtoupper(substr($storeCode, 0, 2))
+        ],
+        'shipping' => [
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'address_1' => $cart['address'],
+            'city' => $cart['city'],
+            'postcode' => $cart['postcode'],
+            'country' => strtoupper(substr($storeCode, 0, 2))
+        ],
+        'line_items' => $lineItems,
+        'meta_data' => [
+            ['key' => '_call_center', 'value' => 'yes'],
+            ['key' => '_call_center_agent', 'value' => $agentName],
+            ['key' => '_call_center_date', 'value' => date('Y-m-d H:i:s')],
+            ['key' => '_abandoned_cart_id', 'value' => $cart['cartDbId']]
+        ],
+        'customer_note' => 'Order created via Call Center by ' . $agentName
+    ];
+    
+    // Create order via WooCommerce API
+    $result = wcApiRequest($storeCode, 'orders', [], 'POST', $orderData);
+    
+    if (isset($result['error'])) {
+        return $result;
+    }
+    
+    if (!isset($result['id'])) {
+        return ['error' => 'Failed to create order'];
+    }
+    
+    // Update call data to mark as converted
+    $callData = loadCallData();
+    $callData[$cartId] = [
+        'callStatus' => 'converted',
+        'notes' => ($callData[$cartId]['notes'] ?? '') . "\nOrder #{$result['id']} created by {$agentName}",
+        'lastUpdated' => date('c'),
+        'orderId' => $result['id']
+    ];
+    saveCallData($callData);
+    
+    // Clear cache
+    global $cacheDir;
+    if (is_dir($cacheDir)) array_map('unlink', glob($cacheDir . '*.json'));
+    
+    return [
+        'success' => true,
+        'orderId' => $result['id'],
+        'orderNumber' => $result['number'] ?? $result['id'],
+        'orderTotal' => $result['total'],
+        'orderStatus' => $result['status'],
+        'storeUrl' => $config['url'] . '/wp-admin/post.php?post=' . $result['id'] . '&action=edit'
+    ];
 }
 
 // Router
@@ -395,6 +526,29 @@ try {
             echo json_encode($storeList);
             break;
             
+        case 'create-order':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $cartId = $input['cartId'] ?? '';
+            $agent = $input['agent'] ?? 'Call Center';
+            
+            if (!$cartId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Missing cartId']);
+                break;
+            }
+            
+            $result = createOrderFromCart($cartId, $agent);
+            if (isset($result['error'])) {
+                http_response_code(400);
+            }
+            echo json_encode($result);
+            break;
+            
         case 'update-status':
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 http_response_code(405);
@@ -409,7 +563,8 @@ try {
             $callData[$id] = [
                 'callStatus' => $input['callStatus'] ?? 'not_called',
                 'notes' => $input['notes'] ?? '',
-                'lastUpdated' => date('c')
+                'lastUpdated' => date('c'),
+                'orderId' => $callData[$id]['orderId'] ?? null
             ];
             saveCallData($callData);
             echo json_encode(['success' => true]);
@@ -438,11 +593,11 @@ try {
             break;
             
         case 'health':
-            echo json_encode(['status' => 'ok', 'timestamp' => date('c'), 'php' => PHP_VERSION]);
+            echo json_encode(['status' => 'ok', 'version' => '3.0', 'timestamp' => date('c')]);
             break;
             
         default:
-            echo json_encode(['error' => 'Unknown action', 'available' => ['abandoned-carts', 'one-time-buyers', 'pending-orders', 'stores', 'update-status', 'clear-cache', 'login', 'health']]);
+            echo json_encode(['error' => 'Unknown action', 'available' => ['abandoned-carts', 'one-time-buyers', 'pending-orders', 'stores', 'create-order', 'update-status', 'clear-cache', 'login', 'health']]);
     }
 } catch (Exception $e) {
     http_response_code(500);
