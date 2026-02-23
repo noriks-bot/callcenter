@@ -42,6 +42,36 @@ $metakocka = [
 ];
 
 $smsSettingsFile = __DIR__ . '/data/sms-settings.json';
+$agentsFile = __DIR__ . '/data/agents.json';
+
+// ========== AGENT MANAGEMENT FUNCTIONS ==========
+function loadAgents() {
+    global $agentsFile;
+    if (file_exists($agentsFile)) {
+        return json_decode(file_get_contents($agentsFile), true) ?: ['users' => []];
+    }
+    // Default admin user if file doesn't exist
+    return [
+        'users' => [
+            [
+                'id' => 'admin_1',
+                'username' => 'noriks',
+                'password' => 'noriks2024',
+                'role' => 'admin',
+                'countries' => ['all'],
+                'createdAt' => date('c'),
+                'active' => true
+            ]
+        ]
+    ];
+}
+
+function saveAgents($data) {
+    global $agentsFile;
+    $dir = dirname($agentsFile);
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    file_put_contents($agentsFile, json_encode($data, JSON_PRETTY_PRINT));
+}
 
 function loadSmsSettings() {
     global $smsSettingsFile;
@@ -1022,17 +1052,149 @@ try {
         case 'login':
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['error' => 'POST required']); break; }
             $input = json_decode(file_get_contents('php://input'), true);
-            $users = [
-                'noriks' => ['password' => 'noriks', 'role' => 'admin', 'countries' => ['all']],
-                'hr' => ['password' => 'hr', 'role' => 'agent', 'countries' => ['hr']]
-            ];
-            $user = $users[$input['username'] ?? ''] ?? null;
+            $agents = loadAgents();
+            $user = null;
+            foreach ($agents['users'] as $u) {
+                if ($u['username'] === ($input['username'] ?? '') && $u['active'] !== false) {
+                    $user = $u;
+                    break;
+                }
+            }
             if ($user && $user['password'] === ($input['password'] ?? '')) {
-                echo json_encode(['success' => true, 'user' => ['username' => $input['username'], 'role' => $user['role'], 'countries' => $user['countries']]]);
+                echo json_encode([
+                    'success' => true, 
+                    'user' => [
+                        'id' => $user['id'],
+                        'username' => $user['username'], 
+                        'role' => $user['role'], 
+                        'countries' => $user['countries']
+                    ]
+                ]);
             } else {
                 http_response_code(401);
                 echo json_encode(['success' => false, 'error' => 'Invalid credentials']);
             }
+            break;
+            
+        // ========== AGENT MANAGEMENT ==========
+        case 'agents-list':
+            $agents = loadAgents();
+            // Return without passwords
+            $safeUsers = array_map(function($u) {
+                return [
+                    'id' => $u['id'],
+                    'username' => $u['username'],
+                    'role' => $u['role'],
+                    'countries' => $u['countries'],
+                    'createdAt' => $u['createdAt'] ?? null,
+                    'active' => $u['active'] ?? true
+                ];
+            }, $agents['users']);
+            echo json_encode(['users' => $safeUsers]);
+            break;
+            
+        case 'agents-add':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['error' => 'POST required']); break; }
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (empty($input['username']) || empty($input['password'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Username and password required']);
+                break;
+            }
+            
+            $agents = loadAgents();
+            
+            // Check if username exists
+            foreach ($agents['users'] as $u) {
+                if ($u['username'] === $input['username']) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Username already exists']);
+                    break 2;
+                }
+            }
+            
+            $newUser = [
+                'id' => 'agent_' . time(),
+                'username' => $input['username'],
+                'password' => $input['password'],
+                'role' => $input['role'] ?? 'agent',
+                'countries' => $input['countries'] ?? ['hr'],
+                'createdAt' => date('c'),
+                'active' => true
+            ];
+            
+            $agents['users'][] = $newUser;
+            saveAgents($agents);
+            
+            echo json_encode(['success' => true, 'id' => $newUser['id']]);
+            break;
+            
+        case 'agents-update':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['error' => 'POST required']); break; }
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (empty($input['id'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Agent ID required']);
+                break;
+            }
+            
+            $agents = loadAgents();
+            $found = false;
+            
+            foreach ($agents['users'] as &$u) {
+                if ($u['id'] === $input['id']) {
+                    if (!empty($input['username'])) $u['username'] = $input['username'];
+                    if (!empty($input['password'])) $u['password'] = $input['password'];
+                    if (isset($input['role'])) $u['role'] = $input['role'];
+                    if (isset($input['countries'])) $u['countries'] = $input['countries'];
+                    if (isset($input['active'])) $u['active'] = $input['active'];
+                    $found = true;
+                    break;
+                }
+            }
+            
+            if (!$found) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Agent not found']);
+                break;
+            }
+            
+            saveAgents($agents);
+            echo json_encode(['success' => true]);
+            break;
+            
+        case 'agents-delete':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['error' => 'POST required']); break; }
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (empty($input['id'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Agent ID required']);
+                break;
+            }
+            
+            // Prevent deleting last admin
+            $agents = loadAgents();
+            $adminCount = count(array_filter($agents['users'], fn($u) => $u['role'] === 'admin'));
+            $targetUser = null;
+            foreach ($agents['users'] as $u) {
+                if ($u['id'] === $input['id']) {
+                    $targetUser = $u;
+                    break;
+                }
+            }
+            
+            if ($targetUser && $targetUser['role'] === 'admin' && $adminCount <= 1) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Cannot delete last admin']);
+                break;
+            }
+            
+            $agents['users'] = array_values(array_filter($agents['users'], fn($u) => $u['id'] !== $input['id']));
+            saveAgents($agents);
+            echo json_encode(['success' => true]);
             break;
             
         case 'health':
@@ -1070,6 +1232,10 @@ try {
                     'sms-settings',
                     'sms-test-connection',
                     'sms-send',
+                    'agents-list',
+                    'agents-add',
+                    'agents-update',
+                    'agents-delete',
                     'clear-cache', 
                     'login', 
                     'health'

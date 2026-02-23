@@ -955,6 +955,48 @@
             font-size: 13px;
         }
         
+        /* Agent Management */
+        .country-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .country-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .country-checkbox:hover { border-color: var(--accent); }
+        .country-checkbox.selected {
+            background: rgba(59,130,246,0.15);
+            border-color: var(--accent);
+        }
+        .country-checkbox input { display: none; }
+        .country-checkbox .flag { font-size: 18px; }
+        .country-checkbox .name { font-size: 13px; font-weight: 500; }
+        
+        .admin-only { display: none; }
+        body.is-admin .admin-only { display: block; }
+        
+        .agent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .agent-badge.admin { background: rgba(168,85,247,0.2); color: var(--purple); }
+        .agent-badge.agent { background: rgba(59,130,246,0.2); color: var(--accent); }
+        .agent-badge.inactive { background: rgba(239,68,68,0.2); color: var(--red); }
+        
         /* Light Theme */
         body.light {
             --bg-dark: #f8fafc;
@@ -1080,6 +1122,14 @@
                 <div class="nav-item" data-tab="sms-settings">
                     <i class="fas fa-cog"></i>
                     <span>SMS Settings</span>
+                </div>
+            </div>
+            
+            <div class="nav-section admin-only" id="adminSection">
+                <div class="nav-title">Admin</div>
+                <div class="nav-item" data-tab="agents">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Agents</span>
                 </div>
             </div>
             
@@ -1667,6 +1717,94 @@
         </div>
     </div>
     
+    <!-- Agents Management Content (Admin Only) -->
+    <div id="agentsContent" style="display:none;padding:24px;">
+        <div style="max-width:1000px;">
+            <div class="table-card" style="padding:24px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                    <div>
+                        <h3 style="margin-bottom:8px;">👥 Agent Management</h3>
+                        <p style="color:var(--text-muted);">Upravljaj z agenti in njihovimi dovoljenji za države.</p>
+                    </div>
+                    <button class="btn btn-save" onclick="openAgentModal()">
+                        <i class="fas fa-plus"></i> Add Agent
+                    </button>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="data-table" id="agentsTable">
+                        <thead>
+                            <tr>
+                                <th>Agent</th>
+                                <th>Role</th>
+                                <th>Countries</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agentsTableBody">
+                            <!-- Rows rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Agent Modal -->
+    <div class="modal-bg" id="agentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="agentModalTitle">➕ Add Agent</div>
+                <button class="modal-close" onclick="closeModal('agentModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="agentEditId">
+                
+                <div class="form-group">
+                    <label class="form-label">Username *</label>
+                    <input type="text" class="form-input" id="agentUsername" placeholder="npr. marko">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password *</label>
+                    <input type="password" class="form-input" id="agentPassword" placeholder="Geslo za prijavo">
+                    <small style="color:var(--text-muted);font-size:12px;" id="passwordHint">Pusti prazno za ohranitev obstoječega (pri urejanju)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" id="agentRole">
+                        <option value="agent">Agent - vidi samo dodeljene države</option>
+                        <option value="admin">Admin - vidi vse, upravlja nastavitve</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Assigned Countries</label>
+                    <div class="country-checkboxes" id="agentCountries">
+                        <!-- Checkboxes rendered by JS -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <div class="toggle-row">
+                        <span class="toggle-label">Active</span>
+                        <div class="toggle" id="agentActiveToggle" onclick="toggleAgentActive()"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('agentModal')">Prekliči</button>
+                <button class="btn btn-save" onclick="saveAgent()">
+                    <i class="fas fa-save"></i> Shrani
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Theme Toggle Button -->
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Theme">
         <i class="fas fa-sun"></i>
@@ -1679,9 +1817,25 @@
         // Auth
         const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
         if (!user) window.location.href = 'login.html';
+        
+        const isAdmin = user.role === 'admin';
+        const userCountries = user.countries || [];
+        const hasAllCountries = userCountries.includes('all');
+        
         document.getElementById('userName').textContent = user.username;
-        document.getElementById('userRole').textContent = user.role === 'admin' ? 'Administrator' : 'Agent';
+        document.getElementById('userRole').textContent = isAdmin ? 'Administrator' : 'Agent';
         document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
+        
+        // Show admin sections
+        if (isAdmin) {
+            document.body.classList.add('is-admin');
+        }
+        
+        // Hide SMS Settings for non-admins
+        if (!isAdmin) {
+            const smsSettingsNav = document.querySelector('[data-tab="sms-settings"]');
+            if (smsSettingsNav) smsSettingsNav.style.display = 'none';
+        }
         
         // State
         let stores = [];
@@ -1754,15 +1908,17 @@
                     pending: 'Pending Orders',
                     buyers: 'Enkratni kupci',
                     'sms-dashboard': 'SMS Dashboard',
-                    'sms-settings': 'SMS Provider Settings'
+                    'sms-settings': 'SMS Provider Settings',
+                    'agents': 'Agent Management'
                 };
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
                 
                 // Show/hide content based on tab
-                const hideTabs = ['sms-dashboard', 'sms-settings', 'dashboard'];
+                const hideTabs = ['sms-dashboard', 'sms-settings', 'dashboard', 'agents'];
                 document.getElementById('dashboardContent').style.display = currentTab === 'dashboard' ? 'block' : 'none';
                 document.getElementById('smsDashboardContent').style.display = currentTab === 'sms-dashboard' ? 'block' : 'none';
                 document.getElementById('smsSettingsContent').style.display = currentTab === 'sms-settings' ? 'block' : 'none';
+                document.getElementById('agentsContent').style.display = currentTab === 'agents' ? 'block' : 'none';
                 document.querySelector('.stats-grid').style.display = hideTabs.includes(currentTab) ? 'none' : 'grid';
                 document.querySelector('.country-tabs').style.display = hideTabs.includes(currentTab) ? 'none' : 'flex';
                 document.querySelector('.content').style.display = hideTabs.includes(currentTab) ? 'none' : 'block';
@@ -1773,6 +1929,8 @@
                     renderSmsTable();
                 } else if (currentTab === 'sms-settings') {
                     loadSmsSettingsUI();
+                } else if (currentTab === 'agents') {
+                    loadAgents();
                 } else {
                     renderTable();
                     setTimeout(addCustomerClickHandlers, 100);
@@ -1796,17 +1954,38 @@
         
         function renderCountryTabs() {
             const container = document.getElementById('countryTabs');
-            container.innerHTML = `
+            
+            // Filter stores based on user's assigned countries
+            const allowedStores = hasAllCountries 
+                ? stores 
+                : stores.filter(s => userCountries.includes(s.code));
+            
+            // If agent has only one country, hide tabs and set that country
+            if (!hasAllCountries && allowedStores.length === 1) {
+                container.style.display = 'none';
+                currentStore = allowedStores[0].code;
+                return;
+            }
+            
+            // Show "All" tab only for admins or users with multiple countries
+            const showAllTab = hasAllCountries || allowedStores.length > 1;
+            
+            container.innerHTML = (showAllTab ? `
                 <button class="country-tab active" data-store="all">
                     <span class="flag">🌍</span> All
                     <span class="count" id="count-all">0</span>
                 </button>
-            ` + stores.map(s => `
-                <button class="country-tab" data-store="${s.code}">
+            ` : '') + allowedStores.map((s, i) => `
+                <button class="country-tab ${!showAllTab && i === 0 ? 'active' : ''}" data-store="${s.code}">
                     <span class="flag">${s.flag}</span> ${s.name}
                     <span class="count" id="count-${s.code}">0</span>
                 </button>
             `).join('');
+            
+            // Set initial store for non-admins
+            if (!showAllTab && allowedStores.length > 0) {
+                currentStore = allowedStores[0].code;
+            }
             
             container.querySelectorAll('.country-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
@@ -1818,9 +1997,9 @@
                 });
             });
             
-            // Also populate SMS country filter
+            // Also populate SMS country filter (only allowed countries)
             const smsFilter = document.getElementById('smsCountryFilter');
-            stores.forEach(s => {
+            allowedStores.forEach(s => {
                 smsFilter.innerHTML += `<option value="${s.code}">${s.flag} ${s.name}</option>`;
             });
         }
@@ -1874,10 +2053,17 @@
         }
         
         function updateCounts() {
-            document.getElementById('count-all').textContent = carts.length;
-            document.getElementById('navCarts').textContent = carts.length;
-            document.getElementById('navPending').textContent = pending.length;
-            document.getElementById('navBuyers').textContent = buyers.length;
+            // Filter data by user's allowed countries
+            const filteredCarts = hasAllCountries ? carts : carts.filter(c => userCountries.includes(c.storeCode));
+            const filteredPending = hasAllCountries ? pending : pending.filter(p => userCountries.includes(p.storeCode));
+            const filteredBuyers = hasAllCountries ? buyers : buyers.filter(b => userCountries.includes(b.storeCode));
+            
+            const countAllEl = document.getElementById('count-all');
+            if (countAllEl) countAllEl.textContent = filteredCarts.length;
+            
+            document.getElementById('navCarts').textContent = filteredCarts.length;
+            document.getElementById('navPending').textContent = filteredPending.length;
+            document.getElementById('navBuyers').textContent = filteredBuyers.length;
             
             stores.forEach(s => {
                 const el = document.getElementById(`count-${s.code}`);
@@ -1910,6 +2096,11 @@
             const status = document.getElementById('statusFilter').value;
             
             let data = currentTab === 'carts' ? [...carts] : currentTab === 'pending' ? [...pending] : [...buyers];
+            
+            // Filter by user's allowed countries first
+            if (!hasAllCountries) {
+                data = data.filter(d => userCountries.includes(d.storeCode));
+            }
             
             if (currentStore !== 'all') data = data.filter(d => d.storeCode === currentStore);
             if (status) data = data.filter(d => d.callStatus === status);
@@ -3627,6 +3818,245 @@
             });
         }
         
+        // ========== AGENT MANAGEMENT ==========
+        let agentsList = [];
+        let editingAgentId = null;
+        let agentActive = true;
+        
+        async function loadAgents() {
+            try {
+                const res = await fetch('api.php?action=agents-list');
+                const data = await res.json();
+                agentsList = data.users || [];
+                renderAgentsTable();
+            } catch (e) {
+                console.error('Failed to load agents:', e);
+                showToast('Napaka pri nalaganju agentov', true);
+            }
+        }
+        
+        function renderAgentsTable() {
+            const tbody = document.getElementById('agentsTableBody');
+            if (!tbody) return;
+            
+            if (agentsList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;text-align:center;"><i class="fas fa-users"></i><p>Ni agentov</p></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = agentsList.map(agent => {
+                const countriesDisplay = agent.countries.includes('all') 
+                    ? '<span class="badge converted">🌍 Vse države</span>'
+                    : agent.countries.map(c => {
+                        const store = stores.find(s => s.code === c);
+                        return store ? `<span class="badge called">${store.flag} ${c.toUpperCase()}</span>` : c;
+                    }).join(' ');
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="customer-cell">
+                                <div class="avatar">${agent.username[0].toUpperCase()}</div>
+                                <div>
+                                    <div class="customer-name">${esc(agent.username)}</div>
+                                    <div class="customer-email">${agent.id}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="agent-badge ${agent.role}">${agent.role === 'admin' ? '👑 Admin' : '👤 Agent'}</span></td>
+                        <td>${countriesDisplay}</td>
+                        <td>
+                            <span class="badge ${agent.active !== false ? 'converted' : 'not_interested'}">
+                                ${agent.active !== false ? '✅ Active' : '❌ Inactive'}
+                            </span>
+                        </td>
+                        <td style="font-size:12px;">${formatDate(agent.createdAt)}</td>
+                        <td style="white-space:nowrap;">
+                            <button class="action-btn order" onclick="editAgent('${agent.id}')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            ${agent.id !== user.id ? `
+                                <button class="action-btn" onclick="deleteAgent('${agent.id}', '${esc(agent.username)}')" title="Delete" style="background:rgba(239,68,68,0.2);color:var(--red);">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function openAgentModal(agentId = null) {
+            editingAgentId = agentId;
+            agentActive = true;
+            
+            // Reset form
+            document.getElementById('agentEditId').value = '';
+            document.getElementById('agentUsername').value = '';
+            document.getElementById('agentPassword').value = '';
+            document.getElementById('agentRole').value = 'agent';
+            document.getElementById('agentActiveToggle').classList.add('active');
+            document.getElementById('passwordHint').style.display = agentId ? 'block' : 'none';
+            
+            // Render country checkboxes
+            const countriesContainer = document.getElementById('agentCountries');
+            countriesContainer.innerHTML = `
+                <label class="country-checkbox" onclick="toggleCountryCheckbox(this)">
+                    <input type="checkbox" value="all">
+                    <span class="flag">🌍</span>
+                    <span class="name">Vse države</span>
+                </label>
+            ` + stores.map(s => `
+                <label class="country-checkbox" onclick="toggleCountryCheckbox(this)">
+                    <input type="checkbox" value="${s.code}">
+                    <span class="flag">${s.flag}</span>
+                    <span class="name">${s.code.toUpperCase()}</span>
+                </label>
+            `).join('');
+            
+            if (agentId) {
+                // Edit mode
+                document.getElementById('agentModalTitle').textContent = '✏️ Edit Agent';
+                const agent = agentsList.find(a => a.id === agentId);
+                if (agent) {
+                    document.getElementById('agentEditId').value = agent.id;
+                    document.getElementById('agentUsername').value = agent.username;
+                    document.getElementById('agentRole').value = agent.role;
+                    agentActive = agent.active !== false;
+                    document.getElementById('agentActiveToggle').classList.toggle('active', agentActive);
+                    
+                    // Select countries
+                    agent.countries.forEach(c => {
+                        const cb = countriesContainer.querySelector(`input[value="${c}"]`);
+                        if (cb) {
+                            cb.checked = true;
+                            cb.closest('.country-checkbox').classList.add('selected');
+                        }
+                    });
+                }
+            } else {
+                document.getElementById('agentModalTitle').textContent = '➕ Add Agent';
+            }
+            
+            document.getElementById('agentModal').classList.add('open');
+        }
+        
+        function editAgent(agentId) {
+            openAgentModal(agentId);
+        }
+        
+        function toggleCountryCheckbox(label) {
+            const checkbox = label.querySelector('input');
+            checkbox.checked = !checkbox.checked;
+            label.classList.toggle('selected', checkbox.checked);
+            
+            // If "all" is selected, deselect others
+            if (checkbox.value === 'all' && checkbox.checked) {
+                document.querySelectorAll('#agentCountries input:not([value="all"])').forEach(cb => {
+                    cb.checked = false;
+                    cb.closest('.country-checkbox').classList.remove('selected');
+                });
+            }
+            // If other is selected, deselect "all"
+            if (checkbox.value !== 'all' && checkbox.checked) {
+                const allCb = document.querySelector('#agentCountries input[value="all"]');
+                if (allCb) {
+                    allCb.checked = false;
+                    allCb.closest('.country-checkbox').classList.remove('selected');
+                }
+            }
+        }
+        
+        function toggleAgentActive() {
+            agentActive = !agentActive;
+            document.getElementById('agentActiveToggle').classList.toggle('active', agentActive);
+        }
+        
+        async function saveAgent() {
+            const username = document.getElementById('agentUsername').value.trim();
+            const password = document.getElementById('agentPassword').value;
+            const role = document.getElementById('agentRole').value;
+            
+            // Get selected countries
+            const selectedCountries = [];
+            document.querySelectorAll('#agentCountries input:checked').forEach(cb => {
+                selectedCountries.push(cb.value);
+            });
+            
+            if (!username) {
+                showToast('Username je obvezen', true);
+                return;
+            }
+            
+            if (!editingAgentId && !password) {
+                showToast('Password je obvezen za novega agenta', true);
+                return;
+            }
+            
+            if (selectedCountries.length === 0) {
+                showToast('Izberi vsaj eno državo', true);
+                return;
+            }
+            
+            const data = {
+                username,
+                role,
+                countries: selectedCountries,
+                active: agentActive
+            };
+            
+            if (password) data.password = password;
+            
+            try {
+                let endpoint = 'agents-add';
+                if (editingAgentId) {
+                    endpoint = 'agents-update';
+                    data.id = editingAgentId;
+                }
+                
+                const res = await fetch(`api.php?action=${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                
+                if (result.success || result.id) {
+                    showToast(editingAgentId ? '✅ Agent posodobljen!' : '✅ Agent dodan!');
+                    closeModal('agentModal');
+                    loadAgents();
+                } else {
+                    showToast(result.error || 'Napaka pri shranjevanju', true);
+                }
+            } catch (e) {
+                showToast('Napaka pri povezavi', true);
+            }
+        }
+        
+        async function deleteAgent(agentId, username) {
+            if (!confirm(`Ali si prepričan, da želiš izbrisati agenta "${username}"?`)) {
+                return;
+            }
+            
+            try {
+                const res = await fetch('api.php?action=agents-delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: agentId })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast('✅ Agent izbrisan!');
+                    loadAgents();
+                } else {
+                    showToast(result.error || 'Napaka pri brisanju', true);
+                }
+            } catch (e) {
+                showToast('Napaka pri povezavi', true);
+            }
+        }
+        
         // ========== THEME TOGGLE ==========
         function toggleTheme() {
             document.body.classList.toggle('light');
@@ -3639,6 +4069,325 @@
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light');
         }
+        
+        // ========== AGENT MANAGEMENT FUNCTIONS ==========
+        let agentsList = [];
+        let editingAgentId = null;
+        let agentActiveState = true;
+        
+        async function loadAgents() {
+            if (!isAdmin) return;
+            
+            try {
+                const res = await fetch('api.php?action=agents-list');
+                const data = await res.json();
+                agentsList = data.users || [];
+                renderAgentsTable();
+            } catch (e) {
+                console.error('Failed to load agents:', e);
+            }
+        }
+        
+        function renderAgentsTable() {
+            const tbody = document.getElementById('agentsTableBody');
+            if (!tbody) return;
+            
+            if (agentsList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-users"></i><p>Ni agentov</p></td></tr>';
+                return;
+            }
+            
+            const countryFlags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', gr: '🇬🇷', sk: '🇸🇰', it: '🇮🇹', hu: '🇭🇺', all: '🌍' };
+            
+            tbody.innerHTML = agentsList.map(agent => {
+                const countries = (agent.countries || []).map(c => 
+                    c === 'all' ? '🌍 All' : `${countryFlags[c] || ''} ${c.toUpperCase()}`
+                ).join(', ');
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="customer-cell">
+                                <div class="avatar">${initials(agent.username)}</div>
+                                <div>
+                                    <div class="customer-name">${esc(agent.username)}</div>
+                                    <div class="customer-email">ID: ${agent.id}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="agent-badge ${agent.role}">
+                                <i class="fas ${agent.role === 'admin' ? 'fa-shield-alt' : 'fa-user'}"></i>
+                                ${agent.role === 'admin' ? 'Admin' : 'Agent'}
+                            </span>
+                        </td>
+                        <td style="max-width:200px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                                ${(agent.countries || []).map(c => `
+                                    <span style="background:var(--bg-dark);padding:2px 8px;border-radius:4px;font-size:12px;">
+                                        ${c === 'all' ? '🌍 All' : `${countryFlags[c] || ''} ${c.toUpperCase()}`}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge ${agent.active !== false ? 'converted' : 'not_interested'}">
+                                ${agent.active !== false ? '✅ Active' : '❌ Inactive'}
+                            </span>
+                        </td>
+                        <td style="font-size:12px;color:var(--text-muted);">
+                            ${agent.createdAt ? formatDate(agent.createdAt) : '—'}
+                        </td>
+                        <td style="white-space:nowrap;">
+                            <button class="action-btn" onclick="openAgentModal('${agent.id}')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            ${agent.role !== 'admin' || agentsList.filter(a => a.role === 'admin').length > 1 ? `
+                                <button class="action-btn" onclick="deleteAgent('${agent.id}')" title="Delete" style="background:rgba(239,68,68,0.2);color:var(--red);">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function openAgentModal(agentId = null) {
+            editingAgentId = agentId;
+            const agent = agentId ? agentsList.find(a => a.id === agentId) : null;
+            
+            // Update modal title
+            document.getElementById('agentModalTitle').textContent = agent ? '✏️ Edit Agent' : '➕ Add Agent';
+            document.getElementById('passwordHint').style.display = agent ? 'block' : 'none';
+            
+            // Populate fields
+            document.getElementById('agentEditId').value = agentId || '';
+            document.getElementById('agentUsername').value = agent?.username || '';
+            document.getElementById('agentPassword').value = '';
+            document.getElementById('agentRole').value = agent?.role || 'agent';
+            
+            agentActiveState = agent?.active !== false;
+            document.getElementById('agentActiveToggle').classList.toggle('active', agentActiveState);
+            
+            // Render country checkboxes
+            renderAgentCountryCheckboxes(agent?.countries || []);
+            
+            document.getElementById('agentModal').classList.add('open');
+        }
+        
+        function renderAgentCountryCheckboxes(selectedCountries = []) {
+            const container = document.getElementById('agentCountries');
+            const countries = [
+                { code: 'hr', flag: '🇭🇷', name: 'Croatia' },
+                { code: 'cz', flag: '🇨🇿', name: 'Czech' },
+                { code: 'pl', flag: '🇵🇱', name: 'Poland' },
+                { code: 'gr', flag: '🇬🇷', name: 'Greece' },
+                { code: 'sk', flag: '🇸🇰', name: 'Slovakia' },
+                { code: 'it', flag: '🇮🇹', name: 'Italy' },
+                { code: 'hu', flag: '🇭🇺', name: 'Hungary' }
+            ];
+            
+            const hasAll = selectedCountries.includes('all');
+            
+            container.innerHTML = `
+                <label class="country-checkbox ${hasAll ? 'selected' : ''}" onclick="toggleAgentCountry(this, 'all')">
+                    <input type="checkbox" name="agent_country" value="all" ${hasAll ? 'checked' : ''}>
+                    <span class="flag">🌍</span>
+                    <span class="name">All Countries</span>
+                </label>
+                ${countries.map(c => `
+                    <label class="country-checkbox ${selectedCountries.includes(c.code) ? 'selected' : ''}" onclick="toggleAgentCountry(this, '${c.code}')">
+                        <input type="checkbox" name="agent_country" value="${c.code}" ${selectedCountries.includes(c.code) ? 'checked' : ''}>
+                        <span class="flag">${c.flag}</span>
+                        <span class="name">${c.code.toUpperCase()}</span>
+                    </label>
+                `).join('')}
+            `;
+        }
+        
+        function toggleAgentCountry(label, code) {
+            const checkbox = label.querySelector('input');
+            const isChecked = !checkbox.checked;
+            checkbox.checked = isChecked;
+            label.classList.toggle('selected', isChecked);
+            
+            // If "all" is selected, uncheck others
+            if (code === 'all' && isChecked) {
+                document.querySelectorAll('#agentCountries input[name="agent_country"]').forEach(cb => {
+                    if (cb.value !== 'all') {
+                        cb.checked = false;
+                        cb.closest('label').classList.remove('selected');
+                    }
+                });
+            }
+            // If specific country selected, uncheck "all"
+            else if (code !== 'all' && isChecked) {
+                const allCb = document.querySelector('#agentCountries input[value="all"]');
+                if (allCb) {
+                    allCb.checked = false;
+                    allCb.closest('label').classList.remove('selected');
+                }
+            }
+        }
+        
+        function toggleAgentActive() {
+            agentActiveState = !agentActiveState;
+            document.getElementById('agentActiveToggle').classList.toggle('active', agentActiveState);
+        }
+        
+        async function saveAgent() {
+            const username = document.getElementById('agentUsername').value.trim();
+            const password = document.getElementById('agentPassword').value;
+            const role = document.getElementById('agentRole').value;
+            
+            // Get selected countries
+            const countries = [];
+            document.querySelectorAll('#agentCountries input[name="agent_country"]:checked').forEach(cb => {
+                countries.push(cb.value);
+            });
+            
+            // Validation
+            if (!username) {
+                showToast('Username is required', true);
+                return;
+            }
+            
+            if (!editingAgentId && !password) {
+                showToast('Password is required for new agents', true);
+                return;
+            }
+            
+            if (countries.length === 0) {
+                showToast('Select at least one country', true);
+                return;
+            }
+            
+            const payload = {
+                username,
+                role,
+                countries,
+                active: agentActiveState
+            };
+            
+            if (password) {
+                payload.password = password;
+            }
+            
+            try {
+                let res;
+                if (editingAgentId) {
+                    payload.id = editingAgentId;
+                    res = await fetch('api.php?action=agents-update', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    res = await fetch('api.php?action=agents-add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }
+                
+                const result = await res.json();
+                
+                if (result.success || result.id) {
+                    closeModal('agentModal');
+                    showToast(editingAgentId ? '✅ Agent updated!' : '✅ Agent added!');
+                    await loadAgents();
+                } else {
+                    showToast(result.error || 'Error saving agent', true);
+                }
+            } catch (e) {
+                showToast('Connection error', true);
+            }
+        }
+        
+        async function deleteAgent(agentId) {
+            const agent = agentsList.find(a => a.id === agentId);
+            if (!agent) return;
+            
+            if (!confirm(`Are you sure you want to delete agent "${agent.username}"?`)) {
+                return;
+            }
+            
+            try {
+                const res = await fetch('api.php?action=agents-delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: agentId })
+                });
+                
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast('✅ Agent deleted!');
+                    await loadAgents();
+                } else {
+                    showToast(result.error || 'Error deleting agent', true);
+                }
+            } catch (e) {
+                showToast('Connection error', true);
+            }
+        }
+        
+        // ========== COUNTRY FILTERING FOR AGENTS ==========
+        function filterCountryTabs() {
+            if (hasAllCountries || isAdmin) return; // Admin sees everything
+            
+            // Hide country tabs that user doesn't have access to
+            document.querySelectorAll('.country-tab[data-store]').forEach(tab => {
+                const storeCode = tab.dataset.store;
+                if (storeCode === 'all') {
+                    // "All" tab - keep but will filter data
+                    return;
+                }
+                if (!userCountries.includes(storeCode)) {
+                    tab.style.display = 'none';
+                }
+            });
+            
+            // If user has only one country, auto-select it
+            if (userCountries.length === 1) {
+                currentStore = userCountries[0];
+                document.querySelectorAll('.country-tab').forEach(t => t.classList.remove('active'));
+                const targetTab = document.querySelector(`.country-tab[data-store="${userCountries[0]}"]`);
+                if (targetTab) targetTab.classList.add('active');
+            }
+        }
+        
+        function filterDataByUserCountries(dataArray) {
+            if (hasAllCountries || isAdmin) return dataArray;
+            return dataArray.filter(item => userCountries.includes(item.storeCode));
+        }
+        
+        // Override loadAllData to filter by user countries
+        const originalLoadAllData = loadAllData;
+        loadAllData = async function() {
+            await originalLoadAllData();
+            
+            // Filter data by user countries
+            if (!hasAllCountries && !isAdmin) {
+                carts = filterDataByUserCountries(carts);
+                pending = filterDataByUserCountries(pending);
+                buyers = filterDataByUserCountries(buyers);
+            }
+            
+            // Apply country tab filtering
+            filterCountryTabs();
+            
+            // Update counts after filtering
+            updateCounts();
+            updateStats();
+            renderTable();
+            
+            // Load agents if admin
+            if (isAdmin) {
+                loadAgents();
+            }
+        };
         
         init();
     </script>
