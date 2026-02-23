@@ -2408,3 +2408,45 @@ body.is-admin .admin-only {
         border: 1px solid #ddd;
     }
 }
+
+/* ============ SPECIAL CONTENT AREAS (outside main) ============ */
+#dashboardContent,
+#smsDashboardContent,
+#smsSettingsContent,
+#agentsContent,
+#followupsContent,
+#paketomatiContent,
+#analyticsContent,
+#emailTemplatesContent {
+    margin-left: var(--sidebar-width);
+    padding: 24px;
+    min-height: calc(100vh - var(--header-height));
+    transition: margin-left var(--transition-slow);
+}
+
+/* When sidebar is collapsed */
+.main.expanded ~ #dashboardContent,
+.main.expanded ~ #smsDashboardContent,
+.main.expanded ~ #smsSettingsContent,
+.main.expanded ~ #agentsContent,
+.main.expanded ~ #followupsContent,
+.main.expanded ~ #paketomatiContent,
+.main.expanded ~ #analyticsContent,
+.main.expanded ~ #emailTemplatesContent {
+    margin-left: 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    #dashboardContent,
+    #smsDashboardContent,
+    #smsSettingsContent,
+    #agentsContent,
+    #followupsContent,
+    #paketomatiContent,
+    #analyticsContent,
+    #emailTemplatesContent {
+        margin-left: 0;
+        padding: 16px;
+    }
+}
