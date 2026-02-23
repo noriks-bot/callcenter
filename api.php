@@ -657,7 +657,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
     global $stores, $storeCurrencies;
     
     $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all');
-    $cached = getCache($cacheKey, 600);
+    $cached = getCache($cacheKey, 1800);  // 30 min cache (fetching is slow)
     if ($cached !== null) return $cached;
     
     $callData = loadCallData();
@@ -670,10 +670,12 @@ function fetchOneTimeBuyers($storeFilter = null) {
     foreach ($storesToFetch as $storeCode => $config) {
         if (!$config) continue;
         
-        // FIX: Fetch MORE orders - pagination up to 5 pages (500 orders)
-        // NO date filter to get maximum data
+        // FIX: Fetch ALL orders - pagination up to 30 pages (3000 orders per store)
+        // This ensures we capture all one-time buyers, not just recent ones
         $allOrders = [];
-        $maxPages = 5;
+        $maxPages = 30;  // 30 pages × 100 = 3000 orders max per store
+        
+        error_log("[OneTimeBuyers] Fetching orders for $storeCode (max $maxPages pages)...");
         
         for ($page = 1; $page <= $maxPages; $page++) {
             $orders = wcApiRequest($storeCode, 'orders', [
@@ -685,14 +687,19 @@ function fetchOneTimeBuyers($storeFilter = null) {
             ]);
             
             // Skip if not array or if it's an error response
-            if (!is_array($orders) || isset($orders['error']) || empty($orders)) break;
+            if (!is_array($orders) || isset($orders['error']) || empty($orders)) {
+                error_log("[OneTimeBuyers] $storeCode page $page: stopped (empty or error)");
+                break;
+            }
             
             $allOrders = array_merge($allOrders, $orders);
+            error_log("[OneTimeBuyers] $storeCode page $page: got " . count($orders) . " orders (total: " . count($allOrders) . ")");
             
             // If we got less than 100, there are no more pages
             if (count($orders) < 100) break;
         }
         
+        error_log("[OneTimeBuyers] $storeCode: fetched " . count($allOrders) . " total orders");
         $orders = $allOrders;
         
         // Group orders by email
@@ -752,6 +759,64 @@ function fetchOneTimeBuyers($storeFilter = null) {
     
     setCache($cacheKey, $allBuyers);
     return $allBuyers;
+}
+
+// Debug function to see what's happening with orders
+function fetchOneTimeBuyersDebug($storeFilter = null) {
+    global $stores;
+    
+    $storesToFetch = $storeFilter ? [$storeFilter => $stores[$storeFilter]] : $stores;
+    $debug = [];
+    
+    foreach ($storesToFetch as $storeCode => $config) {
+        if (!$config) continue;
+        
+        $allOrders = [];
+        $pageStats = [];
+        
+        for ($page = 1; $page <= 30; $page++) {
+            $orders = wcApiRequest($storeCode, 'orders', [
+                'per_page' => 100,
+                'status' => 'processing,completed',
+                'orderby' => 'date',
+                'order' => 'desc',
+                'page' => $page
+            ]);
+            
+            if (!is_array($orders) || isset($orders['error']) || empty($orders)) {
+                $pageStats[] = ['page' => $page, 'count' => 0, 'stopped' => true];
+                break;
+            }
+            
+            $pageStats[] = ['page' => $page, 'count' => count($orders)];
+            $allOrders = array_merge($allOrders, $orders);
+            
+            if (count($orders) < 100) break;
+        }
+        
+        // Count unique emails
+        $emailCounts = [];
+        foreach ($allOrders as $order) {
+            $email = strtolower($order['billing']['email'] ?? '');
+            if ($email) {
+                $emailCounts[$email] = ($emailCounts[$email] ?? 0) + 1;
+            }
+        }
+        
+        $oneTimeBuyers = count(array_filter($emailCounts, fn($c) => $c === 1));
+        $repeatBuyers = count(array_filter($emailCounts, fn($c) => $c > 1));
+        
+        $debug[$storeCode] = [
+            'totalOrders' => count($allOrders),
+            'pagesFetched' => count($pageStats),
+            'pageStats' => $pageStats,
+            'uniqueCustomers' => count($emailCounts),
+            'oneTimeBuyers' => $oneTimeBuyers,
+            'repeatBuyers' => $repeatBuyers
+        ];
+    }
+    
+    return $debug;
 }
 
 function fetchPendingOrders() {
@@ -1364,6 +1429,11 @@ try {
             
         case 'one-time-buyers':
             echo json_encode(fetchOneTimeBuyers($store));
+            break;
+            
+        case 'one-time-buyers-debug':
+            // Debug endpoint to see raw data
+            echo json_encode(fetchOneTimeBuyersDebug($store));
             break;
             
         case 'pending-orders':
