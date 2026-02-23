@@ -908,25 +908,48 @@
     
     <!-- SMS Dashboard Content (shown when tab selected) -->
     <div id="smsDashboardContent" style="display:none;">
-        <div class="filters-bar">
-            <input type="date" class="form-input" id="smsDateFrom" style="max-width:150px;">
-            <input type="date" class="form-input" id="smsDateTo" style="max-width:150px;">
-            <select class="filter-select" id="smsCountryFilter">
-                <option value="">Vse države</option>
-            </select>
-            <select class="filter-select" id="smsStatusFilter">
-                <option value="">Vsi statusi</option>
-                <option value="queued">V čakanju</option>
-                <option value="sent">Poslano</option>
-                <option value="delivered">Dostavljeno</option>
-                <option value="failed">Neuspešno</option>
-            </select>
-            <button class="action-btn-header" onclick="exportSmsCsv()">
-                <i class="fas fa-download"></i> CSV Export
-            </button>
+        <!-- SMS Queue Section (from API) -->
+        <div class="table-card" style="margin-bottom:20px;">
+            <div style="padding:20px;border-bottom:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <h3 style="margin:0 0 4px 0;">📤 Čakalna vrsta za pošiljanje</h3>
+                        <p style="margin:0;color:var(--text-muted);font-size:13px;">SMS-i ki čakajo na pošiljanje</p>
+                    </div>
+                    <button class="btn" style="background:var(--bg-hover);" onclick="loadSmsDashboardQueue()">
+                        <i class="fas fa-sync"></i> Osveži
+                    </button>
+                </div>
+            </div>
+            <div id="smsDashboardQueue" style="padding:20px;">
+                <div class="loading"><div class="spinner"></div>Loading...</div>
+            </div>
         </div>
+        
+        <!-- SMS History Section (from localStorage) -->
         <div class="table-card">
-            <div id="smsTableContainer">
+            <div style="padding:20px;border-bottom:1px solid var(--border);">
+                <h3 style="margin:0 0 4px 0;">📋 Zgodovina pošiljanja</h3>
+                <p style="margin:0;color:var(--text-muted);font-size:13px;">Poslani SMS-i (lokalna zgodovina)</p>
+            </div>
+            <div class="filters-bar" style="border-bottom:1px solid var(--border);">
+                <input type="date" class="form-input" id="smsDateFrom" style="max-width:150px;">
+                <input type="date" class="form-input" id="smsDateTo" style="max-width:150px;">
+                <select class="filter-select" id="smsCountryFilter">
+                    <option value="">Vse države</option>
+                </select>
+                <select class="filter-select" id="smsStatusFilter">
+                    <option value="">Vsi statusi</option>
+                    <option value="queued">V čakanju</option>
+                    <option value="sent">Poslano</option>
+                    <option value="delivered">Dostavljeno</option>
+                    <option value="failed">Neuspešno</option>
+                </select>
+                <button class="action-btn-header" onclick="exportSmsCsv()">
+                    <i class="fas fa-download"></i> CSV Export
+                </button>
+            </div>
+            <div id="smsTableContainer" style="padding:20px;">
                 <div class="empty"><i class="fas fa-comment-sms"></i><p>Ni poslanih SMS sporočil</p></div>
             </div>
         </div>
@@ -1563,9 +1586,13 @@ Available variables:
                         renderDashboard();
                     } else if (currentTab === 'sms-dashboard') {
                         document.getElementById('smsDashboardContent').style.display = 'block';
+                        loadSmsDashboardQueue();
                         renderSmsTable();
                     } else if (currentTab === 'sms-settings') {
-                        document.getElementById('smsSettingsContent').style.display = 'block';
+                        console.log('[Settings] Showing SMS Settings tab');
+                        const settingsEl = document.getElementById('smsSettingsContent');
+                        console.log('[Settings] Element found:', !!settingsEl);
+                        if (settingsEl) settingsEl.style.display = 'block';
                         loadSmsSettingsUI();
                     } else if (currentTab === 'email-templates') {
                         document.getElementById('emailTemplatesContent').style.display = 'block';
@@ -2644,7 +2671,87 @@ Available variables:
             closeModal('pushModal');
         }
         
-        // SMS Dashboard
+        // SMS Dashboard - Load Queue from API
+        async function loadSmsDashboardQueue() {
+            const container = document.getElementById('smsDashboardQueue');
+            if (!container) return;
+            
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+            
+            try {
+                const res = await fetch('api.php?action=sms-queue&status=queued');
+                const queue = await res.json();
+                
+                if (!Array.isArray(queue) || queue.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty" style="padding:20px;">
+                            <i class="fas fa-inbox"></i>
+                            <p>Čakalna vrsta je prazna</p>
+                            <p style="font-size:12px;color:var(--text-muted);">SMS-i se dodajo ko pošlješ SMS stranki iz customer modal-a</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Datum</th>
+                                    <th>Prejemnik</th>
+                                    <th>Sporočilo</th>
+                                    <th>Država</th>
+                                    <th>Akcije</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${queue.map(sms => {
+                                    const store = stores.find(s => s.code === sms.storeCode);
+                                    return `
+                                        <tr>
+                                            <td style="font-size:12px;">${new Date(sms.date).toLocaleString('sl-SI')}</td>
+                                            <td>
+                                                <div style="font-weight:500;">${esc(sms.customerName || 'Unknown')}</div>
+                                                <div style="font-size:12px;color:var(--text-muted);">${sms.recipient || ''}</div>
+                                            </td>
+                                            <td style="max-width:300px;">
+                                                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(sms.message || '')}">${esc(sms.message || '')}</div>
+                                            </td>
+                                            <td>${store?.flag || '🌍'} ${(sms.storeCode || '').toUpperCase()}</td>
+                                            <td style="white-space:nowrap;">
+                                                <button class="action-btn" onclick="removeFromQueueApi('${sms.id}')" title="Odstrani">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (e) {
+                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka: ${e.message}</p></div>`;
+            }
+        }
+        
+        async function removeFromQueueApi(smsId) {
+            try {
+                await fetch('api.php?action=sms-remove', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: smsId})
+                });
+                loadSmsDashboardQueue();
+                renderSmsQueueManagement();
+                showToast('SMS odstranjen iz čakalne vrste');
+            } catch (e) {
+                showToast('Napaka pri odstranjevanju', true);
+            }
+        }
+        
+        // SMS Dashboard - Load History
         async function renderSmsTable() {
             // Refresh from API first
             await loadSmsData();
@@ -2943,13 +3050,16 @@ Available variables:
         let smsProviderSettings = null;
         
         async function loadSmsSettingsUI() {
+            console.log('[SMS Settings] Loading UI...');
             try {
                 const res = await fetch('api.php?action=sms-settings');
                 smsProviderSettings = await res.json();
+                console.log('[SMS Settings] Data loaded:', smsProviderSettings);
                 renderSmsProviderTable();
                 renderSmsQueueManagement();
+                console.log('[SMS Settings] Render complete');
             } catch (e) {
-                console.error('Failed to load SMS settings:', e);
+                console.error('[SMS Settings] Failed to load:', e);
                 showToast('Napaka pri nalaganju SMS nastavitev', true);
             }
         }
