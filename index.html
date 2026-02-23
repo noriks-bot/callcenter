@@ -355,6 +355,10 @@
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </div>
+                <div class="nav-item" data-tab="leads">
+                    <i class="fas fa-users"></i>
+                    <span>Leads</span>
+                </div>
             </div>
             
             <div class="nav-section">
@@ -1844,10 +1848,12 @@ Available variables:
                 // Data tabs that use content tabs
                 const dataTabs = ['carts', 'pending', 'buyers', 'paketomati'];
                 const isDataTab = dataTabs.includes(currentTab);
+                const isLeadsTab = currentTab === 'leads';
                 
                 // Update page title
                 const titles = {
                     dashboard: 'Dashboard',
+                    leads: 'Leads',
                     carts: 'Abandoned Carts',
                     pending: 'Pending Orders',
                     buyers: 'Enkratni kupci',
@@ -1867,17 +1873,24 @@ Available variables:
                 // Content tabs element
                 const contentTabs = document.getElementById('contentTabs');
                 
-                if (isDataTab) {
+                if (isDataTab || isLeadsTab) {
                     // Show main view with stats, country tabs, content tabs
                     showMainView();
                     
+                    // For "leads" tab, default to carts view
+                    if (isLeadsTab) {
+                        currentContentTab = 'carts';
+                        currentTab = 'carts';
+                    } else {
+                        currentContentTab = currentTab;
+                    }
+                    
                     // Sync content tab state
-                    currentContentTab = currentTab;
                     contentTabs.querySelectorAll('.content-tab').forEach(t => {
-                        t.classList.toggle('active', t.dataset.content === currentTab);
+                        t.classList.toggle('active', t.dataset.content === currentContentTab);
                     });
                     
-                    if (currentTab === 'paketomati') {
+                    if (currentContentTab === 'paketomati') {
                         document.querySelector('.content').style.display = 'none';
                         document.getElementById('paketomatiContent').style.display = 'block';
                         loadPaketomati();
@@ -1947,10 +1960,10 @@ Available variables:
                     };
                     document.getElementById('pageTitle').textContent = titles[newTab] || newTab;
                     
-                    // Update sidebar active state
+                    // Update sidebar active state - keep "Leads" highlighted for content tabs
                     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                    const sidebarItem = document.querySelector(`.nav-item[data-tab="${newTab}"]`);
-                    if (sidebarItem) sidebarItem.classList.add('active');
+                    const leadsItem = document.querySelector('.nav-item[data-tab="leads"]');
+                    if (leadsItem) leadsItem.classList.add('active');
                     
                     // Hide ALL content areas first (prevents overlap)
                     hideAllContent();
