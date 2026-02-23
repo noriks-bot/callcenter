@@ -107,7 +107,27 @@ function formatPhoneForSms($phone, $storeCode) {
     }
     
     // MetaKocka REQUIRES + prefix - always ensure it's there
-    return '+' . $phone;
+    $phone = '+' . $phone;
+    
+    // Format with spaces for readability
+    // Country code lengths: HR=385(3), CZ=420(3), SK=421(3), PL=48(2), GR=30(2), IT=39(2), HU=36(2)
+    $countryCodeLen = strlen($countryCode);
+    $nationalPart = substr($phone, 1 + $countryCodeLen); // Part after +XXX
+    
+    // Format: +XXX XX XXX XXX (space after country code, then groups of 2-3)
+    // First 2 digits, then rest in groups of 3
+    if (strlen($nationalPart) >= 2) {
+        $formatted = '+' . $countryCode . ' ' . substr($nationalPart, 0, 2);
+        $rest = substr($nationalPart, 2);
+        // Split rest into chunks of 3
+        $chunks = str_split($rest, 3);
+        if (!empty($chunks)) {
+            $formatted .= ' ' . implode(' ', $chunks);
+        }
+        return $formatted;
+    }
+    
+    return $phone;
 }
 
 // ========== AGENT MANAGEMENT FUNCTIONS ==========
