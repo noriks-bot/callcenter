@@ -2417,28 +2417,29 @@ body.is-admin .admin-only {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--card-border);
 }
 
 .page-title-large {
-    font-size: 24px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     margin: 0;
 }
 
 .page-title-large i {
     color: var(--accent-blue);
+    font-size: 14px;
 }
 
 .page-header-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
 }
 
@@ -2452,7 +2453,7 @@ body.is-admin .admin-only {
 #analyticsContent,
 #emailTemplatesContent {
     margin-left: var(--sidebar-width);
-    padding: 24px;
+    padding: 12px 16px;
     min-height: 100vh;
     background: var(--content-bg);
     transition: margin-left var(--transition-slow);
@@ -2481,6 +2482,6 @@ body.is-admin .admin-only {
     #paketomatiContent,
     #analyticsContent,
     #emailTemplatesContent {
-        padding: 16px;
+        padding: 10px 12px;
     }
 }
