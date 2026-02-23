@@ -438,21 +438,22 @@
         </div>
     </aside>
     
+    <!-- Header / Top Bar (outside main so it's always visible) -->
+    <div class="top-bar" id="topBar">
+        <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+        <div class="page-title" id="pageTitle">Abandoned Carts</div>
+        <div class="top-bar-actions">
+            <button class="action-btn-header" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> <span class="hide-mobile">Refresh</span>
+            </button>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+    
     <!-- Main -->
     <main class="main" id="main">
-        <div class="top-bar">
-            <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
-            <div class="page-title" id="pageTitle">Abandoned Carts</div>
-            <div class="top-bar-actions">
-                <button class="action-btn-header" onclick="refreshData()">
-                    <i class="fas fa-sync-alt"></i> <span class="hide-mobile">Refresh</span>
-                </button>
-                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
-        </div>
-        
         <div class="country-tabs" id="countryTabs"></div>
         
         <!-- Content Type Tabs (below country tabs) -->
