@@ -8,85 +8,112 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .country-tabs {
-            display: flex;
-            gap: 8px;
-            padding: 16px 24px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
+        /* Country Header Bar */
+        .country-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .country-tab {
-            padding: 10px 20px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-primary);
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0;
+        }
+        .country-btn {
+            padding: 20px 10px;
+            background: transparent;
+            border: none;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            text-align: center;
             transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            color: rgba(255,255,255,0.7);
         }
-        .country-tab:hover {
-            border-color: var(--accent);
-            background: var(--bg-hover);
-        }
-        .country-tab.active {
-            background: var(--accent);
-            border-color: var(--accent);
+        .country-btn:hover {
+            background: rgba(255,255,255,0.1);
             color: white;
         }
-        .country-tab .flag {
-            font-size: 18px;
+        .country-btn.active {
+            background: rgba(255,255,255,0.15);
+            border-bottom-color: #3b82f6;
+            color: white;
         }
-        .country-tab .count {
-            background: rgba(255,255,255,0.2);
-            padding: 2px 8px;
-            border-radius: 12px;
+        .country-btn .flag {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .country-btn .name {
             font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .country-tab.active .count {
-            background: rgba(255,255,255,0.3);
+        .country-btn .count {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 4px;
+            color: #3b82f6;
         }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
+        .country-btn.active .count {
+            color: #60a5fa;
         }
-        .loading-overlay.hidden { display: none; }
-        .loading-box {
-            background: var(--bg-card);
-            padding: 32px 48px;
-            border-radius: 12px;
-            text-align: center;
+        
+        /* Loading */
+        .loading-bar {
+            height: 3px;
+            background: #1e293b;
+            position: relative;
+            overflow: hidden;
         }
-        .loading-box .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
+        .loading-bar.active::after {
+            content: '';
+            position: absolute;
+            left: -50%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            animation: loading 1s infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes loading {
+            to { left: 100%; }
+        }
+        
+        /* Adjust main content */
+        .main-content {
+            margin-left: 260px;
+        }
+        .page-content {
+            padding: 24px;
+        }
+        
+        @media (max-width: 1200px) {
+            .country-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .country-grid { grid-template-columns: repeat(4, 1fr); }
+            .country-btn { padding: 12px 8px; }
+            .country-btn .flag { font-size: 24px; }
+            .country-btn .name { font-size: 10px; }
+            .country-btn .count { font-size: 14px; }
+            .main-content { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay hidden" id="loadingOverlay">
-        <div class="loading-box">
-            <div class="spinner"></div>
-            <div>Loading data...</div>
+    <!-- Loading Bar -->
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <!-- Country Header -->
+    <div class="country-header" id="countryHeader">
+        <div class="country-grid" id="countryGrid">
+            <button class="country-btn active" data-store="">
+                <span class="flag">🌍</span>
+                <span class="name">All</span>
+                <span class="count" id="count-all">-</span>
+            </button>
         </div>
     </div>
 
@@ -150,100 +177,74 @@
                 <button class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <div class="breadcrumb">
-                    <a href="#">Application</a>
-                    <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
-                    <span class="current">Call Center</span>
-                </div>
+                <h1 style="font-size: 18px; font-weight: 600; margin: 0;">
+                    <span id="currentCountryName">All Countries</span>
+                </h1>
             </div>
             <div class="header-right">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search..." id="globalSearch">
                 </div>
-                <button class="header-btn" onclick="loadData(true)">
+                <button class="header-btn" onclick="loadData(true)" title="Refresh (clear cache)">
                     <i class="fas fa-sync-alt"></i>
                 </button>
-                <div class="header-avatar" id="headerAvatar">N</div>
             </div>
         </header>
         
-        <!-- Country Tabs -->
-        <div class="country-tabs" id="countryTabs">
-            <div class="country-tab active" data-store="">
-                <span class="flag">🌍</span>
-                <span>All Countries</span>
-                <span class="count" id="count-all">0</span>
-            </div>
-        </div>
-        
         <!-- Page Content -->
         <div class="page-content">
-            <!-- Stats -->
+            <!-- Stats for selected country -->
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card">
                     <div class="stat-card-header">
-                        <div class="stat-icon blue">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
+                        <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
                     </div>
                     <div class="stat-value" id="statAbandoned">0</div>
                     <div class="stat-label">Abandoned Carts</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-header">
-                        <div class="stat-icon purple">
-                            <i class="fas fa-user-slash"></i>
-                        </div>
+                        <div class="stat-icon purple"><i class="fas fa-user-slash"></i></div>
                     </div>
                     <div class="stat-value" id="statSuppressed">0</div>
-                    <div class="stat-label">Suppressed Profiles</div>
+                    <div class="stat-label">Suppressed</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-header">
-                        <div class="stat-icon orange">
-                            <i class="fas fa-clock"></i>
-                        </div>
+                        <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
                     </div>
                     <div class="stat-value" id="statPending">0</div>
                     <div class="stat-label">Pending Orders</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-header">
-                        <div class="stat-icon green">
-                            <i class="fas fa-phone-alt"></i>
-                        </div>
+                        <div class="stat-icon green"><i class="fas fa-euro-sign"></i></div>
                     </div>
-                    <div class="stat-value" id="statCalled">0</div>
-                    <div class="stat-label">Called Today</div>
+                    <div class="stat-value" id="statValue">€0</div>
+                    <div class="stat-label">Cart Value</div>
                 </div>
             </div>
             
-            <!-- Main Card with Tabs -->
+            <!-- Main Card -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-headset"></i>
-                        Call Queue
-                    </h2>
+                    <h2 class="card-title"><i class="fas fa-headset"></i> Call Queue</h2>
                 </div>
                 
                 <div class="card-body">
                     <!-- Tabs -->
                     <div class="tabs">
                         <button class="tab active" data-tab="abandoned">
-                            <i class="fas fa-shopping-cart"></i>
-                            Abandoned Carts
+                            <i class="fas fa-shopping-cart"></i> Abandoned
                             <span class="count" id="tab-abandoned-count">0</span>
                         </button>
                         <button class="tab" data-tab="suppressed">
-                            <i class="fas fa-user-slash"></i>
-                            Suppressed
+                            <i class="fas fa-user-slash"></i> Suppressed
                             <span class="count" id="tab-suppressed-count">0</span>
                         </button>
                         <button class="tab" data-tab="pending">
-                            <i class="fas fa-clock"></i>
-                            Pending Orders
+                            <i class="fas fa-clock"></i> Pending
                             <span class="count" id="tab-pending-count">0</span>
                         </button>
                     </div>
@@ -259,10 +260,10 @@
                             <option value="converted">Converted</option>
                             <option value="not_interested">Not Interested</option>
                         </select>
-                        <input type="text" class="filter-input" id="filterSearch" placeholder="Search by name, email, phone...">
+                        <input type="text" class="filter-input" id="filterSearch" placeholder="Search name, email, phone...">
                     </div>
                     
-                    <!-- Table Content -->
+                    <!-- Tables -->
                     <div id="content-abandoned" class="tab-content active">
                         <div class="table-container">
                             <table class="data-table">
@@ -270,7 +271,7 @@
                                     <tr>
                                         <th>Customer</th>
                                         <th>Store</th>
-                                        <th>Cart Value</th>
+                                        <th>Value</th>
                                         <th>Items</th>
                                         <th>Phone</th>
                                         <th>Status</th>
@@ -278,14 +279,12 @@
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="abandoned-table">
-                                    <tr><td colspan="8"><div class="loading"><div class="loading-spinner"></div>Loading...</div></td></tr>
-                                </tbody>
+                                <tbody id="abandoned-table"><tr><td colspan="8" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
                             </table>
                         </div>
                     </div>
                     
-                    <div id="content-suppressed" class="tab-content" style="display: none;">
+                    <div id="content-suppressed" class="tab-content" style="display:none;">
                         <div class="table-container">
                             <table class="data-table">
                                 <thead>
@@ -293,20 +292,18 @@
                                         <th>Profile</th>
                                         <th>Phone</th>
                                         <th>Reason</th>
-                                        <th>Suppressed</th>
+                                        <th>Date</th>
                                         <th>Status</th>
                                         <th>Notes</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="suppressed-table">
-                                    <tr><td colspan="7"><div class="loading"><div class="loading-spinner"></div>Loading...</div></td></tr>
-                                </tbody>
+                                <tbody id="suppressed-table"><tr><td colspan="7" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
                             </table>
                         </div>
                     </div>
                     
-                    <div id="content-pending" class="tab-content" style="display: none;">
+                    <div id="content-pending" class="tab-content" style="display:none;">
                         <div class="table-container">
                             <table class="data-table">
                                 <thead>
@@ -321,9 +318,7 @@
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="pending-table">
-                                    <tr><td colspan="8"><div class="loading"><div class="loading-spinner"></div>Loading...</div></td></tr>
-                                </tbody>
+                                <tbody id="pending-table"><tr><td colspan="8" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
                             </table>
                         </div>
                     </div>
@@ -332,7 +327,7 @@
         </div>
     </main>
     
-    <!-- Update Status Modal -->
+    <!-- Modal -->
     <div class="modal-overlay" id="statusModal">
         <div class="modal">
             <div class="modal-header">
@@ -341,7 +336,7 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">Call Status</label>
+                    <label class="form-label">Status</label>
                     <select class="form-select" id="modalStatus">
                         <option value="not_called">Not Called</option>
                         <option value="called">Called</option>
@@ -353,7 +348,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Notes</label>
-                    <textarea class="form-textarea" id="modalNotes" placeholder="Add notes..."></textarea>
+                    <textarea class="form-textarea" id="modalNotes" placeholder="Notes..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -372,9 +367,8 @@
         let currentTab = 'abandoned';
         let currentStore = '';
         let currentEditId = null;
-        let countryCounts = {};
         
-        // Check auth
+        // Auth check
         const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
         if (!user) {
             window.location.href = 'login.html';
@@ -382,10 +376,9 @@
             document.getElementById('userName').textContent = user.username;
             document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Agent';
             document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
-            document.getElementById('headerAvatar').textContent = user.username[0].toUpperCase();
         }
         
-        // Navigation
+        // Tab navigation
         document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -402,20 +395,25 @@
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+            document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add('active');
             document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
             document.getElementById(`content-${tab}`).style.display = 'block';
             applyFilters();
         }
         
-        // Country tabs
-        document.getElementById('countryTabs').addEventListener('click', (e) => {
-            const tab = e.target.closest('.country-tab');
-            if (!tab) return;
-            currentStore = tab.dataset.store || '';
-            document.querySelectorAll('.country-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+        // Country selection
+        document.getElementById('countryGrid').addEventListener('click', (e) => {
+            const btn = e.target.closest('.country-btn');
+            if (!btn) return;
+            currentStore = btn.dataset.store || '';
+            document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const store = stores.find(s => s.code === currentStore);
+            document.getElementById('currentCountryName').textContent = store ? `${store.flag} ${store.name}` : 'All Countries';
+            
             applyFilters();
+            updateStats();
         });
         
         // Mobile sidebar
@@ -423,251 +421,208 @@
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('active');
         });
-        
         document.getElementById('sidebarOverlay').addEventListener('click', () => {
             document.getElementById('sidebar').classList.remove('open');
             document.getElementById('sidebarOverlay').classList.remove('active');
         });
         
-        // Show/hide loading
-        function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
-        function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+        // Loading
+        function setLoading(on) {
+            document.getElementById('loadingBar').classList.toggle('active', on);
+        }
         
         // Load data
         async function loadData(clearCache = false) {
-            showLoading();
+            setLoading(true);
             
             if (clearCache) {
                 await fetch('api.php?action=clear-cache').catch(() => {});
             }
             
-            await loadStores();
-            await Promise.all([
-                loadAbandonedCarts(),
-                loadSuppressedProfiles(),
-                loadPendingOrders()
-            ]);
-            updateStats();
-            hideLoading();
-        }
-        
-        async function loadStores() {
             try {
-                const res = await fetch('api.php?action=stores');
-                stores = await res.json();
+                // Load stores first
+                const storesRes = await fetch('api.php?action=stores');
+                stores = await storesRes.json();
                 renderCountryTabs();
+                
+                // Load all data in parallel
+                const [cartsRes, profilesRes, ordersRes] = await Promise.all([
+                    fetch('api.php?action=abandoned-carts'),
+                    fetch('api.php?action=suppressed-profiles'),
+                    fetch('api.php?action=pending-orders')
+                ]);
+                
+                abandonedCarts = await cartsRes.json() || [];
+                suppressedProfiles = await profilesRes.json() || [];
+                pendingOrders = await ordersRes.json() || [];
+                
+                if (!Array.isArray(abandonedCarts)) abandonedCarts = [];
+                if (!Array.isArray(suppressedProfiles)) suppressedProfiles = [];
+                if (!Array.isArray(pendingOrders)) pendingOrders = [];
+                
+                updateCounts();
+                updateStats();
+                applyFilters();
             } catch (e) {
-                console.error('Failed to load stores:', e);
+                console.error('Load error:', e);
             }
+            
+            setLoading(false);
         }
         
         function renderCountryTabs() {
-            const container = document.getElementById('countryTabs');
-            container.innerHTML = `
-                <div class="country-tab active" data-store="">
+            const grid = document.getElementById('countryGrid');
+            grid.innerHTML = `
+                <button class="country-btn active" data-store="">
                     <span class="flag">🌍</span>
-                    <span>All</span>
-                    <span class="count" id="count-all">0</span>
-                </div>
+                    <span class="name">All</span>
+                    <span class="count" id="count-all">-</span>
+                </button>
             `;
             stores.forEach(s => {
-                container.innerHTML += `
-                    <div class="country-tab" data-store="${s.code}">
+                grid.innerHTML += `
+                    <button class="country-btn" data-store="${s.code}">
                         <span class="flag">${s.flag}</span>
-                        <span>${s.name}</span>
-                        <span class="count" id="count-${s.code}">0</span>
-                    </div>
+                        <span class="name">${s.name}</span>
+                        <span class="count" id="count-${s.code}">-</span>
+                    </button>
                 `;
             });
         }
         
-        function updateCountryCounts() {
-            countryCounts = { all: 0 };
-            stores.forEach(s => countryCounts[s.code] = 0);
+        function updateCounts() {
+            // Update sidebar counts
+            document.getElementById('abandoned-count').textContent = abandonedCarts.length;
+            document.getElementById('suppressed-count').textContent = suppressedProfiles.length;
+            document.getElementById('pending-count').textContent = pendingOrders.length;
+            document.getElementById('tab-abandoned-count').textContent = abandonedCarts.length;
+            document.getElementById('tab-suppressed-count').textContent = suppressedProfiles.length;
+            document.getElementById('tab-pending-count').textContent = pendingOrders.length;
             
-            const getData = () => {
-                if (currentTab === 'abandoned') return abandonedCarts;
-                if (currentTab === 'pending') return pendingOrders;
-                return [];
-            };
-            
-            getData().forEach(item => {
-                countryCounts.all++;
-                if (countryCounts[item.storeCode] !== undefined) {
-                    countryCounts[item.storeCode]++;
-                }
+            // Update country counts
+            const counts = { all: abandonedCarts.length };
+            stores.forEach(s => counts[s.code] = 0);
+            abandonedCarts.forEach(c => {
+                if (counts[c.storeCode] !== undefined) counts[c.storeCode]++;
             });
             
-            Object.keys(countryCounts).forEach(code => {
+            Object.keys(counts).forEach(code => {
                 const el = document.getElementById(`count-${code}`);
-                if (el) el.textContent = countryCounts[code];
+                if (el) el.textContent = counts[code];
             });
-        }
-        
-        async function loadAbandonedCarts() {
-            try {
-                const res = await fetch('api.php?action=abandoned-carts');
-                abandonedCarts = await res.json();
-                if (!Array.isArray(abandonedCarts)) abandonedCarts = [];
-                document.getElementById('abandoned-count').textContent = abandonedCarts.length;
-                document.getElementById('tab-abandoned-count').textContent = abandonedCarts.length;
-                document.getElementById('statAbandoned').textContent = abandonedCarts.length;
-                updateCountryCounts();
-                renderAbandonedCarts();
-            } catch (e) {
-                console.error('Failed to load abandoned carts:', e);
-                abandonedCarts = [];
-            }
-        }
-        
-        async function loadSuppressedProfiles() {
-            try {
-                const res = await fetch('api.php?action=suppressed-profiles');
-                suppressedProfiles = await res.json();
-                if (!Array.isArray(suppressedProfiles)) suppressedProfiles = [];
-                document.getElementById('suppressed-count').textContent = suppressedProfiles.length;
-                document.getElementById('tab-suppressed-count').textContent = suppressedProfiles.length;
-                document.getElementById('statSuppressed').textContent = suppressedProfiles.length;
-                renderSuppressedProfiles();
-            } catch (e) {
-                console.error('Failed to load suppressed profiles:', e);
-                suppressedProfiles = [];
-            }
-        }
-        
-        async function loadPendingOrders() {
-            try {
-                const res = await fetch('api.php?action=pending-orders');
-                pendingOrders = await res.json();
-                if (!Array.isArray(pendingOrders)) pendingOrders = [];
-                document.getElementById('pending-count').textContent = pendingOrders.length;
-                document.getElementById('tab-pending-count').textContent = pendingOrders.length;
-                document.getElementById('statPending').textContent = pendingOrders.length;
-                renderPendingOrders();
-            } catch (e) {
-                console.error('Failed to load pending orders:', e);
-                pendingOrders = [];
-            }
         }
         
         function updateStats() {
-            const allItems = [...abandonedCarts, ...suppressedProfiles, ...pendingOrders];
-            const calledToday = allItems.filter(i => 
-                i.callStatus && i.callStatus !== 'not_called' && 
-                i.lastUpdated && new Date(i.lastUpdated).toDateString() === new Date().toDateString()
-            ).length;
-            document.getElementById('statCalled').textContent = calledToday;
+            const data = currentStore 
+                ? abandonedCarts.filter(c => c.storeCode === currentStore)
+                : abandonedCarts;
+            const pendingData = currentStore
+                ? pendingOrders.filter(o => o.storeCode === currentStore)
+                : pendingOrders;
+            
+            document.getElementById('statAbandoned').textContent = data.length;
+            document.getElementById('statSuppressed').textContent = suppressedProfiles.length;
+            document.getElementById('statPending').textContent = pendingData.length;
+            
+            const totalValue = data.reduce((sum, c) => sum + (c.cartValue || 0), 0);
+            const currency = data[0]?.currency || 'EUR';
+            const symbols = { EUR: '€', CZK: 'Kč', PLN: 'zł', HUF: 'Ft' };
+            document.getElementById('statValue').textContent = `${symbols[currency] || '€'}${totalValue.toFixed(0)}`;
         }
         
         // Render functions
-        function renderAbandonedCarts(data = null) {
-            const items = data || abandonedCarts;
+        function renderAbandonedCarts(items) {
             const tbody = document.getElementById('abandoned-table');
-            
-            if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-shopping-cart"></i><h3>No abandoned carts</h3></div></td></tr>`;
+            if (!items.length) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b;">No abandoned carts</td></tr>';
                 return;
             }
-            
-            tbody.innerHTML = items.map(cart => `
+            tbody.innerHTML = items.map(c => `
                 <tr>
                     <td>
                         <div class="customer-cell">
-                            <div class="customer-avatar">${getInitials(cart.customerName)}</div>
+                            <div class="customer-avatar">${getInitials(c.customerName)}</div>
                             <div class="customer-info">
-                                <div class="customer-name">${escapeHtml(cart.customerName)}</div>
-                                <div class="customer-email">${escapeHtml(cart.email)}</div>
+                                <div class="customer-name">${esc(c.customerName)}</div>
+                                <div class="customer-email">${esc(c.email)}</div>
                             </div>
                         </div>
                     </td>
-                    <td><span class="store-badge"><span class="store-flag">${cart.storeFlag}</span> ${cart.storeName}</span></td>
-                    <td class="amount-cell">${formatCurrency(cart.cartValue, cart.currency)}</td>
-                    <td>
-                        <div class="cart-items">
-                            ${(cart.cartContents || []).slice(0, 2).map(item => `
-                                <div class="cart-item"><span class="cart-item-qty">${item.quantity}x</span> ${escapeHtml((item.name || '').substring(0, 30))}${(item.name || '').length > 30 ? '...' : ''}</div>
-                            `).join('')}
-                            ${(cart.cartContents || []).length > 2 ? `<div class="cart-item" style="color: var(--text-muted);">+${cart.cartContents.length - 2} more</div>` : ''}
-                        </div>
-                    </td>
-                    <td>${cart.phone ? `<a href="tel:${cart.phone}" class="phone-link"><i class="fas fa-phone"></i> ${cart.phone}</a>` : '—'}</td>
-                    <td><span class="status-badge ${cart.callStatus}">${formatStatus(cart.callStatus)}</span></td>
-                    <td><div class="timestamp"><div class="timestamp-ago">${timeAgo(cart.abandonedAt)}</div>${formatDate(cart.abandonedAt)}</div></td>
+                    <td><span class="store-badge"><span class="store-flag">${c.storeFlag}</span> ${c.storeName}</span></td>
+                    <td class="amount-cell">${formatCurrency(c.cartValue, c.currency)}</td>
+                    <td>${(c.cartContents||[]).slice(0,2).map(i=>`<div style="font-size:12px;">${i.quantity}x ${esc((i.name||'').substring(0,25))}</div>`).join('')}</td>
+                    <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '—'}</td>
+                    <td><span class="status-badge ${c.callStatus}">${formatStatus(c.callStatus)}</span></td>
+                    <td><div style="font-size:12px;">${timeAgo(c.abandonedAt)}<br><span style="color:#64748b;">${formatDate(c.abandonedAt)}</span></div></td>
                     <td>
                         <div class="action-btns">
-                            ${cart.phone ? `<button class="action-btn call" onclick="makeCall('${cart.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${cart.id}', '${cart.callStatus}', '${escapeHtml(cart.notes || '')}')" title="Update"><i class="fas fa-edit"></i></button>
+                            ${c.phone ? `<button class="action-btn call" onclick="makeCall('${c.phone}')"><i class="fas fa-phone"></i></button>` : ''}
+                            <button class="action-btn" onclick="openModal('${c.id}','${c.callStatus}','${esc(c.notes||'')}')"><i class="fas fa-edit"></i></button>
                         </div>
                     </td>
                 </tr>
             `).join('');
         }
         
-        function renderSuppressedProfiles(data = null) {
-            const items = data || suppressedProfiles;
+        function renderSuppressedProfiles(items) {
             const tbody = document.getElementById('suppressed-table');
-            
-            if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-user-slash"></i><h3>No suppressed profiles</h3></div></td></tr>`;
+            if (!items.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#64748b;">No profiles</td></tr>';
                 return;
             }
-            
-            tbody.innerHTML = items.map(profile => `
+            tbody.innerHTML = items.map(p => `
                 <tr>
                     <td>
                         <div class="customer-cell">
-                            <div class="customer-avatar">${getInitials(profile.firstName + ' ' + profile.lastName)}</div>
+                            <div class="customer-avatar">${getInitials(p.firstName+' '+p.lastName)}</div>
                             <div class="customer-info">
-                                <div class="customer-name">${escapeHtml(profile.firstName)} ${escapeHtml(profile.lastName)}</div>
-                                <div class="customer-email">${escapeHtml(profile.email)}</div>
+                                <div class="customer-name">${esc(p.firstName)} ${esc(p.lastName)}</div>
+                                <div class="customer-email">${esc(p.email)}</div>
                             </div>
                         </div>
                     </td>
-                    <td>${profile.phone ? `<a href="tel:${profile.phone}" class="phone-link"><i class="fas fa-phone"></i> ${profile.phone}</a>` : '—'}</td>
-                    <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">${formatReason(profile.suppressionReason)}</span></td>
-                    <td><div class="timestamp"><div class="timestamp-ago">${timeAgo(profile.suppressedAt)}</div>${formatDate(profile.suppressedAt)}</div></td>
-                    <td><span class="status-badge ${profile.callStatus}">${formatStatus(profile.callStatus)}</span></td>
-                    <td><div class="notes-preview">${escapeHtml(profile.notes || '')}</div></td>
+                    <td>${p.phone ? `<a href="tel:${p.phone}" class="phone-link"><i class="fas fa-phone"></i> ${p.phone}</a>` : '—'}</td>
+                    <td><span class="status-badge" style="background:#fef3c7;color:#92400e;">${formatReason(p.suppressionReason)}</span></td>
+                    <td>${formatDate(p.suppressedAt)}</td>
+                    <td><span class="status-badge ${p.callStatus}">${formatStatus(p.callStatus)}</span></td>
+                    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;">${esc(p.notes||'')}</td>
                     <td>
                         <div class="action-btns">
-                            ${profile.phone ? `<button class="action-btn call" onclick="makeCall('${profile.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${profile.id}', '${profile.callStatus}', '${escapeHtml(profile.notes || '')}')" title="Update"><i class="fas fa-edit"></i></button>
+                            ${p.phone ? `<button class="action-btn call" onclick="makeCall('${p.phone}')"><i class="fas fa-phone"></i></button>` : ''}
+                            <button class="action-btn" onclick="openModal('${p.id}','${p.callStatus}','${esc(p.notes||'')}')"><i class="fas fa-edit"></i></button>
                         </div>
                     </td>
                 </tr>
             `).join('');
         }
         
-        function renderPendingOrders(data = null) {
-            const items = data || pendingOrders;
+        function renderPendingOrders(items) {
             const tbody = document.getElementById('pending-table');
-            
-            if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-clock"></i><h3>No pending orders</h3></div></td></tr>`;
+            if (!items.length) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b;">No pending orders</td></tr>';
                 return;
             }
-            
-            tbody.innerHTML = items.map(order => `
+            tbody.innerHTML = items.map(o => `
                 <tr>
                     <td>
                         <div class="customer-cell">
-                            <div class="customer-avatar">${getInitials(order.customerName)}</div>
+                            <div class="customer-avatar">${getInitials(o.customerName)}</div>
                             <div class="customer-info">
-                                <div class="customer-name">${escapeHtml(order.customerName)}</div>
-                                <div class="customer-email">${escapeHtml(order.email)}</div>
+                                <div class="customer-name">${esc(o.customerName)}</div>
+                                <div class="customer-email">${esc(o.email)}</div>
                             </div>
                         </div>
                     </td>
-                    <td><span class="store-badge"><span class="store-flag">${order.storeFlag}</span> ${order.storeName}</span></td>
-                    <td><strong>#${order.orderId}</strong></td>
-                    <td class="amount-cell">${formatCurrency(order.orderTotal, order.currency)}</td>
-                    <td>${order.phone ? `<a href="tel:${order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${order.phone}</a>` : '—'}</td>
-                    <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">${order.orderStatus}</span></td>
-                    <td><span class="status-badge ${order.callStatus}">${formatStatus(order.callStatus)}</span></td>
+                    <td><span class="store-badge"><span class="store-flag">${o.storeFlag}</span> ${o.storeName}</span></td>
+                    <td><strong>#${o.orderId}</strong></td>
+                    <td class="amount-cell">${formatCurrency(o.orderTotal, o.currency)}</td>
+                    <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '—'}</td>
+                    <td><span class="status-badge" style="background:#fef3c7;color:#92400e;">${o.orderStatus}</span></td>
+                    <td><span class="status-badge ${o.callStatus}">${formatStatus(o.callStatus)}</span></td>
                     <td>
                         <div class="action-btns">
-                            ${order.phone ? `<button class="action-btn call" onclick="makeCall('${order.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${order.id}', '${order.callStatus}', '${escapeHtml(order.notes || '')}')" title="Update"><i class="fas fa-edit"></i></button>
+                            ${o.phone ? `<button class="action-btn call" onclick="makeCall('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
+                            <button class="action-btn" onclick="openModal('${o.id}','${o.callStatus}','${esc(o.notes||'')}')"><i class="fas fa-edit"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -684,37 +639,35 @@
             const search = (document.getElementById('filterSearch').value || document.getElementById('globalSearch').value).toLowerCase();
             
             if (currentTab === 'abandoned') {
-                let filtered = abandonedCarts;
-                if (currentStore) filtered = filtered.filter(c => c.storeCode === currentStore);
-                if (status) filtered = filtered.filter(c => c.callStatus === status);
-                if (search) filtered = filtered.filter(c => 
-                    (c.customerName || '').toLowerCase().includes(search) ||
-                    (c.email || '').toLowerCase().includes(search) ||
-                    (c.phone && c.phone.includes(search))
+                let data = abandonedCarts;
+                if (currentStore) data = data.filter(c => c.storeCode === currentStore);
+                if (status) data = data.filter(c => c.callStatus === status);
+                if (search) data = data.filter(c => 
+                    (c.customerName||'').toLowerCase().includes(search) ||
+                    (c.email||'').toLowerCase().includes(search) ||
+                    (c.phone||'').includes(search)
                 );
-                renderAbandonedCarts(filtered);
-                updateCountryCounts();
+                renderAbandonedCarts(data);
             } else if (currentTab === 'suppressed') {
-                let filtered = suppressedProfiles;
-                if (status) filtered = filtered.filter(p => p.callStatus === status);
-                if (search) filtered = filtered.filter(p => 
-                    (p.firstName + ' ' + p.lastName).toLowerCase().includes(search) ||
-                    (p.email || '').toLowerCase().includes(search) ||
-                    (p.phone && p.phone.includes(search))
+                let data = suppressedProfiles;
+                if (status) data = data.filter(p => p.callStatus === status);
+                if (search) data = data.filter(p => 
+                    ((p.firstName||'')+' '+(p.lastName||'')).toLowerCase().includes(search) ||
+                    (p.email||'').toLowerCase().includes(search) ||
+                    (p.phone||'').includes(search)
                 );
-                renderSuppressedProfiles(filtered);
-            } else if (currentTab === 'pending') {
-                let filtered = pendingOrders;
-                if (currentStore) filtered = filtered.filter(o => o.storeCode === currentStore);
-                if (status) filtered = filtered.filter(o => o.callStatus === status);
-                if (search) filtered = filtered.filter(o => 
-                    (o.customerName || '').toLowerCase().includes(search) ||
-                    (o.email || '').toLowerCase().includes(search) ||
-                    (o.phone && o.phone.includes(search)) ||
+                renderSuppressedProfiles(data);
+            } else {
+                let data = pendingOrders;
+                if (currentStore) data = data.filter(o => o.storeCode === currentStore);
+                if (status) data = data.filter(o => o.callStatus === status);
+                if (search) data = data.filter(o => 
+                    (o.customerName||'').toLowerCase().includes(search) ||
+                    (o.email||'').toLowerCase().includes(search) ||
+                    (o.phone||'').includes(search) ||
                     String(o.orderId).includes(search)
                 );
-                renderPendingOrders(filtered);
-                updateCountryCounts();
+                renderPendingOrders(data);
             }
         }
         
@@ -725,77 +678,40 @@
             document.getElementById('modalNotes').value = notes || '';
             document.getElementById('statusModal').classList.add('active');
         }
-        
         function closeModal() {
             document.getElementById('statusModal').classList.remove('active');
             currentEditId = null;
         }
-        
         async function saveStatus() {
             if (!currentEditId) return;
-            
             const status = document.getElementById('modalStatus').value;
             const notes = document.getElementById('modalNotes').value;
-            
             try {
                 await fetch('api.php?action=update-status', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: currentEditId, callStatus: status, notes })
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({id:currentEditId, callStatus:status, notes})
                 });
-                
-                // Update local data
-                const updateItem = (arr) => {
+                [abandonedCarts, suppressedProfiles, pendingOrders].forEach(arr => {
                     const item = arr.find(i => i.id === currentEditId);
-                    if (item) {
-                        item.callStatus = status;
-                        item.notes = notes;
-                        item.lastUpdated = new Date().toISOString();
-                    }
-                };
-                updateItem(abandonedCarts);
-                updateItem(suppressedProfiles);
-                updateItem(pendingOrders);
-                
+                    if (item) { item.callStatus = status; item.notes = notes; item.lastUpdated = new Date().toISOString(); }
+                });
                 applyFilters();
-                updateStats();
                 closeModal();
-            } catch (e) {
-                alert('Failed to save');
-            }
+            } catch(e) { alert('Error saving'); }
         }
         
-        function makeCall(phone) { window.open(`tel:${phone}`, '_self'); }
+        function makeCall(phone) { window.open('tel:'+phone, '_self'); }
         function logout() { localStorage.removeItem('callcenter_user'); window.location.href = 'login.html'; }
         
         // Helpers
-        function getInitials(name) { return (name || '?').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(); }
-        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text || ''; return div.innerHTML; }
-        function formatCurrency(amount, currency) {
-            const symbols = { EUR: '€', CZK: 'Kč', PLN: 'zł', HUF: 'Ft' };
-            return `${symbols[currency] || currency} ${parseFloat(amount || 0).toFixed(2)}`;
-        }
-        function formatStatus(status) {
-            const labels = { not_called: 'Not Called', called: 'Called', answered: 'Answered', no_answer: 'No Answer', converted: 'Converted', not_interested: 'Not Interested' };
-            return labels[status] || status;
-        }
-        function formatReason(reason) {
-            const labels = { user_suppressed: 'Unsubscribed', hard_bounce: 'Hard Bounce', spam_complaint: 'Spam', invalid_email: 'Invalid Email', unsubscribed: 'Unsubscribed' };
-            return labels[reason] || reason;
-        }
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const d = new Date(dateStr);
-            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        }
-        function timeAgo(dateStr) {
-            if (!dateStr) return '';
-            const seconds = Math.floor((new Date() - new Date(dateStr)) / 1000);
-            if (seconds < 60) return 'Just now';
-            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
-            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
-            return Math.floor(seconds / 86400) + 'd ago';
-        }
+        function getInitials(n) { return (n||'?').split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase(); }
+        function esc(t) { const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
+        function formatCurrency(a,c) { const s={EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}; return `${s[c]||c} ${parseFloat(a||0).toFixed(2)}`; }
+        function formatStatus(s) { return {not_called:'Not Called',called:'Called',answered:'Answered',no_answer:'No Answer',converted:'Converted',not_interested:'Not Interested'}[s]||s; }
+        function formatReason(r) { return {user_suppressed:'Unsubscribed',hard_bounce:'Bounce',spam_complaint:'Spam',invalid_email:'Invalid',unsubscribed:'Unsubscribed'}[r]||r; }
+        function formatDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); }
+        function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
         
         // Init
         loadData();
