@@ -43,6 +43,7 @@ $metakocka = [
 
 $smsSettingsFile = __DIR__ . '/data/sms-settings.json';
 $agentsFile = __DIR__ . '/data/agents.json';
+$callLogsFile = __DIR__ . '/data/call-logs.json';
 
 // ========== AGENT MANAGEMENT FUNCTIONS ==========
 function loadAgents() {
@@ -96,6 +97,191 @@ function saveSmsSettings($data) {
     $dir = dirname($smsSettingsFile);
     if (!is_dir($dir)) mkdir($dir, 0755, true);
     file_put_contents($smsSettingsFile, json_encode($data, JSON_PRETTY_PRINT));
+}
+
+// ========== CALL LOGS FUNCTIONS ==========
+function loadCallLogs() {
+    global $callLogsFile;
+    if (file_exists($callLogsFile)) {
+        $data = json_decode(file_get_contents($callLogsFile), true);
+        return $data['logs'] ?? [];
+    }
+    return [];
+}
+
+function saveCallLogs($logs) {
+    global $callLogsFile;
+    $dir = dirname($callLogsFile);
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    file_put_contents($callLogsFile, json_encode(['logs' => $logs], JSON_PRETTY_PRINT));
+}
+
+function addCallLog($data) {
+    $logs = loadCallLogs();
+    
+    $logEntry = [
+        'id' => 'call_' . time() . '_' . rand(1000, 9999),
+        'customerId' => $data['customerId'] ?? '',
+        'storeCode' => $data['storeCode'] ?? '',
+        'status' => $data['status'] ?? 'not_called',
+        'notes' => $data['notes'] ?? '',
+        'duration' => $data['duration'] ?? null,
+        'callbackAt' => $data['callbackAt'] ?? null,
+        'agentId' => $data['agentId'] ?? 'unknown',
+        'createdAt' => date('c')
+    ];
+    
+    $logs[] = $logEntry;
+    saveCallLogs($logs);
+    
+    // Update the customer's current call status based on latest log
+    updateCustomerCallStatus($data['customerId'], $data['status'], $data['notes'] ?? '');
+    
+    return ['success' => true, 'id' => $logEntry['id'], 'log' => $logEntry];
+}
+
+function updateCustomerCallStatus($customerId, $status, $notes = '') {
+    $callData = loadCallData();
+    $callData[$customerId] = [
+        'callStatus' => $status,
+        'notes' => $notes,
+        'lastUpdated' => date('c'),
+        'orderId' => $callData[$customerId]['orderId'] ?? null
+    ];
+    saveCallData($callData);
+}
+
+function getCallLogsForCustomer($customerId) {
+    $logs = loadCallLogs();
+    return array_values(array_filter($logs, fn($log) => $log['customerId'] === $customerId));
+}
+
+function getFollowUps($agentId = null, $includeAll = false) {
+    $logs = loadCallLogs();
+    $today = date('Y-m-d');
+    $tomorrow = date('Y-m-d', strtotime('+1 day'));
+    
+    $followups = array_filter($logs, function($log) use ($agentId, $includeAll, $today) {
+        // Must have callback scheduled
+        if (empty($log['callbackAt'])) return false;
+        
+        // Must be callback status
+        if ($log['status'] !== 'callback') return false;
+        
+        // Filter by agent if specified
+        if ($agentId && !$includeAll && $log['agentId'] !== $agentId) return false;
+        
+        // Only future or today callbacks (not past)
+        $callbackDate = date('Y-m-d', strtotime($log['callbackAt']));
+        return $callbackDate >= $today;
+    });
+    
+    // Sort by callback time
+    usort($followups, fn($a, $b) => strtotime($a['callbackAt']) - strtotime($b['callbackAt']));
+    
+    // Add customer info to each followup
+    $carts = fetchAbandonedCarts();
+    $enrichedFollowups = [];
+    
+    foreach ($followups as $followup) {
+        $customer = null;
+        foreach ($carts as $cart) {
+            if ($cart['id'] === $followup['customerId']) {
+                $customer = $cart;
+                break;
+            }
+        }
+        
+        $callbackTime = strtotime($followup['callbackAt']);
+        $isDue = $callbackTime <= time();
+        $isToday = date('Y-m-d', $callbackTime) === $today;
+        $isTomorrow = date('Y-m-d', $callbackTime) === $tomorrow;
+        
+        $enrichedFollowups[] = array_merge($followup, [
+            'customer' => $customer ? [
+                'name' => $customer['customerName'],
+                'phone' => $customer['phone'],
+                'email' => $customer['email'],
+                'storeFlag' => $customer['storeFlag'],
+                'cartValue' => $customer['cartValue'],
+                'currency' => $customer['currency']
+            ] : null,
+            'isDue' => $isDue,
+            'isToday' => $isToday,
+            'isTomorrow' => $isTomorrow
+        ]);
+    }
+    
+    return $enrichedFollowups;
+}
+
+function getCallStats($filters = []) {
+    $logs = loadCallLogs();
+    
+    // Apply date filters
+    if (!empty($filters['dateFrom'])) {
+        $logs = array_filter($logs, fn($l) => $l['createdAt'] >= $filters['dateFrom']);
+    }
+    if (!empty($filters['dateTo'])) {
+        $logs = array_filter($logs, fn($l) => $l['createdAt'] <= $filters['dateTo'] . 'T23:59:59');
+    }
+    if (!empty($filters['storeCode'])) {
+        $logs = array_filter($logs, fn($l) => $l['storeCode'] === $filters['storeCode']);
+    }
+    if (!empty($filters['agentId'])) {
+        $logs = array_filter($logs, fn($l) => $l['agentId'] === $filters['agentId']);
+    }
+    
+    $logs = array_values($logs);
+    
+    // Status counts
+    $statusCounts = [];
+    foreach ($logs as $log) {
+        $status = $log['status'];
+        $statusCounts[$status] = ($statusCounts[$status] ?? 0) + 1;
+    }
+    
+    // Agent stats
+    $agentStats = [];
+    foreach ($logs as $log) {
+        $agentId = $log['agentId'];
+        if (!isset($agentStats[$agentId])) {
+            $agentStats[$agentId] = ['calls' => 0, 'converted' => 0];
+        }
+        $agentStats[$agentId]['calls']++;
+        if ($log['status'] === 'converted') {
+            $agentStats[$agentId]['converted']++;
+        }
+    }
+    
+    // Calls by hour
+    $hourlyStats = array_fill(0, 24, 0);
+    foreach ($logs as $log) {
+        $hour = (int)date('G', strtotime($log['createdAt']));
+        $hourlyStats[$hour]++;
+    }
+    
+    // Calls by day (last 30 days)
+    $dailyStats = [];
+    for ($i = 29; $i >= 0; $i--) {
+        $date = date('Y-m-d', strtotime("-{$i} days"));
+        $dailyStats[$date] = 0;
+    }
+    foreach ($logs as $log) {
+        $date = date('Y-m-d', strtotime($log['createdAt']));
+        if (isset($dailyStats[$date])) {
+            $dailyStats[$date]++;
+        }
+    }
+    
+    return [
+        'totalCalls' => count($logs),
+        'statusCounts' => $statusCounts,
+        'agentStats' => $agentStats,
+        'hourlyStats' => $hourlyStats,
+        'dailyStats' => $dailyStats,
+        'conversionRate' => count($logs) > 0 ? round(($statusCounts['converted'] ?? 0) / count($logs) * 100, 1) : 0
+    ];
 }
 
 // MetaKocka SMS Functions
@@ -1197,19 +1383,97 @@ try {
             echo json_encode(['success' => true]);
             break;
             
+        // ========== CALL LOGS ENDPOINTS ==========
+        case 'call-logs':
+            $filters = [
+                'storeCode' => $_GET['storeCode'] ?? null,
+                'agentId' => $_GET['agentId'] ?? null,
+                'dateFrom' => $_GET['dateFrom'] ?? null,
+                'dateTo' => $_GET['dateTo'] ?? null
+            ];
+            $logs = loadCallLogs();
+            
+            // Apply filters
+            if ($filters['storeCode']) {
+                $logs = array_filter($logs, fn($l) => $l['storeCode'] === $filters['storeCode']);
+            }
+            if ($filters['agentId']) {
+                $logs = array_filter($logs, fn($l) => $l['agentId'] === $filters['agentId']);
+            }
+            if ($filters['dateFrom']) {
+                $logs = array_filter($logs, fn($l) => $l['createdAt'] >= $filters['dateFrom']);
+            }
+            if ($filters['dateTo']) {
+                $logs = array_filter($logs, fn($l) => $l['createdAt'] <= $filters['dateTo'] . 'T23:59:59');
+            }
+            
+            // Sort by date desc
+            usort($logs, fn($a, $b) => strtotime($b['createdAt']) - strtotime($a['createdAt']));
+            echo json_encode(array_values($logs));
+            break;
+            
+        case 'call-logs-add':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (empty($input['customerId'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Customer ID required']);
+                break;
+            }
+            
+            echo json_encode(addCallLog($input));
+            break;
+            
+        case 'call-logs-customer':
+            $customerId = $_GET['customerId'] ?? '';
+            if (empty($customerId)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Customer ID required']);
+                break;
+            }
+            
+            $logs = getCallLogsForCustomer($customerId);
+            usort($logs, fn($a, $b) => strtotime($b['createdAt']) - strtotime($a['createdAt']));
+            echo json_encode($logs);
+            break;
+            
+        case 'my-followups':
+            $agentId = $_GET['agentId'] ?? null;
+            $includeAll = ($_GET['all'] ?? '') === 'true';
+            echo json_encode(getFollowUps($agentId, $includeAll));
+            break;
+            
+        case 'call-stats':
+            $filters = [
+                'storeCode' => $_GET['storeCode'] ?? null,
+                'agentId' => $_GET['agentId'] ?? null,
+                'dateFrom' => $_GET['dateFrom'] ?? null,
+                'dateTo' => $_GET['dateTo'] ?? null
+            ];
+            echo json_encode(getCallStats($filters));
+            break;
+            
         case 'health':
             echo json_encode([
                 'status' => 'ok', 
-                'version' => '5.0', 
+                'version' => '6.0', 
                 'timestamp' => date('c'),
                 'features' => [
                     'enhanced_order_creation' => true,
                     'editable_items' => true,
                     'free_shipping' => true,
                     'sms_queue' => true,
-                    'sms_sending' => true, // Manual only via sms-send endpoint
+                    'sms_sending' => true,
                     'metakocka_integration' => true,
-                    'sms_settings' => true
+                    'sms_settings' => true,
+                    'call_logging' => true,
+                    'follow_ups' => true,
+                    'analytics' => true
                 ]
             ]);
             break;
@@ -1236,6 +1500,11 @@ try {
                     'agents-add',
                     'agents-update',
                     'agents-delete',
+                    'call-logs',
+                    'call-logs-add',
+                    'call-logs-customer',
+                    'my-followups',
+                    'call-stats',
                     'clear-cache', 
                     'login', 
                     'health'

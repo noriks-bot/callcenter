@@ -307,9 +307,10 @@
         .badge.not_called { background: var(--bg-hover); color: var(--text-muted); }
         .badge.called { background: rgba(59,130,246,0.2); color: var(--accent); }
         .badge.answered { background: rgba(34,197,94,0.2); color: var(--green); }
-        .badge.no_answer { background: rgba(249,115,22,0.2); color: var(--orange); }
+        .badge.no_answer, .badge.no_answer_1, .badge.no_answer_2, .badge.no_answer_3, .badge.no_answer_4, .badge.no_answer_5, .badge.voicemail { background: rgba(249,115,22,0.2); color: var(--orange); }
         .badge.converted { background: rgba(34,197,94,0.3); color: var(--green); }
-        .badge.not_interested { background: rgba(239,68,68,0.2); color: #f87171; }
+        .badge.not_interested, .badge.wrong_number { background: rgba(239,68,68,0.2); color: #f87171; }
+        .badge.callback { background: rgba(168,85,247,0.2); color: var(--purple); }
         
         .action-btn {
             width: 36px; height: 36px;
@@ -1072,6 +1073,168 @@
             display: none;
         }
         .sidebar-overlay.show { display: block; }
+        
+        /* Follow-ups Badge */
+        .followup-badge.due { background: var(--red) !important; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        
+        /* Call Log Timeline */
+        .call-timeline { position: relative; padding-left: 24px; }
+        .call-timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        .call-log-item {
+            position: relative;
+            margin-bottom: 16px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .call-log-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 18px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid var(--bg-card);
+        }
+        .call-log-item.converted::before { background: var(--green); }
+        .call-log-item.not_interested::before { background: var(--red); }
+        .call-log-item.callback::before { background: var(--orange); }
+        .call-log-item.no_answer::before { background: var(--text-muted); }
+        .call-log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .call-log-status { font-weight: 600; font-size: 14px; }
+        .call-log-time { font-size: 12px; color: var(--text-muted); }
+        .call-log-agent { font-size: 12px; color: var(--accent); margin-bottom: 4px; }
+        .call-log-notes { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+        .call-log-duration { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+        .call-log-callback {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(249, 115, 22, 0.15);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--orange);
+        }
+        
+        /* Follow-ups Section */
+        .followup-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--accent);
+            transition: all 0.2s;
+        }
+        .followup-card:hover { transform: translateX(4px); }
+        .followup-card.due { border-left-color: var(--red); background: rgba(239,68,68,0.1); }
+        .followup-card.today { border-left-color: var(--orange); }
+        .followup-card.tomorrow { border-left-color: var(--green); }
+        .followup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .followup-customer { font-weight: 600; font-size: 15px; }
+        .followup-time {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .followup-time.due { background: var(--red); color: white; }
+        .followup-time.today { background: var(--orange); color: white; }
+        .followup-time.tomorrow { background: var(--green); color: white; }
+        .followup-time.future { background: var(--bg-hover); }
+        .followup-details { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+        .followup-notes {
+            background: var(--bg-dark);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        .followup-actions { display: flex; gap: 8px; }
+        
+        /* Call Status Selector */
+        .call-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .call-status-option {
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .call-status-option:hover { border-color: var(--accent); }
+        .call-status-option.selected { border-color: var(--accent); background: rgba(59,130,246,0.15); color: var(--accent); }
+        .call-status-option.converted.selected { border-color: var(--green); background: rgba(34,197,94,0.15); color: var(--green); }
+        .call-status-option.not_interested.selected { border-color: var(--red); background: rgba(239,68,68,0.15); color: var(--red); }
+        .call-status-option.callback.selected { border-color: var(--orange); background: rgba(249,115,22,0.15); color: var(--orange); }
+        
+        /* Analytics Cards */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .analytics-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .analytics-card h3 { font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .leaderboard-rank {
+            width: 28px; height: 28px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .leaderboard-rank.gold { background: #fbbf24; }
+        .leaderboard-rank.silver { background: #94a3b8; }
+        .leaderboard-rank.bronze { background: #d97706; }
+        .leaderboard-info { flex: 1; }
+        .leaderboard-name { font-weight: 600; }
+        .leaderboard-stats { font-size: 12px; color: var(--text-muted); }
+        .leaderboard-rate { font-weight: 700; color: var(--green); }
+        
+        /* Charts container */
+        .chart-container { height: 250px; position: relative; }
     </style>
 </head>
 <body>
@@ -1109,6 +1272,19 @@
                     <i class="fas fa-user"></i>
                     <span>Enkratni kupci</span>
                     <span class="badge" id="navBuyers">0</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Calls</div>
+                <div class="nav-item" data-tab="followups">
+                    <i class="fas fa-phone-volume"></i>
+                    <span>My Follow-ups</span>
+                    <span class="badge followup-badge" id="navFollowups">0</span>
+                </div>
+                <div class="nav-item" data-tab="analytics">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Analytics</span>
                 </div>
             </div>
             
@@ -1195,11 +1371,14 @@
                 <select class="filter-select" id="statusFilter">
                     <option value="">All Status</option>
                     <option value="not_called">Not Called</option>
-                    <option value="called">Called</option>
-                    <option value="answered">Answered</option>
-                    <option value="no_answer">No Answer</option>
+                    <option value="no_answer_1">No Answer (1)</option>
+                    <option value="no_answer_2">No Answer (2)</option>
+                    <option value="no_answer_3">No Answer (3+)</option>
+                    <option value="callback">Callback Scheduled</option>
                     <option value="converted">Converted</option>
                     <option value="not_interested">Not Interested</option>
+                    <option value="wrong_number">Wrong Number</option>
+                    <option value="voicemail">Voicemail</option>
                 </select>
             </div>
             
@@ -1752,6 +1931,101 @@
         </div>
     </div>
     
+    <!-- Follow-ups Content -->
+    <div id="followupsContent" style="display:none;padding:24px;">
+        <div style="max-width:900px;">
+            <div class="table-card" style="padding:24px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                    <div>
+                        <h3 style="margin-bottom:8px;">📞 My Follow-ups</h3>
+                        <p style="color:var(--text-muted);">Dogovorjeni callbacki za danes in prihodnje dni.</p>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn" style="background:var(--bg-hover);" onclick="renderFollowups(true)">
+                            <i class="fas fa-users"></i> Vsi agenti
+                        </button>
+                        <button class="btn btn-save" onclick="renderFollowups()">
+                            <i class="fas fa-sync"></i> Osveži
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="followupsContainer">
+                    <div class="loading"><div class="spinner"></div>Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analytics Content -->
+    <div id="analyticsContent" style="display:none;padding:24px;">
+        <div style="max-width:1200px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <div>
+                    <h3 style="margin-bottom:8px;">📊 Analytics Dashboard</h3>
+                    <p style="color:var(--text-muted);">Statistika klicev, SMS in agent performance.</p>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <select class="filter-select" id="analyticsDateRange" onchange="renderAnalytics()">
+                        <option value="7">Zadnjih 7 dni</option>
+                        <option value="30" selected>Zadnjih 30 dni</option>
+                        <option value="90">Zadnjih 90 dni</option>
+                    </select>
+                    <button class="btn btn-save" onclick="renderAnalytics()">
+                        <i class="fas fa-sync"></i> Osveži
+                    </button>
+                </div>
+            </div>
+            
+            <div class="analytics-grid" id="analyticsContainer">
+                <div class="loading"><div class="spinner"></div>Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call Log Modal -->
+    <div class="modal-bg" id="callLogModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">📞 Log Call</div>
+                <button class="modal-close" onclick="closeModal('callLogModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="callLogCustomerId">
+                <input type="hidden" id="callLogStoreCode">
+                
+                <div class="form-group">
+                    <label class="form-label">Call Status *</label>
+                    <div class="call-status-grid" id="callStatusGrid">
+                        <!-- Status options rendered by JS -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="callLogNotes" placeholder="Kaj ste se dogovorili, zakaj ni odgovoril, itd..." rows="3"></textarea>
+                </div>
+                
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div class="form-group">
+                        <label class="form-label">Call Duration (min)</label>
+                        <input type="number" class="form-input" id="callLogDuration" placeholder="npr. 5" min="0" step="1">
+                    </div>
+                    <div class="form-group" id="callbackSection" style="display:none;">
+                        <label class="form-label">Callback Date/Time *</label>
+                        <input type="datetime-local" class="form-input" id="callLogCallback">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('callLogModal')">Prekliči</button>
+                <button class="btn btn-save" onclick="saveCallLog()">
+                    <i class="fas fa-save"></i> Shrani klic
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Agent Modal -->
     <div class="modal-bg" id="agentModal">
         <div class="modal">
@@ -1909,16 +2183,20 @@
                     buyers: 'Enkratni kupci',
                     'sms-dashboard': 'SMS Dashboard',
                     'sms-settings': 'SMS Provider Settings',
-                    'agents': 'Agent Management'
+                    'agents': 'Agent Management',
+                    'followups': 'My Follow-ups',
+                    'analytics': 'Analytics'
                 };
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
                 
                 // Show/hide content based on tab
-                const hideTabs = ['sms-dashboard', 'sms-settings', 'dashboard', 'agents'];
+                const hideTabs = ['sms-dashboard', 'sms-settings', 'dashboard', 'agents', 'followups', 'analytics'];
                 document.getElementById('dashboardContent').style.display = currentTab === 'dashboard' ? 'block' : 'none';
                 document.getElementById('smsDashboardContent').style.display = currentTab === 'sms-dashboard' ? 'block' : 'none';
                 document.getElementById('smsSettingsContent').style.display = currentTab === 'sms-settings' ? 'block' : 'none';
                 document.getElementById('agentsContent').style.display = currentTab === 'agents' ? 'block' : 'none';
+                document.getElementById('followupsContent').style.display = currentTab === 'followups' ? 'block' : 'none';
+                document.getElementById('analyticsContent').style.display = currentTab === 'analytics' ? 'block' : 'none';
                 document.querySelector('.stats-grid').style.display = hideTabs.includes(currentTab) ? 'none' : 'grid';
                 document.querySelector('.country-tabs').style.display = hideTabs.includes(currentTab) ? 'none' : 'flex';
                 document.querySelector('.content').style.display = hideTabs.includes(currentTab) ? 'none' : 'block';
@@ -1931,6 +2209,10 @@
                     loadSmsSettingsUI();
                 } else if (currentTab === 'agents') {
                     loadAgents();
+                } else if (currentTab === 'followups') {
+                    renderFollowups();
+                } else if (currentTab === 'analytics') {
+                    renderAnalytics();
                 } else {
                     renderTable();
                     setTimeout(addCustomerClickHandlers, 100);
@@ -2244,10 +2526,10 @@
                                 <td style="font-size:12px;">${timeAgo(c.abandonedAt)}</td>
                                 <td style="white-space:nowrap;">
                                     ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
+                                    <button class="action-btn" onclick="openCallLogModal(carts.find(x=>x.id==='${c.id}'))" title="Log Call" style="background:rgba(168,85,247,0.2);color:#a855f7;"><i class="fas fa-headset"></i></button>
                                     <button class="action-btn order" onclick="openOrderModal('${c.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i></button>
                                     <button class="action-btn push" onclick="openPushModal('${c.id}','cart')" title="Push Notification"><i class="fas fa-bell"></i></button>
                                     ${c.phone ? `<button class="action-btn sms" onclick="openSmsModal('${c.id}','cart')" title="Send SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openStatusModal('${c.id}','${c.callStatus}','${esc(c.notes||'')}')" title="Edit"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -3384,7 +3666,25 @@
         // Helpers
         function initials(n) { return (n||'?').split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase(); }
         function esc(t) { const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
-        function statusLabel(s) { return {not_called:'Not Called',called:'Called',answered:'Answered',no_answer:'No Answer',converted:'Converted',not_interested:'Not Interested'}[s]||s; }
+        function statusLabel(s) { 
+            const labels = {
+                not_called:'Not Called',
+                no_answer_1:'No Answer (1)',
+                no_answer_2:'No Answer (2)',
+                no_answer_3:'No Answer (3)',
+                no_answer_4:'No Answer (4)',
+                no_answer_5:'No Answer (5)',
+                callback:'Callback',
+                converted:'Converted',
+                not_interested:'Not Interested',
+                wrong_number:'Wrong #',
+                voicemail:'Voicemail',
+                called:'Called',
+                answered:'Answered',
+                no_answer:'No Answer'
+            };
+            return labels[s] || s;
+        }
         function formatDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
         function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
         
@@ -4147,6 +4447,611 @@
             if (isAdmin) {
                 loadAgents();
             }
+            
+            // Load follow-ups count
+            loadFollowupsCount();
+        };
+        
+        // ========== CALL LOGGING FUNCTIONS ==========
+        const CALL_STATUSES = [
+            { value: 'not_called', label: 'Not Called', icon: '📵', class: '' },
+            { value: 'no_answer_1', label: 'No Answer (1)', icon: '📞', class: 'no_answer' },
+            { value: 'no_answer_2', label: 'No Answer (2)', icon: '📞', class: 'no_answer' },
+            { value: 'no_answer_3', label: 'No Answer (3)', icon: '📞', class: 'no_answer' },
+            { value: 'no_answer_4', label: 'No Answer (4)', icon: '📞', class: 'no_answer' },
+            { value: 'no_answer_5', label: 'No Answer (5)', icon: '📞', class: 'no_answer' },
+            { value: 'callback', label: 'Callback', icon: '🔔', class: 'callback' },
+            { value: 'converted', label: 'Converted', icon: '✅', class: 'converted' },
+            { value: 'not_interested', label: 'Not Interested', icon: '❌', class: 'not_interested' },
+            { value: 'wrong_number', label: 'Wrong Number', icon: '❓', class: 'not_interested' },
+            { value: 'voicemail', label: 'Voicemail', icon: '📬', class: 'no_answer' }
+        ];
+        
+        let currentCallLogCustomer = null;
+        let selectedCallStatus = 'not_called';
+        let followupsData = [];
+        let analyticsCharts = {};
+        
+        function openCallLogModal(customer) {
+            currentCallLogCustomer = customer;
+            selectedCallStatus = customer.callStatus || 'not_called';
+            
+            document.getElementById('callLogCustomerId').value = customer.id;
+            document.getElementById('callLogStoreCode').value = customer.storeCode;
+            document.getElementById('callLogNotes').value = '';
+            document.getElementById('callLogDuration').value = '';
+            document.getElementById('callLogCallback').value = '';
+            
+            renderCallStatusGrid();
+            toggleCallbackSection();
+            
+            document.getElementById('callLogModal').classList.add('open');
+        }
+        
+        function renderCallStatusGrid() {
+            const grid = document.getElementById('callStatusGrid');
+            grid.innerHTML = CALL_STATUSES.filter(s => s.value !== 'not_called').map(status => `
+                <div class="call-status-option ${status.class} ${selectedCallStatus === status.value ? 'selected' : ''}" 
+                     onclick="selectCallStatus('${status.value}')">
+                    <span style="font-size:18px;display:block;margin-bottom:4px;">${status.icon}</span>
+                    ${status.label}
+                </div>
+            `).join('');
+        }
+        
+        function selectCallStatus(status) {
+            selectedCallStatus = status;
+            renderCallStatusGrid();
+            toggleCallbackSection();
+        }
+        
+        function toggleCallbackSection() {
+            const section = document.getElementById('callbackSection');
+            section.style.display = selectedCallStatus === 'callback' ? 'block' : 'none';
+            
+            if (selectedCallStatus === 'callback' && !document.getElementById('callLogCallback').value) {
+                // Default to tomorrow 10:00
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(10, 0, 0, 0);
+                document.getElementById('callLogCallback').value = tomorrow.toISOString().slice(0, 16);
+            }
+        }
+        
+        async function saveCallLog() {
+            const customerId = document.getElementById('callLogCustomerId').value;
+            const storeCode = document.getElementById('callLogStoreCode').value;
+            const notes = document.getElementById('callLogNotes').value;
+            const duration = document.getElementById('callLogDuration').value;
+            const callbackAt = document.getElementById('callLogCallback').value;
+            
+            if (selectedCallStatus === 'callback' && !callbackAt) {
+                showToast('Prosim izberi datum in čas za callback!', true);
+                return;
+            }
+            
+            try {
+                const res = await fetch('api.php?action=call-logs-add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerId,
+                        storeCode,
+                        status: selectedCallStatus,
+                        notes,
+                        duration: duration ? parseInt(duration) : null,
+                        callbackAt: callbackAt ? new Date(callbackAt).toISOString() : null,
+                        agentId: user.username
+                    })
+                });
+                
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast('Call logged successfully!');
+                    closeModal('callLogModal');
+                    
+                    // Update local data
+                    const cart = carts.find(c => c.id === customerId);
+                    if (cart) {
+                        cart.callStatus = selectedCallStatus;
+                        cart.notes = notes;
+                    }
+                    
+                    renderTable();
+                    loadFollowupsCount();
+                    
+                    // Refresh customer 360 if open
+                    if (currentCustomer && currentCustomer.id === customerId) {
+                        renderC360Content();
+                    }
+                } else {
+                    showToast(result.error || 'Failed to log call', true);
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, true);
+            }
+        }
+        
+        async function loadFollowupsCount() {
+            try {
+                const res = await fetch(`api.php?action=my-followups&agentId=${encodeURIComponent(user.username)}`);
+                followupsData = await res.json();
+                
+                const dueCount = followupsData.filter(f => f.isDue).length;
+                const todayCount = followupsData.filter(f => f.isToday).length;
+                const totalCount = followupsData.length;
+                
+                const badge = document.getElementById('navFollowups');
+                badge.textContent = totalCount;
+                
+                if (dueCount > 0) {
+                    badge.classList.add('due');
+                    badge.title = `${dueCount} due now!`;
+                } else {
+                    badge.classList.remove('due');
+                }
+            } catch (e) {
+                console.error('Failed to load followups count:', e);
+            }
+        }
+        
+        async function renderFollowups(showAll = false) {
+            const container = document.getElementById('followupsContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+            
+            try {
+                const url = showAll 
+                    ? 'api.php?action=my-followups&all=true' 
+                    : `api.php?action=my-followups&agentId=${encodeURIComponent(user.username)}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty" style="padding:60px;">
+                            <i class="fas fa-check-circle" style="font-size:48px;color:var(--green);margin-bottom:16px;"></i>
+                            <p>Ni scheduled follow-ups! 🎉</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Group by date
+                const today = new Date().toDateString();
+                const tomorrow = new Date(Date.now() + 86400000).toDateString();
+                
+                const groups = {
+                    due: { label: '⚠️ Due Now', items: [] },
+                    today: { label: '📅 Danes', items: [] },
+                    tomorrow: { label: '📆 Jutri', items: [] },
+                    later: { label: '🗓️ Kasneje', items: [] }
+                };
+                
+                data.forEach(f => {
+                    if (f.isDue) groups.due.items.push(f);
+                    else if (f.isToday) groups.today.items.push(f);
+                    else if (f.isTomorrow) groups.tomorrow.items.push(f);
+                    else groups.later.items.push(f);
+                });
+                
+                let html = '';
+                for (const [key, group] of Object.entries(groups)) {
+                    if (group.items.length === 0) continue;
+                    
+                    html += `<h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:13px;">${group.label} (${group.items.length})</h4>`;
+                    
+                    group.items.forEach(f => {
+                        const timeClass = f.isDue ? 'due' : (f.isToday ? 'today' : (f.isTomorrow ? 'tomorrow' : 'future'));
+                        const timeLabel = f.isDue ? 'DUE!' : formatDateTime(f.callbackAt);
+                        
+                        html += `
+                            <div class="followup-card ${timeClass}">
+                                <div class="followup-header">
+                                    <div>
+                                        <div class="followup-customer">${f.customer?.storeFlag || ''} ${esc(f.customer?.name || 'Unknown')}</div>
+                                        <div style="font-size:12px;color:var(--text-muted);">Agent: ${esc(f.agentId)}</div>
+                                    </div>
+                                    <span class="followup-time ${timeClass}">${timeLabel}</span>
+                                </div>
+                                <div class="followup-details">
+                                    📞 ${esc(f.customer?.phone || 'N/A')} &nbsp;|&nbsp; 
+                                    💰 ${f.customer?.currency || '€'}${(f.customer?.cartValue || 0).toFixed(2)}
+                                </div>
+                                ${f.notes ? `<div class="followup-notes">${esc(f.notes)}</div>` : ''}
+                                <div class="followup-actions">
+                                    <button class="btn btn-save" onclick="callFollowupCustomer('${f.customerId}')">
+                                        <i class="fas fa-phone"></i> Pokliči
+                                    </button>
+                                    <button class="btn" style="background:var(--bg-hover);" onclick="viewFollowupCustomer('${f.customerId}')">
+                                        <i class="fas fa-eye"></i> Poglej
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
+            }
+        }
+        
+        function callFollowupCustomer(customerId) {
+            const customer = carts.find(c => c.id === customerId);
+            if (customer) {
+                openCallLogModal(customer);
+            }
+        }
+        
+        function viewFollowupCustomer(customerId) {
+            const customer = carts.find(c => c.id === customerId);
+            if (customer) {
+                openCustomer360(customer);
+            }
+        }
+        
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('sl-SI') + ' ' + d.toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // ========== ANALYTICS FUNCTIONS ==========
+        async function renderAnalytics() {
+            const container = document.getElementById('analyticsContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+            
+            const days = parseInt(document.getElementById('analyticsDateRange').value) || 30;
+            const dateFrom = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+            
+            try {
+                const [statsRes, smsRes] = await Promise.all([
+                    fetch(`api.php?action=call-stats&dateFrom=${dateFrom}`),
+                    fetch('api.php?action=sms-queue')
+                ]);
+                
+                const stats = await statsRes.json();
+                const smsData = await smsRes.json();
+                
+                // Calculate SMS stats
+                const smsStats = {
+                    total: smsData.length,
+                    sent: smsData.filter(s => s.status === 'sent').length,
+                    queued: smsData.filter(s => s.status === 'queued').length,
+                    failed: smsData.filter(s => s.status === 'failed').length
+                };
+                
+                container.innerHTML = `
+                    <!-- Summary Cards -->
+                    <div class="analytics-card" style="grid-column: span 2;">
+                        <h3><i class="fas fa-chart-line"></i> Overview (Last ${days} days)</h3>
+                        <div class="stats-grid" style="padding:0;grid-template-columns:repeat(4, 1fr);">
+                            <div class="stat-card" style="margin:0;">
+                                <div class="stat-icon" style="background:var(--accent);"><i class="fas fa-phone"></i></div>
+                                <div class="stat-value">${stats.totalCalls || 0}</div>
+                                <div class="stat-label">Total Calls</div>
+                            </div>
+                            <div class="stat-card" style="margin:0;">
+                                <div class="stat-icon" style="background:var(--green);"><i class="fas fa-check"></i></div>
+                                <div class="stat-value">${stats.statusCounts?.converted || 0}</div>
+                                <div class="stat-label">Conversions</div>
+                            </div>
+                            <div class="stat-card" style="margin:0;">
+                                <div class="stat-icon" style="background:var(--orange);"><i class="fas fa-percentage"></i></div>
+                                <div class="stat-value">${stats.conversionRate || 0}%</div>
+                                <div class="stat-label">Conv. Rate</div>
+                            </div>
+                            <div class="stat-card" style="margin:0;">
+                                <div class="stat-icon" style="background:var(--purple);"><i class="fas fa-sms"></i></div>
+                                <div class="stat-value">${smsStats.sent}</div>
+                                <div class="stat-label">SMS Sent</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Calls by Status -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-chart-pie"></i> Calls by Status</h3>
+                        <div class="chart-container">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Agent Leaderboard -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-trophy"></i> Agent Leaderboard</h3>
+                        <div id="leaderboardContainer">
+                            ${renderLeaderboard(stats.agentStats)}
+                        </div>
+                    </div>
+                    
+                    <!-- Calls Over Time -->
+                    <div class="analytics-card" style="grid-column: span 2;">
+                        <h3><i class="fas fa-chart-line"></i> Calls Over Time</h3>
+                        <div class="chart-container">
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Best Hours -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-clock"></i> Calls by Hour</h3>
+                        <div class="chart-container">
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- SMS Stats -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-sms"></i> SMS Performance</h3>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                            <div style="background:var(--bg-dark);padding:16px;border-radius:8px;text-align:center;">
+                                <div style="font-size:24px;font-weight:700;color:var(--green);">${smsStats.sent}</div>
+                                <div style="font-size:12px;color:var(--text-muted);">Sent</div>
+                            </div>
+                            <div style="background:var(--bg-dark);padding:16px;border-radius:8px;text-align:center;">
+                                <div style="font-size:24px;font-weight:700;color:var(--orange);">${smsStats.queued}</div>
+                                <div style="font-size:12px;color:var(--text-muted);">Queued</div>
+                            </div>
+                            <div style="background:var(--bg-dark);padding:16px;border-radius:8px;text-align:center;">
+                                <div style="font-size:24px;font-weight:700;color:var(--red);">${smsStats.failed}</div>
+                                <div style="font-size:12px;color:var(--text-muted);">Failed</div>
+                            </div>
+                            <div style="background:var(--bg-dark);padding:16px;border-radius:8px;text-align:center;">
+                                <div style="font-size:24px;font-weight:700;">${smsStats.total}</div>
+                                <div style="font-size:12px;color:var(--text-muted);">Total</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Render charts
+                renderAnalyticsCharts(stats);
+                
+            } catch (e) {
+                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
+            }
+        }
+        
+        function renderLeaderboard(agentStats) {
+            if (!agentStats || Object.keys(agentStats).length === 0) {
+                return '<p style="color:var(--text-muted);text-align:center;padding:20px;">No agent data yet</p>';
+            }
+            
+            const agents = Object.entries(agentStats)
+                .map(([id, data]) => ({
+                    id,
+                    calls: data.calls,
+                    converted: data.converted,
+                    rate: data.calls > 0 ? Math.round((data.converted / data.calls) * 100) : 0
+                }))
+                .sort((a, b) => b.converted - a.converted || b.calls - a.calls);
+            
+            return agents.slice(0, 5).map((agent, i) => {
+                const rankClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : ''));
+                return `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank ${rankClass}">${i + 1}</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${esc(agent.id)}</div>
+                            <div class="leaderboard-stats">${agent.calls} calls, ${agent.converted} conv.</div>
+                        </div>
+                        <div class="leaderboard-rate">${agent.rate}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderAnalyticsCharts(stats) {
+            // Destroy existing charts
+            Object.values(analyticsCharts).forEach(chart => chart?.destroy());
+            
+            // Status Pie Chart
+            const statusCtx = document.getElementById('statusChart')?.getContext('2d');
+            if (statusCtx && stats.statusCounts) {
+                const statusColors = {
+                    converted: '#22c55e',
+                    not_interested: '#ef4444',
+                    callback: '#f97316',
+                    no_answer_1: '#64748b',
+                    no_answer_2: '#64748b',
+                    no_answer_3: '#64748b',
+                    no_answer_4: '#64748b',
+                    no_answer_5: '#64748b',
+                    voicemail: '#8b5cf6',
+                    wrong_number: '#ec4899'
+                };
+                
+                const labels = Object.keys(stats.statusCounts);
+                const data = Object.values(stats.statusCounts);
+                const colors = labels.map(l => statusColors[l] || '#64748b');
+                
+                analyticsCharts.status = new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 8 } } },
+                        cutout: '60%'
+                    }
+                });
+            }
+            
+            // Timeline Chart
+            const timelineCtx = document.getElementById('timelineChart')?.getContext('2d');
+            if (timelineCtx && stats.dailyStats) {
+                const labels = Object.keys(stats.dailyStats).map(d => {
+                    const date = new Date(d);
+                    return date.toLocaleDateString('sl-SI', { day: 'numeric', month: 'short' });
+                });
+                
+                analyticsCharts.timeline = new Chart(timelineCtx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Calls',
+                            data: Object.values(stats.dailyStats),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59,130,246,0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+            
+            // Hourly Chart
+            const hourlyCtx = document.getElementById('hourlyChart')?.getContext('2d');
+            if (hourlyCtx && stats.hourlyStats) {
+                const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+                
+                analyticsCharts.hourly = new Chart(hourlyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Calls',
+                            data: stats.hourlyStats,
+                            backgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // ========== CUSTOMER 360° CALL HISTORY ==========
+        async function loadCustomerCallHistory(customerId) {
+            try {
+                const res = await fetch(`api.php?action=call-logs-customer&customerId=${encodeURIComponent(customerId)}`);
+                return await res.json();
+            } catch (e) {
+                console.error('Failed to load call history:', e);
+                return [];
+            }
+        }
+        
+        // Override renderC360Timeline to include call history
+        const originalRenderC360Timeline = renderC360Timeline;
+        renderC360Timeline = async function(customerCarts, customerSms) {
+            const container = document.getElementById('c360Content');
+            
+            // Load call history
+            const callLogs = currentCustomer ? await loadCustomerCallHistory(currentCustomer.id) : [];
+            
+            const events = [];
+            
+            // Add call logs
+            callLogs.forEach(log => {
+                const statusInfo = CALL_STATUSES.find(s => s.value === log.status) || { label: log.status, icon: '📞' };
+                events.push({
+                    type: 'call',
+                    icon: 'fa-phone',
+                    title: `${statusInfo.icon} ${statusInfo.label}`,
+                    desc: log.notes || 'No notes',
+                    time: log.createdAt,
+                    extra: log.duration ? `Duration: ${log.duration} min` : null,
+                    callback: log.callbackAt,
+                    agent: log.agentId,
+                    statusClass: log.status.includes('no_answer') ? 'no_answer' : log.status
+                });
+            });
+            
+            // Add cart events
+            customerCarts.forEach(c => {
+                events.push({
+                    type: 'cart',
+                    icon: 'fa-shopping-cart',
+                    title: 'Cart abandoned',
+                    desc: `€${c.cartValue?.toFixed(2)} - ${c.storeFlag} ${c.storeName}`,
+                    time: c.abandonedAt
+                });
+                if (c.callStatus === 'converted') {
+                    events.push({
+                        type: 'order',
+                        icon: 'fa-check-circle',
+                        title: 'Cart converted to order',
+                        desc: `Order #${c.orderId || 'N/A'}`,
+                        time: c.lastUpdated
+                    });
+                }
+            });
+            
+            // Add SMS events
+            customerSms.forEach(s => {
+                events.push({
+                    type: 'sms',
+                    icon: 'fa-comment-sms',
+                    title: s.status === 'sent' ? 'SMS sent' : 'SMS queued',
+                    desc: s.message?.substring(0, 50) + '...',
+                    time: s.date
+                });
+            });
+            
+            events.sort((a, b) => new Date(b.time) - new Date(a.time));
+            
+            if (events.length === 0) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><p>No activity history</p></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="call-timeline">
+                    ${events.map(e => `
+                        <div class="call-log-item ${e.statusClass || e.type}">
+                            <div class="call-log-header">
+                                <span class="call-log-status">${e.type === 'call' ? '' : '<i class="fas ' + e.icon + '"></i> '}${esc(e.title)}</span>
+                                <span class="call-log-time">${timeAgo(e.time)}</span>
+                            </div>
+                            ${e.agent ? `<div class="call-log-agent">Agent: ${esc(e.agent)}</div>` : ''}
+                            <div class="call-log-notes">${esc(e.desc)}</div>
+                            ${e.extra ? `<div class="call-log-duration"><i class="fas fa-clock"></i> ${e.extra}</div>` : ''}
+                            ${e.callback ? `<div class="call-log-callback"><i class="fas fa-bell"></i> Callback: ${formatDateTime(e.callback)}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        };
+        
+        // Add "Log Call" button to Customer 360°
+        const originalOpenCustomer360 = openCustomer360;
+        openCustomer360 = function(customer) {
+            originalOpenCustomer360(customer);
+            
+            // Add log call button if not exists
+            setTimeout(() => {
+                const header = document.querySelector('.c360-header');
+                if (header && !document.getElementById('c360LogCallBtn')) {
+                    const btn = document.createElement('button');
+                    btn.id = 'c360LogCallBtn';
+                    btn.className = 'btn btn-save';
+                    btn.style.marginLeft = 'auto';
+                    btn.innerHTML = '<i class="fas fa-phone"></i> Log Call';
+                    btn.onclick = () => openCallLogModal(currentCustomer);
+                    header.appendChild(btn);
+                }
+            }, 100);
         };
         
         init();
