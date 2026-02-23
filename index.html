@@ -1126,15 +1126,13 @@
         <div style="max-width:1400px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
                 <div>
-                    <h3 style="margin-bottom:8px;">📦 Paketomat & Pošta Naročila</h3>
-                    <p style="color:var(--text-muted);">Processing/on-hold naročila iz WooCommerce z dostavno službo paketomat ali pošta - za obveščanje strank.</p>
+                    <h3 style="margin-bottom:8px;">📦 Paketi v Paketomatih</h3>
+                    <p style="color:var(--text-muted);">Naročila kjer paket TRENUTNO čaka na prevzem v paketomatu ali pošti (iz MetaKocka delivery events).</p>
                 </div>
                 <div style="display:flex;gap:8px;">
                     <select class="filter-select" id="paketomatFilter" onchange="loadPaketomati()">
-                        <option value="all">Vse paketomat/pošta</option>
-                        <option value="paketomat">Samo Paketomat</option>
-                        <option value="posta">Samo Pošta</option>
-                        <option value="all_orders">🔧 Vsi orderji (debug)</option>
+                        <option value="all">V paketomatu / čaka</option>
+                        <option value="all_orders">🔧 Vsi z delivery events</option>
                     </select>
                     <select class="filter-select" id="paketomatStatusFilter" onchange="renderPaketomatiTable()">
                         <option value="all">Vsi statusi</option>
@@ -1157,14 +1155,14 @@
                             <th>Telefon</th>
                             <th>Email</th>
                             <th>Dostava</th>
-                            <th>Lokacija</th>
+                            <th>Zadnji event</th>
                             <th>Znesek</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="paketomatiTableBody">
-                        <tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam...</td></tr>
+                        <tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam iz MetaKocka...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1888,12 +1886,13 @@ Available variables:
             updateContentTabCounts();
         }
         
-        // Currency conversion rates to EUR
+        // Currency conversion rates to EUR (approximate, Feb 2026)
+        // Update periodically for accuracy
         const currencyToEur = {
             EUR: 1,
-            CZK: 0.041,
-            PLN: 0.23,
-            HUF: 0.0025
+            CZK: 0.040,  // 1 CZK ≈ 0.040 EUR (25 CZK = 1 EUR)
+            PLN: 0.23,   // 1 PLN ≈ 0.23 EUR (4.35 PLN = 1 EUR)
+            HUF: 0.0025  // 1 HUF ≈ 0.0025 EUR (400 HUF = 1 EUR)
         };
         
         function convertToEur(value, currency) {
@@ -3819,7 +3818,7 @@ Available variables:
             // Calculate stats
             const customerCarts = carts.filter(c => c.email === customer.email);
             const totalSpent = customerCarts.filter(c => c.callStatus === 'converted')
-                .reduce((sum, c) => sum + (c.cartValue || 0), 0);
+                .reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
             const orderCount = customerCarts.filter(c => c.callStatus === 'converted').length;
             
             document.getElementById('c360TotalSpent').textContent = '€' + totalSpent.toFixed(2);
@@ -5172,7 +5171,7 @@ ${esc(previewBody)}
         async function loadPaketomati() {
             const filter = document.getElementById('paketomatFilter')?.value || 'all';
             console.log('[Paketomati] Loading with filter:', filter);
-            document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam naročila iz WooCommerce...</td></tr>';
+            document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam naročila iz MetaKocka...</td></tr>';
             
             try {
                 const res = await fetch(`api.php?action=paketomati&filter=${filter}`);
@@ -5200,9 +5199,9 @@ ${esc(previewBody)}
                 let msg;
                 if (paketomatiData.length === 0) {
                     if (typeFilter === 'all_orders') {
-                        msg = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;"><i class="fas fa-box" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>Ni processing/on-hold naročil v WooCommerce<br><small style="font-size:12px;">Preveri WooCommerce admin za stanje naročil</small></td></tr>';
+                        msg = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;"><i class="fas fa-box" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>Ni naročil v MetaKocka<br><small style="font-size:12px;">Preveri MetaKocka za stanje naročil</small></td></tr>';
                     } else {
-                        msg = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;"><i class="fas fa-box" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>Ni naročil za paketomat/pošto<br><small style="font-size:12px;">Uporabi "Vsi orderji (debug)" filter da vidiš vse processing/on-hold orderje</small></td></tr>';
+                        msg = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;"><i class="fas fa-box" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>🎉 Ni paketov, ki čakajo na prevzem<br><small style="font-size:12px;">Noben paket trenutno ni v paketomatu</small></td></tr>';
                     }
                 } else {
                     msg = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;">Ni naročil za izbran filter</td></tr>';
@@ -5223,10 +5222,20 @@ ${esc(previewBody)}
                     notified: 'Obveščeno'
                 };
                 
+                // Format last event date
+                const eventDate = order.lastEventDate ? new Date(order.lastEventDate).toLocaleDateString('sl-SI') : '';
+                const eventTitle = order.lastDeliveryEvent + (eventDate ? ` (${eventDate})` : '');
+                
                 return `
                     <tr>
-                        <td><strong>${esc(order.orderNumber)}</strong></td>
-                        <td>${esc(order.customerName)}</td>
+                        <td>
+                            <strong>${esc(order.orderNumber)}</strong>
+                            ${order.trackingCode ? `<br><small style="color:var(--text-muted);font-size:11px;">📦 ${esc(order.trackingCode)}</small>` : ''}
+                        </td>
+                        <td>
+                            ${esc(order.customerName)}
+                            <br><small style="color:var(--text-muted);font-size:11px;">${esc(order.city || '')} ${order.country || ''}</small>
+                        </td>
                         <td>
                             ${order.phone ? `
                                 <a href="tel:${order.phone}" class="action-btn-mini" title="Pokliči">
@@ -5237,8 +5246,11 @@ ${esc(previewBody)}
                         <td>
                             ${order.email ? `<a href="mailto:${order.email}" style="color:var(--accent);">${esc(order.email)}</a>` : '-'}
                         </td>
-                        <td><span style="background:var(--bg-hover);padding:4px 8px;border-radius:4px;font-size:12px;">${esc(order.deliveryService)}</span></td>
-                        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(order.paketomatLocation)}">${esc(order.paketomatLocation || order.city || '-')}</td>
+                        <td><span style="background:var(--bg-hover);padding:4px 8px;border-radius:4px;font-size:12px;">${esc(order.deliveryService || '-')}</span></td>
+                        <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(eventTitle)}">
+                            <span style="color:var(--green);font-weight:500;">📍 ${esc(order.lastDeliveryEvent || '-')}</span>
+                            ${eventDate ? `<br><small style="color:var(--text-muted);font-size:11px;">${eventDate}</small>` : ''}
+                        </td>
                         <td><strong>${order.orderTotal.toFixed(2)} ${order.currency}</strong></td>
                         <td>
                             <select onchange="updatePaketomatStatus('${order.id}', this.value)" style="background:var(--bg-hover);border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:${statusColors[order.status]};cursor:pointer;">

@@ -1082,135 +1082,163 @@ function saveLastSeen($data) {
 }
 
 function fetchPaketomatOrders($filter = 'all') {
-    global $stores, $storeCurrencies;
+    global $stores;
     
-    $cached = getCache('paketomat_orders_' . $filter, 60); // Shorter cache
+    $cached = getCache('paketomat_orders_' . $filter, 120); // 2 min cache
     if ($cached !== null) return $cached;
     
     $statusData = loadPaketomatStatus();
     $allOrders = [];
-    $seenIds = [];
     
-    // Keywords for paketomat/parcel locker shipping methods
-    $PAKETOMAT_KEYWORDS = [
-        'paketomat', 'parcel', 'locker', 'pickup', 'point', 'box', 
-        'packstation', 'inpost', 'gls', 'dpd', 'alzabox', 'pošta', 'post',
-        'zásilkovna', 'balikovna', 'paczkomat', 'csomagpont', 'omniva',
-        'pickup_point', 'parcel_shop', 'parcel_locker', 'smartpost',
-        'foxpost', 'packeta', 'zasielkovna', 'speedy', 'econt', 'sameday'
+    // PRAVILNA LOGIKA: Paketomat = naročilo kjer je ZADNJI delivery event eden od teh statusov
+    // To pomeni, da je paket TRENUTNO v paketomatu in čaka na prevzem
+    $PAKETOMAT_STATUSES = [
+        "Can be picked up from GLS parcel locker",
+        "Can be picked up from ParcelShop",
+        "Placed in the (collection) parcel machine",
+        "Parcel stored in temporary parcel machine",
+        "Packet has been delivered to its destination branch and is waiting for pickup",
+        "It's waiting to be collected at the Parcel Service Point",
+        "Awaiting collection",
+        "Accepted at an InPost branch",
+        "Rerouted to parcel machine"
     ];
     
-    // If filter is 'all_orders', show ALL processing/on-hold orders (for debugging)
-    $showAllOrders = ($filter === 'all_orders');
+    // MetaKocka API - fetch all sales orders with delivery events
+    $mkUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
+    $mkPayload = [
+        'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+        'company_id' => '6371',
+        'doc_type' => 'sales_order',
+        'result_type' => 'doc',
+        'limit' => 500,
+        'return_delivery_service_events' => true
+    ];
     
-    // Fetch orders from all WooCommerce stores
-    foreach ($stores as $storeCode => $store) {
-        // Fetch processing and on-hold orders
-        $orders = wcApiRequest($storeCode, 'orders', [
-            'status' => 'processing,on-hold',
-            'per_page' => 100
-        ]);
+    $ch = curl_init($mkUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => json_encode($mkPayload),
+        CURLOPT_TIMEOUT => 30
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+    
+    if ($curlError || $httpCode !== 200) {
+        error_log("[Paketomati] MetaKocka API error: HTTP $httpCode, error: $curlError");
+        return [];
+    }
+    
+    $data = json_decode($response, true);
+    if (!$data || !isset($data['opr_code']) || $data['opr_code'] !== '0') {
+        error_log("[Paketomati] MetaKocka API error response: " . json_encode($data));
+        return [];
+    }
+    
+    $orders = $data['result'] ?? [];
+    
+    foreach ($orders as $order) {
+        $events = $order['delivery_service_events'] ?? [];
         
-        if (!is_array($orders) || isset($orders['error'])) {
-            error_log("[Paketomati] Error fetching orders for $storeCode: " . json_encode($orders));
-            continue;
+        // Skip orders without delivery events
+        if (empty($events)) continue;
+        
+        // Get the LAST (newest) event - array is chronological, last = newest
+        $lastEvent = end($events);
+        $lastEventStatus = $lastEvent['event'] ?? '';
+        
+        // Check if last event status is a paketomat status
+        $isPaketomat = false;
+        foreach ($PAKETOMAT_STATUSES as $paketStatus) {
+            if (stripos($lastEventStatus, $paketStatus) !== false || $lastEventStatus === $paketStatus) {
+                $isPaketomat = true;
+                break;
+            }
         }
         
-        foreach ($orders as $order) {
-            // Check if shipping method is paketomat/parcel locker
-            $isPaketomat = false;
-            $shippingMethod = '';
-            
-            // Get shipping method from shipping_lines
-            foreach ($order['shipping_lines'] ?? [] as $shipping) {
-                $methodId = strtolower($shipping['method_id'] ?? '');
-                $methodTitle = strtolower($shipping['method_title'] ?? '');
-                $shippingMethod = $shipping['method_title'] ?? $shipping['method_id'] ?? '';
-                
-                foreach ($PAKETOMAT_KEYWORDS as $keyword) {
-                    if (strpos($methodId, $keyword) !== false || strpos($methodTitle, $keyword) !== false) {
-                        $isPaketomat = true;
-                        break 2;
-                    }
-                }
-            }
-            
-            // Also check meta_data for paketomat info
-            if (!$isPaketomat) {
-                foreach ($order['meta_data'] ?? [] as $meta) {
-                    $key = strtolower($meta['key'] ?? '');
-                    $value = strtolower(strval($meta['value'] ?? ''));
-                    if (strpos($key, 'paketomat') !== false || strpos($key, 'parcel') !== false ||
-                        strpos($key, 'pickup_point') !== false || strpos($key, 'locker') !== false ||
-                        strpos($key, 'shipping_point') !== false || strpos($key, 'delivery_point') !== false) {
-                        $isPaketomat = true;
-                        if (!$shippingMethod) $shippingMethod = $meta['value'] ?? 'Paketomat';
-                        break;
-                    }
-                }
-            }
-            
-            // If not showing all orders and this isn't a paketomat order, skip
-            if (!$showAllOrders && !$isPaketomat) continue;
-            
-            $orderId = 'wc_' . $storeCode . '_' . $order['id'];
-            
-            // Skip duplicates
-            if (isset($seenIds[$orderId])) continue;
-            $seenIds[$orderId] = true;
-            
-            $savedStatus = $statusData[$orderId] ?? [];
-            
-            // Get billing/shipping info
-            $billing = $order['billing'] ?? [];
-            $shipping = $order['shipping'] ?? $billing;
-            
-            // Try to get paketomat location from meta_data
-            $paketomatLocation = '';
-            foreach ($order['meta_data'] ?? [] as $meta) {
-                $key = strtolower($meta['key'] ?? '');
-                if (strpos($key, 'paketomat') !== false || strpos($key, 'pickup') !== false ||
-                    strpos($key, 'locker') !== false || strpos($key, 'point') !== false) {
-                    if (is_string($meta['value']) && strlen($meta['value']) > 3) {
-                        $paketomatLocation = $meta['value'];
-                        break;
-                    }
-                }
-            }
-            if (!$paketomatLocation) {
-                $paketomatLocation = trim(($shipping['address_1'] ?? '') . ' ' . ($shipping['address_2'] ?? ''));
-            }
-            
-            $allOrders[] = [
-                'id' => $orderId,
-                'wcOrderId' => $order['id'],
-                'storeCode' => $storeCode,
-                'orderNumber' => $order['number'] ?? $order['id'],
-                'title' => '#' . ($order['number'] ?? $order['id']),
-                'customerName' => trim(($billing['first_name'] ?? '') . ' ' . ($billing['last_name'] ?? '')),
-                'email' => $billing['email'] ?? '',
-                'phone' => $billing['phone'] ?? '',
-                'deliveryService' => $shippingMethod,
-                'paketomatLocation' => $paketomatLocation,
-                'orderTotal' => floatval($order['total'] ?? 0),
-                'currency' => $order['currency'] ?? $storeCurrencies[$storeCode] ?? 'EUR',
-                'createdAt' => $order['date_created'] ?? '',
-                'status' => $savedStatus['status'] ?? 'not_called',
-                'notes' => $savedStatus['notes'] ?? '',
-                'lastUpdated' => $savedStatus['lastUpdated'] ?? null,
-                'address' => trim(($shipping['address_1'] ?? '') . ' ' . ($shipping['address_2'] ?? '')),
-                'city' => $shipping['city'] ?? '',
-                'postcode' => $shipping['postcode'] ?? '',
-                'country' => $shipping['country'] ?? strtoupper($storeCode),
-                'orderStatus' => $order['status'] ?? '',
-                'storeFlag' => $stores[$storeCode]['flag'] ?? ''
-            ];
+        // If filter is not 'all_orders', only show paketomat orders
+        if ($filter !== 'all_orders' && !$isPaketomat) continue;
+        
+        // Extract order details
+        $orderId = 'mk_' . ($order['count_code'] ?? $order['mk_id'] ?? uniqid());
+        $orderNumber = $order['count_code'] ?? '';
+        
+        // Partner (customer) info
+        $partner = $order['partner'] ?? [];
+        $customerName = $partner['name'] ?? '';
+        $email = $partner['email'] ?? '';
+        $phone = $partner['phone'] ?? $partner['phone2'] ?? '';
+        
+        // Address info
+        $street = $partner['street'] ?? '';
+        $city = $partner['city'] ?? '';
+        $postcode = $partner['post_number'] ?? '';
+        $country = $partner['country'] ?? '';
+        
+        // Delivery service info
+        $deliveryService = $order['delivery_service'] ?? '';
+        $trackingCode = $order['delivery_service_tracking_code'] ?? '';
+        
+        // Paketomat location - try to extract from delivery point or last event
+        $paketomatLocation = $order['delivery_point_name'] ?? $order['delivery_service_point'] ?? '';
+        if (!$paketomatLocation && $lastEvent) {
+            $paketomatLocation = $lastEvent['location'] ?? $lastEventStatus;
         }
-    } // end stores loop
+        
+        // Order total and currency
+        $orderTotal = floatval($order['sum_all'] ?? $order['total'] ?? 0);
+        $currency = $order['currency_code'] ?? 'EUR';
+        
+        // Created date
+        $createdAt = $order['doc_date'] ?? $order['date_created'] ?? '';
+        
+        // Get store code from webshop or guess from country
+        $storeCode = strtolower($order['webshop'] ?? $country ?? 'si');
+        $storeFlag = $stores[$storeCode]['flag'] ?? '🏳️';
+        
+        // Saved status
+        $savedStatus = $statusData[$orderId] ?? [];
+        
+        $allOrders[] = [
+            'id' => $orderId,
+            'mkId' => $order['mk_id'] ?? null,
+            'orderNumber' => $orderNumber,
+            'title' => '#' . $orderNumber,
+            'customerName' => $customerName,
+            'email' => $email,
+            'phone' => $phone,
+            'deliveryService' => $deliveryService,
+            'trackingCode' => $trackingCode,
+            'paketomatLocation' => $paketomatLocation,
+            'lastDeliveryEvent' => $lastEventStatus,
+            'lastEventDate' => $lastEvent['date'] ?? '',
+            'orderTotal' => $orderTotal,
+            'currency' => $currency,
+            'createdAt' => $createdAt,
+            'status' => $savedStatus['status'] ?? 'not_called',
+            'notes' => $savedStatus['notes'] ?? '',
+            'lastUpdated' => $savedStatus['lastUpdated'] ?? null,
+            'address' => $street,
+            'city' => $city,
+            'postcode' => $postcode,
+            'country' => strtoupper($country),
+            'orderStatus' => $order['status_code'] ?? '',
+            'storeCode' => $storeCode,
+            'storeFlag' => $storeFlag,
+            'isPaketomat' => $isPaketomat
+        ];
+    }
     
-    // Sort by date desc
+    // Sort by last event date (newest first)
     usort($allOrders, function($a, $b) {
-        return strtotime($b['createdAt'] ?: '1970-01-01') - strtotime($a['createdAt'] ?: '1970-01-01');
+        $dateA = $a['lastEventDate'] ?: $a['createdAt'] ?: '1970-01-01';
+        $dateB = $b['lastEventDate'] ?: $b['createdAt'] ?: '1970-01-01';
+        return strtotime($dateB) - strtotime($dateA);
     });
     
     setCache('paketomat_orders_' . $filter, $allOrders);
