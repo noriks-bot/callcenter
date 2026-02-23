@@ -2412,6 +2412,36 @@ body.is-admin .admin-only {
     }
 }
 
+/* ============ PAGE HEADER FOR SPECIAL CONTENT ============ */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.page-title-large {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.page-title-large i {
+    color: var(--accent-blue);
+}
+
+.page-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 /* ============ SPECIAL CONTENT AREAS (outside main) ============ */
 #dashboardContent,
 #smsDashboardContent,
@@ -2421,32 +2451,27 @@ body.is-admin .admin-only {
 #paketomatiContent,
 #analyticsContent,
 #emailTemplatesContent {
-    position: fixed;
-    top: 0;
-    left: var(--sidebar-width);
-    right: 0;
-    bottom: 0;
+    margin-left: var(--sidebar-width);
     padding: 24px;
-    padding-top: calc(var(--header-height) + 24px);
-    overflow-y: auto;
+    min-height: 100vh;
     background: var(--content-bg);
-    transition: left var(--transition-slow);
-    z-index: 100;
+    transition: margin-left var(--transition-slow);
 }
 
-/* When sidebar is collapsed */
-.main.expanded ~ #dashboardContent,
-.main.expanded ~ #smsDashboardContent,
-.main.expanded ~ #smsSettingsContent,
-.main.expanded ~ #agentsContent,
-.main.expanded ~ #followupsContent,
-.main.expanded ~ #paketomatiContent,
-.main.expanded ~ #analyticsContent,
-.main.expanded ~ #emailTemplatesContent {
-    left: 0;
+/* Mobile responsive - sidebar hidden */
+@media (max-width: 1024px) {
+    #dashboardContent,
+    #smsDashboardContent,
+    #smsSettingsContent,
+    #agentsContent,
+    #followupsContent,
+    #paketomatiContent,
+    #analyticsContent,
+    #emailTemplatesContent {
+        margin-left: 0;
+    }
 }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
     #dashboardContent,
     #smsDashboardContent,
@@ -2456,8 +2481,6 @@ body.is-admin .admin-only {
     #paketomatiContent,
     #analyticsContent,
     #emailTemplatesContent {
-        left: 0;
         padding: 16px;
-        padding-top: calc(var(--header-height) + 16px);
     }
 }

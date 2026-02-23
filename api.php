@@ -30,6 +30,17 @@ $stores = [
 $storeCurrencies = ['hr' => 'EUR', 'cz' => 'CZK', 'pl' => 'PLN', 'sk' => 'EUR', 'hu' => 'HUF', 'gr' => 'EUR', 'it' => 'EUR'];
 $storeCountryCodes = ['hr' => 'HR', 'cz' => 'CZ', 'pl' => 'PL', 'sk' => 'SK', 'hu' => 'HU', 'gr' => 'GR', 'it' => 'IT'];
 
+// Phone country codes for SMS formatting (MetaKocka requires international format without +)
+$phoneCountryCodes = [
+    'hr' => '385',  // Croatia
+    'cz' => '420',  // Czech
+    'pl' => '48',   // Poland
+    'gr' => '30',   // Greece
+    'sk' => '421',  // Slovakia
+    'it' => '39',   // Italy
+    'hu' => '36'    // Hungary
+];
+
 $dataFile = __DIR__ . '/data/call_data.json';
 $smsQueueFile = __DIR__ . '/data/sms_queue.json';
 $cacheDir = __DIR__ . '/data/cache/';
@@ -44,6 +55,59 @@ $metakocka = [
 $smsSettingsFile = __DIR__ . '/data/sms-settings.json';
 $agentsFile = __DIR__ . '/data/agents.json';
 $callLogsFile = __DIR__ . '/data/call-logs.json';
+
+// ========== PHONE NUMBER FORMATTING ==========
+/**
+ * Format phone number for MetaKocka SMS API
+ * MetaKocka requires international format WITHOUT the + prefix
+ * 
+ * Examples:
+ *   098216102      → 38598216102 (HR)
+ *   +38598216102   → 38598216102
+ *   0038598216102  → 38598216102
+ *   38598216102    → 38598216102 (already correct)
+ */
+function formatPhoneForSms($phone, $storeCode) {
+    global $phoneCountryCodes;
+    
+    // Get country code for this store
+    $countryCode = $phoneCountryCodes[$storeCode] ?? '385'; // Default to Croatia
+    
+    // Remove all non-digit characters except leading +
+    $phone = trim($phone);
+    
+    // Remove + prefix
+    if (substr($phone, 0, 1) === '+') {
+        $phone = substr($phone, 1);
+    }
+    
+    // Remove 00 prefix (international dialing)
+    if (substr($phone, 0, 2) === '00') {
+        $phone = substr($phone, 2);
+    }
+    
+    // Remove any remaining non-digit characters (spaces, dashes, etc.)
+    $phone = preg_replace('/[^0-9]/', '', $phone);
+    
+    // Check if already has country code
+    $hasCountryCode = false;
+    foreach ($GLOBALS['phoneCountryCodes'] as $code) {
+        if (substr($phone, 0, strlen($code)) === $code) {
+            $hasCountryCode = true;
+            break;
+        }
+    }
+    
+    // If starts with 0 (local format), remove it and add country code
+    if (!$hasCountryCode && substr($phone, 0, 1) === '0') {
+        $phone = $countryCode . substr($phone, 1);
+    } elseif (!$hasCountryCode) {
+        // Number doesn't have country code and doesn't start with 0 - prepend country code
+        $phone = $countryCode . $phone;
+    }
+    
+    return $phone;
+}
 
 // ========== AGENT MANAGEMENT FUNCTIONS ==========
 function loadAgents() {
@@ -388,12 +452,16 @@ function sendQueuedSms($smsId, $overridePhone = null) {
     }
     
     // Use overridden phone if provided, otherwise use the one from the queue
-    $recipientPhone = $overridePhone ?: $sms['recipient'];
+    $rawPhone = $overridePhone ?: $sms['recipient'];
     
     // Log if phone was overridden
     if ($overridePhone) {
         $logMsg("[SMS-SEND] Phone overridden: {$sms['recipient']} -> {$overridePhone}");
     }
+    
+    // Format phone number for MetaKocka (international format without +)
+    $recipientPhone = formatPhoneForSms($rawPhone, $storeCode);
+    $logMsg("[SMS-SEND] Phone formatted: {$rawPhone} -> {$recipientPhone}");
     
     // Prepare MetaKocka SMS payload (correct format per API docs)
     $payload = [
