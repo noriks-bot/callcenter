@@ -8,667 +8,751 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Country Header Bar */
-        .country-header {
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
-            padding: 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+        
+        /* Country Selection Screen */
+        .country-select-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
-        .country-grid {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 0;
-        }
-        .country-btn {
-            padding: 20px 10px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            border-bottom: 3px solid transparent;
-            color: rgba(255,255,255,0.7);
-        }
-        .country-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        .country-btn.active {
-            background: rgba(255,255,255,0.15);
-            border-bottom-color: #3b82f6;
-            color: white;
-        }
-        .country-btn .flag {
+        .country-select-screen h1 {
             font-size: 32px;
-            display: block;
+            margin-bottom: 8px;
+            color: white;
+        }
+        .country-select-screen p {
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        .country-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+        .country-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .country-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+        }
+        .country-card .flag {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+        .country-card .name {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
             margin-bottom: 8px;
         }
-        .country-btn .name {
+        .country-card .stats {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .country-card .stat {
+            text-align: center;
+        }
+        .country-card .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+        .country-card .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        
+        /* Country View */
+        .country-view {
+            display: none;
+            min-height: 100vh;
+        }
+        .country-view.active {
+            display: block;
+        }
+        .country-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+        }
+        .country-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+        .country-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .country-title .flag { font-size: 36px; }
+        .country-title .name { font-size: 24px; font-weight: 700; color: white; }
+        .country-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .refresh-btn {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .refresh-btn:hover { background: #2563eb; }
+        .user-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 24px 32px;
+            background: #1e293b;
+        }
+        .stat-box {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-box .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+        }
+        .stat-box .label {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .stat-box.blue .value { color: #3b82f6; }
+        .stat-box.green .value { color: #22c55e; }
+        .stat-box.orange .value { color: #f97316; }
+        .stat-box.purple .value { color: #a855f7; }
+        
+        /* Content Tabs */
+        .content-tabs {
+            display: flex;
+            gap: 0;
+            background: #1e293b;
+            padding: 0 32px;
+            border-bottom: 1px solid #334155;
+        }
+        .content-tab {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .content-tab:hover { color: #94a3b8; }
+        .content-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        .content-tab .count {
+            background: #334155;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .content-tab.active .count { background: #3b82f6; color: white; }
+        
+        /* Search Bar */
+        .search-bar {
+            padding: 16px 32px;
+            background: #1e293b;
+            display: flex;
+            gap: 12px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        .search-input:focus { outline: none; border-color: #3b82f6; }
+        .filter-select {
+            padding: 12px 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        /* Table */
+        .table-container {
+            padding: 0 32px 32px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 16px;
+            background: #0f172a;
+            color: #64748b;
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        .country-btn .count {
-            font-size: 18px;
-            font-weight: 700;
-            margin-top: 4px;
-            color: #3b82f6;
+        .data-table td {
+            padding: 16px;
+            border-top: 1px solid #334155;
+            font-size: 14px;
         }
-        .country-btn.active .count {
-            color: #60a5fa;
-        }
+        .data-table tr:hover td { background: rgba(255,255,255,0.02); }
         
-        /* Loading */
-        .loading-bar {
-            height: 3px;
+        .customer-cell { display: flex; align-items: center; gap: 12px; }
+        .customer-avatar {
+            width: 40px; height: 40px;
+            background: #3b82f6;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 14px;
+        }
+        .customer-name { font-weight: 600; color: white; }
+        .customer-email { font-size: 12px; color: #64748b; }
+        
+        .phone-link {
+            color: #22c55e;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .phone-link:hover { text-decoration: underline; }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.not_called { background: #334155; color: #94a3b8; }
+        .status-badge.called { background: #1e3a5f; color: #60a5fa; }
+        .status-badge.answered { background: #14532d; color: #4ade80; }
+        .status-badge.no_answer { background: #422006; color: #fbbf24; }
+        .status-badge.converted { background: #14532d; color: #22c55e; }
+        .status-badge.not_interested { background: #450a0a; color: #f87171; }
+        
+        .action-btn {
+            width: 36px; height: 36px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #334155;
+            color: #94a3b8;
+            margin-right: 4px;
+        }
+        .action-btn:hover { background: #475569; color: white; }
+        .action-btn.call { background: #14532d; color: #22c55e; }
+        .action-btn.call:hover { background: #166534; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
             background: #1e293b;
-            position: relative;
-            overflow: hidden;
-        }
-        .loading-bar.active::after {
-            content: '';
-            position: absolute;
-            left: -50%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
-            animation: loading 1s infinite;
-        }
-        @keyframes loading {
-            to { left: 100%; }
-        }
-        
-        /* Adjust main content */
-        .main-content {
-            margin-left: 260px;
-        }
-        .page-content {
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
             padding: 24px;
         }
-        
-        @media (max-width: 1200px) {
-            .country-grid { grid-template-columns: repeat(4, 1fr); }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
+        .modal-title { font-size: 18px; font-weight: 700; }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 14px; margin-bottom: 8px; color: #94a3b8; }
+        .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        .modal-footer { display: flex; gap: 12px; margin-top: 20px; }
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+        }
+        .btn-secondary { background: #334155; color: white; }
+        .btn-primary { background: #3b82f6; color: white; }
+        
+        /* Loading */
+        .loading { text-align: center; padding: 40px; color: #64748b; }
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid #334155;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
         @media (max-width: 768px) {
-            .country-grid { grid-template-columns: repeat(4, 1fr); }
-            .country-btn { padding: 12px 8px; }
-            .country-btn .flag { font-size: 24px; }
-            .country-btn .name { font-size: 10px; }
-            .country-btn .count { font-size: 14px; }
-            .main-content { margin-left: 0; }
+            .country-cards { grid-template-columns: repeat(2, 1fr); }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .country-header { padding: 16px; flex-direction: column; gap: 16px; }
+            .content-tabs { overflow-x: auto; padding: 0 16px; }
+            .search-bar, .table-container { padding-left: 16px; padding-right: 16px; }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Bar -->
-    <div class="loading-bar" id="loadingBar"></div>
-
-    <!-- Country Header -->
-    <div class="country-header" id="countryHeader">
-        <div class="country-grid" id="countryGrid">
-            <button class="country-btn active" data-store="">
-                <span class="flag">🌍</span>
-                <span class="name">All</span>
-                <span class="count" id="count-all">-</span>
-            </button>
+    <!-- Country Selection Screen -->
+    <div class="country-select-screen" id="countrySelectScreen">
+        <h1>📞 Noriks Call Center</h1>
+        <p>Select a country to view calls</p>
+        <div class="country-cards" id="countryCards">
+            <div class="loading"><div class="spinner"></div>Loading countries...</div>
         </div>
     </div>
-
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">N</div>
-            <span class="sidebar-title">Call Center</span>
-        </div>
-        
-        <nav class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">Main Menu</div>
-                <a href="#" class="nav-item active" data-tab="abandoned">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Abandoned Carts</span>
-                    <span class="nav-badge" id="abandoned-count">0</span>
-                </a>
-                <a href="#" class="nav-item" data-tab="suppressed">
-                    <i class="fas fa-user-slash"></i>
-                    <span>Suppressed Profiles</span>
-                    <span class="nav-badge" id="suppressed-count">0</span>
-                </a>
-                <a href="#" class="nav-item" data-tab="pending">
-                    <i class="fas fa-clock"></i>
-                    <span>Pending Orders</span>
-                    <span class="nav-badge" id="pending-count">0</span>
-                </a>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-section-title">Reports</div>
-                <a href="report.html" class="nav-item">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Statistics</span>
-                </a>
-            </div>
-        </nav>
-        
-        <div class="sidebar-footer">
-            <div class="user-card">
-                <div class="user-avatar" id="userAvatar">N</div>
-                <div class="user-info">
-                    <div class="user-name" id="userName">Noriks</div>
-                    <div class="user-role" id="userRole">Admin</div>
+    
+    <!-- Country View (shown when country is selected) -->
+    <div class="country-view" id="countryView">
+        <div class="country-header">
+            <div class="country-header-left">
+                <button class="back-btn" onclick="showCountrySelect()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="country-title">
+                    <span class="flag" id="viewFlag">🇭🇷</span>
+                    <span class="name" id="viewName">Croatia</span>
                 </div>
-                <button onclick="logout()" style="background: none; border: none; color: var(--sidebar-text); cursor: pointer; padding: 8px;">
+            </div>
+            <div class="country-header-right">
+                <button class="refresh-btn" onclick="loadCountryData(true)">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <div class="user-badge" id="userBadge">👤 noriks</div>
+                <button class="back-btn" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
         </div>
-    </aside>
-    
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <button class="menu-toggle" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 style="font-size: 18px; font-weight: 600; margin: 0;">
-                    <span id="currentCountryName">All Countries</span>
-                </h1>
-            </div>
-            <div class="header-right">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search..." id="globalSearch">
-                </div>
-                <button class="header-btn" onclick="loadData(true)" title="Refresh (clear cache)">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-        </header>
         
-        <!-- Page Content -->
-        <div class="page-content">
-            <!-- Stats for selected country -->
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
-                    </div>
-                    <div class="stat-value" id="statAbandoned">0</div>
-                    <div class="stat-label">Abandoned Carts</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon purple"><i class="fas fa-user-slash"></i></div>
-                    </div>
-                    <div class="stat-value" id="statSuppressed">0</div>
-                    <div class="stat-label">Suppressed</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
-                    </div>
-                    <div class="stat-value" id="statPending">0</div>
-                    <div class="stat-label">Pending Orders</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon green"><i class="fas fa-euro-sign"></i></div>
-                    </div>
-                    <div class="stat-value" id="statValue">€0</div>
-                    <div class="stat-label">Cart Value</div>
-                </div>
+        <div class="stats-bar">
+            <div class="stat-box blue">
+                <div class="value" id="statCarts">0</div>
+                <div class="label">Abandoned Carts</div>
             </div>
-            
-            <!-- Main Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-headset"></i> Call Queue</h2>
-                </div>
-                
-                <div class="card-body">
-                    <!-- Tabs -->
-                    <div class="tabs">
-                        <button class="tab active" data-tab="abandoned">
-                            <i class="fas fa-shopping-cart"></i> Abandoned
-                            <span class="count" id="tab-abandoned-count">0</span>
-                        </button>
-                        <button class="tab" data-tab="suppressed">
-                            <i class="fas fa-user-slash"></i> Suppressed
-                            <span class="count" id="tab-suppressed-count">0</span>
-                        </button>
-                        <button class="tab" data-tab="pending">
-                            <i class="fas fa-clock"></i> Pending
-                            <span class="count" id="tab-pending-count">0</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Filters -->
-                    <div class="filters">
-                        <select class="filter-select" id="filterStatus">
-                            <option value="">All Status</option>
-                            <option value="not_called">Not Called</option>
-                            <option value="called">Called</option>
-                            <option value="answered">Answered</option>
-                            <option value="no_answer">No Answer</option>
-                            <option value="converted">Converted</option>
-                            <option value="not_interested">Not Interested</option>
-                        </select>
-                        <input type="text" class="filter-input" id="filterSearch" placeholder="Search name, email, phone...">
-                    </div>
-                    
-                    <!-- Tables -->
-                    <div id="content-abandoned" class="tab-content active">
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Store</th>
-                                        <th>Value</th>
-                                        <th>Items</th>
-                                        <th>Phone</th>
-                                        <th>Status</th>
-                                        <th>Time</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="abandoned-table"><tr><td colspan="8" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div id="content-suppressed" class="tab-content" style="display:none;">
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Profile</th>
-                                        <th>Phone</th>
-                                        <th>Reason</th>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Notes</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="suppressed-table"><tr><td colspan="7" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div id="content-pending" class="tab-content" style="display:none;">
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Store</th>
-                                        <th>Order</th>
-                                        <th>Total</th>
-                                        <th>Phone</th>
-                                        <th>Order Status</th>
-                                        <th>Call Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="pending-table"><tr><td colspan="8" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <div class="stat-box green">
+                <div class="value" id="statValue">€0</div>
+                <div class="label">Total Value</div>
+            </div>
+            <div class="stat-box orange">
+                <div class="value" id="statPending">0</div>
+                <div class="label">Pending Orders</div>
+            </div>
+            <div class="stat-box purple">
+                <div class="value" id="statNotCalled">0</div>
+                <div class="label">Not Called</div>
             </div>
         </div>
-    </main>
+        
+        <div class="content-tabs">
+            <button class="content-tab active" data-tab="carts">
+                <i class="fas fa-shopping-cart"></i>
+                Abandoned Carts
+                <span class="count" id="tabCartsCount">0</span>
+            </button>
+            <button class="content-tab" data-tab="pending">
+                <i class="fas fa-clock"></i>
+                Pending Orders
+                <span class="count" id="tabPendingCount">0</span>
+            </button>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search by name, email, phone...">
+            <select class="filter-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="not_called">Not Called</option>
+                <option value="called">Called</option>
+                <option value="answered">Answered</option>
+                <option value="no_answer">No Answer</option>
+                <option value="converted">Converted</option>
+                <option value="not_interested">Not Interested</option>
+            </select>
+        </div>
+        
+        <div class="table-container">
+            <!-- Carts Table -->
+            <table class="data-table" id="cartsTable">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Cart Value</th>
+                        <th>Products</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="cartsBody">
+                    <tr><td colspan="7"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr>
+                </tbody>
+            </table>
+            
+            <!-- Pending Table -->
+            <table class="data-table" id="pendingTable" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Order #</th>
+                        <th>Total</th>
+                        <th>Phone</th>
+                        <th>Order Status</th>
+                        <th>Call Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingBody">
+                    <tr><td colspan="7"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
     
     <!-- Modal -->
-    <div class="modal-overlay" id="statusModal">
+    <div class="modal-overlay" id="modal">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">Update Call Status</h3>
-                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                <div class="modal-title">Update Status</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" id="modalStatus">
-                        <option value="not_called">Not Called</option>
-                        <option value="called">Called</option>
-                        <option value="answered">Answered</option>
-                        <option value="no_answer">No Answer</option>
-                        <option value="converted">Converted</option>
-                        <option value="not_interested">Not Interested</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Notes</label>
-                    <textarea class="form-textarea" id="modalNotes" placeholder="Notes..."></textarea>
-                </div>
+            <div class="form-group">
+                <label class="form-label">Call Status</label>
+                <select class="form-select" id="modalStatus">
+                    <option value="not_called">Not Called</option>
+                    <option value="called">Called</option>
+                    <option value="answered">Answered</option>
+                    <option value="no_answer">No Answer</option>
+                    <option value="converted">Converted</option>
+                    <option value="not_interested">Not Interested</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea class="form-textarea" id="modalNotes" placeholder="Add notes..."></textarea>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveStatus()"><i class="fas fa-check"></i> Save</button>
+                <button class="btn btn-primary" onclick="saveStatus()">Save</button>
             </div>
         </div>
     </div>
     
     <script>
+        // Auth
+        const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
+        if (!user) window.location.href = 'login.html';
+        document.getElementById('userBadge').textContent = '👤 ' + user.username;
+        
         // State
-        let abandonedCarts = [];
-        let suppressedProfiles = [];
-        let pendingOrders = [];
         let stores = [];
-        let currentTab = 'abandoned';
-        let currentStore = '';
+        let allCarts = [];
+        let allPending = [];
+        let currentStore = null;
+        let currentTab = 'carts';
         let currentEditId = null;
         
-        // Auth check
-        const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
-        if (!user) {
-            window.location.href = 'login.html';
-        } else {
-            document.getElementById('userName').textContent = user.username;
-            document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Agent';
-            document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
+        // Load stores on init
+        async function init() {
+            const res = await fetch('api.php?action=stores');
+            stores = await res.json();
+            
+            // Load all carts to get counts
+            const cartsRes = await fetch('api.php?action=abandoned-carts');
+            allCarts = await cartsRes.json() || [];
+            
+            const pendingRes = await fetch('api.php?action=pending-orders');
+            allPending = await pendingRes.json() || [];
+            
+            renderCountryCards();
         }
         
-        // Tab navigation
-        document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchTab(item.dataset.tab);
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                item.classList.add('active');
-            });
-        });
-        
-        document.querySelectorAll('.tab[data-tab]').forEach(tab => {
-            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-        });
-        
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add('active');
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-            document.getElementById(`content-${tab}`).style.display = 'block';
-            applyFilters();
-        }
-        
-        // Country selection
-        document.getElementById('countryGrid').addEventListener('click', (e) => {
-            const btn = e.target.closest('.country-btn');
-            if (!btn) return;
-            currentStore = btn.dataset.store || '';
-            document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            const store = stores.find(s => s.code === currentStore);
-            document.getElementById('currentCountryName').textContent = store ? `${store.flag} ${store.name}` : 'All Countries';
-            
-            applyFilters();
-            updateStats();
-        });
-        
-        // Mobile sidebar
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
-        });
-        document.getElementById('sidebarOverlay').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-        });
-        
-        // Loading
-        function setLoading(on) {
-            document.getElementById('loadingBar').classList.toggle('active', on);
-        }
-        
-        // Load data
-        async function loadData(clearCache = false) {
-            setLoading(true);
-            
-            if (clearCache) {
-                await fetch('api.php?action=clear-cache').catch(() => {});
-            }
-            
-            try {
-                // Load stores first
-                const storesRes = await fetch('api.php?action=stores');
-                stores = await storesRes.json();
-                renderCountryTabs();
+        function renderCountryCards() {
+            const container = document.getElementById('countryCards');
+            container.innerHTML = stores.map(s => {
+                const carts = allCarts.filter(c => c.storeCode === s.code);
+                const pending = allPending.filter(p => p.storeCode === s.code);
+                const value = carts.reduce((sum, c) => sum + (c.cartValue || 0), 0);
+                const currency = carts[0]?.currency || 'EUR';
+                const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[currency] || '€';
                 
-                // Load all data in parallel
-                const [cartsRes, profilesRes, ordersRes] = await Promise.all([
-                    fetch('api.php?action=abandoned-carts'),
-                    fetch('api.php?action=suppressed-profiles'),
-                    fetch('api.php?action=pending-orders')
-                ]);
-                
-                abandonedCarts = await cartsRes.json() || [];
-                suppressedProfiles = await profilesRes.json() || [];
-                pendingOrders = await ordersRes.json() || [];
-                
-                if (!Array.isArray(abandonedCarts)) abandonedCarts = [];
-                if (!Array.isArray(suppressedProfiles)) suppressedProfiles = [];
-                if (!Array.isArray(pendingOrders)) pendingOrders = [];
-                
-                updateCounts();
-                updateStats();
-                applyFilters();
-            } catch (e) {
-                console.error('Load error:', e);
-            }
-            
-            setLoading(false);
-        }
-        
-        function renderCountryTabs() {
-            const grid = document.getElementById('countryGrid');
-            grid.innerHTML = `
-                <button class="country-btn active" data-store="">
-                    <span class="flag">🌍</span>
-                    <span class="name">All</span>
-                    <span class="count" id="count-all">-</span>
-                </button>
-            `;
-            stores.forEach(s => {
-                grid.innerHTML += `
-                    <button class="country-btn" data-store="${s.code}">
-                        <span class="flag">${s.flag}</span>
-                        <span class="name">${s.name}</span>
-                        <span class="count" id="count-${s.code}">-</span>
-                    </button>
+                return `
+                    <div class="country-card" onclick="selectCountry('${s.code}')">
+                        <div class="flag">${s.flag}</div>
+                        <div class="name">${s.name}</div>
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">${carts.length}</div>
+                                <div class="stat-label">Carts</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${sym}${Math.round(value)}</div>
+                                <div class="stat-label">Value</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${pending.length}</div>
+                                <div class="stat-label">Pending</div>
+                            </div>
+                        </div>
+                    </div>
                 `;
-            });
+            }).join('');
         }
         
-        function updateCounts() {
-            // Update sidebar counts
-            document.getElementById('abandoned-count').textContent = abandonedCarts.length;
-            document.getElementById('suppressed-count').textContent = suppressedProfiles.length;
-            document.getElementById('pending-count').textContent = pendingOrders.length;
-            document.getElementById('tab-abandoned-count').textContent = abandonedCarts.length;
-            document.getElementById('tab-suppressed-count').textContent = suppressedProfiles.length;
-            document.getElementById('tab-pending-count').textContent = pendingOrders.length;
+        function selectCountry(code) {
+            currentStore = stores.find(s => s.code === code);
+            document.getElementById('viewFlag').textContent = currentStore.flag;
+            document.getElementById('viewName').textContent = currentStore.name;
             
-            // Update country counts
-            const counts = { all: abandonedCarts.length };
-            stores.forEach(s => counts[s.code] = 0);
-            abandonedCarts.forEach(c => {
-                if (counts[c.storeCode] !== undefined) counts[c.storeCode]++;
-            });
+            document.getElementById('countrySelectScreen').style.display = 'none';
+            document.getElementById('countryView').classList.add('active');
             
-            Object.keys(counts).forEach(code => {
-                const el = document.getElementById(`count-${code}`);
-                if (el) el.textContent = counts[code];
-            });
+            loadCountryData();
         }
         
-        function updateStats() {
-            const data = currentStore 
-                ? abandonedCarts.filter(c => c.storeCode === currentStore)
-                : abandonedCarts;
-            const pendingData = currentStore
-                ? pendingOrders.filter(o => o.storeCode === currentStore)
-                : pendingOrders;
-            
-            document.getElementById('statAbandoned').textContent = data.length;
-            document.getElementById('statSuppressed').textContent = suppressedProfiles.length;
-            document.getElementById('statPending').textContent = pendingData.length;
-            
-            const totalValue = data.reduce((sum, c) => sum + (c.cartValue || 0), 0);
-            const currency = data[0]?.currency || 'EUR';
-            const symbols = { EUR: '€', CZK: 'Kč', PLN: 'zł', HUF: 'Ft' };
-            document.getElementById('statValue').textContent = `${symbols[currency] || '€'}${totalValue.toFixed(0)}`;
+        function showCountrySelect() {
+            document.getElementById('countryView').classList.remove('active');
+            document.getElementById('countrySelectScreen').style.display = 'flex';
+            currentStore = null;
         }
         
-        // Render functions
-        function renderAbandonedCarts(items) {
-            const tbody = document.getElementById('abandoned-table');
-            if (!items.length) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b;">No abandoned carts</td></tr>';
-                return;
+        async function loadCountryData(refresh = false) {
+            if (refresh) {
+                await fetch('api.php?action=clear-cache');
+                const cartsRes = await fetch('api.php?action=abandoned-carts');
+                allCarts = await cartsRes.json() || [];
+                const pendingRes = await fetch('api.php?action=pending-orders');
+                allPending = await pendingRes.json() || [];
             }
-            tbody.innerHTML = items.map(c => `
-                <tr>
-                    <td>
-                        <div class="customer-cell">
-                            <div class="customer-avatar">${getInitials(c.customerName)}</div>
-                            <div class="customer-info">
-                                <div class="customer-name">${esc(c.customerName)}</div>
-                                <div class="customer-email">${esc(c.email)}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="store-badge"><span class="store-flag">${c.storeFlag}</span> ${c.storeName}</span></td>
-                    <td class="amount-cell">${formatCurrency(c.cartValue, c.currency)}</td>
-                    <td>${(c.cartContents||[]).slice(0,2).map(i=>`<div style="font-size:12px;">${i.quantity}x ${esc((i.name||'').substring(0,25))}</div>`).join('')}</td>
-                    <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '—'}</td>
-                    <td><span class="status-badge ${c.callStatus}">${formatStatus(c.callStatus)}</span></td>
-                    <td><div style="font-size:12px;">${timeAgo(c.abandonedAt)}<br><span style="color:#64748b;">${formatDate(c.abandonedAt)}</span></div></td>
-                    <td>
-                        <div class="action-btns">
-                            ${c.phone ? `<button class="action-btn call" onclick="makeCall('${c.phone}')"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${c.id}','${c.callStatus}','${esc(c.notes||'')}')"><i class="fas fa-edit"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            
+            const carts = allCarts.filter(c => c.storeCode === currentStore.code);
+            const pending = allPending.filter(p => p.storeCode === currentStore.code);
+            
+            // Update stats
+            const value = carts.reduce((sum, c) => sum + (c.cartValue || 0), 0);
+            const notCalled = carts.filter(c => c.callStatus === 'not_called').length;
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[carts[0]?.currency] || '€';
+            
+            document.getElementById('statCarts').textContent = carts.length;
+            document.getElementById('statValue').textContent = sym + Math.round(value);
+            document.getElementById('statPending').textContent = pending.length;
+            document.getElementById('statNotCalled').textContent = notCalled;
+            document.getElementById('tabCartsCount').textContent = carts.length;
+            document.getElementById('tabPendingCount').textContent = pending.length;
+            
+            renderData();
         }
         
-        function renderSuppressedProfiles(items) {
-            const tbody = document.getElementById('suppressed-table');
-            if (!items.length) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#64748b;">No profiles</td></tr>';
-                return;
-            }
-            tbody.innerHTML = items.map(p => `
-                <tr>
-                    <td>
-                        <div class="customer-cell">
-                            <div class="customer-avatar">${getInitials(p.firstName+' '+p.lastName)}</div>
-                            <div class="customer-info">
-                                <div class="customer-name">${esc(p.firstName)} ${esc(p.lastName)}</div>
-                                <div class="customer-email">${esc(p.email)}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${p.phone ? `<a href="tel:${p.phone}" class="phone-link"><i class="fas fa-phone"></i> ${p.phone}</a>` : '—'}</td>
-                    <td><span class="status-badge" style="background:#fef3c7;color:#92400e;">${formatReason(p.suppressionReason)}</span></td>
-                    <td>${formatDate(p.suppressedAt)}</td>
-                    <td><span class="status-badge ${p.callStatus}">${formatStatus(p.callStatus)}</span></td>
-                    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;">${esc(p.notes||'')}</td>
-                    <td>
-                        <div class="action-btns">
-                            ${p.phone ? `<button class="action-btn call" onclick="makeCall('${p.phone}')"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${p.id}','${p.callStatus}','${esc(p.notes||'')}')"><i class="fas fa-edit"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        function renderPendingOrders(items) {
-            const tbody = document.getElementById('pending-table');
-            if (!items.length) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b;">No pending orders</td></tr>';
-                return;
-            }
-            tbody.innerHTML = items.map(o => `
-                <tr>
-                    <td>
-                        <div class="customer-cell">
-                            <div class="customer-avatar">${getInitials(o.customerName)}</div>
-                            <div class="customer-info">
-                                <div class="customer-name">${esc(o.customerName)}</div>
-                                <div class="customer-email">${esc(o.email)}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="store-badge"><span class="store-flag">${o.storeFlag}</span> ${o.storeName}</span></td>
-                    <td><strong>#${o.orderId}</strong></td>
-                    <td class="amount-cell">${formatCurrency(o.orderTotal, o.currency)}</td>
-                    <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '—'}</td>
-                    <td><span class="status-badge" style="background:#fef3c7;color:#92400e;">${o.orderStatus}</span></td>
-                    <td><span class="status-badge ${o.callStatus}">${formatStatus(o.callStatus)}</span></td>
-                    <td>
-                        <div class="action-btns">
-                            ${o.phone ? `<button class="action-btn call" onclick="makeCall('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${o.id}','${o.callStatus}','${esc(o.notes||'')}')"><i class="fas fa-edit"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
+        // Tabs
+        document.querySelectorAll('.content-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                currentTab = tab.dataset.tab;
+                document.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('cartsTable').style.display = currentTab === 'carts' ? '' : 'none';
+                document.getElementById('pendingTable').style.display = currentTab === 'pending' ? '' : 'none';
+                renderData();
+            });
+        });
         
         // Filters
-        document.getElementById('filterStatus').addEventListener('change', applyFilters);
-        document.getElementById('filterSearch').addEventListener('input', applyFilters);
-        document.getElementById('globalSearch').addEventListener('input', applyFilters);
+        document.getElementById('searchInput').addEventListener('input', renderData);
+        document.getElementById('statusFilter').addEventListener('change', renderData);
         
-        function applyFilters() {
-            const status = document.getElementById('filterStatus').value;
-            const search = (document.getElementById('filterSearch').value || document.getElementById('globalSearch').value).toLowerCase();
+        function renderData() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
             
-            if (currentTab === 'abandoned') {
-                let data = abandonedCarts;
-                if (currentStore) data = data.filter(c => c.storeCode === currentStore);
+            if (currentTab === 'carts') {
+                let data = allCarts.filter(c => c.storeCode === currentStore.code);
                 if (status) data = data.filter(c => c.callStatus === status);
                 if (search) data = data.filter(c => 
                     (c.customerName||'').toLowerCase().includes(search) ||
                     (c.email||'').toLowerCase().includes(search) ||
                     (c.phone||'').includes(search)
                 );
-                renderAbandonedCarts(data);
-            } else if (currentTab === 'suppressed') {
-                let data = suppressedProfiles;
+                renderCarts(data);
+            } else {
+                let data = allPending.filter(p => p.storeCode === currentStore.code);
                 if (status) data = data.filter(p => p.callStatus === status);
                 if (search) data = data.filter(p => 
-                    ((p.firstName||'')+' '+(p.lastName||'')).toLowerCase().includes(search) ||
+                    (p.customerName||'').toLowerCase().includes(search) ||
                     (p.email||'').toLowerCase().includes(search) ||
                     (p.phone||'').includes(search)
                 );
-                renderSuppressedProfiles(data);
-            } else {
-                let data = pendingOrders;
-                if (currentStore) data = data.filter(o => o.storeCode === currentStore);
-                if (status) data = data.filter(o => o.callStatus === status);
-                if (search) data = data.filter(o => 
-                    (o.customerName||'').toLowerCase().includes(search) ||
-                    (o.email||'').toLowerCase().includes(search) ||
-                    (o.phone||'').includes(search) ||
-                    String(o.orderId).includes(search)
-                );
-                renderPendingOrders(data);
+                renderPending(data);
             }
+        }
+        
+        function renderCarts(data) {
+            const tbody = document.getElementById('cartsBody');
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-shopping-cart"></i><p>No abandoned carts</p></div></td></tr>';
+                return;
+            }
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[data[0]?.currency] || '€';
+            tbody.innerHTML = data.map(c => `
+                <tr>
+                    <td>
+                        <div class="customer-cell">
+                            <div class="customer-avatar">${initials(c.customerName)}</div>
+                            <div>
+                                <div class="customer-name">${esc(c.customerName)}</div>
+                                <div class="customer-email">${esc(c.email)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><strong>${sym}${(c.cartValue||0).toFixed(2)}</strong></td>
+                    <td style="max-width:200px;font-size:12px;">
+                        ${(c.cartContents||[]).slice(0,2).map(i => `${i.quantity}x ${esc((i.name||'').substring(0,30))}`).join('<br>')}
+                        ${(c.cartContents||[]).length > 2 ? `<br><span style="color:#64748b;">+${c.cartContents.length-2} more</span>` : ''}
+                    </td>
+                    <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '—'}</td>
+                    <td><span class="status-badge ${c.callStatus}">${statusLabel(c.callStatus)}</span></td>
+                    <td style="font-size:12px;">${timeAgo(c.abandonedAt)}<br><span style="color:#64748b;">${formatDate(c.abandonedAt)}</span></td>
+                    <td>
+                        ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')"><i class="fas fa-phone"></i></button>` : ''}
+                        <button class="action-btn" onclick="openModal('${c.id}','${c.callStatus}','${esc(c.notes||'')}')"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderPending(data) {
+            const tbody = document.getElementById('pendingBody');
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-clock"></i><p>No pending orders</p></div></td></tr>';
+                return;
+            }
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[data[0]?.currency] || '€';
+            tbody.innerHTML = data.map(o => `
+                <tr>
+                    <td>
+                        <div class="customer-cell">
+                            <div class="customer-avatar">${initials(o.customerName)}</div>
+                            <div>
+                                <div class="customer-name">${esc(o.customerName)}</div>
+                                <div class="customer-email">${esc(o.email)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><strong>#${o.orderId}</strong></td>
+                    <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
+                    <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '—'}</td>
+                    <td><span class="status-badge" style="background:#422006;color:#fbbf24;">${o.orderStatus}</span></td>
+                    <td><span class="status-badge ${o.callStatus}">${statusLabel(o.callStatus)}</span></td>
+                    <td>
+                        ${o.phone ? `<button class="action-btn call" onclick="call('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
+                        <button class="action-btn" onclick="openModal('${o.id}','${o.callStatus}','${esc(o.notes||'')}')"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>
+            `).join('');
         }
         
         // Modal
@@ -676,45 +760,39 @@
             currentEditId = id;
             document.getElementById('modalStatus').value = status || 'not_called';
             document.getElementById('modalNotes').value = notes || '';
-            document.getElementById('statusModal').classList.add('active');
+            document.getElementById('modal').classList.add('active');
         }
         function closeModal() {
-            document.getElementById('statusModal').classList.remove('active');
-            currentEditId = null;
+            document.getElementById('modal').classList.remove('active');
         }
         async function saveStatus() {
-            if (!currentEditId) return;
             const status = document.getElementById('modalStatus').value;
             const notes = document.getElementById('modalNotes').value;
-            try {
-                await fetch('api.php?action=update-status', {
-                    method: 'POST',
-                    headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({id:currentEditId, callStatus:status, notes})
-                });
-                [abandonedCarts, suppressedProfiles, pendingOrders].forEach(arr => {
-                    const item = arr.find(i => i.id === currentEditId);
-                    if (item) { item.callStatus = status; item.notes = notes; item.lastUpdated = new Date().toISOString(); }
-                });
-                applyFilters();
-                closeModal();
-            } catch(e) { alert('Error saving'); }
+            await fetch('api.php?action=update-status', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({id: currentEditId, callStatus: status, notes})
+            });
+            [allCarts, allPending].forEach(arr => {
+                const item = arr.find(i => i.id === currentEditId);
+                if (item) { item.callStatus = status; item.notes = notes; }
+            });
+            closeModal();
+            renderData();
+            loadCountryData();
         }
         
-        function makeCall(phone) { window.open('tel:'+phone, '_self'); }
+        function call(phone) { window.open('tel:'+phone, '_self'); }
         function logout() { localStorage.removeItem('callcenter_user'); window.location.href = 'login.html'; }
         
         // Helpers
-        function getInitials(n) { return (n||'?').split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase(); }
+        function initials(n) { return (n||'?').split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase(); }
         function esc(t) { const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
-        function formatCurrency(a,c) { const s={EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}; return `${s[c]||c} ${parseFloat(a||0).toFixed(2)}`; }
-        function formatStatus(s) { return {not_called:'Not Called',called:'Called',answered:'Answered',no_answer:'No Answer',converted:'Converted',not_interested:'Not Interested'}[s]||s; }
-        function formatReason(r) { return {user_suppressed:'Unsubscribed',hard_bounce:'Bounce',spam_complaint:'Spam',invalid_email:'Invalid',unsubscribed:'Unsubscribed'}[r]||r; }
+        function statusLabel(s) { return {not_called:'Not Called',called:'Called',answered:'Answered',no_answer:'No Answer',converted:'Converted',not_interested:'Not Interested'}[s]||s; }
         function formatDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); }
-        function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+        function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d ago'; }
         
-        // Init
-        loadData();
+        init();
     </script>
 </body>
 </html>
