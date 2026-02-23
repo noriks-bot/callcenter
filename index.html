@@ -1372,11 +1372,6 @@ Available variables:
         </div>
     </div>
     
-    <!-- Theme Toggle Button -->
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Theme">
-        <i class="fas fa-sun"></i>
-    </button>
-    
     <!-- Toast Container (Enhanced) -->
     <div class="toast-container" id="toastContainer"></div>
     
@@ -3861,17 +3856,9 @@ Available variables:
             });
         }
         // ========== THEME TOGGLE ==========
-        function toggleTheme() {
-            document.body.classList.toggle('light');
-            const isLight = document.body.classList.contains('light');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            document.querySelector('.theme-toggle i').className = isLight ? 'fas fa-moon' : 'fas fa-sun';
-        }
-        
-        // Load saved theme
-        if (localStorage.getItem('theme') === 'light') {
-            document.body.classList.add('light');
-        }
+        // NOTE: Theme toggle functions are defined earlier in the file (initTheme, toggleTheme, updateThemeIcon)
+        // They use body.dark class and localStorage.callcenter_theme
+        // DO NOT add duplicate theme code here!
         
         // ========== AGENT MANAGEMENT FUNCTIONS ==========
         let agentsList = [];
