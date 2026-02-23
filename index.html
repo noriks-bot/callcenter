@@ -961,7 +961,7 @@
         
         <!-- SMS Queue Section (from API) -->
         <div class="table-card" style="margin-bottom:20px;">
-            <div style="padding:20px;border-bottom:1px solid var(--border);">
+            <div style="padding:20px;border-bottom:1px solid var(--card-border);">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
                     <div>
                         <h3 style="margin:0 0 4px 0;">📤 Čakalna vrsta za pošiljanje</h3>
@@ -979,11 +979,11 @@
         
         <!-- SMS History Section (from localStorage) -->
         <div class="table-card">
-            <div style="padding:20px;border-bottom:1px solid var(--border);">
+            <div style="padding:20px;border-bottom:1px solid var(--card-border);">
                 <h3 style="margin:0 0 4px 0;">📋 Zgodovina pošiljanja</h3>
                 <p style="margin:0;color:var(--text-muted);font-size:13px;">Poslani SMS-i (lokalna zgodovina)</p>
             </div>
-            <div class="filters-bar" style="border-bottom:1px solid var(--border);">
+            <div class="filters-bar" style="border-bottom:1px solid var(--card-border);">
                 <input type="date" class="form-input" id="smsDateFrom" style="max-width:150px;">
                 <input type="date" class="form-input" id="smsDateTo" style="max-width:150px;">
                 <select class="filter-select" id="smsCountryFilter">
@@ -1020,9 +1020,9 @@
         
         <div style="max-width:1000px;">
             <!-- SMS Provider Settings -->
-            <div class="table-card" style="padding:24px;margin-bottom:20px;">
-                <h3 style="margin-bottom:8px;">📱 MetaKocka SMS Provider Settings</h3>
-                <p style="color:var(--text-muted);margin-bottom:24px;">
+            <div class="table-card" style="padding:12px 16px;margin-bottom:12px;">
+                <h3 style="margin-bottom:4px;font-size:14px;">📱 MetaKocka SMS Provider Settings</h3>
+                <p style="color:var(--text-muted);margin-bottom:12px;font-size:12px;">
                     Nastavi <code>eshop_sync_id</code> za vsako državo. SMS-e pošilja Dejan ročno iz čakalne vrste.
                 </p>
                 
@@ -1043,7 +1043,7 @@
                     </table>
                 </div>
                 
-                <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+                <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
                     <button class="btn btn-save" onclick="saveSmsSettings()">
                         <i class="fas fa-save"></i> Shrani nastavitve
                     </button>
@@ -1054,9 +1054,9 @@
             </div>
             
             <!-- Template Preview Section -->
-            <div class="table-card" style="padding:24px;margin-bottom:20px;">
-                <h3 style="margin-bottom:20px;">📝 Predogled predlog</h3>
-                <p style="color:var(--text-muted);margin-bottom:16px;">
+            <div class="table-card" style="padding:12px 16px;margin-bottom:12px;">
+                <h3 style="margin-bottom:8px;font-size:14px;">📝 Predogled predlog</h3>
+                <p style="color:var(--text-muted);margin-bottom:10px;font-size:12px;">
                     Preveri kako izgledajo SMS sporočila v različnih jezikih. Variabele: <code>{ime}</code>, <code>{produkt}</code>, <code>{cena}</code>, <code>{link}</code>
                 </p>
                 
@@ -1666,8 +1666,8 @@ Available variables:
             container.innerHTML = `
                 <tr>
                     <td colspan="10" style="padding:40px;text-align:center;">
-                        <i class="fas fa-exclamation-triangle" style="font-size:32px;color:var(--red);margin-bottom:12px;display:block;"></i>
-                        <div style="color:var(--red);margin-bottom:12px;">${message}</div>
+                        <i class="fas fa-exclamation-triangle" style="font-size:32px;color:var(--accent-red);margin-bottom:12px;display:block;"></i>
+                        <div style="color:var(--accent-red);margin-bottom:12px;">${message}</div>
                         ${retryFn ? `<button class="btn btn-save" onclick="${retryFn}" style="margin-top:8px;">
                             <i class="fas fa-redo"></i> Poskusi znova
                         </button>` : ''}
@@ -2065,7 +2065,7 @@ Available variables:
                 // Show error state in main content
                 document.querySelector('.content').innerHTML = `
                     <div style="padding:60px;text-align:center;">
-                        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:var(--red);margin-bottom:20px;display:block;"></i>
+                        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:var(--accent-red);margin-bottom:20px;display:block;"></i>
                         <h3 style="margin-bottom:12px;">Napaka pri nalaganju aplikacije</h3>
                         <p style="color:var(--text-muted);margin-bottom:20px;">${error.message}</p>
                         <button class="btn btn-save" onclick="location.reload()">
@@ -2099,12 +2099,10 @@ Available variables:
             container.innerHTML = (showAllTab ? `
                 <button class="country-tab active" data-store="all">
                     <span class="flag">🌍</span> All
-                    <span class="count" id="count-all">0</span>
                 </button>
             ` : '') + allowedStores.map((s, i) => `
                 <button class="country-tab ${!showAllTab && i === 0 ? 'active' : ''}" data-store="${s.code}">
                     <span class="flag">${s.flag}</span> ${s.name}
-                    <span class="count" id="count-${s.code}">0</span>
                 </button>
             `).join('');
             
@@ -3209,7 +3207,7 @@ Available variables:
                     </div>
                 `;
             } catch (e) {
-                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka: ${e.message}</p><button class="btn btn-save" style="margin-top:12px;" onclick="loadSmsDashboardQueue()"><i class="fas fa-redo"></i> Poskusi znova</button></div>`;
+                container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka: ${e.message}</p><button class="btn btn-save" style="margin-top:12px;" onclick="loadSmsDashboardQueue()"><i class="fas fa-redo"></i> Poskusi znova</button></div>`;
             }
         }
         
@@ -3540,7 +3538,7 @@ Available variables:
                             </select>
                             <div style="display:flex;align-items:center;gap:4px;">
                                 <input type="number" min="1" max="72" value="${rule.delay}" 
-                                       style="width:60px;padding:8px;background:var(--content-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);text-align:center;"
+                                       style="width:60px;padding:8px;background:var(--content-bg);border:1px solid var(--card-border);border-radius:6px;color:var(--text-primary);text-align:center;"
                                        onchange="updateRule(${i}, 'delay', parseInt(this.value))">
                                 <span style="font-size:12px;color:var(--text-muted);">ur</span>
                             </div>
@@ -3824,7 +3822,7 @@ Available variables:
                     </div>
                 `;
             } catch (e) {
-                container.innerHTML = '<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka pri nalaganju</p><button class="btn btn-save" style="margin-top:12px;" onclick="renderSmsQueueManagement()"><i class="fas fa-redo"></i> Poskusi znova</button></div>';
+                container.innerHTML = '<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka pri nalaganju</p><button class="btn btn-save" style="margin-top:12px;" onclick="renderSmsQueueManagement()"><i class="fas fa-redo"></i> Poskusi znova</button></div>';
             }
         }
         
@@ -4683,7 +4681,7 @@ Available variables:
                                 <i class="fas fa-edit"></i>
                             </button>
                             ${agent.role !== 'admin' || agentsList.filter(a => a.role === 'admin').length > 1 ? `
-                                <button class="action-btn" onclick="deleteAgent('${agent.id}')" title="Delete" style="background:rgba(239,68,68,0.2);color:var(--red);">
+                                <button class="action-btn" onclick="deleteAgent('${agent.id}')" title="Delete" style="background:rgba(239,68,68,0.2);color:var(--accent-red);">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             ` : ''}
@@ -5090,7 +5088,7 @@ Available variables:
                 if (data.length === 0) {
                     container.innerHTML = `
                         <div class="empty" style="padding:60px;">
-                            <i class="fas fa-check-circle" style="font-size:48px;color:var(--green);margin-bottom:16px;"></i>
+                            <i class="fas fa-check-circle" style="font-size:48px;color:var(--accent-green);margin-bottom:16px;"></i>
                             <p>Ni scheduled follow-ups! 🎉</p>
                         </div>
                     `;
@@ -5154,7 +5152,7 @@ Available variables:
                 
                 container.innerHTML = html;
             } catch (e) {
-                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
+                container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
             }
         }
         
@@ -5209,22 +5207,22 @@ Available variables:
                         <h3><i class="fas fa-chart-line"></i> Overview (Last ${days} days)</h3>
                         <div class="stats-grid" style="padding:0;grid-template-columns:repeat(4, 1fr);">
                             <div class="stat-card" style="margin:0;">
-                                <div class="stat-icon" style="background:var(--accent);"><i class="fas fa-phone"></i></div>
+                                <div class="stat-icon" style="background:var(--accent-blue);"><i class="fas fa-phone"></i></div>
                                 <div class="stat-value">${stats.totalCalls || 0}</div>
                                 <div class="stat-label">Total Calls</div>
                             </div>
                             <div class="stat-card" style="margin:0;">
-                                <div class="stat-icon" style="background:var(--green);"><i class="fas fa-check"></i></div>
+                                <div class="stat-icon" style="background:var(--accent-green);"><i class="fas fa-check"></i></div>
                                 <div class="stat-value">${stats.statusCounts?.converted || 0}</div>
                                 <div class="stat-label">Conversions</div>
                             </div>
                             <div class="stat-card" style="margin:0;">
-                                <div class="stat-icon" style="background:var(--orange);"><i class="fas fa-percentage"></i></div>
+                                <div class="stat-icon" style="background:var(--accent-orange);"><i class="fas fa-percentage"></i></div>
                                 <div class="stat-value">${stats.conversionRate || 0}%</div>
                                 <div class="stat-label">Conv. Rate</div>
                             </div>
                             <div class="stat-card" style="margin:0;">
-                                <div class="stat-icon" style="background:var(--purple);"><i class="fas fa-sms"></i></div>
+                                <div class="stat-icon" style="background:var(--accent-purple);"><i class="fas fa-sms"></i></div>
                                 <div class="stat-value">${smsStats.sent}</div>
                                 <div class="stat-label">SMS Sent</div>
                             </div>
@@ -5268,15 +5266,15 @@ Available variables:
                         <h3><i class="fas fa-sms"></i> SMS Performance</h3>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                             <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
-                                <div style="font-size:24px;font-weight:700;color:var(--green);">${smsStats.sent}</div>
+                                <div style="font-size:24px;font-weight:700;color:var(--accent-green);">${smsStats.sent}</div>
                                 <div style="font-size:12px;color:var(--text-muted);">Sent</div>
                             </div>
                             <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
-                                <div style="font-size:24px;font-weight:700;color:var(--orange);">${smsStats.queued}</div>
+                                <div style="font-size:24px;font-weight:700;color:var(--accent-orange);">${smsStats.queued}</div>
                                 <div style="font-size:12px;color:var(--text-muted);">Queued</div>
                             </div>
                             <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
-                                <div style="font-size:24px;font-weight:700;color:var(--red);">${smsStats.failed}</div>
+                                <div style="font-size:24px;font-weight:700;color:var(--accent-red);">${smsStats.failed}</div>
                                 <div style="font-size:12px;color:var(--text-muted);">Failed</div>
                             </div>
                             <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
@@ -5291,7 +5289,7 @@ Available variables:
                 renderAnalyticsCharts(stats);
                 
             } catch (e) {
-                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
+                container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
             }
         }
         
@@ -5558,7 +5556,7 @@ Available variables:
                 
                 filterEmailTemplates();
             } catch (e) {
-                container.innerHTML = `<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
+                container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
             }
         }
         
@@ -5612,7 +5610,7 @@ Available variables:
                                     <tr>
                                         <td>${store?.flag || ''} ${t.storeCode.toUpperCase()}</td>
                                         <td>
-                                            <span class="badge" style="background:rgba(59,130,246,0.2);color:var(--accent);">
+                                            <span class="badge" style="background:rgba(59,130,246,0.2);color:var(--accent-blue);">
                                                 ${typeIcons[t.type] || '📧'} ${typeLabels[t.type] || t.type}
                                             </span>
                                         </td>
@@ -5624,7 +5622,7 @@ Available variables:
                                             <button class="action-btn" onclick="editEmailTemplate('${t.id}')" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="action-btn" onclick="previewEmailTemplate('${t.id}')" title="Preview" style="background:rgba(168,85,247,0.2);color:var(--purple);">
+                                            <button class="action-btn" onclick="previewEmailTemplate('${t.id}')" title="Preview" style="background:rgba(168,85,247,0.2);color:var(--accent-purple);">
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                         </td>
@@ -5767,8 +5765,8 @@ ${esc(previewBody)}
                 paketomatiData = [];
                 document.getElementById('paketomatiTableBody').innerHTML = `
                     <tr><td colspan="9" style="padding:40px;text-align:center;">
-                        <i class="fas fa-exclamation-triangle" style="font-size:32px;color:var(--red);margin-bottom:12px;display:block;"></i>
-                        <div style="color:var(--red);margin-bottom:12px;">Napaka pri nalaganju: ${result.error || 'Unknown error'}</div>
+                        <i class="fas fa-exclamation-triangle" style="font-size:32px;color:var(--accent-red);margin-bottom:12px;display:block;"></i>
+                        <div style="color:var(--accent-red);margin-bottom:12px;">Napaka pri nalaganju: ${result.error || 'Unknown error'}</div>
                         <button class="btn btn-save" onclick="loadPaketomati()" style="margin-top:8px;">
                             <i class="fas fa-redo"></i> Poskusi znova
                         </button>
@@ -5805,8 +5803,8 @@ ${esc(previewBody)}
             const html = filtered.map(order => {
                 const statusColors = {
                     not_called: 'var(--text-muted)',
-                    called: 'var(--orange)',
-                    notified: 'var(--green)'
+                    called: 'var(--accent-orange)',
+                    notified: 'var(--accent-green)'
                 };
                 const statusLabels = {
                     not_called: 'Ni poklicano',
@@ -5836,16 +5834,16 @@ ${esc(previewBody)}
                             ` : '<span style="color:var(--text-muted)">-</span>'}
                         </td>
                         <td>
-                            ${order.email ? `<a href="mailto:${order.email}" style="color:var(--accent);">${esc(order.email)}</a>` : '-'}
+                            ${order.email ? `<a href="mailto:${order.email}" style="color:var(--accent-blue);">${esc(order.email)}</a>` : '-'}
                         </td>
                         <td><span style="background:var(--card-border);padding:4px 8px;border-radius:4px;font-size:12px;">${esc(order.deliveryService || '-')}</span></td>
                         <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(eventTitle)}">
-                            <span style="color:var(--green);font-weight:500;">📍 ${esc(order.lastDeliveryEvent || '-')}</span>
+                            <span style="color:var(--accent-green);font-weight:500;">📍 ${esc(order.lastDeliveryEvent || '-')}</span>
                             ${eventDate ? `<br><small style="color:var(--text-muted);font-size:11px;">${eventDate}</small>` : ''}
                         </td>
                         <td><strong>${order.orderTotal.toFixed(2)} ${order.currency}</strong></td>
                         <td>
-                            <select onchange="updatePaketomatStatus('${order.id}', this.value)" style="background:var(--card-border);border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:${statusColors[order.status]};cursor:pointer;">
+                            <select onchange="updatePaketomatStatus('${order.id}', this.value)" style="background:var(--card-border);border:1px solid var(--card-border);border-radius:4px;padding:4px 8px;color:${statusColors[order.status]};cursor:pointer;">
                                 <option value="not_called" ${order.status === 'not_called' ? 'selected' : ''}>Ni poklicano</option>
                                 <option value="called" ${order.status === 'called' ? 'selected' : ''}>Poklicano</option>
                                 <option value="notified" ${order.status === 'notified' ? 'selected' : ''}>Obveščeno</option>
@@ -5902,7 +5900,7 @@ ${esc(previewBody)}
                         <button class="modal-close" onclick="document.getElementById('paketomatNotesModal').remove()">×</button>
                     </div>
                     <div class="modal-body">
-                        <textarea id="paketomatNotesText" rows="5" style="width:100%;background:var(--content-bg);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);resize:vertical;">${currentNotes}</textarea>
+                        <textarea id="paketomatNotesText" rows="5" style="width:100%;background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px;color:var(--text-primary);resize:vertical;">${currentNotes}</textarea>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-cancel" onclick="document.getElementById('paketomatNotesModal').remove()">Prekliči</button>
@@ -6024,12 +6022,12 @@ ${esc(previewBody)}
                     // Update badge with "new" indicator
                     if (data.newCarts.length > 0) {
                         const cartsBadge = document.getElementById('navCarts');
-                        cartsBadge.style.background = 'var(--red)';
+                        cartsBadge.style.background = 'var(--accent-red)';
                         cartsBadge.style.color = 'white';
                     }
                     if (data.newPaketomati.length > 0) {
                         const paketBadge = document.getElementById('navPaketomati');
-                        paketBadge.style.background = 'var(--red)';
+                        paketBadge.style.background = 'var(--accent-red)';
                         paketBadge.style.color = 'white';
                     }
                     
