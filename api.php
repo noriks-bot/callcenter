@@ -59,13 +59,13 @@ $callLogsFile = __DIR__ . '/data/call-logs.json';
 // ========== PHONE NUMBER FORMATTING ==========
 /**
  * Format phone number for MetaKocka SMS API
- * MetaKocka requires international format WITHOUT the + prefix
+ * MetaKocka requires international format WITH + prefix
  * 
  * Examples:
- *   098216102      → 38598216102 (HR)
- *   +38598216102   → 38598216102
- *   0038598216102  → 38598216102
- *   38598216102    → 38598216102 (already correct)
+ *   098216102      → +385 98 216 102 (HR)
+ *   +38598216102   → +385 98 216 102
+ *   0038598216102  → +385 98 216 102
+ *   38598216102    → +385 98 216 102
  */
 function formatPhoneForSms($phone, $storeCode) {
     global $phoneCountryCodes;
