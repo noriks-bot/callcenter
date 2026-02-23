@@ -158,7 +158,7 @@
         .action-btn-header:hover { background: var(--border); }
         .action-btn-header.primary { background: var(--accent); }
         
-        /* Country Tabs */
+        /* Country Tabs - Responsive */
         .country-tabs {
             display: flex;
             gap: 0;
@@ -166,7 +166,10 @@
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
             padding: 0 24px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
+        .country-tabs::-webkit-scrollbar { display: none; }
         .country-tab {
             padding: 14px 20px;
             background: none;
@@ -180,6 +183,7 @@
             gap: 8px;
             border-bottom: 3px solid transparent;
             white-space: nowrap;
+            flex-shrink: 0;
         }
         .country-tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
         .country-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -207,6 +211,7 @@
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 20px;
+            flex-shrink: 0;
         }
         .stat-icon.blue { background: rgba(59,130,246,0.15); color: var(--accent); }
         .stat-icon.green { background: rgba(34,197,94,0.15); color: var(--green); }
@@ -222,9 +227,11 @@
             display: flex;
             gap: 12px;
             margin-bottom: 16px;
+            flex-wrap: wrap;
         }
         .search-input {
             flex: 1;
+            min-width: 200px;
             padding: 12px 16px;
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -242,15 +249,20 @@
             min-width: 150px;
         }
         
-        /* Table */
+        /* Table - Responsive */
         .table-card {
             background: var(--bg-card);
             border-radius: 12px;
             overflow: hidden;
         }
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 800px;
         }
         .data-table th {
             text-align: left;
@@ -260,6 +272,7 @@
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
+            white-space: nowrap;
         }
         .data-table td {
             padding: 14px 16px;
@@ -275,6 +288,7 @@
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             font-weight: 600; font-size: 14px;
+            flex-shrink: 0;
         }
         .customer-name { font-weight: 600; }
         .customer-email { font-size: 12px; color: var(--text-muted); }
@@ -287,6 +301,7 @@
             border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
+            white-space: nowrap;
         }
         .badge.not_called { background: var(--bg-hover); color: var(--text-muted); }
         .badge.called { background: rgba(59,130,246,0.2); color: var(--accent); }
@@ -302,11 +317,16 @@
             display: inline-flex; align-items: center; justify-content: center;
             background: var(--bg-hover); color: var(--text-muted);
             margin-right: 4px;
+            flex-shrink: 0;
         }
         .action-btn:hover { background: var(--border); color: white; }
         .action-btn.call { background: rgba(34,197,94,0.2); color: var(--green); }
         .action-btn.order { background: rgba(59,130,246,0.2); color: var(--accent); }
         .action-btn.order:hover { background: var(--accent); color: white; }
+        .action-btn.push { background: rgba(249,115,22,0.2); color: var(--orange); }
+        .action-btn.push:hover { background: var(--orange); color: white; }
+        .action-btn.sms { background: rgba(168,85,247,0.2); color: var(--purple); }
+        .action-btn.sms:hover { background: var(--purple); color: white; }
         
         .empty { text-align: center; padding: 60px; color: var(--text-muted); }
         .empty i { font-size: 48px; opacity: 0.3; margin-bottom: 16px; display: block; }
@@ -317,20 +337,29 @@
             background: rgba(0,0,0,0.8);
             display: none; align-items: center; justify-content: center;
             z-index: 200;
+            padding: 16px;
+            overflow-y: auto;
         }
         .modal-bg.open { display: flex; }
         .modal {
             background: var(--bg-card);
             border-radius: 16px;
-            width: 100%; max-width: 450px;
-            margin: 20px;
+            width: 100%; max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: auto;
         }
+        .modal.wide { max-width: 700px; }
         .modal-header {
             padding: 20px 24px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 10;
         }
         .modal-title { font-size: 18px; font-weight: 700; }
         .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
@@ -347,11 +376,16 @@
             padding: 16px 24px;
             border-top: 1px solid var(--border);
             display: flex; gap: 12px;
+            flex-wrap: wrap;
+            position: sticky;
+            bottom: 0;
+            background: var(--bg-card);
         }
-        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; flex: 1; font-size: 14px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; flex: 1; font-size: 14px; min-width: 100px; }
         .btn-cancel { background: var(--bg-hover); color: var(--text); }
         .btn-save { background: var(--accent); color: white; }
         .btn-success { background: var(--green); color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .loading { text-align: center; padding: 40px; }
         .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 12px; }
@@ -369,11 +403,138 @@
             display: none;
             z-index: 300;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 90%;
         }
         .toast.show { display: block; animation: slideIn 0.3s; }
         .toast.error { background: var(--red); }
+        .toast.info { background: var(--accent); }
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } }
         
+        /* Order Items */
+        .order-items { margin: 16px 0; }
+        .order-item {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .order-item-info { flex: 1; min-width: 150px; }
+        .order-item-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .order-item-id { font-size: 11px; color: var(--text-muted); }
+        .order-item-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .order-item-controls input {
+            width: 80px;
+            padding: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            text-align: center;
+        }
+        .order-item-controls label { font-size: 12px; color: var(--text-muted); }
+        .order-item-total { font-weight: 700; color: var(--green); min-width: 80px; text-align: right; }
+        .btn-remove-item {
+            background: rgba(239,68,68,0.2);
+            color: var(--red);
+            border: none;
+            width: 32px; height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-remove-item:hover { background: var(--red); color: white; }
+        
+        .order-summary {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .order-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .order-summary-row:last-child { border: none; font-weight: 700; font-size: 18px; }
+        .order-summary-row.free-shipping { color: var(--green); }
+        
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+        }
+        .toggle-label { font-size: 14px; }
+        .toggle {
+            width: 48px; height: 26px;
+            background: var(--bg-hover);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .toggle.active { background: var(--green); }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 3px; left: 3px;
+            transition: transform 0.2s;
+        }
+        .toggle.active::after { transform: translateX(22px); }
+        
+        /* Customer Info in Modal */
+        .customer-info-card {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .customer-info-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .customer-info-row:last-child { margin-bottom: 0; }
+        .customer-info-field { flex: 1; min-width: 150px; }
+        .customer-info-field label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .customer-info-field input {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        
+        /* SMS/Push Popup Content */
+        .message-preview {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        .char-count.warning { color: var(--orange); }
+        .char-count.error { color: var(--red); }
+        
+        /* Mobile Responsive */
         @media (max-width: 1024px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
@@ -382,11 +543,36 @@
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 640px) {
-            .stats-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+            .content { padding: 0 16px 16px; }
+            .top-bar { padding: 0 16px; }
+            .country-tabs { padding: 0 16px; }
+            .stat-card { padding: 16px; }
+            .stat-value { font-size: 24px; }
+            .modal { margin: 8px; border-radius: 12px; }
+            .modal-body { padding: 16px; }
+            .modal-header, .modal-footer { padding: 16px; }
+            .order-item { padding: 10px; }
+            .order-item-controls { width: 100%; justify-content: space-between; }
+            .filters-bar { flex-direction: column; }
+            .search-input, .filter-select { min-width: 100%; }
         }
+        
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+            display: none;
+        }
+        .sidebar-overlay.show { display: block; }
     </style>
 </head>
 <body>
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -414,6 +600,19 @@
                     <i class="fas fa-user"></i>
                     <span>Enkratni kupci</span>
                     <span class="badge" id="navBuyers">0</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">SMS</div>
+                <div class="nav-item" data-tab="sms-dashboard">
+                    <i class="fas fa-comment-sms"></i>
+                    <span>SMS Dashboard</span>
+                    <span class="badge" id="navSms">0</span>
+                </div>
+                <div class="nav-item" data-tab="sms-settings">
+                    <i class="fas fa-cog"></i>
+                    <span>SMS Automation</span>
                 </div>
             </div>
             
@@ -447,7 +646,7 @@
             <div class="page-title" id="pageTitle">Abandoned Carts</div>
             <div class="top-bar-actions">
                 <button class="action-btn-header" onclick="refreshData()">
-                    <i class="fas fa-sync-alt"></i> Refresh
+                    <i class="fas fa-sync-alt"></i> <span class="hide-mobile">Refresh</span>
                 </button>
             </div>
         </div>
@@ -468,8 +667,8 @@
                 <div><div class="stat-value" id="statPending">0</div><div class="stat-label">Pending Orders</div></div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple"><i class="fas fa-user"></i></div>
-                <div><div class="stat-value" id="statBuyers">0</div><div class="stat-label">Enkratni kupci</div></div>
+                <div class="stat-icon purple"><i class="fas fa-comment-sms"></i></div>
+                <div><div class="stat-value" id="statSms">0</div><div class="stat-label">SMS Sent Today</div></div>
             </div>
         </div>
         
@@ -526,29 +725,228 @@
         </div>
     </div>
     
-    <!-- Create Order Modal -->
+    <!-- Create Order Modal (Enhanced) -->
     <div class="modal-bg" id="orderModal">
-        <div class="modal">
+        <div class="modal wide">
             <div class="modal-header">
-                <div class="modal-title">🛒 Create Order</div>
+                <div class="modal-title">🛒 Ustvari naročilo</div>
                 <button class="modal-close" onclick="closeModal('orderModal')">×</button>
             </div>
             <div class="modal-body" id="orderModalBody">
-                <p style="margin-bottom:16px;">Create WooCommerce order from this abandoned cart?</p>
-                <div style="background:var(--bg-dark);padding:16px;border-radius:8px;margin-bottom:16px;">
-                    <div style="margin-bottom:8px;"><strong id="orderCustomer">Customer Name</strong></div>
-                    <div style="font-size:13px;color:var(--text-muted);" id="orderEmail">email@example.com</div>
-                    <div style="font-size:13px;color:var(--text-muted);" id="orderPhone">+123456789</div>
-                    <div style="margin-top:12px;font-size:20px;font-weight:700;color:var(--green);" id="orderValue">€0.00</div>
+                <!-- Customer Info -->
+                <h4 style="margin-bottom:12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Podatki stranke</h4>
+                <div class="customer-info-card">
+                    <div class="customer-info-row">
+                        <div class="customer-info-field">
+                            <label>Ime</label>
+                            <input type="text" id="orderFirstName" placeholder="Ime">
+                        </div>
+                        <div class="customer-info-field">
+                            <label>Priimek</label>
+                            <input type="text" id="orderLastName" placeholder="Priimek">
+                        </div>
+                    </div>
+                    <div class="customer-info-row">
+                        <div class="customer-info-field">
+                            <label>Email</label>
+                            <input type="email" id="orderEmail" placeholder="email@example.com">
+                        </div>
+                        <div class="customer-info-field">
+                            <label>Telefon</label>
+                            <input type="tel" id="orderPhone" placeholder="+386...">
+                        </div>
+                    </div>
+                    <div class="customer-info-row">
+                        <div class="customer-info-field">
+                            <label>Naslov</label>
+                            <input type="text" id="orderAddress" placeholder="Ulica in številka">
+                        </div>
+                    </div>
+                    <div class="customer-info-row">
+                        <div class="customer-info-field">
+                            <label>Mesto</label>
+                            <input type="text" id="orderCity" placeholder="Mesto">
+                        </div>
+                        <div class="customer-info-field">
+                            <label>Poštna</label>
+                            <input type="text" id="orderPostcode" placeholder="1000">
+                        </div>
+                    </div>
                 </div>
-                <p style="font-size:13px;color:var(--text-muted);">
-                    <i class="fas fa-info-circle"></i> Order will be created with status "Processing" and meta tag "_call_center".
+                
+                <!-- Products -->
+                <h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Izdelki</h4>
+                <div class="order-items" id="orderItems">
+                    <!-- Items will be rendered here -->
+                </div>
+                
+                <!-- Options -->
+                <div class="toggle-row">
+                    <span class="toggle-label">🚚 Brezplačna dostava</span>
+                    <div class="toggle" id="freeShippingToggle" onclick="toggleFreeShipping()"></div>
+                </div>
+                
+                <!-- Summary -->
+                <div class="order-summary">
+                    <div class="order-summary-row">
+                        <span>Izdelki</span>
+                        <span id="orderSubtotal">€0.00</span>
+                    </div>
+                    <div class="order-summary-row" id="shippingRow">
+                        <span>Dostava</span>
+                        <span id="orderShipping">€5.00</span>
+                    </div>
+                    <div class="order-summary-row">
+                        <span>SKUPAJ</span>
+                        <span id="orderTotal">€0.00</span>
+                    </div>
+                </div>
+                
+                <p style="font-size:12px;color:var(--text-muted);margin-top:16px;">
+                    <i class="fas fa-info-circle"></i> Naročilo bo ustvarjeno s statusom "Processing" in meta oznako "_call_center".
                 </p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal('orderModal')">Cancel</button>
-                <button class="btn btn-success" onclick="confirmCreateOrder()">
-                    <i class="fas fa-check"></i> Create Order
+                <button class="btn btn-cancel" onclick="closeModal('orderModal')">Prekliči</button>
+                <button class="btn btn-success" onclick="confirmCreateOrder()" id="createOrderBtn">
+                    <i class="fas fa-check"></i> Ustvari naročilo
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SMS Modal -->
+    <div class="modal-bg" id="smsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">📱 Pošlji SMS</div>
+                <button class="modal-close" onclick="closeModal('smsModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-info-card">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div class="avatar" id="smsAvatar">?</div>
+                        <div>
+                            <div style="font-weight:600;" id="smsCustomerName">Customer Name</div>
+                            <div style="font-size:13px;color:var(--text-muted);" id="smsCustomerPhone">+123456789</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Predloga</label>
+                    <select class="form-select" id="smsTemplate" onchange="applySmsTemplate()">
+                        <option value="">-- Izberi predlogo --</option>
+                        <option value="reminder">🔔 Opomnik za košarico</option>
+                        <option value="discount">💰 Popust ponudba</option>
+                        <option value="lastchance">⏰ Zadnja priložnost</option>
+                        <option value="custom">✏️ Prilagojeno sporočilo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Sporočilo</label>
+                    <textarea class="form-textarea" id="smsMessage" placeholder="Vnesite sporočilo..." oninput="updateCharCount()"></textarea>
+                    <div class="char-count" id="smsCharCount">0 / 160 znakov</div>
+                </div>
+                
+                <div class="message-preview" id="smsPreview" style="display:none;">
+                    <strong style="font-size:11px;color:var(--text-muted);">PREDOGLED:</strong><br>
+                    <span id="smsPreviewText"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('smsModal')">Prekliči</button>
+                <button class="btn btn-save" onclick="queueSms()" id="sendSmsBtn" disabled title="SMS pošilja samo Dejan ročno">
+                    <i class="fas fa-clock"></i> Dodaj v čakalno vrsto
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Push Notification Modal -->
+    <div class="modal-bg" id="pushModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">🔔 Push Obvestilo</div>
+                <button class="modal-close" onclick="closeModal('pushModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-info-card">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div class="avatar" id="pushAvatar">?</div>
+                        <div>
+                            <div style="font-weight:600;" id="pushCustomerName">Customer Name</div>
+                            <div style="font-size:13px;color:var(--text-muted);" id="pushCustomerEmail">email@example.com</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Naslov</label>
+                    <input type="text" class="form-input" id="pushTitle" placeholder="Naslov obvestila" value="Pozabili ste na košarico! 🛒">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Sporočilo</label>
+                    <textarea class="form-textarea" id="pushMessage" placeholder="Vsebina obvestila...">Vaša košarica vas čaka! Dokončajte nakup zdaj.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">URL (opcijsko)</label>
+                    <input type="text" class="form-input" id="pushUrl" placeholder="https://noriks.com/checkout">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('pushModal')">Prekliči</button>
+                <button class="btn btn-save" onclick="sendPush()" id="sendPushBtn" disabled title="Push ni implementiran">
+                    <i class="fas fa-paper-plane"></i> Pošlji Push
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SMS Dashboard Content (shown when tab selected) -->
+    <div id="smsDashboardContent" style="display:none;">
+        <div class="filters-bar">
+            <input type="date" class="form-input" id="smsDateFrom" style="max-width:150px;">
+            <input type="date" class="form-input" id="smsDateTo" style="max-width:150px;">
+            <select class="filter-select" id="smsCountryFilter">
+                <option value="">Vse države</option>
+            </select>
+            <select class="filter-select" id="smsStatusFilter">
+                <option value="">Vsi statusi</option>
+                <option value="queued">V čakanju</option>
+                <option value="sent">Poslano</option>
+                <option value="delivered">Dostavljeno</option>
+                <option value="failed">Neuspešno</option>
+            </select>
+            <button class="action-btn-header" onclick="exportSmsCsv()">
+                <i class="fas fa-download"></i> CSV Export
+            </button>
+        </div>
+        <div class="table-card">
+            <div id="smsTableContainer">
+                <div class="empty"><i class="fas fa-comment-sms"></i><p>Ni poslanih SMS sporočil</p></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SMS Automation Settings (shown when tab selected) -->
+    <div id="smsSettingsContent" style="display:none;">
+        <div style="max-width:800px;">
+            <div class="table-card" style="padding:24px;">
+                <h3 style="margin-bottom:20px;">⚙️ SMS Automation Pravila</h3>
+                <p style="color:var(--text-muted);margin-bottom:24px;">
+                    Nastavi avtomatska SMS sporočila za opuščene košarice. SMS-e pošilja Dejan ročno iz čakalne vrste.
+                </p>
+                
+                <div id="automationRules">
+                    <!-- Rules will be rendered here -->
+                </div>
+                
+                <button class="btn btn-save" style="margin-top:20px;" onclick="addAutomationRule()">
+                    <i class="fas fa-plus"></i> Dodaj pravilo
                 </button>
             </div>
         </div>
@@ -570,15 +968,46 @@
         let carts = [];
         let pending = [];
         let buyers = [];
+        let smsLog = [];
+        let smsAutomation = [];
         let currentStore = 'all';
         let currentTab = 'carts';
         let editId = null;
         let orderCartId = null;
         let orderCart = null;
+        let orderItems = [];
+        let freeShipping = false;
+        let smsTarget = null;
+        let pushTarget = null;
+        
+        const SHIPPING_COST = 5.00;
+        
+        // SMS Templates
+        const smsTemplates = {
+            reminder: {
+                text: 'Pozdravljeni {ime}! Vaša košarica z {produkt} vas še vedno čaka. Dokončajte nakup: {link}'
+            },
+            discount: {
+                text: 'Pozdravljeni {ime}! Samo za vas: 10% popust na {produkt}! Koda: SAVE10. Nakup: {link}'
+            },
+            lastchance: {
+                text: '{ime}, zadnja priložnost! {produkt} bo kmalu razprodan. Ne zamudite: {link}'
+            }
+        };
         
         // Sidebar toggle
-        document.getElementById('menuBtn').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('open');
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('show');
+        });
+        
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('show');
         });
         
         // Nav items
@@ -587,10 +1016,35 @@
                 currentTab = item.dataset.tab;
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
-                document.getElementById('pageTitle').textContent = 
-                    currentTab === 'carts' ? 'Abandoned Carts' : 
-                    currentTab === 'pending' ? 'Pending Orders' : 'Enkratni kupci';
-                renderTable();
+                
+                // Close sidebar on mobile
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('show');
+                
+                // Update page title
+                const titles = {
+                    carts: 'Abandoned Carts',
+                    pending: 'Pending Orders',
+                    buyers: 'Enkratni kupci',
+                    'sms-dashboard': 'SMS Dashboard',
+                    'sms-settings': 'SMS Automation Settings'
+                };
+                document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
+                
+                // Show/hide content
+                document.getElementById('smsDashboardContent').style.display = currentTab === 'sms-dashboard' ? 'block' : 'none';
+                document.getElementById('smsSettingsContent').style.display = currentTab === 'sms-settings' ? 'block' : 'none';
+                document.querySelector('.stats-grid').style.display = ['sms-dashboard', 'sms-settings'].includes(currentTab) ? 'none' : 'grid';
+                document.querySelector('.country-tabs').style.display = ['sms-dashboard', 'sms-settings'].includes(currentTab) ? 'none' : 'flex';
+                document.querySelector('.content').style.display = ['sms-dashboard', 'sms-settings'].includes(currentTab) ? 'none' : 'block';
+                
+                if (currentTab === 'sms-dashboard') {
+                    renderSmsTable();
+                } else if (currentTab === 'sms-settings') {
+                    renderAutomationRules();
+                } else {
+                    renderTable();
+                }
             });
         });
         
@@ -599,6 +1053,7 @@
             const res = await fetch('api.php?action=stores');
             stores = await res.json();
             renderCountryTabs();
+            loadSmsData();
             await loadAllData();
         }
         
@@ -625,6 +1080,12 @@
                     renderTable();
                 });
             });
+            
+            // Also populate SMS country filter
+            const smsFilter = document.getElementById('smsCountryFilter');
+            stores.forEach(s => {
+                smsFilter.innerHTML += `<option value="${s.code}">${s.flag} ${s.name}</option>`;
+            });
         }
         
         async function loadAllData() {
@@ -649,6 +1110,32 @@
             showToast('Data refreshed!');
         }
         
+        function loadSmsData() {
+            smsLog = JSON.parse(localStorage.getItem('sms_log') || '[]');
+            smsAutomation = JSON.parse(localStorage.getItem('sms_automation') || '[]');
+            
+            // Default automation rules if empty
+            if (smsAutomation.length === 0) {
+                smsAutomation = [
+                    { id: 1, name: 'Po 3 urah', delay: 3, template: 'reminder', countries: ['all'], active: false },
+                    { id: 2, name: 'Po 6 urah', delay: 6, template: 'discount', countries: ['all'], active: false },
+                    { id: 3, name: 'Po 24 urah', delay: 24, template: 'lastchance', countries: ['all'], active: false }
+                ];
+                saveSmsAutomation();
+            }
+            
+            document.getElementById('navSms').textContent = smsLog.filter(s => s.status === 'queued').length;
+        }
+        
+        function saveSmsLog() {
+            localStorage.setItem('sms_log', JSON.stringify(smsLog));
+            document.getElementById('navSms').textContent = smsLog.filter(s => s.status === 'queued').length;
+        }
+        
+        function saveSmsAutomation() {
+            localStorage.setItem('sms_automation', JSON.stringify(smsAutomation));
+        }
+        
         function updateCounts() {
             document.getElementById('count-all').textContent = carts.length;
             document.getElementById('navCarts').textContent = carts.length;
@@ -664,15 +1151,17 @@
         function updateStats() {
             const fc = currentStore === 'all' ? carts : carts.filter(c => c.storeCode === currentStore);
             const fp = currentStore === 'all' ? pending : pending.filter(p => p.storeCode === currentStore);
-            const fb = currentStore === 'all' ? buyers : buyers.filter(b => b.storeCode === currentStore);
             
             const totalValue = fc.reduce((sum, c) => sum + (c.cartValue || 0), 0);
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[fc[0]?.currency] || '€';
             
+            const today = new Date().toDateString();
+            const smsToday = smsLog.filter(s => new Date(s.date).toDateString() === today).length;
+            
             document.getElementById('statCarts').textContent = fc.length;
             document.getElementById('statValue').textContent = sym + Math.round(totalValue).toLocaleString();
             document.getElementById('statPending').textContent = fp.length;
-            document.getElementById('statBuyers').textContent = fb.length;
+            document.getElementById('statSms').textContent = smsToday;
         }
         
         // Filters
@@ -707,6 +1196,7 @@
         
         function renderCartsTable(data) {
             document.getElementById('tableContainer').innerHTML = `
+                <div class="table-wrapper">
                 <table class="data-table">
                     <thead><tr>
                         <th>Customer</th><th>Store</th><th>Value</th><th>Phone</th><th>Status</th><th>Time</th><th>Actions</th>
@@ -721,19 +1211,23 @@
                                 <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '—'}</td>
                                 <td><span class="badge ${c.callStatus}">${statusLabel(c.callStatus)}</span></td>
                                 <td style="font-size:12px;">${timeAgo(c.abandonedAt)}</td>
-                                <td>
+                                <td style="white-space:nowrap;">
                                     ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
                                     <button class="action-btn order" onclick="openOrderModal('${c.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i></button>
+                                    <button class="action-btn push" onclick="openPushModal('${c.id}','cart')" title="Push Notification"><i class="fas fa-bell"></i></button>
+                                    ${c.phone ? `<button class="action-btn sms" onclick="openSmsModal('${c.id}','cart')" title="Send SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
                                     <button class="action-btn" onclick="openStatusModal('${c.id}','${c.callStatus}','${esc(c.notes||'')}')" title="Edit"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
                     </tbody>
-                </table>`;
+                </table>
+                </div>`;
         }
         
         function renderPendingTable(data) {
             document.getElementById('tableContainer').innerHTML = `
+                <div class="table-wrapper">
                 <table class="data-table">
                     <thead><tr>
                         <th>Customer</th><th>Store</th><th>Order #</th><th>Total</th><th>Phone</th><th>Status</th><th>Actions</th>
@@ -748,18 +1242,22 @@
                                 <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
                                 <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '—'}</td>
                                 <td><span class="badge ${o.callStatus}">${statusLabel(o.callStatus)}</span></td>
-                                <td>
+                                <td style="white-space:nowrap;">
                                     ${o.phone ? `<button class="action-btn call" onclick="call('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
+                                    <button class="action-btn push" onclick="openPushModal('${o.id}','pending')" title="Push"><i class="fas fa-bell"></i></button>
+                                    ${o.phone ? `<button class="action-btn sms" onclick="openSmsModal('${o.id}','pending')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
                                     <button class="action-btn" onclick="openStatusModal('${o.id}','${o.callStatus}','${esc(o.notes||'')}')"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
                     </tbody>
-                </table>`;
+                </table>
+                </div>`;
         }
         
         function renderBuyersTable(data) {
             document.getElementById('tableContainer').innerHTML = `
+                <div class="table-wrapper">
                 <table class="data-table">
                     <thead><tr>
                         <th>Customer</th><th>Store</th><th>Spent</th><th>Phone</th><th>Registered</th><th>Status</th><th>Actions</th>
@@ -774,14 +1272,17 @@
                                 <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '—'}</td>
                                 <td style="font-size:12px;">${formatDate(b.registeredAt)}</td>
                                 <td><span class="badge ${b.callStatus}">${statusLabel(b.callStatus)}</span></td>
-                                <td>
+                                <td style="white-space:nowrap;">
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
+                                    <button class="action-btn push" onclick="openPushModal('${b.id}','buyer')" title="Push"><i class="fas fa-bell"></i></button>
+                                    ${b.phone ? `<button class="action-btn sms" onclick="openSmsModal('${b.id}','buyer')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
                                     <button class="action-btn" onclick="openStatusModal('${b.id}','${b.callStatus}','${esc(b.notes||'')}')"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
                     </tbody>
-                </table>`;
+                </table>
+                </div>`;
         }
         
         // Status Modal
@@ -809,63 +1310,453 @@
             showToast('Status updated!');
         }
         
-        // Order Modal
+        // Order Modal (Enhanced)
         function openOrderModal(cartId) {
             orderCartId = cartId;
             orderCart = carts.find(c => c.id === cartId);
             if (!orderCart) return;
             
-            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
-            document.getElementById('orderCustomer').textContent = orderCart.customerName;
-            document.getElementById('orderEmail').textContent = orderCart.email;
-            document.getElementById('orderPhone').textContent = orderCart.phone || 'No phone';
-            document.getElementById('orderValue').textContent = sym + (orderCart.cartValue||0).toFixed(2);
+            // Populate customer info
+            const nameParts = orderCart.customerName.split(' ');
+            document.getElementById('orderFirstName').value = orderCart.firstName || nameParts[0] || '';
+            document.getElementById('orderLastName').value = orderCart.lastName || nameParts.slice(1).join(' ') || '';
+            document.getElementById('orderEmail').value = orderCart.email || '';
+            document.getElementById('orderPhone').value = orderCart.phone || '';
+            document.getElementById('orderAddress').value = orderCart.address || '';
+            document.getElementById('orderCity').value = orderCart.city || '';
+            document.getElementById('orderPostcode').value = orderCart.postcode || '';
+            
+            // Copy cart items for editing
+            orderItems = (orderCart.cartContents || []).map((item, idx) => ({
+                ...item,
+                idx: idx,
+                editPrice: item.price,
+                editQty: item.quantity
+            }));
+            
+            freeShipping = false;
+            document.getElementById('freeShippingToggle').classList.remove('active');
+            
+            renderOrderItems();
             document.getElementById('orderModal').classList.add('open');
         }
         
-        async function confirmCreateOrder() {
-            if (!orderCartId) return;
+        function renderOrderItems() {
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart?.currency] || '€';
+            const container = document.getElementById('orderItems');
             
-            const btn = event.target;
+            if (orderItems.length === 0) {
+                container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-box-open"></i><p>Ni izdelkov v košarici</p></div>';
+                updateOrderTotals();
+                return;
+            }
+            
+            container.innerHTML = orderItems.map((item, i) => `
+                <div class="order-item">
+                    <div class="order-item-info">
+                        <div class="order-item-name">${esc(item.name)}</div>
+                        <div class="order-item-id">ID: ${item.productId || 'N/A'}${item.variationId ? ' / Var: ' + item.variationId : ''}</div>
+                    </div>
+                    <div class="order-item-controls">
+                        <div>
+                            <label>Količina</label>
+                            <input type="number" min="1" value="${item.editQty}" onchange="updateItemQty(${i}, this.value)">
+                        </div>
+                        <div>
+                            <label>Cena (${sym})</label>
+                            <input type="number" step="0.01" min="0" value="${item.editPrice.toFixed(2)}" onchange="updateItemPrice(${i}, this.value)">
+                        </div>
+                    </div>
+                    <div class="order-item-total">${sym}${(item.editPrice * item.editQty).toFixed(2)}</div>
+                    <button class="btn-remove-item" onclick="removeOrderItem(${i})" title="Odstrani"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+            
+            updateOrderTotals();
+        }
+        
+        function updateItemQty(idx, val) {
+            orderItems[idx].editQty = Math.max(1, parseInt(val) || 1);
+            renderOrderItems();
+        }
+        
+        function updateItemPrice(idx, val) {
+            orderItems[idx].editPrice = Math.max(0, parseFloat(val) || 0);
+            renderOrderItems();
+        }
+        
+        function removeOrderItem(idx) {
+            orderItems.splice(idx, 1);
+            renderOrderItems();
+        }
+        
+        function toggleFreeShipping() {
+            freeShipping = !freeShipping;
+            document.getElementById('freeShippingToggle').classList.toggle('active', freeShipping);
+            updateOrderTotals();
+        }
+        
+        function updateOrderTotals() {
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart?.currency] || '€';
+            const subtotal = orderItems.reduce((sum, item) => sum + (item.editPrice * item.editQty), 0);
+            const shipping = freeShipping ? 0 : SHIPPING_COST;
+            const total = subtotal + shipping;
+            
+            document.getElementById('orderSubtotal').textContent = sym + subtotal.toFixed(2);
+            document.getElementById('orderShipping').textContent = freeShipping ? 'BREZPLAČNO' : sym + shipping.toFixed(2);
+            document.getElementById('shippingRow').classList.toggle('free-shipping', freeShipping);
+            document.getElementById('orderTotal').textContent = sym + total.toFixed(2);
+        }
+        
+        async function confirmCreateOrder() {
+            if (!orderCartId || orderItems.length === 0) {
+                showToast('Dodajte vsaj en izdelek', true);
+                return;
+            }
+            
+            const btn = document.getElementById('createOrderBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ustvarjam...';
+            
+            // Gather edited data
+            const orderData = {
+                cartId: orderCartId,
+                agent: user.username,
+                customer: {
+                    firstName: document.getElementById('orderFirstName').value,
+                    lastName: document.getElementById('orderLastName').value,
+                    email: document.getElementById('orderEmail').value,
+                    phone: document.getElementById('orderPhone').value,
+                    address: document.getElementById('orderAddress').value,
+                    city: document.getElementById('orderCity').value,
+                    postcode: document.getElementById('orderPostcode').value
+                },
+                items: orderItems.map(item => ({
+                    productId: item.productId,
+                    variationId: item.variationId,
+                    quantity: item.editQty,
+                    price: item.editPrice
+                })),
+                freeShipping: freeShipping
+            };
             
             try {
                 const res = await fetch('api.php?action=create-order', {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ cartId: orderCartId, agent: user.username })
+                    body: JSON.stringify(orderData)
                 });
                 const result = await res.json();
                 
                 if (result.success) {
                     closeModal('orderModal');
-                    showToast(`✅ Order #${result.orderNumber} created!`);
-                    // Remove from carts list
+                    showToast(`✅ Naročilo #${result.orderNumber} ustvarjeno!`);
                     carts = carts.filter(c => c.id !== orderCartId);
                     updateCounts();
                     updateStats();
                     renderTable();
                 } else {
-                    showToast(result.error || 'Failed to create order', true);
+                    showToast(result.error || 'Napaka pri ustvarjanju naročila', true);
                 }
             } catch (e) {
-                showToast('Error creating order', true);
+                showToast('Napaka pri povezavi', true);
             }
             
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-check"></i> Create Order';
+            btn.innerHTML = '<i class="fas fa-check"></i> Ustvari naročilo';
         }
+        
+        // SMS Modal
+        function openSmsModal(id, type) {
+            const data = type === 'cart' ? carts : type === 'pending' ? pending : buyers;
+            const item = data.find(d => d.id === id);
+            if (!item || !item.phone) return;
+            
+            smsTarget = { ...item, type };
+            
+            document.getElementById('smsAvatar').textContent = initials(item.customerName);
+            document.getElementById('smsCustomerName').textContent = item.customerName;
+            document.getElementById('smsCustomerPhone').textContent = item.phone;
+            document.getElementById('smsTemplate').value = '';
+            document.getElementById('smsMessage').value = '';
+            document.getElementById('smsPreview').style.display = 'none';
+            updateCharCount();
+            
+            document.getElementById('smsModal').classList.add('open');
+        }
+        
+        function applySmsTemplate() {
+            const tpl = document.getElementById('smsTemplate').value;
+            if (!tpl || tpl === 'custom') {
+                document.getElementById('smsMessage').value = '';
+                return;
+            }
+            
+            const template = smsTemplates[tpl];
+            if (!template) return;
+            
+            // Replace variables
+            let text = template.text;
+            const firstName = smsTarget.firstName || smsTarget.customerName.split(' ')[0] || 'Stranka';
+            const product = smsTarget.cartContents?.[0]?.name || 'vaš izdelek';
+            const price = smsTarget.cartValue?.toFixed(2) || '0.00';
+            const storeUrl = `https://noriks.com/${smsTarget.storeCode}/checkout`;
+            
+            text = text.replace('{ime}', firstName)
+                       .replace('{produkt}', product)
+                       .replace('{cena}', price)
+                       .replace('{link}', storeUrl);
+            
+            document.getElementById('smsMessage').value = text;
+            updateCharCount();
+        }
+        
+        function updateCharCount() {
+            const msg = document.getElementById('smsMessage').value;
+            const len = msg.length;
+            const counter = document.getElementById('smsCharCount');
+            counter.textContent = `${len} / 160 znakov`;
+            counter.className = 'char-count' + (len > 160 ? ' error' : len > 140 ? ' warning' : '');
+            
+            // Show preview
+            const preview = document.getElementById('smsPreview');
+            if (msg.trim()) {
+                preview.style.display = 'block';
+                document.getElementById('smsPreviewText').textContent = msg;
+            } else {
+                preview.style.display = 'none';
+            }
+            
+            // Enable/disable button
+            document.getElementById('sendSmsBtn').disabled = !msg.trim();
+        }
+        
+        function queueSms() {
+            const msg = document.getElementById('smsMessage').value.trim();
+            if (!msg || !smsTarget) return;
+            
+            // Add to queue (NOT send!)
+            smsLog.push({
+                id: Date.now(),
+                date: new Date().toISOString(),
+                recipient: smsTarget.phone,
+                customerName: smsTarget.customerName,
+                storeCode: smsTarget.storeCode,
+                message: msg,
+                status: 'queued', // Always queued, never sent automatically
+                cartId: smsTarget.id
+            });
+            
+            saveSmsLog();
+            closeModal('smsModal');
+            showToast('📱 SMS dodan v čakalno vrsto. Dejan bo poslal ročno.', false, 'info');
+            updateStats();
+        }
+        
+        // Push Modal
+        function openPushModal(id, type) {
+            const data = type === 'cart' ? carts : type === 'pending' ? pending : buyers;
+            const item = data.find(d => d.id === id);
+            if (!item) return;
+            
+            pushTarget = { ...item, type };
+            
+            document.getElementById('pushAvatar').textContent = initials(item.customerName);
+            document.getElementById('pushCustomerName').textContent = item.customerName;
+            document.getElementById('pushCustomerEmail').textContent = item.email || 'No email';
+            document.getElementById('pushUrl').value = `https://noriks.com/${item.storeCode}/checkout`;
+            
+            document.getElementById('pushModal').classList.add('open');
+        }
+        
+        function sendPush() {
+            // Push not implemented - just show message
+            showToast('🔔 Push obvestila še niso implementirana', false, 'info');
+            closeModal('pushModal');
+        }
+        
+        // SMS Dashboard
+        function renderSmsTable() {
+            const dateFrom = document.getElementById('smsDateFrom').value;
+            const dateTo = document.getElementById('smsDateTo').value;
+            const country = document.getElementById('smsCountryFilter').value;
+            const status = document.getElementById('smsStatusFilter').value;
+            
+            let filtered = [...smsLog];
+            
+            if (dateFrom) filtered = filtered.filter(s => s.date >= dateFrom);
+            if (dateTo) filtered = filtered.filter(s => s.date <= dateTo + 'T23:59:59');
+            if (country) filtered = filtered.filter(s => s.storeCode === country);
+            if (status) filtered = filtered.filter(s => s.status === status);
+            
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const container = document.getElementById('smsTableContainer');
+            
+            if (!filtered.length) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-comment-sms"></i><p>Ni SMS sporočil za prikaz</p></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr>
+                        <th>Datum/Čas</th>
+                        <th>Prejemnik</th>
+                        <th>Sporočilo</th>
+                        <th>Država</th>
+                        <th>Status</th>
+                        <th>Akcije</th>
+                    </tr></thead>
+                    <tbody>
+                        ${filtered.map(s => `
+                            <tr>
+                                <td style="font-size:12px;">${new Date(s.date).toLocaleString('sl-SI')}</td>
+                                <td>
+                                    <div style="font-weight:500;">${esc(s.customerName)}</div>
+                                    <div style="font-size:12px;color:var(--text-muted);">${s.recipient}</div>
+                                </td>
+                                <td style="max-width:300px;">
+                                    <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.message)}">${esc(s.message)}</div>
+                                </td>
+                                <td>${stores.find(st => st.code === s.storeCode)?.flag || '🌍'}</td>
+                                <td><span class="badge ${s.status === 'queued' ? 'called' : s.status === 'sent' ? 'answered' : s.status === 'delivered' ? 'converted' : 'not_interested'}">${s.status}</span></td>
+                                <td>
+                                    ${s.status === 'queued' ? `<button class="action-btn" onclick="removeSmsFromQueue(${s.id})" title="Odstrani"><i class="fas fa-trash"></i></button>` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                </div>
+            `;
+        }
+        
+        function removeSmsFromQueue(id) {
+            smsLog = smsLog.filter(s => s.id !== id);
+            saveSmsLog();
+            renderSmsTable();
+            showToast('SMS odstranjen iz čakalne vrste');
+        }
+        
+        function exportSmsCsv() {
+            if (!smsLog.length) {
+                showToast('Ni podatkov za izvoz', true);
+                return;
+            }
+            
+            const headers = ['Datum', 'Prejemnik', 'Telefon', 'Sporočilo', 'Država', 'Status'];
+            const rows = smsLog.map(s => [
+                new Date(s.date).toLocaleString('sl-SI'),
+                s.customerName,
+                s.recipient,
+                `"${s.message.replace(/"/g, '""')}"`,
+                s.storeCode,
+                s.status
+            ]);
+            
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sms-log-${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('CSV izvožen!');
+        }
+        
+        // SMS Automation Settings
+        function renderAutomationRules() {
+            const container = document.getElementById('automationRules');
+            
+            container.innerHTML = smsAutomation.map((rule, i) => `
+                <div class="order-item" style="margin-bottom:16px;">
+                    <div class="order-item-info" style="min-width:200px;">
+                        <input type="text" class="form-input" value="${esc(rule.name)}" 
+                               onchange="updateRule(${i}, 'name', this.value)" 
+                               placeholder="Ime pravila" style="margin-bottom:8px;">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <select class="form-select" style="flex:1;min-width:100px;" 
+                                    onchange="updateRule(${i}, 'template', this.value)">
+                                <option value="reminder" ${rule.template === 'reminder' ? 'selected' : ''}>🔔 Opomnik</option>
+                                <option value="discount" ${rule.template === 'discount' ? 'selected' : ''}>💰 Popust</option>
+                                <option value="lastchance" ${rule.template === 'lastchance' ? 'selected' : ''}>⏰ Zadnja priložnost</option>
+                            </select>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <input type="number" min="1" max="72" value="${rule.delay}" 
+                                       style="width:60px;padding:8px;background:var(--bg-dark);border:1px solid var(--border);border-radius:6px;color:var(--text);text-align:center;"
+                                       onchange="updateRule(${i}, 'delay', parseInt(this.value))">
+                                <span style="font-size:12px;color:var(--text-muted);">ur</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:16px;">
+                        <div class="toggle ${rule.active ? 'active' : ''}" onclick="toggleRule(${i})"></div>
+                        <span style="font-size:12px;color:var(--text-muted);">${rule.active ? 'Aktivno' : 'Neaktivno'}</span>
+                    </div>
+                    <button class="btn-remove-item" onclick="removeRule(${i})" title="Odstrani"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+            
+            if (smsAutomation.length === 0) {
+                container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-cog"></i><p>Ni nastavljenih pravil</p></div>';
+            }
+        }
+        
+        function updateRule(idx, field, value) {
+            smsAutomation[idx][field] = value;
+            saveSmsAutomation();
+        }
+        
+        function toggleRule(idx) {
+            smsAutomation[idx].active = !smsAutomation[idx].active;
+            saveSmsAutomation();
+            renderAutomationRules();
+            
+            if (smsAutomation[idx].active) {
+                showToast('⚠️ Pravilo aktivirano. SMS sporočila se NE pošiljajo avtomatsko - dodajajo se v čakalno vrsto.', false, 'info');
+            }
+        }
+        
+        function removeRule(idx) {
+            smsAutomation.splice(idx, 1);
+            saveSmsAutomation();
+            renderAutomationRules();
+        }
+        
+        function addAutomationRule() {
+            smsAutomation.push({
+                id: Date.now(),
+                name: 'Novo pravilo',
+                delay: 3,
+                template: 'reminder',
+                countries: ['all'],
+                active: false
+            });
+            saveSmsAutomation();
+            renderAutomationRules();
+        }
+        
+        // Add filter listeners for SMS dashboard
+        document.getElementById('smsDateFrom').addEventListener('change', renderSmsTable);
+        document.getElementById('smsDateTo').addEventListener('change', renderSmsTable);
+        document.getElementById('smsCountryFilter').addEventListener('change', renderSmsTable);
+        document.getElementById('smsStatusFilter').addEventListener('change', renderSmsTable);
         
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
         function call(phone) { window.open('tel:'+phone, '_self'); }
         function logout() { localStorage.removeItem('callcenter_user'); window.location.href = 'login.html'; }
         
-        function showToast(msg, isError = false) {
+        function showToast(msg, isError = false, type = null) {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
-            toast.className = 'toast show' + (isError ? ' error' : '');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            toast.className = 'toast show';
+            if (isError) toast.classList.add('error');
+            else if (type === 'info') toast.classList.add('info');
+            setTimeout(() => toast.classList.remove('show'), 4000);
         }
         
         // Helpers

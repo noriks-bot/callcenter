@@ -1,8 +1,8 @@
 <?php
 /**
- * Noriks Call Center - PHP API v3
- * + Create orders from abandoned carts
- * + Meta tags for call center orders
+ * Noriks Call Center - PHP API v4
+ * + Enhanced order creation with editable items, prices, free shipping
+ * + SMS queue support (MetaKocka ready - NOT sending!)
  */
 
 error_reporting(E_ALL);
@@ -28,9 +28,18 @@ $stores = [
 ];
 
 $storeCurrencies = ['hr' => 'EUR', 'cz' => 'CZK', 'pl' => 'PLN', 'sk' => 'EUR', 'hu' => 'HUF', 'gr' => 'EUR', 'it' => 'EUR'];
+$storeCountryCodes = ['hr' => 'HR', 'cz' => 'CZ', 'pl' => 'PL', 'sk' => 'SK', 'hu' => 'HU', 'gr' => 'GR', 'it' => 'IT'];
 
 $dataFile = __DIR__ . '/data/call_data.json';
+$smsQueueFile = __DIR__ . '/data/sms_queue.json';
 $cacheDir = __DIR__ . '/data/cache/';
+
+// MetaKocka config (for SMS - NOT USED FOR SENDING!)
+$metakocka = [
+    'company_id' => 6371,
+    'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+    'api_url' => 'https://main.metakocka.si/rest/eshop/v1'
+];
 
 function loadCallData() {
     global $dataFile;
@@ -45,6 +54,21 @@ function saveCallData($data) {
     $dir = dirname($dataFile);
     if (!is_dir($dir)) mkdir($dir, 0755, true);
     file_put_contents($dataFile, json_encode($data, JSON_PRETTY_PRINT));
+}
+
+function loadSmsQueue() {
+    global $smsQueueFile;
+    if (file_exists($smsQueueFile)) {
+        return json_decode(file_get_contents($smsQueueFile), true) ?: [];
+    }
+    return [];
+}
+
+function saveSmsQueue($data) {
+    global $smsQueueFile;
+    $dir = dirname($smsQueueFile);
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    file_put_contents($smsQueueFile, json_encode($data, JSON_PRETTY_PRINT));
 }
 
 function getCache($key, $maxAge = 300) {
@@ -386,9 +410,15 @@ function fetchPendingOrders() {
     return $allOrders;
 }
 
-// CREATE ORDER FROM ABANDONED CART
-function createOrderFromCart($cartId, $agentName = 'Call Center') {
-    global $stores, $storeCurrencies;
+// ENHANCED: CREATE ORDER FROM ABANDONED CART WITH EDITABLE ITEMS
+function createOrderFromCart($input) {
+    global $stores, $storeCurrencies, $storeCountryCodes;
+    
+    $cartId = $input['cartId'] ?? '';
+    $agentName = $input['agent'] ?? 'Call Center';
+    $customerData = $input['customer'] ?? [];
+    $items = $input['items'] ?? [];
+    $freeShipping = $input['freeShipping'] ?? false;
     
     // Find the cart
     $carts = fetchAbandonedCarts();
@@ -410,23 +440,51 @@ function createOrderFromCart($cartId, $agentName = 'Call Center') {
         return ['error' => 'Invalid store'];
     }
     
-    // Build order data
+    // Use edited items if provided, otherwise use original cart contents
     $lineItems = [];
-    foreach ($cart['cartContents'] as $item) {
-        $lineItem = [
-            'product_id' => $item['productId'],
-            'quantity' => $item['quantity']
-        ];
-        if (!empty($item['variationId'])) {
-            $lineItem['variation_id'] = $item['variationId'];
+    if (!empty($items)) {
+        foreach ($items as $item) {
+            $lineItem = [
+                'product_id' => intval($item['productId']),
+                'quantity' => intval($item['quantity'] ?? 1)
+            ];
+            if (!empty($item['variationId'])) {
+                $lineItem['variation_id'] = intval($item['variationId']);
+            }
+            // Set custom price if different from product default
+            if (isset($item['price'])) {
+                $lineItem['subtotal'] = strval($item['price'] * $item['quantity']);
+                $lineItem['total'] = strval($item['price'] * $item['quantity']);
+            }
+            $lineItems[] = $lineItem;
         }
-        $lineItems[] = $lineItem;
+    } else {
+        // Fallback to original cart contents
+        foreach ($cart['cartContents'] as $item) {
+            $lineItem = [
+                'product_id' => $item['productId'],
+                'quantity' => $item['quantity']
+            ];
+            if (!empty($item['variationId'])) {
+                $lineItem['variation_id'] = $item['variationId'];
+            }
+            $lineItems[] = $lineItem;
+        }
     }
     
-    // Parse name
-    $nameParts = explode(' ', $cart['customerName'], 2);
-    $firstName = $cart['firstName'] ?: ($nameParts[0] ?? '');
-    $lastName = $cart['lastName'] ?: ($nameParts[1] ?? '');
+    if (empty($lineItems)) {
+        return ['error' => 'No items in order'];
+    }
+    
+    // Use customer data from input or fallback to cart data
+    $firstName = $customerData['firstName'] ?? $cart['firstName'] ?? '';
+    $lastName = $customerData['lastName'] ?? $cart['lastName'] ?? '';
+    $email = $customerData['email'] ?? $cart['email'] ?? '';
+    $phone = $customerData['phone'] ?? $cart['phone'] ?? '';
+    $address = $customerData['address'] ?? $cart['address'] ?? '';
+    $city = $customerData['city'] ?? $cart['city'] ?? '';
+    $postcode = $customerData['postcode'] ?? $cart['postcode'] ?? '';
+    $countryCode = $storeCountryCodes[$storeCode] ?? strtoupper(substr($storeCode, 0, 2));
     
     $orderData = [
         'payment_method' => 'cod',
@@ -436,30 +494,42 @@ function createOrderFromCart($cartId, $agentName = 'Call Center') {
         'billing' => [
             'first_name' => $firstName,
             'last_name' => $lastName,
-            'email' => $cart['email'],
-            'phone' => $cart['phone'],
-            'address_1' => $cart['address'],
-            'city' => $cart['city'],
-            'postcode' => $cart['postcode'],
-            'country' => strtoupper(substr($storeCode, 0, 2))
+            'email' => $email,
+            'phone' => $phone,
+            'address_1' => $address,
+            'city' => $city,
+            'postcode' => $postcode,
+            'country' => $countryCode
         ],
         'shipping' => [
             'first_name' => $firstName,
             'last_name' => $lastName,
-            'address_1' => $cart['address'],
-            'city' => $cart['city'],
-            'postcode' => $cart['postcode'],
-            'country' => strtoupper(substr($storeCode, 0, 2))
+            'address_1' => $address,
+            'city' => $city,
+            'postcode' => $postcode,
+            'country' => $countryCode
         ],
         'line_items' => $lineItems,
         'meta_data' => [
             ['key' => '_call_center', 'value' => 'yes'],
             ['key' => '_call_center_agent', 'value' => $agentName],
             ['key' => '_call_center_date', 'value' => date('Y-m-d H:i:s')],
-            ['key' => '_abandoned_cart_id', 'value' => $cart['cartDbId']]
+            ['key' => '_abandoned_cart_id', 'value' => $cart['cartDbId']],
+            ['key' => '_free_shipping', 'value' => $freeShipping ? 'yes' : 'no']
         ],
         'customer_note' => 'Order created via Call Center by ' . $agentName
     ];
+    
+    // Add shipping line if free shipping
+    if ($freeShipping) {
+        $orderData['shipping_lines'] = [
+            [
+                'method_id' => 'free_shipping',
+                'method_title' => 'Free Shipping (Call Center)',
+                'total' => '0.00'
+            ]
+        ];
+    }
     
     // Create order via WooCommerce API
     $result = wcApiRequest($storeCode, 'orders', [], 'POST', $orderData);
@@ -494,6 +564,58 @@ function createOrderFromCart($cartId, $agentName = 'Call Center') {
         'orderStatus' => $result['status'],
         'storeUrl' => $config['url'] . '/wp-admin/post.php?post=' . $result['id'] . '&action=edit'
     ];
+}
+
+// SMS QUEUE FUNCTIONS (NOT SENDING - JUST QUEUEING!)
+function addSmsToQueue($data) {
+    $queue = loadSmsQueue();
+    
+    $smsEntry = [
+        'id' => time() . '_' . rand(1000, 9999),
+        'date' => date('c'),
+        'recipient' => $data['phone'] ?? '',
+        'customerName' => $data['customerName'] ?? '',
+        'storeCode' => $data['storeCode'] ?? '',
+        'message' => $data['message'] ?? '',
+        'status' => 'queued', // Always queued - NEVER sent automatically!
+        'cartId' => $data['cartId'] ?? null,
+        'addedBy' => $data['addedBy'] ?? 'system'
+    ];
+    
+    $queue[] = $smsEntry;
+    saveSmsQueue($queue);
+    
+    return ['success' => true, 'id' => $smsEntry['id'], 'status' => 'queued'];
+}
+
+function getSmsQueue($filters = []) {
+    $queue = loadSmsQueue();
+    
+    // Apply filters
+    if (!empty($filters['status'])) {
+        $queue = array_filter($queue, fn($s) => $s['status'] === $filters['status']);
+    }
+    if (!empty($filters['storeCode'])) {
+        $queue = array_filter($queue, fn($s) => $s['storeCode'] === $filters['storeCode']);
+    }
+    if (!empty($filters['dateFrom'])) {
+        $queue = array_filter($queue, fn($s) => $s['date'] >= $filters['dateFrom']);
+    }
+    if (!empty($filters['dateTo'])) {
+        $queue = array_filter($queue, fn($s) => $s['date'] <= $filters['dateTo'] . 'T23:59:59');
+    }
+    
+    // Sort by date desc
+    usort($queue, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
+    
+    return array_values($queue);
+}
+
+function removeSmsFromQueue($smsId) {
+    $queue = loadSmsQueue();
+    $queue = array_filter($queue, fn($s) => $s['id'] !== $smsId);
+    saveSmsQueue(array_values($queue));
+    return ['success' => true];
 }
 
 // Router
@@ -533,16 +655,14 @@ try {
                 break;
             }
             $input = json_decode(file_get_contents('php://input'), true);
-            $cartId = $input['cartId'] ?? '';
-            $agent = $input['agent'] ?? 'Call Center';
             
-            if (!$cartId) {
+            if (empty($input['cartId'])) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Missing cartId']);
                 break;
             }
             
-            $result = createOrderFromCart($cartId, $agent);
+            $result = createOrderFromCart($input);
             if (isset($result['error'])) {
                 http_response_code(400);
             }
@@ -570,6 +690,37 @@ try {
             echo json_encode(['success' => true]);
             break;
             
+        // SMS Queue endpoints
+        case 'sms-queue':
+            $filters = [
+                'status' => $_GET['status'] ?? null,
+                'storeCode' => $_GET['storeCode'] ?? null,
+                'dateFrom' => $_GET['dateFrom'] ?? null,
+                'dateTo' => $_GET['dateTo'] ?? null
+            ];
+            echo json_encode(getSmsQueue($filters));
+            break;
+            
+        case 'sms-add':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            echo json_encode(addSmsToQueue($input));
+            break;
+            
+        case 'sms-remove':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            echo json_encode(removeSmsFromQueue($input['id'] ?? ''));
+            break;
+            
         case 'clear-cache':
             global $cacheDir;
             if (is_dir($cacheDir)) array_map('unlink', glob($cacheDir . '*.json'));
@@ -593,11 +744,38 @@ try {
             break;
             
         case 'health':
-            echo json_encode(['status' => 'ok', 'version' => '3.0', 'timestamp' => date('c')]);
+            echo json_encode([
+                'status' => 'ok', 
+                'version' => '4.0', 
+                'timestamp' => date('c'),
+                'features' => [
+                    'enhanced_order_creation' => true,
+                    'editable_items' => true,
+                    'free_shipping' => true,
+                    'sms_queue' => true,
+                    'sms_sending' => false // NEVER sends SMS automatically!
+                ]
+            ]);
             break;
             
         default:
-            echo json_encode(['error' => 'Unknown action', 'available' => ['abandoned-carts', 'one-time-buyers', 'pending-orders', 'stores', 'create-order', 'update-status', 'clear-cache', 'login', 'health']]);
+            echo json_encode([
+                'error' => 'Unknown action', 
+                'available' => [
+                    'abandoned-carts', 
+                    'one-time-buyers', 
+                    'pending-orders', 
+                    'stores', 
+                    'create-order', 
+                    'update-status', 
+                    'sms-queue',
+                    'sms-add',
+                    'sms-remove',
+                    'clear-cache', 
+                    'login', 
+                    'health'
+                ]
+            ]);
     }
 } catch (Exception $e) {
     http_response_code(500);
