@@ -557,7 +557,7 @@ a:hover {
     background: var(--card-bg);
     border-bottom: 1px solid var(--card-border);
     overflow-x: auto;
-    padding: 0 12px;
+    padding: 0 16px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
@@ -567,16 +567,16 @@ a:hover {
 }
 
 .country-tab {
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: none;
     border: none;
-    color: var(--text-secondary);
-    font-size: 12px;
+    color: var(--text-muted);
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     border-bottom: 2px solid transparent;
     white-space: nowrap;
     flex-shrink: 0;
@@ -585,7 +585,6 @@ a:hover {
 
 .country-tab:hover {
     color: var(--text-primary);
-    background: var(--content-bg);
 }
 
 .country-tab.active {
@@ -594,14 +593,14 @@ a:hover {
 }
 
 .country-tab .flag {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .country-tab .count {
     background: var(--content-bg);
-    padding: 2px 6px;
-    border-radius: 8px;
-    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 6px;
+    font-size: 9px;
     font-weight: 600;
 }
 
@@ -719,34 +718,33 @@ a:hover {
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .kpi-card {
     background: var(--card-bg);
-    border-radius: var(--radius-md);
-    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     border: 1px solid var(--card-border);
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
     transition: all var(--transition-normal);
 }
 
 .kpi-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--card-shadow-hover);
+    border-color: var(--accent-blue);
 }
 
 .kpi-icon {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 12px;
     flex-shrink: 0;
 }
 
@@ -776,22 +774,20 @@ a:hover {
 }
 
 .kpi-value {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
-    margin-bottom: 2px;
 }
 
 .kpi-label {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
+    font-size: 10px;
+    color: var(--text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .kpi-change {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
 }
 
@@ -809,7 +805,7 @@ a:hover {
 
 /* ============ CONTENT AREA ============ */
 .content {
-    padding: 0 16px 16px;
+    padding: 0 16px 12px;
 }
 
 /* ============ CARDS ============ */
@@ -869,27 +865,26 @@ a:hover {
 /* ============ FILTERS ============ */
 .filters-bar {
     display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 6px;
+    margin-bottom: 8px;
     flex-wrap: wrap;
 }
 
 .search-input {
     flex: 1;
-    min-width: 180px;
-    padding: 8px 12px;
+    min-width: 160px;
+    padding: 6px 10px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: var(--radius-sm);
+    border-radius: 3px;
     color: var(--text-primary);
-    font-size: 12px;
+    font-size: 11px;
     transition: all var(--transition-normal);
 }
 
 .search-input:focus {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 .search-input::placeholder {
@@ -897,13 +892,13 @@ a:hover {
 }
 
 .filter-select {
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: var(--radius-sm);
+    border-radius: 3px;
     color: var(--text-primary);
-    min-width: 140px;
-    font-size: 12px;
+    min-width: 120px;
+    font-size: 11px;
     cursor: pointer;
     transition: all var(--transition-normal);
 }
@@ -922,13 +917,13 @@ a:hover {
 
 .data-table th {
     text-align: left;
-    padding: 8px 10px;
+    padding: 6px 8px;
     background: var(--content-bg);
-    color: var(--text-secondary);
-    font-size: 10px;
+    color: var(--text-muted);
+    font-size: 9px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     white-space: nowrap;
     border-bottom: 1px solid var(--card-border);
 }
@@ -946,7 +941,7 @@ a:hover {
 .data-table th.sortable::after {
     content: ' ↕';
     opacity: 0.3;
-    font-size: 9px;
+    font-size: 8px;
 }
 
 .data-table th.sortable.asc::after {
@@ -960,9 +955,9 @@ a:hover {
 }
 
 .data-table td {
-    padding: 6px 10px;
+    padding: 5px 8px;
     border-bottom: 1px solid var(--card-border);
-    font-size: 12px;
+    font-size: 11px;
     vertical-align: middle;
 }
 
@@ -978,31 +973,31 @@ a:hover {
 .customer-cell {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .avatar {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    border-radius: var(--radius-sm);
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 10px;
+    font-size: 9px;
     color: #fff;
     flex-shrink: 0;
 }
 
 .customer-name {
     font-weight: 600;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-primary);
 }
 
 .customer-email {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--text-muted);
 }
 
@@ -1024,10 +1019,10 @@ a:hover {
 .badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 3px;
-    font-size: 10px;
+    gap: 3px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-size: 9px;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -1076,19 +1071,19 @@ a:hover {
 
 /* Action Buttons */
 .action-btn {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: 3px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: var(--content-bg);
     color: var(--text-muted);
-    margin-right: 4px;
+    margin-right: 3px;
     flex-shrink: 0;
-    font-size: 11px;
+    font-size: 10px;
     transition: all var(--transition-normal);
 }
 

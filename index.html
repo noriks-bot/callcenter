@@ -15,52 +15,54 @@
         .hide-mobile { }
         @media (max-width: 640px) { .hide-mobile { display: none !important; } }
         
-        /* Content Type Tabs */
+        /* Content Type Tabs - Clean underlined style */
         .content-tabs {
             display: flex;
-            gap: 6px;
-            padding: 0 12px 10px;
+            gap: 0;
+            padding: 0 16px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--card-border);
         }
         .content-tab {
             display: flex;
             align-items: center;
             gap: 5px;
-            padding: 6px 10px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 3px;
-            color: var(--text-secondary);
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
             font-size: 11px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             white-space: nowrap;
         }
         .content-tab:hover {
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
+            color: var(--text-primary);
         }
         .content-tab.active {
-            background: var(--accent-blue);
-            border-color: var(--accent-blue);
-            color: #fff;
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
         }
-        .content-tab i { font-size: 11px; }
+        .content-tab i { font-size: 10px; opacity: 0.7; }
+        .content-tab.active i { opacity: 1; }
         .content-tab .count {
-            background: rgba(0,0,0,0.15);
+            background: var(--content-bg);
             padding: 1px 5px;
-            border-radius: 3px;
-            font-size: 10px;
+            border-radius: 6px;
+            font-size: 9px;
             font-weight: 600;
         }
         .content-tab.active .count {
-            background: rgba(255,255,255,0.25);
+            background: var(--accent-blue);
+            color: #fff;
         }
         @media (max-width: 768px) {
-            .content-tabs { padding: 0 12px 8px; gap: 4px; }
-            .content-tab { padding: 5px 8px; font-size: 10px; }
+            .content-tabs { padding: 0 12px; }
+            .content-tab { padding: 6px 8px; font-size: 10px; }
             .content-tab span:not(.count) { display: none; }
             .content-tab i { font-size: 12px; }
         }
