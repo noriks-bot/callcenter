@@ -1082,85 +1082,78 @@ function saveLastSeen($data) {
 }
 
 function fetchPaketomatOrders($filter = 'all') {
-    global $metakocka;
+    global $stores, $storeCurrencies;
     
-    $cached = getCache('paketomat_orders_' . $filter, 120);
+    $cached = getCache('paketomat_orders_' . $filter, 60); // Shorter cache
     if ($cached !== null) return $cached;
     
     $statusData = loadPaketomatStatus();
     $allOrders = [];
-    
-    // Statusi ki pomenijo "čaka na prevzem v paketomatu/pošti"
-    $PAKETOMAT_STATUSES = [
-        "Can be picked up from GLS parcel locker",
-        "Can be picked up from ParcelShop",
-        "Placed in the (collection) parcel machine",
-        "Parcel stored in temporary parcel machine",
-        "Packet has been delivered to its destination branch and is waiting for pickup",
-        "It's waiting to be collected at the Parcel Service Point",
-        "Awaiting collection",
-        "Accepted at an InPost branch",
-        "Rerouted to parcel machine"
-    ];
-    
-    // Fetch orders with delivery service events (multiple pages for better coverage)
     $seenIds = [];
     
-    for ($offset = 0; $offset <= 300; $offset += 100) {
-        $payload = [
-            'secret_key' => $metakocka['secret_key'],
-            'company_id' => strval($metakocka['company_id']),
-            'doc_type' => 'sales_order',
-            'result_type' => 'doc',
-            'limit' => 100,
-            'offset' => $offset,
-            'return_delivery_service_events' => true
-        ];
-        
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => 'https://main.metakocka.si/rest/eshop/v1/search',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_POSTFIELDS => json_encode($payload),
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_SSL_VERIFYPEER => true
+    // Keywords for paketomat/parcel locker shipping methods
+    $PAKETOMAT_KEYWORDS = [
+        'paketomat', 'parcel', 'locker', 'pickup', 'point', 'box', 
+        'packstation', 'inpost', 'gls', 'dpd', 'alzabox', 'pošta', 'post',
+        'zásilkovna', 'balikovna', 'paczkomat', 'csomagpont', 'omniva',
+        'pickup_point', 'parcel_shop', 'parcel_locker', 'smartpost',
+        'foxpost', 'packeta', 'zasielkovna', 'speedy', 'econt', 'sameday'
+    ];
+    
+    // If filter is 'all_orders', show ALL processing/on-hold orders (for debugging)
+    $showAllOrders = ($filter === 'all_orders');
+    
+    // Fetch orders from all WooCommerce stores
+    foreach ($stores as $storeCode => $store) {
+        // Fetch processing and on-hold orders
+        $orders = wcApiRequest($storeCode, 'orders', [
+            'status' => 'processing,on-hold',
+            'per_page' => 100
         ]);
         
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        if (!is_array($orders) || isset($orders['error'])) {
+            error_log("[Paketomati] Error fetching orders for $storeCode: " . json_encode($orders));
+            continue;
+        }
         
-        if ($httpCode < 200 || $httpCode >= 300) continue;
-        
-        $data = json_decode($response, true);
-        if (!isset($data['opr_code']) || $data['opr_code'] !== '0' || !isset($data['result'])) continue;
-        
-        foreach ($data['result'] as $order) {
-            // Get delivery service events
-            $events = $order['delivery_service_events'] ?? [];
+        foreach ($orders as $order) {
+            // Check if shipping method is paketomat/parcel locker
+            $isPaketomat = false;
+            $shippingMethod = '';
             
-            // Skip orders without events
-            if (empty($events)) continue;
-            
-            // Sort events by date desc to get the latest one
-            usort($events, function($a, $b) {
-                $dateA = $a['event_date'] ?? $a['date'] ?? '1970-01-01';
-                $dateB = $b['event_date'] ?? $b['date'] ?? '1970-01-01';
-                return strtotime($dateB) - strtotime($dateA);
-            });
-            
-            // Get latest event status
-            $latestEvent = $events[0];
-            $latestStatus = $latestEvent['event_status'] ?? $latestEvent['status'] ?? '';
-            
-            // Only include orders where latest status is "waiting for pickup"
-            if (!in_array($latestStatus, $PAKETOMAT_STATUSES)) {
-                continue;
+            // Get shipping method from shipping_lines
+            foreach ($order['shipping_lines'] ?? [] as $shipping) {
+                $methodId = strtolower($shipping['method_id'] ?? '');
+                $methodTitle = strtolower($shipping['method_title'] ?? '');
+                $shippingMethod = $shipping['method_title'] ?? $shipping['method_id'] ?? '';
+                
+                foreach ($PAKETOMAT_KEYWORDS as $keyword) {
+                    if (strpos($methodId, $keyword) !== false || strpos($methodTitle, $keyword) !== false) {
+                        $isPaketomat = true;
+                        break 2;
+                    }
+                }
             }
             
-            $orderId = 'mk_' . ($order['mk_id'] ?? $order['count_code'] ?? uniqid());
+            // Also check meta_data for paketomat info
+            if (!$isPaketomat) {
+                foreach ($order['meta_data'] ?? [] as $meta) {
+                    $key = strtolower($meta['key'] ?? '');
+                    $value = strtolower(strval($meta['value'] ?? ''));
+                    if (strpos($key, 'paketomat') !== false || strpos($key, 'parcel') !== false ||
+                        strpos($key, 'pickup_point') !== false || strpos($key, 'locker') !== false ||
+                        strpos($key, 'shipping_point') !== false || strpos($key, 'delivery_point') !== false) {
+                        $isPaketomat = true;
+                        if (!$shippingMethod) $shippingMethod = $meta['value'] ?? 'Paketomat';
+                        break;
+                    }
+                }
+            }
+            
+            // If not showing all orders and this isn't a paketomat order, skip
+            if (!$showAllOrders && !$isPaketomat) continue;
+            
+            $orderId = 'wc_' . $storeCode . '_' . $order['id'];
             
             // Skip duplicates
             if (isset($seenIds[$orderId])) continue;
@@ -1168,37 +1161,52 @@ function fetchPaketomatOrders($filter = 'all') {
             
             $savedStatus = $statusData[$orderId] ?? [];
             
-            // Get customer data from partner/receiver structure
-            $partner = $order['partner'] ?? [];
-            $receiver = $order['receiver'] ?? $partner;
-            $partnerContact = $receiver['partner_contact'] ?? $partner['partner_contact'] ?? [];
+            // Get billing/shipping info
+            $billing = $order['billing'] ?? [];
+            $shipping = $order['shipping'] ?? $billing;
+            
+            // Try to get paketomat location from meta_data
+            $paketomatLocation = '';
+            foreach ($order['meta_data'] ?? [] as $meta) {
+                $key = strtolower($meta['key'] ?? '');
+                if (strpos($key, 'paketomat') !== false || strpos($key, 'pickup') !== false ||
+                    strpos($key, 'locker') !== false || strpos($key, 'point') !== false) {
+                    if (is_string($meta['value']) && strlen($meta['value']) > 3) {
+                        $paketomatLocation = $meta['value'];
+                        break;
+                    }
+                }
+            }
+            if (!$paketomatLocation) {
+                $paketomatLocation = trim(($shipping['address_1'] ?? '') . ' ' . ($shipping['address_2'] ?? ''));
+            }
             
             $allOrders[] = [
                 'id' => $orderId,
-                'mkId' => $order['mk_id'] ?? null,
-                'orderNumber' => $order['count_code'] ?? '',
-                'title' => $order['title'] ?? $order['buyer_order'] ?? '',
-                'customerName' => $receiver['customer'] ?? $partner['customer'] ?? '',
-                'email' => $partnerContact['email'] ?? '',
-                'phone' => $partnerContact['gsm'] ?? $partnerContact['phone'] ?? '',
-                'deliveryService' => $order['delivery_type'] ?? '',
-                'paketomatLocation' => $receiver['street'] ?? '',
-                'orderTotal' => floatval($order['sum_all'] ?? 0),
-                'currency' => $order['currency_code'] ?? 'EUR',
-                'createdAt' => $order['doc_date'] ?? '',
+                'wcOrderId' => $order['id'],
+                'storeCode' => $storeCode,
+                'orderNumber' => $order['number'] ?? $order['id'],
+                'title' => '#' . ($order['number'] ?? $order['id']),
+                'customerName' => trim(($billing['first_name'] ?? '') . ' ' . ($billing['last_name'] ?? '')),
+                'email' => $billing['email'] ?? '',
+                'phone' => $billing['phone'] ?? '',
+                'deliveryService' => $shippingMethod,
+                'paketomatLocation' => $paketomatLocation,
+                'orderTotal' => floatval($order['total'] ?? 0),
+                'currency' => $order['currency'] ?? $storeCurrencies[$storeCode] ?? 'EUR',
+                'createdAt' => $order['date_created'] ?? '',
                 'status' => $savedStatus['status'] ?? 'not_called',
                 'notes' => $savedStatus['notes'] ?? '',
                 'lastUpdated' => $savedStatus['lastUpdated'] ?? null,
-                'address' => $receiver['street'] ?? '',
-                'city' => $receiver['place'] ?? '',
-                'postcode' => $receiver['post_number'] ?? '',
-                'country' => $receiver['country_iso_2'] ?? $receiver['country'] ?? '',
-                'latestEventStatus' => $latestStatus,
-                'latestEventDate' => $latestEvent['event_date'] ?? $latestEvent['date'] ?? '',
-                'deliveryEvents' => array_slice($events, 0, 5) // Last 5 events
+                'address' => trim(($shipping['address_1'] ?? '') . ' ' . ($shipping['address_2'] ?? '')),
+                'city' => $shipping['city'] ?? '',
+                'postcode' => $shipping['postcode'] ?? '',
+                'country' => $shipping['country'] ?? strtoupper($storeCode),
+                'orderStatus' => $order['status'] ?? '',
+                'storeFlag' => $stores[$storeCode]['flag'] ?? ''
             ];
         }
-    } // end offset loop
+    } // end stores loop
     
     // Sort by date desc
     usort($allOrders, function($a, $b) {
@@ -1464,17 +1472,37 @@ try {
                 break;
             }
             
-            // Search products via WooCommerce API
-            $products = wcApiRequest($storeCode, 'products', [
+            // Search products via WooCommerce API - both by name AND by SKU
+            $productsByName = wcApiRequest($storeCode, 'products', [
                 'search' => $query,
-                'per_page' => 20,
+                'per_page' => 15,
                 'status' => 'publish',
                 'stock_status' => 'instock'
             ]);
             
-            if (isset($products['error'])) {
-                http_response_code(500);
-                echo json_encode($products);
+            // Also search by SKU
+            $productsBySku = wcApiRequest($storeCode, 'products', [
+                'sku' => $query,
+                'per_page' => 15,
+                'status' => 'publish'
+            ]);
+            
+            // Merge results, avoiding duplicates
+            $seenIds = [];
+            $products = [];
+            
+            foreach ([$productsByName, $productsBySku] as $productList) {
+                if (!is_array($productList) || isset($productList['error'])) continue;
+                foreach ($productList as $p) {
+                    if (!isset($seenIds[$p['id']])) {
+                        $seenIds[$p['id']] = true;
+                        $products[] = $p;
+                    }
+                }
+            }
+            
+            if (empty($products)) {
+                echo json_encode([]);
                 break;
             }
             

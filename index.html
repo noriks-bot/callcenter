@@ -1887,12 +1887,26 @@ Available variables:
             updateContentTabCounts();
         }
         
+        // Currency conversion rates to EUR
+        const currencyToEur = {
+            EUR: 1,
+            CZK: 0.041,
+            PLN: 0.23,
+            HUF: 0.0025
+        };
+        
+        function convertToEur(value, currency) {
+            const rate = currencyToEur[currency] || 1;
+            return value * rate;
+        }
+        
         function updateStats() {
             const fc = currentStore === 'all' ? carts : carts.filter(c => c.storeCode === currentStore);
             const fp = currentStore === 'all' ? pending : pending.filter(p => p.storeCode === currentStore);
             
-            const totalValue = fc.reduce((sum, c) => sum + (c.cartValue || 0), 0);
-            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[fc[0]?.currency] || '€';
+            // Convert all values to EUR before summing
+            const totalValue = fc.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
+            const sym = '€'; // Always show in EUR since we're converting
             
             const today = new Date().toDateString();
             const smsToday = smsLog.filter(s => new Date(s.date).toDateString() === today).length;
@@ -3601,7 +3615,8 @@ Available variables:
         }
         
         function updateKPIs() {
-            const totalValue = carts.reduce((sum, c) => sum + (c.cartValue || 0), 0);
+            // Convert all values to EUR before summing
+            const totalValue = carts.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
             const converted = carts.filter(c => c.callStatus === 'converted').length;
             const recoveryRate = carts.length > 0 ? Math.round((converted / carts.length) * 100) : 0;
             
@@ -3609,9 +3624,9 @@ Available variables:
             weekAgo.setDate(weekAgo.getDate() - 7);
             const smsSentWeek = smsLog.filter(s => new Date(s.date) > weekAgo && s.status === 'sent').length;
             
-            // Estimate recovered revenue (converted carts value)
+            // Estimate recovered revenue (converted carts value) - convert to EUR
             const recoveredValue = carts.filter(c => c.callStatus === 'converted')
-                .reduce((sum, c) => sum + (c.cartValue || 0), 0);
+                .reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
             
             document.getElementById('kpiTotalValue').textContent = '€' + Math.round(totalValue).toLocaleString();
             document.getElementById('kpiRecoveryRate').textContent = recoveryRate + '%';
