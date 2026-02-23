@@ -2637,10 +2637,11 @@ Available variables:
         }
         
         function updateCounts() {
-            // Filter data by user's allowed countries
-            const filteredCarts = hasAllCountries ? carts : carts.filter(c => userCountries.includes(c.storeCode));
-            const filteredPending = hasAllCountries ? pending : pending.filter(p => userCountries.includes(p.storeCode));
-            const filteredBuyers = hasAllCountries ? buyers : buyers.filter(b => userCountries.includes(b.storeCode));
+            // Filter data by user's allowed countries (admins see everything)
+            const shouldFilter = !hasAllCountries && !isAdmin;
+            const filteredCarts = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
+            const filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
+            const filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
             
             const countAllEl = document.getElementById('count-all');
             if (countAllEl) countAllEl.textContent = filteredCarts.length;
@@ -2681,8 +2682,8 @@ Available variables:
             
             let data = currentTab === 'carts' ? [...carts] : currentTab === 'pending' ? [...pending] : [...buyers];
             
-            // Filter by user's allowed countries first
-            if (!hasAllCountries) {
+            // Filter by user's allowed countries first (admins see everything)
+            if (!hasAllCountries && !isAdmin) {
                 data = data.filter(d => userCountries.includes(d.storeCode));
             }
             
