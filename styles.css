@@ -53,11 +53,11 @@
     --accent-yellow: #eab308;
     --accent-yellow-light: #fef3c7;
     
-    /* Border Radius */
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
+    /* Border Radius - Compact/Professional */
+    --radius-sm: 3px;
+    --radius-md: 4px;
+    --radius-lg: 6px;
+    --radius-xl: 8px;
     
     /* Transitions */
     --transition-fast: 0.15s ease;
@@ -557,7 +557,7 @@ a:hover {
     background: var(--card-bg);
     border-bottom: 1px solid var(--card-border);
     overflow-x: auto;
-    padding: 0 24px;
+    padding: 0 12px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
@@ -567,17 +567,17 @@ a:hover {
 }
 
 .country-tab {
-    padding: 16px 24px;
+    padding: 8px 12px;
     background: none;
     border: none;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-bottom: 3px solid transparent;
+    gap: 6px;
+    border-bottom: 2px solid transparent;
     white-space: nowrap;
     flex-shrink: 0;
     transition: all var(--transition-normal);
@@ -594,14 +594,14 @@ a:hover {
 }
 
 .country-tab .flag {
-    font-size: 20px;
+    font-size: 14px;
 }
 
 .country-tab .count {
     background: var(--content-bg);
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 10px;
     font-weight: 600;
 }
 
@@ -614,35 +614,35 @@ a:hover {
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    padding: 24px;
+    gap: 10px;
+    padding: 12px 16px;
 }
 
 .stat-card {
     background: var(--card-bg);
-    border-radius: var(--radius-xl);
-    padding: 24px;
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
     display: flex;
-    align-items: flex-start;
-    gap: 16px;
+    align-items: center;
+    gap: 10px;
     border: 1px solid var(--card-border);
     box-shadow: var(--card-shadow);
     transition: all var(--transition-normal);
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     box-shadow: var(--card-shadow-hover);
 }
 
 .stat-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: var(--radius-lg);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 16px;
     flex-shrink: 0;
 }
 
@@ -673,30 +673,34 @@ a:hover {
 
 .stat-content {
     flex: 1;
+    min-width: 0;
 }
 
 .stat-value {
-    font-size: 32px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.2;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .stat-label {
-    font-size: 14px;
+    font-size: 11px;
     color: var(--text-secondary);
-    margin-bottom: 8px;
+    margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stat-change {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    font-size: 12px;
+    gap: 3px;
+    font-size: 10px;
     font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: 2px 6px;
+    border-radius: 3px;
 }
 
 .stat-change.positive {
@@ -804,33 +808,33 @@ a:hover {
 
 /* ============ CONTENT AREA ============ */
 .content {
-    padding: 0 24px 24px;
+    padding: 0 16px 16px;
 }
 
 /* ============ CARDS ============ */
 .card {
     background: var(--card-bg);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-md);
     border: 1px solid var(--card-border);
     box-shadow: var(--card-shadow);
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--card-border);
 }
 
 .card-title {
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .card-title i {
@@ -840,17 +844,17 @@ a:hover {
 .card-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .card-body {
-    padding: 24px;
+    padding: 16px;
 }
 
 /* Table Card */
 .table-card {
     background: var(--card-bg);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-md);
     border: 1px solid var(--card-border);
     box-shadow: var(--card-shadow);
     overflow: hidden;
@@ -864,27 +868,27 @@ a:hover {
 /* ============ FILTERS ============ */
 .filters-bar {
     display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 12px;
     flex-wrap: wrap;
 }
 
 .search-input {
     flex: 1;
-    min-width: 200px;
-    padding: 12px 16px;
+    min-width: 180px;
+    padding: 8px 12px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 12px;
     transition: all var(--transition-normal);
 }
 
 .search-input:focus {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 .search-input::placeholder {
@@ -892,12 +896,13 @@ a:hover {
 }
 
 .filter-select {
-    padding: 12px 16px;
+    padding: 8px 12px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     color: var(--text-primary);
-    min-width: 160px;
+    min-width: 140px;
+    font-size: 12px;
     cursor: pointer;
     transition: all var(--transition-normal);
 }
@@ -916,10 +921,10 @@ a:hover {
 
 .data-table th {
     text-align: left;
-    padding: 14px 16px;
+    padding: 8px 10px;
     background: var(--content-bg);
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -940,7 +945,7 @@ a:hover {
 .data-table th.sortable::after {
     content: ' ↕';
     opacity: 0.3;
-    font-size: 10px;
+    font-size: 9px;
 }
 
 .data-table th.sortable.asc::after {
@@ -954,9 +959,9 @@ a:hover {
 }
 
 .data-table td {
-    padding: 16px;
+    padding: 6px 10px;
     border-bottom: 1px solid var(--card-border);
-    font-size: 14px;
+    font-size: 12px;
     vertical-align: middle;
 }
 
@@ -972,30 +977,31 @@ a:hover {
 .customer-cell {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .avatar {
-    width: 42px;
-    height: 42px;
+    width: 28px;
+    height: 28px;
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 10px;
     color: #fff;
     flex-shrink: 0;
 }
 
 .customer-name {
     font-weight: 600;
+    font-size: 12px;
     color: var(--text-primary);
 }
 
 .customer-email {
-    font-size: 12px;
+    font-size: 10px;
     color: var(--text-muted);
 }
 
@@ -1017,10 +1023,10 @@ a:hover {
 .badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 10px;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -1069,18 +1075,19 @@ a:hover {
 
 /* Action Buttons */
 .action-btn {
-    width: 36px;
-    height: 36px;
+    width: 26px;
+    height: 26px;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: var(--content-bg);
     color: var(--text-muted);
-    margin-right: 6px;
+    margin-right: 4px;
     flex-shrink: 0;
+    font-size: 11px;
     transition: all var(--transition-normal);
 }
 
@@ -2426,7 +2433,7 @@ body.is-admin .admin-only {
     padding: 24px;
     padding-top: calc(var(--header-height) + 24px);
     overflow-y: auto;
-    background: var(--bg-body);
+    background: var(--content-bg);
     transition: left var(--transition-slow);
     z-index: 100;
 }
@@ -2455,5 +2462,6 @@ body.is-admin .admin-only {
     #emailTemplatesContent {
         left: 0;
         padding: 16px;
+        padding-top: calc(var(--header-height) + 16px);
     }
 }
