@@ -1663,7 +1663,7 @@ Available variables:
             stores = await res.json();
             renderCountryTabs();
             setupContentTabs();
-            loadSmsData();
+            await loadSmsData();
             await loadSmsTemplates();
             await loadAllData();
             
@@ -1794,8 +1794,18 @@ Available variables:
             showToast('Data refreshed!');
         }
         
-        function loadSmsData() {
-            smsLog = JSON.parse(localStorage.getItem('sms_log') || '[]');
+        async function loadSmsData() {
+            try {
+                // Load SMS queue from API
+                const res = await fetch('api.php?action=sms-queue');
+                smsLog = await res.json();
+                console.log('[SMS] Loaded from API:', smsLog.length, 'items');
+            } catch (e) {
+                console.error('[SMS] Failed to load from API:', e);
+                smsLog = [];
+            }
+            
+            // Automation rules still in localStorage (not critical)
             smsAutomation = JSON.parse(localStorage.getItem('sms_automation') || '[]');
             
             // Default automation rules if empty
@@ -2578,26 +2588,38 @@ Available variables:
             document.getElementById('sendSmsBtn').disabled = !msg.trim();
         }
         
-        function queueSms() {
+        async function queueSms() {
             const msg = document.getElementById('smsMessage').value.trim();
             if (!msg || !smsTarget) return;
             
-            // Add to queue (NOT send!)
-            smsLog.push({
-                id: Date.now(),
-                date: new Date().toISOString(),
-                recipient: smsTarget.phone,
-                customerName: smsTarget.customerName,
-                storeCode: smsTarget.storeCode,
-                message: msg,
-                status: 'queued', // Always queued, never sent automatically
-                cartId: smsTarget.id
-            });
-            
-            saveSmsLog();
-            closeModal('smsModal');
-            showToast('📱 SMS dodan v čakalno vrsto. Dejan bo poslal ročno.', false, 'info');
-            updateStats();
+            try {
+                // Add to API queue (NOT send!)
+                const res = await fetch('api.php?action=sms-add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phone: smsTarget.phone,
+                        customerName: smsTarget.customerName,
+                        storeCode: smsTarget.storeCode,
+                        message: msg,
+                        cartId: smsTarget.id,
+                        addedBy: user?.username || 'unknown'
+                    })
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    closeModal('smsModal');
+                    showToast('📱 SMS dodan v čakalno vrsto. Dejan bo poslal ročno.', false, 'info');
+                    await loadSmsData(); // Refresh from API
+                    updateStats();
+                } else {
+                    showToast('Napaka: ' + (result.error || 'Neznana napaka'), true);
+                }
+            } catch (e) {
+                console.error('SMS queue error:', e);
+                showToast('Napaka pri dodajanju SMS', true);
+            }
         }
         
         // Push Modal
@@ -2623,11 +2645,14 @@ Available variables:
         }
         
         // SMS Dashboard
-        function renderSmsTable() {
-            const dateFrom = document.getElementById('smsDateFrom').value;
-            const dateTo = document.getElementById('smsDateTo').value;
-            const country = document.getElementById('smsCountryFilter').value;
-            const status = document.getElementById('smsStatusFilter').value;
+        async function renderSmsTable() {
+            // Refresh from API first
+            await loadSmsData();
+            
+            const dateFrom = document.getElementById('smsDateFrom')?.value;
+            const dateTo = document.getElementById('smsDateTo')?.value;
+            const country = document.getElementById('smsCountryFilter')?.value;
+            const status = document.getElementById('smsStatusFilter')?.value;
             
             let filtered = [...smsLog];
             
@@ -2680,11 +2705,24 @@ Available variables:
             `;
         }
         
-        function removeSmsFromQueue(id) {
-            smsLog = smsLog.filter(s => s.id !== id);
-            saveSmsLog();
-            renderSmsTable();
-            showToast('SMS odstranjen iz čakalne vrste');
+        async function removeSmsFromQueue(id) {
+            try {
+                const res = await fetch('api.php?action=sms-remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: String(id) })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast('SMS odstranjen iz čakalne vrste');
+                    await renderSmsTable();
+                } else {
+                    showToast('Napaka pri odstranjevanju', true);
+                }
+            } catch (e) {
+                console.error('Remove SMS error:', e);
+                showToast('Napaka pri odstranjevanju', true);
+            }
         }
         
         function exportSmsCsv() {
@@ -3126,7 +3164,7 @@ Available variables:
                 if (result.success) {
                     showToast('✅ SMS uspešno poslan!');
                     renderSmsQueueManagement();
-                    renderSmsTable();
+                    await renderSmsTable();
                     updateStats();
                 } else {
                     showToast(`❌ Napaka: ${result.error}`, true);
@@ -3328,7 +3366,7 @@ Available variables:
             
             showToast(`${added} SMS dodanih v čakalno vrsto`, false, 'info');
             clearSelection();
-            loadSmsData();
+            await loadSmsData();
         }
         
         function openBulkStatusModal() {
