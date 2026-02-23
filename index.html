@@ -1127,13 +1127,14 @@
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
                 <div>
                     <h3 style="margin-bottom:8px;">📦 Paketomat & Pošta Naročila</h3>
-                    <p style="color:var(--text-muted);">Naročila iz MetaKocka z dostavno službo paketomat ali pošta - za obveščanje strank.</p>
+                    <p style="color:var(--text-muted);">Processing/on-hold naročila iz WooCommerce z dostavno službo paketomat ali pošta - za obveščanje strank.</p>
                 </div>
                 <div style="display:flex;gap:8px;">
-                    <select class="filter-select" id="paketomatFilter" onchange="renderPaketomatiTable()">
-                        <option value="all">Vse</option>
+                    <select class="filter-select" id="paketomatFilter" onchange="loadPaketomati()">
+                        <option value="all">Vse paketomat/pošta</option>
                         <option value="paketomat">Samo Paketomat</option>
                         <option value="posta">Samo Pošta</option>
+                        <option value="all_orders">🔧 Vsi orderji (debug)</option>
                     </select>
                     <select class="filter-select" id="paketomatStatusFilter" onchange="renderPaketomatiTable()">
                         <option value="all">Vsi statusi</option>
@@ -5171,7 +5172,7 @@ ${esc(previewBody)}
         async function loadPaketomati() {
             const filter = document.getElementById('paketomatFilter')?.value || 'all';
             console.log('[Paketomati] Loading with filter:', filter);
-            document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam iz MetaKocka...</td></tr>';
+            document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam naročila iz WooCommerce...</td></tr>';
             
             try {
                 const res = await fetch(`api.php?action=paketomati&filter=${filter}`);
@@ -5195,9 +5196,17 @@ ${esc(previewBody)}
             
             if (filtered.length === 0) {
                 console.log('[Paketomati] No orders found. Total data:', paketomatiData.length, 'Filter:', statusFilter);
-                const msg = paketomatiData.length === 0 
-                    ? '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;"><i class="fas fa-box" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>Ni naročil ki čakajo na prevzem<br><small style="font-size:12px;">MetaKocka trenutno nima orderjev s statusom "čaka na prevzem v paketomatu"</small></td></tr>'
-                    : '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;">Ni naročil za izbran filter</td></tr>';
+                const typeFilter = document.getElementById('paketomatFilter')?.value || 'all';
+                let msg;
+                if (paketomatiData.length === 0) {
+                    if (typeFilter === 'all_orders') {
+                        msg = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;"><i class="fas fa-box" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>Ni processing/on-hold naročil v WooCommerce<br><small style="font-size:12px;">Preveri WooCommerce admin za stanje naročil</small></td></tr>';
+                    } else {
+                        msg = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;"><i class="fas fa-box" style="font-size:32px;margin-bottom:12px;opacity:0.5;display:block;"></i>Ni naročil za paketomat/pošto<br><small style="font-size:12px;">Uporabi "Vsi orderji (debug)" filter da vidiš vse processing/on-hold orderje</small></td></tr>';
+                    }
+                } else {
+                    msg = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;">Ni naročil za izbran filter</td></tr>';
+                }
                 document.getElementById('paketomatiTableBody').innerHTML = msg;
                 return;
             }
