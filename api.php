@@ -336,7 +336,7 @@ function testSmsConnection($storeCode) {
     return ['success' => true, 'message' => 'Connection OK'];
 }
 
-function sendQueuedSms($smsId) {
+function sendQueuedSms($smsId, $overridePhone = null) {
     global $metakocka;
     
     // File-based logging for debugging
@@ -387,6 +387,14 @@ function sendQueuedSms($smsId) {
         ];
     }
     
+    // Use overridden phone if provided, otherwise use the one from the queue
+    $recipientPhone = $overridePhone ?: $sms['recipient'];
+    
+    // Log if phone was overridden
+    if ($overridePhone) {
+        $logMsg("[SMS-SEND] Phone overridden: {$sms['recipient']} -> {$overridePhone}");
+    }
+    
     // Prepare MetaKocka SMS payload (correct format per API docs)
     $payload = [
         'secret_key' => $metakocka['secret_key'],
@@ -395,14 +403,14 @@ function sendQueuedSms($smsId) {
             [
                 'type' => 'sms',
                 'eshop_sync_id' => $eshopSyncId,
-                'to_number' => $sms['recipient'],
+                'to_number' => $recipientPhone,
                 'message' => $sms['message']
             ]
         ]
     ];
     
     $logMsg("[SMS-SEND] API URL: " . $metakocka['api_url']);
-    $logMsg("[SMS-SEND] Recipient: {$sms['recipient']}");
+    $logMsg("[SMS-SEND] Recipient: {$recipientPhone}");
     $logMsg("[SMS-SEND] Message: " . substr($sms['message'], 0, 50) . '...');
     $logMsg("[SMS-SEND] Payload: " . json_encode($payload));
     
@@ -1630,12 +1638,13 @@ try {
             }
             $input = json_decode(file_get_contents('php://input'), true);
             $smsId = $input['id'] ?? '';
+            $overridePhone = $input['phone'] ?? null;
             if (!$smsId) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Missing SMS ID']);
                 break;
             }
-            echo json_encode(sendQueuedSms($smsId));
+            echo json_encode(sendQueuedSms($smsId, $overridePhone));
             break;
             
         case 'search-products':

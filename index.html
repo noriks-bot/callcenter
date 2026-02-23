@@ -781,6 +781,48 @@
         </div>
     </div>
     
+    <!-- SMS Edit Modal (for editing phone before sending) -->
+    <div class="modal-bg" id="smsEditModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">📱 Pošlji SMS</div>
+                <button class="modal-close" onclick="closeModal('smsEditModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-info-card" style="margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div class="avatar" id="smsEditAvatar">?</div>
+                        <div>
+                            <div style="font-weight:600;" id="smsEditCustomerName">Customer Name</div>
+                            <div style="font-size:12px;color:var(--text-muted);">Stranka</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Telefonska številka</label>
+                    <input type="tel" class="form-input" id="smsEditPhone" placeholder="385xxxxxxxxx">
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+                        <i class="fas fa-info-circle"></i> HR format: 385xxxxxxxxx (brez + ali vodilne 0)
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Sporočilo (samo za branje)</label>
+                    <textarea class="form-textarea" id="smsEditMessage" readonly style="background:var(--bg-dark);cursor:not-allowed;"></textarea>
+                </div>
+                
+                <input type="hidden" id="smsEditId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('smsEditModal')">Prekliči</button>
+                <button class="btn btn-save" onclick="confirmSendSms()" style="background:var(--accent-green);">
+                    <i class="fas fa-paper-plane"></i> Pošlji
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Dashboard Home Content -->
     <div id="dashboardContent" style="display:block;padding:24px;">
         <!-- KPI Cards -->
@@ -3013,7 +3055,7 @@ Available variables:
                                             </td>
                                             <td>${store?.flag || '🌍'} ${(sms.storeCode || '').toUpperCase()}</td>
                                             <td style="white-space:nowrap;">
-                                                <button class="action-btn order" onclick="sendSmsFromDashboard('${sms.id}')" title="Pošlji SMS" style="background:var(--accent-green);color:white;">
+                                                <button class="action-btn order" onclick="openSmsEditModal('${sms.id}', '${esc(sms.recipient || '')}', '${esc(sms.message || '')}', '${esc(sms.customerName || 'Unknown')}')" title="Pošlji SMS" style="background:var(--accent-green);color:white;">
                                                     <i class="fas fa-paper-plane"></i>
                                                 </button>
                                                 <button class="action-btn" onclick="removeFromQueueApi('${sms.id}')" title="Odstrani">
@@ -3036,8 +3078,38 @@ Available variables:
             }
         }
         
+        // Open SMS Edit Modal before sending
+        function openSmsEditModal(smsId, phone, message, customerName) {
+            document.getElementById('smsEditId').value = smsId;
+            document.getElementById('smsEditPhone').value = phone || '';
+            document.getElementById('smsEditMessage').value = message || '';
+            document.getElementById('smsEditCustomerName').textContent = customerName || 'Unknown';
+            document.getElementById('smsEditAvatar').textContent = (customerName || '?')[0].toUpperCase();
+            openModal('smsEditModal');
+        }
+        
+        // Confirm and send SMS with (potentially edited) phone number
+        async function confirmSendSms() {
+            const smsId = document.getElementById('smsEditId').value;
+            const editedPhone = document.getElementById('smsEditPhone').value.trim();
+            
+            if (!editedPhone) {
+                showToast('❌ Vnesi telefonsko številko!', true);
+                return;
+            }
+            
+            // Validate phone format (basic check for HR: should start with 385)
+            if (editedPhone.startsWith('+')) {
+                showToast('❌ Odstrani + iz številke (uporabi format: 385xxxxxxxxx)', true);
+                return;
+            }
+            
+            closeModal('smsEditModal');
+            await sendSmsFromDashboard(smsId, editedPhone);
+        }
+        
         // Send SMS from Dashboard Queue
-        async function sendSmsFromDashboard(smsId) {
+        async function sendSmsFromDashboard(smsId, overridePhone = null) {
             if (!confirm('Ali si prepričan, da želiš poslati ta SMS?\\n\\n⚠️ SMS bo poslan preko MetaKocka API!')) {
                 return;
             }
@@ -3046,10 +3118,14 @@ Available variables:
             showToast('📤 Pošiljam SMS preko MetaKocka...', false, 'info');
             
             try {
+                const payload = { id: smsId };
+                if (overridePhone) {
+                    payload.phone = overridePhone;
+                }
                 const res = await fetch('api.php?action=sms-send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: smsId })
+                    body: JSON.stringify(payload)
                 });
                 const result = await res.json();
                 
@@ -3590,7 +3666,7 @@ Available variables:
                                             <td>${store?.flag || '🌍'} ${sms.storeCode?.toUpperCase() || ''}</td>
                                             <td style="white-space:nowrap;">
                                                 <button class="action-btn" 
-                                                        onclick="sendSingleSms('${sms.id}')" 
+                                                        onclick="openSmsEditModal('${sms.id}', '${esc(sms.recipient || '')}', '${esc(sms.message || '')}', '${esc(sms.customerName || 'Unknown')}')" 
                                                         title="${hasProvider ? 'Pošlji SMS' : 'Provider ni nastavljen'}"
                                                         style="${hasProvider ? 'background:var(--accent-green);color:white;' : 'opacity:0.5;'}"
                                                         ${!hasProvider ? 'disabled' : ''}>
