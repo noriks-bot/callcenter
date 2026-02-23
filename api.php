@@ -339,6 +339,8 @@ function testSmsConnection($storeCode) {
 function sendQueuedSms($smsId) {
     global $metakocka;
     
+    error_log("[SMS-SEND] Starting for smsId: $smsId");
+    
     $queue = loadSmsQueue();
     $sms = null;
     $smsIndex = -1;
@@ -352,19 +354,23 @@ function sendQueuedSms($smsId) {
     }
     
     if (!$sms) {
+        error_log("[SMS-SEND] SMS not found in queue: $smsId");
         return ['success' => false, 'error' => 'SMS not found in queue'];
     }
     
     if ($sms['status'] !== 'queued') {
-        return ['success' => false, 'error' => 'SMS already processed'];
+        error_log("[SMS-SEND] SMS already processed: $smsId (status: {$sms['status']})");
+        return ['success' => false, 'error' => 'SMS already processed (status: ' . $sms['status'] . ')'];
     }
     
     $settings = loadSmsSettings();
     $storeCode = $sms['storeCode'];
     $eshopSyncId = $settings['providers'][$storeCode]['eshop_sync_id'] ?? '';
     
+    error_log("[SMS-SEND] Store: $storeCode, eshop_sync_id: " . ($eshopSyncId ?: 'NOT SET'));
+    
     if (empty($eshopSyncId)) {
-        return ['success' => false, 'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode)];
+        return ['success' => false, 'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode) . '. Nastavi ga v SMS Settings!'];
     }
     
     // Prepare MetaKocka SMS payload (correct format per API docs)
@@ -380,6 +386,9 @@ function sendQueuedSms($smsId) {
             ]
         ]
     ];
+    
+    error_log("[SMS-SEND] Sending to MetaKocka: " . $metakocka['api_url']);
+    error_log("[SMS-SEND] Recipient: {$sms['recipient']}, Message length: " . strlen($sms['message']));
     
     $ch = curl_init();
     curl_setopt_array($ch, [
@@ -397,7 +406,10 @@ function sendQueuedSms($smsId) {
     $error = curl_error($ch);
     curl_close($ch);
     
+    error_log("[SMS-SEND] MetaKocka response: HTTP $httpCode");
+    
     if ($error) {
+        error_log("[SMS-SEND] CURL error: $error");
         $queue[$smsIndex]['status'] = 'failed';
         $queue[$smsIndex]['error'] = 'Connection error: ' . $error;
         $queue[$smsIndex]['sentAt'] = date('c');
@@ -406,22 +418,43 @@ function sendQueuedSms($smsId) {
     }
     
     $data = json_decode($response, true);
+    error_log("[SMS-SEND] MetaKocka response body: " . substr($response, 0, 500));
     
-    if ($httpCode >= 400) {
+    // Check for MetaKocka specific error response
+    if (isset($data['opr_code']) && $data['opr_code'] !== '0') {
+        error_log("[SMS-SEND] MetaKocka error: opr_code={$data['opr_code']}, opr_desc=" . ($data['opr_desc'] ?? 'N/A'));
         $queue[$smsIndex]['status'] = 'failed';
-        $queue[$smsIndex]['error'] = $data['error'] ?? 'API Error (HTTP ' . $httpCode . ')';
+        $queue[$smsIndex]['error'] = $data['opr_desc'] ?? 'MetaKocka error (code: ' . $data['opr_code'] . ')';
         $queue[$smsIndex]['sentAt'] = date('c');
+        $queue[$smsIndex]['metakockaResponse'] = $data;
         saveSmsQueue($queue);
         return ['success' => false, 'error' => $queue[$smsIndex]['error']];
     }
     
-    // Success
+    if ($httpCode >= 400) {
+        error_log("[SMS-SEND] HTTP error: $httpCode");
+        $queue[$smsIndex]['status'] = 'failed';
+        $queue[$smsIndex]['error'] = $data['error'] ?? $data['opr_desc'] ?? 'API Error (HTTP ' . $httpCode . ')';
+        $queue[$smsIndex]['sentAt'] = date('c');
+        $queue[$smsIndex]['metakockaResponse'] = $data;
+        saveSmsQueue($queue);
+        return ['success' => false, 'error' => $queue[$smsIndex]['error']];
+    }
+    
+    // Success!
+    error_log("[SMS-SEND] SUCCESS! SMS sent to {$sms['recipient']}");
     $queue[$smsIndex]['status'] = 'sent';
     $queue[$smsIndex]['sentAt'] = date('c');
     $queue[$smsIndex]['metakockaResponse'] = $data;
     saveSmsQueue($queue);
     
-    return ['success' => true, 'message' => 'SMS sent successfully', 'smsId' => $smsId];
+    return [
+        'success' => true, 
+        'message' => 'SMS uspešno poslan na ' . $sms['recipient'], 
+        'smsId' => $smsId,
+        'recipient' => $sms['recipient'],
+        'metakockaResponse' => $data
+    ];
 }
 
 function loadCallData() {
