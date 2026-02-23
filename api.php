@@ -1104,14 +1104,14 @@ function fetchPaketomatOrders($filter = 'all') {
         "Rerouted to parcel machine"
     ];
     
-    // MetaKocka API - fetch all sales orders with delivery events
+    // MetaKocka API - fetch sales orders with delivery events (max 100 per request)
     $mkUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
     $mkPayload = [
         'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
         'company_id' => '6371',
         'doc_type' => 'sales_order',
         'result_type' => 'doc',
-        'limit' => 500,
+        'limit' => 100,
         'return_delivery_service_events' => true
     ];
     
@@ -1150,7 +1150,7 @@ function fetchPaketomatOrders($filter = 'all') {
         
         // Get the LAST (newest) event - array is chronological, last = newest
         $lastEvent = end($events);
-        $lastEventStatus = $lastEvent['event'] ?? '';
+        $lastEventStatus = $lastEvent['event_status'] ?? '';
         
         // Check if last event status is a paketomat status
         $isPaketomat = false;
@@ -1216,7 +1216,7 @@ function fetchPaketomatOrders($filter = 'all') {
             'trackingCode' => $trackingCode,
             'paketomatLocation' => $paketomatLocation,
             'lastDeliveryEvent' => $lastEventStatus,
-            'lastEventDate' => $lastEvent['date'] ?? '',
+            'lastEventDate' => $lastEvent['event_date'] ?? '',
             'orderTotal' => $orderTotal,
             'currency' => $currency,
             'createdAt' => $createdAt,
@@ -1500,32 +1500,84 @@ try {
                 break;
             }
             
-            // Search products via WooCommerce API - both by name AND by SKU
+            // Search products via WooCommerce API - by name, SKU, and variations
+            
+            // 1. Search by product name
             $productsByName = wcApiRequest($storeCode, 'products', [
                 'search' => $query,
-                'per_page' => 15,
-                'status' => 'publish',
-                'stock_status' => 'instock'
-            ]);
-            
-            // Also search by SKU
-            $productsBySku = wcApiRequest($storeCode, 'products', [
-                'sku' => $query,
-                'per_page' => 15,
+                'per_page' => 20,
                 'status' => 'publish'
             ]);
+            
+            // 2. Exact SKU match (for simple products)
+            $productsBySku = wcApiRequest($storeCode, 'products', [
+                'sku' => $query,
+                'per_page' => 10,
+                'status' => 'publish'
+            ]);
+            
+            // 3. Search variations by SKU (variations often have unique SKUs)
+            // Try fetching all products and check their variations for SKU match
+            $variationParents = [];
+            if (strlen($query) >= 3) {
+                // Get recent variable products to check their variation SKUs
+                $variableProducts = wcApiRequest($storeCode, 'products', [
+                    'type' => 'variable',
+                    'per_page' => 30,
+                    'status' => 'publish',
+                    'orderby' => 'date',
+                    'order' => 'desc'
+                ]);
+                
+                if (is_array($variableProducts) && !isset($variableProducts['error'])) {
+                    foreach ($variableProducts as $vp) {
+                        // Check if any variation SKU contains the query
+                        $variations = wcApiRequest($storeCode, "products/{$vp['id']}/variations", ['per_page' => 50]);
+                        if (is_array($variations) && !isset($variations['error'])) {
+                            foreach ($variations as $var) {
+                                $varSku = strtolower($var['sku'] ?? '');
+                                if ($varSku && strpos($varSku, strtolower($query)) !== false) {
+                                    $variationParents[$vp['id']] = $vp;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
             // Merge results, avoiding duplicates
             $seenIds = [];
             $products = [];
             
-            foreach ([$productsByName, $productsBySku] as $productList) {
-                if (!is_array($productList) || isset($productList['error'])) continue;
-                foreach ($productList as $p) {
+            // Add products from name search
+            if (is_array($productsByName) && !isset($productsByName['error'])) {
+                foreach ($productsByName as $p) {
                     if (!isset($seenIds[$p['id']])) {
                         $seenIds[$p['id']] = true;
                         $products[] = $p;
                     }
+                }
+            }
+            
+            // Add products from SKU search (prioritize - put at beginning)
+            if (is_array($productsBySku) && !isset($productsBySku['error'])) {
+                $skuProducts = [];
+                foreach ($productsBySku as $p) {
+                    if (!isset($seenIds[$p['id']])) {
+                        $seenIds[$p['id']] = true;
+                        $skuProducts[] = $p;
+                    }
+                }
+                // Put SKU matches first
+                $products = array_merge($skuProducts, $products);
+            }
+            
+            // Add variation parent products (from SKU search in variations)
+            foreach ($variationParents as $vp) {
+                if (!isset($seenIds[$vp['id']])) {
+                    $seenIds[$vp['id']] = true;
+                    $products[] = $vp;
                 }
             }
             
