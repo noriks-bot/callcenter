@@ -1073,98 +1073,102 @@ function fetchPaketomatOrders($filter = 'all') {
         "Rerouted to parcel machine"
     ];
     
-    // Fetch orders with delivery service events
-    $payload = [
-        'secret_key' => $metakocka['secret_key'],
-        'company_id' => strval($metakocka['company_id']),
-        'doc_type' => 'sales_order',
-        'result_type' => 'doc',
-        'limit' => 100,
-        'return_delivery_service_events' => true,
-        'query_advance' => [
-            ['type' => 'doc_date_from', 'value' => '2026-01-01+01:00']
-        ]
-    ];
+    // Fetch orders with delivery service events (multiple pages for better coverage)
+    $seenIds = [];
     
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL => 'https://main.metakocka.si/rest/eshop/v1/search',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_POSTFIELDS => json_encode($payload),
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_SSL_VERIFYPEER => true
-    ]);
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    
-    if ($httpCode >= 200 && $httpCode < 300) {
+    for ($offset = 0; $offset <= 300; $offset += 100) {
+        $payload = [
+            'secret_key' => $metakocka['secret_key'],
+            'company_id' => strval($metakocka['company_id']),
+            'doc_type' => 'sales_order',
+            'result_type' => 'doc',
+            'limit' => 100,
+            'offset' => $offset,
+            'return_delivery_service_events' => true
+        ];
+        
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => 'https://main.metakocka.si/rest/eshop/v1/search',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_SSL_VERIFYPEER => true
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode < 200 || $httpCode >= 300) continue;
+        
         $data = json_decode($response, true);
-        if (isset($data['opr_code']) && $data['opr_code'] === '0' && isset($data['result'])) {
-            foreach ($data['result'] as $order) {
-                // Get delivery service events
-                $events = $order['delivery_service_events'] ?? [];
-                
-                // Skip orders without events
-                if (empty($events)) continue;
-                
-                // Sort events by date desc to get the latest one
-                usort($events, function($a, $b) {
-                    $dateA = $a['event_date'] ?? $a['date'] ?? '1970-01-01';
-                    $dateB = $b['event_date'] ?? $b['date'] ?? '1970-01-01';
-                    return strtotime($dateB) - strtotime($dateA);
-                });
-                
-                // Get latest event status
-                $latestEvent = $events[0];
-                $latestStatus = $latestEvent['event_status'] ?? $latestEvent['status'] ?? '';
-                
-                // Only include orders where latest status is "waiting for pickup"
-                if (!in_array($latestStatus, $PAKETOMAT_STATUSES)) {
-                    continue;
-                }
-                
-                $orderId = 'mk_' . ($order['mk_id'] ?? $order['count_code'] ?? uniqid());
-                
-                // Skip duplicates
-                $exists = false;
-                foreach ($allOrders as $existing) {
-                    if ($existing['id'] === $orderId) {
-                        $exists = true;
-                        break;
-                    }
-                }
-                if ($exists) continue;
-                
-                $savedStatus = $statusData[$orderId] ?? [];
-                
-                $allOrders[] = [
-                    'id' => $orderId,
-                    'mkId' => $order['mk_id'] ?? null,
-                    'orderNumber' => $order['count_code'] ?? '',
-                    'customerName' => trim(($order['buyer_name'] ?? '') . ' ' . ($order['buyer_surname'] ?? '')),
-                    'email' => $order['buyer_email'] ?? '',
-                    'phone' => $order['buyer_phone'] ?? $order['buyer_mobile'] ?? '',
-                    'deliveryService' => $order['delivery_service'] ?? '',
-                    'paketomatLocation' => $order['delivery_paketomat_name'] ?? $order['delivery_address'] ?? '',
-                    'orderTotal' => floatval($order['doc_total'] ?? 0),
-                    'currency' => $order['currency'] ?? 'EUR',
-                    'createdAt' => $order['doc_date'] ?? '',
-                    'status' => $savedStatus['status'] ?? 'not_called',
-                    'notes' => $savedStatus['notes'] ?? '',
-                    'lastUpdated' => $savedStatus['lastUpdated'] ?? null,
-                    'address' => $order['delivery_address'] ?? '',
-                    'city' => $order['delivery_city'] ?? '',
-                    'postcode' => $order['delivery_postcode'] ?? '',
-                    'latestEventStatus' => $latestStatus,
-                    'latestEventDate' => $latestEvent['event_date'] ?? $latestEvent['date'] ?? ''
-                ];
+        if (!isset($data['opr_code']) || $data['opr_code'] !== '0' || !isset($data['result'])) continue;
+        
+        foreach ($data['result'] as $order) {
+            // Get delivery service events
+            $events = $order['delivery_service_events'] ?? [];
+            
+            // Skip orders without events
+            if (empty($events)) continue;
+            
+            // Sort events by date desc to get the latest one
+            usort($events, function($a, $b) {
+                $dateA = $a['event_date'] ?? $a['date'] ?? '1970-01-01';
+                $dateB = $b['event_date'] ?? $b['date'] ?? '1970-01-01';
+                return strtotime($dateB) - strtotime($dateA);
+            });
+            
+            // Get latest event status
+            $latestEvent = $events[0];
+            $latestStatus = $latestEvent['event_status'] ?? $latestEvent['status'] ?? '';
+            
+            // Only include orders where latest status is "waiting for pickup"
+            if (!in_array($latestStatus, $PAKETOMAT_STATUSES)) {
+                continue;
             }
+            
+            $orderId = 'mk_' . ($order['mk_id'] ?? $order['count_code'] ?? uniqid());
+            
+            // Skip duplicates
+            if (isset($seenIds[$orderId])) continue;
+            $seenIds[$orderId] = true;
+            
+            $savedStatus = $statusData[$orderId] ?? [];
+            
+            // Get customer data from partner/receiver structure
+            $partner = $order['partner'] ?? [];
+            $receiver = $order['receiver'] ?? $partner;
+            $partnerContact = $receiver['partner_contact'] ?? $partner['partner_contact'] ?? [];
+            
+            $allOrders[] = [
+                'id' => $orderId,
+                'mkId' => $order['mk_id'] ?? null,
+                'orderNumber' => $order['count_code'] ?? '',
+                'title' => $order['title'] ?? $order['buyer_order'] ?? '',
+                'customerName' => $receiver['customer'] ?? $partner['customer'] ?? '',
+                'email' => $partnerContact['email'] ?? '',
+                'phone' => $partnerContact['gsm'] ?? $partnerContact['phone'] ?? '',
+                'deliveryService' => $order['delivery_type'] ?? '',
+                'paketomatLocation' => $receiver['street'] ?? '',
+                'orderTotal' => floatval($order['sum_all'] ?? 0),
+                'currency' => $order['currency_code'] ?? 'EUR',
+                'createdAt' => $order['doc_date'] ?? '',
+                'status' => $savedStatus['status'] ?? 'not_called',
+                'notes' => $savedStatus['notes'] ?? '',
+                'lastUpdated' => $savedStatus['lastUpdated'] ?? null,
+                'address' => $receiver['street'] ?? '',
+                'city' => $receiver['place'] ?? '',
+                'postcode' => $receiver['post_number'] ?? '',
+                'country' => $receiver['country_iso_2'] ?? $receiver['country'] ?? '',
+                'latestEventStatus' => $latestStatus,
+                'latestEventDate' => $latestEvent['event_date'] ?? $latestEvent['date'] ?? '',
+                'deliveryEvents' => array_slice($events, 0, 5) // Last 5 events
+            ];
         }
-    }
+    } // end offset loop
     
     // Sort by date desc
     usort($allOrders, function($a, $b) {
