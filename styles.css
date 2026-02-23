@@ -2418,10 +2418,16 @@ body.is-admin .admin-only {
 #paketomatiContent,
 #analyticsContent,
 #emailTemplatesContent {
-    margin-left: var(--sidebar-width);
+    position: fixed;
+    top: var(--header-height);
+    left: var(--sidebar-width);
+    right: 0;
+    bottom: 0;
     padding: 24px;
-    min-height: calc(100vh - var(--header-height));
-    transition: margin-left var(--transition-slow);
+    overflow-y: auto;
+    background: var(--bg-body);
+    transition: left var(--transition-slow);
+    z-index: 10;
 }
 
 /* When sidebar is collapsed */
@@ -2433,7 +2439,7 @@ body.is-admin .admin-only {
 .main.expanded ~ #paketomatiContent,
 .main.expanded ~ #analyticsContent,
 .main.expanded ~ #emailTemplatesContent {
-    margin-left: 0;
+    left: 0;
 }
 
 /* Mobile responsive */
@@ -2446,7 +2452,7 @@ body.is-admin .admin-only {
     #paketomatiContent,
     #analyticsContent,
     #emailTemplatesContent {
-        margin-left: 0;
+        left: 0;
         padding: 16px;
     }
 }
