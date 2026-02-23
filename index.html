@@ -3281,6 +3281,7 @@ Available variables:
                 if (result.success) {
                     showToast('✅ SMS uspešno poslan!');
                     renderSmsQueueManagement();
+                    loadSmsDashboardQueue();
                     await renderSmsTable();
                     updateStats();
                 } else {
@@ -3300,6 +3301,7 @@ Available variables:
                 });
                 showToast('SMS odstranjen iz čakalne vrste');
                 renderSmsQueueManagement();
+                loadSmsDashboardQueue(); // Update SMS Dashboard too
                 updateStats();
             } catch (e) {
                 showToast('Napaka pri odstranjevanju', true);
