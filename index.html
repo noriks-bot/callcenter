@@ -2303,61 +2303,18 @@ Available variables:
         }
         
         function updateCounts() {
-            // Use same data source logic as renderTable() - use currentTab
-            const activeTab = currentTab; // 'carts', 'pending', or 'buyers'
-            
-            // Debug: log what we're working with
-            console.log('[updateCounts] activeTab:', activeTab, 'stores:', stores.length, 'carts:', carts.length, 'pending:', pending.length, 'buyers:', buyers.length);
-            
-            // Get base data for current tab
-            let baseData;
-            if (activeTab === 'pending') {
-                baseData = [...pending];
-            } else if (activeTab === 'buyers') {
-                baseData = [...buyers];
-            } else {
-                baseData = [...carts]; // Default to carts
-            }
-            
             // Filter by user's allowed countries (admins see everything)
             const shouldFilter = !hasAllCountries && !isAdmin;
-            if (shouldFilter) {
-                baseData = baseData.filter(d => userCountries.includes(d.storeCode));
-            }
-            
-            // Update "All" country tab count (total for current content type)
-            const countAllEl = document.getElementById('count-all');
-            if (countAllEl) countAllEl.textContent = baseData.length;
-            
-            // Update nav sidebar counts (these always show their own totals, not filtered by content tab)
             const filteredCarts = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
             const filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
             const filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
+            
+            // Update nav sidebar counts
             document.getElementById('navCarts').textContent = filteredCarts.length;
             document.getElementById('navPending').textContent = filteredPending.length;
             document.getElementById('navBuyers').textContent = filteredBuyers.length;
             
-            // Update individual country tab counts based on current content type
-            stores.forEach(s => {
-                const el = document.getElementById(`count-${s.code}`);
-                if (el) {
-                    // Count items for this country from the filtered base data
-                    const countryCount = baseData.filter(d => d.storeCode === s.code).length;
-                    el.textContent = countryCount;
-                    // Debug: log each country count
-                    if (countryCount > 0) {
-                        console.log(`[updateCounts] ${s.code}: ${countryCount}`);
-                    }
-                }
-            });
-            
-            // Debug: show sample of storeCode values from data
-            if (baseData.length > 0) {
-                const storeCodes = [...new Set(baseData.map(d => d.storeCode))];
-                console.log('[updateCounts] Unique storeCodes in data:', storeCodes);
-            }
-            
-            // Also update content tab counts
+            // Update content tab counts
             updateContentTabCounts();
         }
         
