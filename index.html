@@ -489,6 +489,165 @@
         }
         .toggle.active::after { transform: translateX(22px); }
         
+        /* Product Search */
+        .product-search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .product-search-input {
+            width: 100%;
+            padding: 12px 16px;
+            padding-left: 40px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        .product-search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .product-search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        .product-search-spinner {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+        .product-search-spinner.active { display: block; }
+        .product-search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .product-search-results.open { display: block; }
+        .product-search-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        .product-search-item:last-child { border-bottom: none; }
+        .product-search-item:hover { background: var(--bg-hover); }
+        .product-search-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: var(--bg-dark);
+            flex-shrink: 0;
+        }
+        .product-search-info { flex: 1; min-width: 0; }
+        .product-search-name {
+            font-weight: 600;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .product-search-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .product-search-price {
+            font-weight: 700;
+            color: var(--green);
+            white-space: nowrap;
+        }
+        .product-search-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        /* Variation Selector */
+        .variation-selector {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .variation-selector-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .variation-selector-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+        .variation-selector-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .variation-selector-price {
+            color: var(--green);
+            font-weight: 600;
+        }
+        .variation-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .variation-option {
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .variation-option:hover { border-color: var(--accent); }
+        .variation-option.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .variation-option.out-of-stock {
+            opacity: 0.5;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        .variation-qty-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .variation-qty-row input {
+            width: 80px;
+            padding: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            text-align: center;
+        }
+        
         /* Customer Info in Modal */
         .customer-info-card {
             background: var(--bg-dark);
@@ -776,6 +935,44 @@
                 
                 <!-- Products -->
                 <h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Izdelki</h4>
+                
+                <!-- Product Search -->
+                <div class="product-search-container">
+                    <i class="fas fa-search product-search-icon"></i>
+                    <input type="text" class="product-search-input" id="productSearchInput" 
+                           placeholder="Išči produkte po imenu ali SKU..." 
+                           autocomplete="off">
+                    <i class="fas fa-spinner fa-spin product-search-spinner" id="productSearchSpinner"></i>
+                    <div class="product-search-results" id="productSearchResults">
+                        <!-- Results will be rendered here -->
+                    </div>
+                </div>
+                
+                <!-- Variation Selector (shown when selecting a variable product) -->
+                <div class="variation-selector" id="variationSelector" style="display:none;">
+                    <div class="variation-selector-header">
+                        <img src="" alt="" class="variation-selector-img" id="variationProductImg">
+                        <div>
+                            <div class="variation-selector-title" id="variationProductName">Product Name</div>
+                            <div class="variation-selector-price" id="variationProductPrice">€0.00</div>
+                        </div>
+                    </div>
+                    <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Izberi variacijo:</p>
+                    <div class="variation-options" id="variationOptions">
+                        <!-- Options will be rendered here -->
+                    </div>
+                    <div class="variation-qty-row">
+                        <label style="font-size:13px;color:var(--text-muted);">Količina:</label>
+                        <input type="number" min="1" value="1" id="variationQty">
+                        <button class="btn btn-save" style="flex:1;" onclick="addSelectedVariation()">
+                            <i class="fas fa-plus"></i> Dodaj v naročilo
+                        </button>
+                        <button class="btn btn-cancel" style="flex:0;padding:12px;" onclick="cancelVariationSelection()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="order-items" id="orderItems">
                     <!-- Items will be rendered here -->
                 </div>
@@ -1337,6 +1534,14 @@
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
             
+            // Reset product search
+            document.getElementById('productSearchInput').value = '';
+            document.getElementById('productSearchResults').classList.remove('open');
+            document.getElementById('productSearchResults').innerHTML = '';
+            document.getElementById('variationSelector').style.display = 'none';
+            selectedProduct = null;
+            selectedVariation = null;
+            
             renderOrderItems();
             document.getElementById('orderModal').classList.add('open');
         }
@@ -1346,13 +1551,14 @@
             const container = document.getElementById('orderItems');
             
             if (orderItems.length === 0) {
-                container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-box-open"></i><p>Ni izdelkov v košarici</p></div>';
+                container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-box-open"></i><p>Ni izdelkov - uporabi iskanje zgoraj</p></div>';
                 updateOrderTotals();
                 return;
             }
             
             container.innerHTML = orderItems.map((item, i) => `
                 <div class="order-item">
+                    ${item.image ? `<img src="${item.image}" alt="" style="width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
                     <div class="order-item-info">
                         <div class="order-item-name">${esc(item.name)}</div>
                         <div class="order-item-id">ID: ${item.productId || 'N/A'}${item.variationId ? ' / Var: ' + item.variationId : ''}</div>
@@ -1394,6 +1600,202 @@
             freeShipping = !freeShipping;
             document.getElementById('freeShippingToggle').classList.toggle('active', freeShipping);
             updateOrderTotals();
+        }
+        
+        // Product Search
+        let searchTimeout = null;
+        let selectedProduct = null;
+        let selectedVariation = null;
+        
+        document.getElementById('productSearchInput').addEventListener('input', function(e) {
+            const query = e.target.value.trim();
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                document.getElementById('productSearchResults').classList.remove('open');
+                return;
+            }
+            
+            document.getElementById('productSearchSpinner').classList.add('active');
+            
+            searchTimeout = setTimeout(() => {
+                searchProducts(query);
+            }, 300);
+        });
+        
+        document.getElementById('productSearchInput').addEventListener('focus', function() {
+            const results = document.getElementById('productSearchResults');
+            if (results.children.length > 0 && this.value.length >= 2) {
+                results.classList.add('open');
+            }
+        });
+        
+        // Close search results when clicking outside
+        document.addEventListener('click', function(e) {
+            const container = document.querySelector('.product-search-container');
+            if (!container.contains(e.target)) {
+                document.getElementById('productSearchResults').classList.remove('open');
+            }
+        });
+        
+        async function searchProducts(query) {
+            if (!orderCart) return;
+            
+            const storeCode = orderCart.storeCode;
+            const spinner = document.getElementById('productSearchSpinner');
+            const resultsContainer = document.getElementById('productSearchResults');
+            
+            try {
+                const res = await fetch(`api.php?action=search-products&store=${storeCode}&q=${encodeURIComponent(query)}`);
+                const products = await res.json();
+                
+                spinner.classList.remove('active');
+                
+                if (products.error) {
+                    resultsContainer.innerHTML = `<div class="product-search-empty"><i class="fas fa-exclamation-circle"></i> ${products.error}</div>`;
+                    resultsContainer.classList.add('open');
+                    return;
+                }
+                
+                if (products.length === 0) {
+                    resultsContainer.innerHTML = '<div class="product-search-empty"><i class="fas fa-search"></i> Ni rezultatov</div>';
+                    resultsContainer.classList.add('open');
+                    return;
+                }
+                
+                const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
+                
+                resultsContainer.innerHTML = products.map(p => `
+                    <div class="product-search-item" onclick='selectProduct(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
+                        <img src="${p.image || 'https://via.placeholder.com/48'}" alt="" class="product-search-img" onerror="this.src='https://via.placeholder.com/48'">
+                        <div class="product-search-info">
+                            <div class="product-search-name">${esc(p.name)}</div>
+                            <div class="product-search-meta">
+                                ${p.sku ? `SKU: ${p.sku} • ` : ''}
+                                ${p.type === 'variable' ? `<i class="fas fa-layer-group"></i> ${p.variations.length} variacije` : 'Preprost izdelek'}
+                            </div>
+                        </div>
+                        <div class="product-search-price">${sym}${p.price.toFixed(2)}</div>
+                    </div>
+                `).join('');
+                
+                resultsContainer.classList.add('open');
+                
+            } catch (e) {
+                spinner.classList.remove('active');
+                resultsContainer.innerHTML = '<div class="product-search-empty"><i class="fas fa-exclamation-triangle"></i> Napaka pri iskanju</div>';
+                resultsContainer.classList.add('open');
+            }
+        }
+        
+        function selectProduct(product) {
+            document.getElementById('productSearchResults').classList.remove('open');
+            document.getElementById('productSearchInput').value = '';
+            
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
+            
+            if (product.type === 'variable' && product.variations.length > 0) {
+                // Show variation selector
+                selectedProduct = product;
+                selectedVariation = null;
+                
+                document.getElementById('variationProductImg').src = product.image || 'https://via.placeholder.com/60';
+                document.getElementById('variationProductName').textContent = product.name;
+                document.getElementById('variationProductPrice').textContent = sym + product.price.toFixed(2);
+                document.getElementById('variationQty').value = 1;
+                
+                const optionsContainer = document.getElementById('variationOptions');
+                optionsContainer.innerHTML = product.variations.map(v => `
+                    <div class="variation-option ${v.inStock ? '' : 'out-of-stock'}" 
+                         onclick="selectVariation(${v.id}, ${v.price}, '${esc(v.name)}', ${v.inStock})"
+                         data-var-id="${v.id}">
+                        ${esc(v.name)} - ${sym}${v.price.toFixed(2)}
+                    </div>
+                `).join('');
+                
+                document.getElementById('variationSelector').style.display = 'block';
+                
+            } else {
+                // Simple product - add directly
+                addProductToOrder({
+                    productId: product.id,
+                    variationId: null,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1,
+                    image: product.image
+                });
+            }
+        }
+        
+        function selectVariation(varId, price, name, inStock) {
+            if (!inStock) return;
+            
+            document.querySelectorAll('.variation-option').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`.variation-option[data-var-id="${varId}"]`).classList.add('selected');
+            
+            const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
+            document.getElementById('variationProductPrice').textContent = sym + price.toFixed(2);
+            
+            selectedVariation = {
+                id: varId,
+                price: price,
+                name: name
+            };
+        }
+        
+        function addSelectedVariation() {
+            if (!selectedProduct || !selectedVariation) {
+                showToast('Izberi variacijo', true);
+                return;
+            }
+            
+            const qty = parseInt(document.getElementById('variationQty').value) || 1;
+            
+            addProductToOrder({
+                productId: selectedProduct.id,
+                variationId: selectedVariation.id,
+                name: `${selectedProduct.name} - ${selectedVariation.name}`,
+                price: selectedVariation.price,
+                quantity: qty,
+                image: selectedProduct.image
+            });
+            
+            cancelVariationSelection();
+        }
+        
+        function cancelVariationSelection() {
+            document.getElementById('variationSelector').style.display = 'none';
+            selectedProduct = null;
+            selectedVariation = null;
+        }
+        
+        function addProductToOrder(product) {
+            // Check if product already exists in order
+            const existingIndex = orderItems.findIndex(item => 
+                item.productId === product.productId && 
+                item.variationId === product.variationId
+            );
+            
+            if (existingIndex >= 0) {
+                // Increase quantity
+                orderItems[existingIndex].editQty += product.quantity;
+            } else {
+                // Add new item
+                orderItems.push({
+                    productId: product.productId,
+                    variationId: product.variationId,
+                    name: product.name,
+                    price: product.price,
+                    editPrice: product.price,
+                    quantity: product.quantity,
+                    editQty: product.quantity,
+                    image: product.image
+                });
+            }
+            
+            renderOrderItems();
+            showToast(`✓ ${product.name} dodano`, false, 'info');
         }
         
         function updateOrderTotals() {

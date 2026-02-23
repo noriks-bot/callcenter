@@ -721,6 +721,83 @@ try {
             echo json_encode(removeSmsFromQueue($input['id'] ?? ''));
             break;
             
+        case 'search-products':
+            $storeCode = $_GET['store'] ?? null;
+            $query = $_GET['q'] ?? '';
+            
+            if (!$storeCode || !isset($stores[$storeCode])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid or missing store']);
+                break;
+            }
+            
+            if (strlen($query) < 2) {
+                echo json_encode([]);
+                break;
+            }
+            
+            $cacheKey = "products_search_{$storeCode}_" . md5($query);
+            $cached = getCache($cacheKey, 120);
+            if ($cached !== null) {
+                echo json_encode($cached);
+                break;
+            }
+            
+            // Search products via WooCommerce API
+            $products = wcApiRequest($storeCode, 'products', [
+                'search' => $query,
+                'per_page' => 20,
+                'status' => 'publish',
+                'stock_status' => 'instock'
+            ]);
+            
+            if (isset($products['error'])) {
+                http_response_code(500);
+                echo json_encode($products);
+                break;
+            }
+            
+            $results = [];
+            foreach ($products as $product) {
+                $productData = [
+                    'id' => $product['id'],
+                    'name' => $product['name'],
+                    'sku' => $product['sku'] ?? '',
+                    'price' => floatval($product['price'] ?? 0),
+                    'regularPrice' => floatval($product['regular_price'] ?? 0),
+                    'salePrice' => floatval($product['sale_price'] ?? 0),
+                    'image' => $product['images'][0]['src'] ?? null,
+                    'type' => $product['type'] ?? 'simple',
+                    'variations' => []
+                ];
+                
+                // Fetch variations for variable products
+                if ($product['type'] === 'variable' && !empty($product['variations'])) {
+                    $variations = wcApiRequest($storeCode, "products/{$product['id']}/variations", ['per_page' => 50]);
+                    if (is_array($variations) && !isset($variations['error'])) {
+                        foreach ($variations as $var) {
+                            $attrNames = [];
+                            foreach (($var['attributes'] ?? []) as $attr) {
+                                $attrNames[] = $attr['option'] ?? '';
+                            }
+                            $productData['variations'][] = [
+                                'id' => $var['id'],
+                                'name' => implode(' / ', array_filter($attrNames)) ?: "Variation #{$var['id']}",
+                                'price' => floatval($var['price'] ?? $productData['price']),
+                                'sku' => $var['sku'] ?? '',
+                                'inStock' => ($var['stock_status'] ?? 'instock') === 'instock'
+                            ];
+                        }
+                    }
+                }
+                
+                $results[] = $productData;
+            }
+            
+            setCache($cacheKey, $results);
+            echo json_encode($results);
+            break;
+            
         case 'clear-cache':
             global $cacheDir;
             if (is_dir($cacheDir)) array_map('unlink', glob($cacheDir . '*.json'));
@@ -766,6 +843,7 @@ try {
                     'one-time-buyers', 
                     'pending-orders', 
                     'stores', 
+                    'search-products',
                     'create-order', 
                     'update-status', 
                     'sms-queue',
