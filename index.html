@@ -2542,7 +2542,7 @@ Available variables:
                                     ${o.phone ? `<button class="action-btn call" onclick="call('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
                                     <button class="action-btn push" onclick="openPushModal('${o.id}','pending')" title="Push"><i class="fas fa-bell"></i></button>
                                     ${o.phone ? `<button class="action-btn sms" onclick="openSmsModal('${o.id}','pending')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openStatusModal('${o.id}','${o.callStatus}','${esc(o.notes||'')}')"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn" onclick="openStatusModal('${o.id}','${o.callStatus}','${escAttr(o.notes||'')}')"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -2580,7 +2580,7 @@ Available variables:
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
                                     <button class="action-btn push" onclick="openPushModal('${b.id}','buyer')" title="Push"><i class="fas fa-bell"></i></button>
                                     ${b.phone ? `<button class="action-btn sms" onclick="openSmsModal('${b.id}','buyer')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openStatusModal('${b.id}','${b.callStatus}','${esc(b.notes||'')}')"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn" onclick="openStatusModal('${b.id}','${b.callStatus}','${escAttr(b.notes||'')}')"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -2815,7 +2815,7 @@ Available variables:
                 const optionsContainer = document.getElementById('variationOptions');
                 optionsContainer.innerHTML = product.variations.map(v => `
                     <div class="variation-option ${v.inStock ? '' : 'out-of-stock'}" 
-                         onclick="selectVariation(${v.id}, ${v.price}, '${esc(v.name)}', ${v.inStock})"
+                         onclick="selectVariation(${v.id}, ${v.price}, '${escAttr(v.name)}', ${v.inStock})"
                          data-var-id="${v.id}">
                         ${esc(v.name)} - ${sym}${v.price.toFixed(2)}
                     </div>
@@ -3157,7 +3157,7 @@ Available variables:
                                             </td>
                                             <td>${store?.flag || '🌍'} ${(sms.storeCode || '').toUpperCase()}</td>
                                             <td style="white-space:nowrap;">
-                                                <button class="action-btn order" onclick="openSmsEditModal('${sms.id}', '${esc(sms.recipient || '')}', '${esc(sms.message || '')}', '${esc(sms.customerName || 'Unknown')}')" title="Pošlji SMS" style="background:var(--accent-green);color:white;">
+                                                <button class="action-btn order" onclick="openSmsEditModal('${sms.id}', '${escAttr(sms.recipient || '')}', '${escAttr(sms.message || '')}', '${escAttr(sms.customerName || 'Unknown')}')" title="Pošlji SMS" style="background:var(--accent-green);color:white;">
                                                     <i class="fas fa-paper-plane"></i>
                                                 </button>
                                                 <button class="action-btn" onclick="removeFromQueueApi('${sms.id}')" title="Odstrani">
@@ -3768,7 +3768,7 @@ Available variables:
                                             <td>${store?.flag || '🌍'} ${sms.storeCode?.toUpperCase() || ''}</td>
                                             <td style="white-space:nowrap;">
                                                 <button class="action-btn" 
-                                                        onclick="openSmsEditModal('${sms.id}', '${esc(sms.recipient || '')}', '${esc(sms.message || '')}', '${esc(sms.customerName || 'Unknown')}')" 
+                                                        onclick="openSmsEditModal('${sms.id}', '${escAttr(sms.recipient || '')}', '${escAttr(sms.message || '')}', '${escAttr(sms.customerName || 'Unknown')}')" 
                                                         title="${hasProvider ? 'Pošlji SMS' : 'Provider ni nastavljen'}"
                                                         style="${hasProvider ? 'background:var(--accent-green);color:white;' : 'opacity:0.5;'}"
                                                         ${!hasProvider ? 'disabled' : ''}>
@@ -4119,6 +4119,7 @@ Available variables:
         // Helpers
         function initials(n) { return (n||'?').split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase(); }
         function esc(t) { const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
+        function escAttr(t) { return (t||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
         function statusLabel(s) { 
             const labels = {
                 not_called:'Not Called',
@@ -5823,11 +5824,11 @@ ${esc(previewBody)}
                                     <button onclick="callCustomer('${order.phone}')" class="action-btn-mini" title="Pokliči">
                                         <i class="fas fa-phone"></i>
                                     </button>
-                                    <button onclick="openSmsModal('${order.id}', '${esc(order.phone)}', '${esc(order.customerName)}', 'paketomat')" class="action-btn-mini" title="Pošlji SMS">
+                                    <button onclick="openSmsModal('${order.id}', '${escAttr(order.phone)}', '${escAttr(order.customerName)}', 'paketomat')" class="action-btn-mini" title="Pošlji SMS">
                                         <i class="fas fa-sms"></i>
                                     </button>
                                 ` : ''}
-                                <button onclick="showPaketomatNotes('${order.id}', '${esc(order.notes || '')}')" class="action-btn-mini" title="Opombe">
+                                <button onclick="showPaketomatNotes('${order.id}', '${escAttr(order.notes || '')}')" class="action-btn-mini" title="Opombe">
                                     <i class="fas fa-sticky-note"></i>
                                 </button>
                             </div>
