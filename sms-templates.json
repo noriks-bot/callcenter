@@ -1,0 +1,100 @@
+{
+  "templates": {
+    "abandoned_cart": {
+      "hr": {
+        "name": "Napuštena košarica",
+        "message": "Pozdrav {ime}! 🛒 Vaša košarica još uvijek čeka. Završite narudžbu i uživajte u {produkt}. Besplatna dostava! 👉 {link}"
+      },
+      "cz": {
+        "name": "Opuštěný košík",
+        "message": "Ahoj {ime}! 🛒 Váš košík na vás stále čeká. Dokončete objednávku a užijte si {produkt}. Doprava zdarma! 👉 {link}"
+      },
+      "pl": {
+        "name": "Porzucony koszyk",
+        "message": "Cześć {ime}! 🛒 Twój koszyk wciąż czeka. Dokończ zamówienie i ciesz się {produkt}. Darmowa dostawa! 👉 {link}"
+      },
+      "gr": {
+        "name": "Εγκαταλελειμμένο καλάθι",
+        "message": "Γεια σου {ime}! 🛒 Το καλάθι σου περιμένει ακόμα. Ολοκλήρωσε την παραγγελία και απόλαυσε {produkt}. Δωρεάν αποστολή! 👉 {link}"
+      },
+      "sk": {
+        "name": "Opustený košík",
+        "message": "Ahoj {ime}! 🛒 Váš košík na vás stále čaká. Dokončite objednávku a užite si {produkt}. Doprava zadarmo! 👉 {link}"
+      },
+      "it": {
+        "name": "Carrello abbandonato",
+        "message": "Ciao {ime}! 🛒 Il tuo carrello ti aspetta ancora. Completa l'ordine e goditi {produkt}. Spedizione gratuita! 👉 {link}"
+      },
+      "hu": {
+        "name": "Elhagyott kosár",
+        "message": "Szia {ime}! 🛒 A kosarad még mindig vár. Fejezd be a rendelést és élvezd a {produkt}-t. Ingyenes szállítás! 👉 {link}"
+      }
+    },
+    "winback": {
+      "hr": {
+        "name": "Povratak kupca",
+        "message": "Pozdrav {ime}! 💙 Nedostajete nam! Evo 15% popusta za vašu sljedeću narudžbu. Kod: POVRATAK15 👉 {link}"
+      },
+      "cz": {
+        "name": "Návrat zákazníka",
+        "message": "Ahoj {ime}! 💙 Chybíš nám! Tady je 15% sleva na vaši další objednávku. Kód: NAVRAT15 👉 {link}"
+      },
+      "pl": {
+        "name": "Powrót klienta",
+        "message": "Cześć {ime}! 💙 Tęsknimy za Tobą! Oto 15% zniżki na następne zamówienie. Kod: POWROT15 👉 {link}"
+      },
+      "gr": {
+        "name": "Επιστροφή πελάτη",
+        "message": "Γεια σου {ime}! 💙 Μας λείπεις! Ορίστε 15% έκπτωση για την επόμενη παραγγελία σου. Κωδικός: EPISTROFI15 👉 {link}"
+      },
+      "sk": {
+        "name": "Návrat zákazníka",
+        "message": "Ahoj {ime}! 💙 Chýbaš nám! Tu je 15% zľava na vašu ďalšiu objednávku. Kód: NAVRAT15 👉 {link}"
+      },
+      "it": {
+        "name": "Ritorno cliente",
+        "message": "Ciao {ime}! 💙 Ci manchi! Ecco il 15% di sconto sul tuo prossimo ordine. Codice: RITORNO15 👉 {link}"
+      },
+      "hu": {
+        "name": "Visszatérő vásárló",
+        "message": "Szia {ime}! 💙 Hiányzol nekünk! Itt egy 15% kedvezmény a következő rendelésedre. Kód: VISSZA15 👉 {link}"
+      }
+    },
+    "last_chance": {
+      "hr": {
+        "name": "Zadnja prilika",
+        "message": "⏰ {ime}, zadnja prilika! Vaša košarica ističe za 2 sata. Ne propustite {produkt}! 👉 {link}"
+      },
+      "cz": {
+        "name": "Poslední šance",
+        "message": "⏰ {ime}, poslední šance! Váš košík vyprší za 2 hodiny. Nenechte si ujít {produkt}! 👉 {link}"
+      },
+      "pl": {
+        "name": "Ostatnia szansa",
+        "message": "⏰ {ime}, ostatnia szansa! Twój koszyk wygasa za 2 godziny. Nie przegap {produkt}! 👉 {link}"
+      },
+      "gr": {
+        "name": "Τελευταία ευκαιρία",
+        "message": "⏰ {ime}, τελευταία ευκαιρία! Το καλάθι σου λήγει σε 2 ώρες. Μη χάσεις {produkt}! 👉 {link}"
+      },
+      "sk": {
+        "name": "Posledná šanca",
+        "message": "⏰ {ime}, posledná šanca! Váš košík vyprší o 2 hodiny. Nenechajte si ujsť {produkt}! 👉 {link}"
+      },
+      "it": {
+        "name": "Ultima occasione",
+        "message": "⏰ {ime}, ultima occasione! Il tuo carrello scade tra 2 ore. Non perdere {produkt}! 👉 {link}"
+      },
+      "hu": {
+        "name": "Utolsó esély",
+        "message": "⏰ {ime}, utolsó esély! A kosarad 2 óra múlva lejár. Ne maradj le a {produkt}-ról! 👉 {link}"
+      }
+    }
+  },
+  "variables": {
+    "{ime}": "Ime kupca / Customer first name",
+    "{produkt}": "Ime produkta / Product name",
+    "{cena}": "Cena / Price",
+    "{link}": "Link do checkout / Checkout URL"
+  }
+}
