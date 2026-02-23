@@ -3583,10 +3583,11 @@ Available variables:
                                             </td>
                                             <td>${store?.flag || '🌍'} ${sms.storeCode?.toUpperCase() || ''}</td>
                                             <td style="white-space:nowrap;">
-                                                <button class="action-btn ${hasProvider ? 'order' : ''}" 
+                                                <button class="action-btn" 
                                                         onclick="sendSingleSms('${sms.id}')" 
-                                                        title="Pošlji SMS"
-                                                        ${!hasProvider ? 'disabled style="opacity:0.5;" title="Provider ni nastavljen"' : ''}>
+                                                        title="${hasProvider ? 'Pošlji SMS' : 'Provider ni nastavljen'}"
+                                                        style="${hasProvider ? 'background:var(--accent-green);color:white;' : 'opacity:0.5;'}"
+                                                        ${!hasProvider ? 'disabled' : ''}>
                                                     <i class="fas fa-paper-plane"></i>
                                                 </button>
                                                 <button class="action-btn" onclick="removeFromQueue('${sms.id}')" title="Odstrani">
@@ -3599,20 +3600,24 @@ Available variables:
                             </tbody>
                         </table>
                     </div>
-                    <div style="margin-top:16px;padding:12px;background:rgba(249,115,22,0.1);border-radius:8px;color:var(--orange);">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>Opozorilo:</strong> SMS-e lahko pošlje samo Dejan! Prepričaj se, da je prejemnik pravilen preden pošlješ.
+                    <div style="margin-top:16px;padding:12px;background:rgba(34,197,94,0.1);border:1px solid var(--accent-green);border-radius:8px;">
+                        <i class="fas fa-info-circle" style="color:var(--accent-green);"></i>
+                        <strong style="color:var(--accent-green);">Pošlji SMS:</strong> Klikni zeleni gumb <i class="fas fa-paper-plane"></i> za pošiljanje SMS-a preko MetaKocka.
+                        ${!Object.values(smsProviderSettings?.providers || {}).some(p => p.eshop_sync_id) ? '<br><span style="color:var(--accent-orange);margin-top:4px;display:inline-block;"><i class="fas fa-exclamation-triangle"></i> Nastavi <code>eshop_sync_id</code> v SMS Settings!</span>' : ''}
                     </div>
                 `;
             } catch (e) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Napaka pri nalaganju</p></div>';
+                container.innerHTML = '<div class="empty" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka pri nalaganju</p><button class="btn btn-save" style="margin-top:12px;" onclick="renderSmsQueueManagement()"><i class="fas fa-redo"></i> Poskusi znova</button></div>';
             }
         }
         
         async function sendSingleSms(smsId) {
-            if (!confirm('Ali si prepričan, da želiš poslati ta SMS? To akcijo lahko izvede samo Dejan!')) {
+            if (!confirm('Ali si prepričan, da želiš poslati ta SMS?\\n\\n⚠️ SMS bo poslan preko MetaKocka API!')) {
                 return;
             }
+            
+            // Show loading
+            showToast('📤 Pošiljam SMS...', false, 'info');
             
             try {
                 const res = await fetch('api.php?action=sms-send', {
@@ -3627,12 +3632,14 @@ Available variables:
                     renderSmsQueueManagement();
                     loadSmsDashboardQueue();
                     await renderSmsTable();
+                    await loadSmsData();
                     updateStats();
                 } else {
-                    showToast(`❌ Napaka: ${result.error}`, true);
+                    showToast(`❌ Napaka: ${result.error || 'Neznana napaka'}`, true);
                 }
             } catch (e) {
-                showToast('Napaka pri pošiljanju', true);
+                console.error('[SMS] Send error:', e);
+                showToast('❌ Napaka pri pošiljanju: ' + e.message, true);
             }
         }
         

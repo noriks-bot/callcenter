@@ -367,14 +367,18 @@ function sendQueuedSms($smsId) {
         return ['success' => false, 'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode)];
     }
     
-    // Prepare MetaKocka SMS payload
+    // Prepare MetaKocka SMS payload (correct format per API docs)
     $payload = [
         'secret_key' => $metakocka['secret_key'],
-        'company_id' => $metakocka['company_id'],
-        'eshop_sync_id' => $eshopSyncId,
-        'message_type' => 'SMS',
-        'recipient' => $sms['recipient'],
-        'message' => $sms['message']
+        'company_id' => strval($metakocka['company_id']),
+        'message_list' => [
+            [
+                'type' => 'sms',
+                'eshop_sync_id' => $eshopSyncId,
+                'to_number' => $sms['recipient'],
+                'message' => $sms['message']
+            ]
+        ]
     ];
     
     $ch = curl_init();
