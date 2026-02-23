@@ -792,7 +792,7 @@
                 
                 <div class="form-group">
                     <label class="form-label">Sporočilo (samo za branje)</label>
-                    <textarea class="form-textarea" id="smsEditMessage" readonly style="background:var(--bg-dark);cursor:not-allowed;"></textarea>
+                    <textarea class="form-textarea" id="smsEditMessage" readonly style="background:var(--content-bg);cursor:not-allowed;"></textarea>
                 </div>
                 
                 <input type="hidden" id="smsEditId">
@@ -967,7 +967,7 @@
                         <h3 style="margin:0 0 4px 0;">📤 Čakalna vrsta za pošiljanje</h3>
                         <p style="margin:0;color:var(--text-muted);font-size:13px;">SMS-i ki čakajo na pošiljanje</p>
                     </div>
-                    <button class="btn" style="background:var(--bg-hover);" onclick="loadSmsDashboardQueue()">
+                    <button class="btn" style="background:var(--card-border);" onclick="loadSmsDashboardQueue()">
                         <i class="fas fa-sync"></i> Osveži
                     </button>
                 </div>
@@ -1073,7 +1073,7 @@
                 </div>
                 
                 <div id="templatePreviewBox" style="display:none;">
-                    <div style="background:var(--bg-dark);border-radius:8px;padding:16px;margin-bottom:12px;">
+                    <div style="background:var(--content-bg);border-radius:8px;padding:16px;margin-bottom:12px;">
                         <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">
                             <i class="fas fa-tag"></i> <span id="previewTemplateName">Template name</span>
                         </div>
@@ -1088,7 +1088,7 @@
                 </div>
                 
                 <!-- Sample Variables -->
-                <div style="margin-top:16px;padding:12px;background:var(--bg-dark);border-radius:8px;">
+                <div style="margin-top:16px;padding:12px;background:var(--content-bg);border-radius:8px;">
                     <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Testni podatki za predogled:</div>
                     <div style="display:flex;gap:12px;flex-wrap:wrap;">
                         <div style="flex:1;min-width:120px;">
@@ -1192,7 +1192,7 @@
                         <p style="color:var(--text-muted);">Dogovorjeni callbacki za danes in prihodnje dni.</p>
                     </div>
                     <div style="display:flex;gap:8px;">
-                        <button class="btn" style="background:var(--bg-hover);" onclick="renderFollowups(true)">
+                        <button class="btn" style="background:var(--card-border);" onclick="renderFollowups(true)">
                             <i class="fas fa-users"></i> Vsi agenti
                         </button>
                         <button class="btn btn-save" onclick="renderFollowups()">
@@ -1408,7 +1408,7 @@ Available variables:
 {link} - Store link"></textarea>
                 </div>
                 
-                <div style="background:var(--bg-dark);padding:12px;border-radius:8px;font-size:12px;color:var(--text-muted);">
+                <div style="background:var(--content-bg);padding:12px;border-radius:8px;font-size:12px;color:var(--text-muted);">
                     <strong>Dostopne spremenljivke:</strong><br>
                     <code>{ime}</code> - Ime stranke<br>
                     <code>{produkt}</code> - Ime produkta<br>
@@ -1859,6 +1859,9 @@ Available variables:
                         renderTable();
                         setTimeout(addCustomerClickHandlers, 100);
                     }
+                    
+                    // Update country tab counts to reflect current content type
+                    updateCounts();
                 } else {
                     // HIDE main element entirely for special tabs (dashboard, analytics, etc.)
                     mainElement.style.display = 'none';
@@ -1945,6 +1948,9 @@ Available variables:
                         currentPage = 1;
                         renderTable();
                     }
+                    
+                    // Update country tab counts to reflect current content type
+                    updateCounts();
                 });
             });
         }
@@ -2286,16 +2292,43 @@ Available variables:
             const filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
             const filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
             
-            const countAllEl = document.getElementById('count-all');
-            if (countAllEl) countAllEl.textContent = filteredCarts.length;
+            // Determine current data source based on content tab
+            let currentData;
+            if (currentContentTab === 'pending') {
+                currentData = filteredPending;
+            } else if (currentContentTab === 'buyers') {
+                currentData = filteredBuyers;
+            } else {
+                currentData = filteredCarts; // Default to carts (also for paketomati)
+            }
             
+            // Update "All" country tab count with current content type data
+            const countAllEl = document.getElementById('count-all');
+            if (countAllEl) countAllEl.textContent = currentData.length;
+            
+            // Update nav sidebar counts (these always show their own totals)
             document.getElementById('navCarts').textContent = filteredCarts.length;
             document.getElementById('navPending').textContent = filteredPending.length;
             document.getElementById('navBuyers').textContent = filteredBuyers.length;
             
+            // Update individual country tab counts based on current content type
             stores.forEach(s => {
                 const el = document.getElementById(`count-${s.code}`);
-                if (el) el.textContent = carts.filter(c => c.storeCode === s.code).length;
+                if (el) {
+                    let countryCount;
+                    if (currentContentTab === 'pending') {
+                        countryCount = pending.filter(p => p.storeCode === s.code).length;
+                    } else if (currentContentTab === 'buyers') {
+                        countryCount = buyers.filter(b => b.storeCode === s.code).length;
+                    } else {
+                        countryCount = carts.filter(c => c.storeCode === s.code).length;
+                    }
+                    // Also apply user's country filter
+                    if (shouldFilter && !userCountries.includes(s.code)) {
+                        countryCount = 0;
+                    }
+                    el.textContent = countryCount;
+                }
             });
             
             // Also update content tab counts
@@ -3507,7 +3540,7 @@ Available variables:
                             </select>
                             <div style="display:flex;align-items:center;gap:4px;">
                                 <input type="number" min="1" max="72" value="${rule.delay}" 
-                                       style="width:60px;padding:8px;background:var(--bg-dark);border:1px solid var(--border);border-radius:6px;color:var(--text);text-align:center;"
+                                       style="width:60px;padding:8px;background:var(--content-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);text-align:center;"
                                        onchange="updateRule(${i}, 'delay', parseInt(this.value))">
                                 <span style="font-size:12px;color:var(--text-muted);">ur</span>
                             </div>
@@ -4631,7 +4664,7 @@ Available variables:
                         <td style="max-width:200px;">
                             <div style="display:flex;flex-wrap:wrap;gap:4px;">
                                 ${(agent.countries || []).map(c => `
-                                    <span style="background:var(--bg-dark);padding:2px 8px;border-radius:4px;font-size:12px;">
+                                    <span style="background:var(--content-bg);padding:2px 8px;border-radius:4px;font-size:12px;">
                                         ${c === 'all' ? '🌍 All' : `${countryFlags[c] || ''} ${c.toUpperCase()}`}
                                     </span>
                                 `).join('')}
@@ -5110,7 +5143,7 @@ Available variables:
                                     <button class="btn btn-save" onclick="callFollowupCustomer('${f.customerId}')">
                                         <i class="fas fa-phone"></i> Pokliči
                                     </button>
-                                    <button class="btn" style="background:var(--bg-hover);" onclick="viewFollowupCustomer('${f.customerId}')">
+                                    <button class="btn" style="background:var(--card-border);" onclick="viewFollowupCustomer('${f.customerId}')">
                                         <i class="fas fa-eye"></i> Poglej
                                     </button>
                                 </div>
@@ -5234,19 +5267,19 @@ Available variables:
                     <div class="analytics-card">
                         <h3><i class="fas fa-sms"></i> SMS Performance</h3>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                            <div style="background:var(--bg-dark);padding:16px;border-radius:8px;text-align:center;">
+                            <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
                                 <div style="font-size:24px;font-weight:700;color:var(--green);">${smsStats.sent}</div>
                                 <div style="font-size:12px;color:var(--text-muted);">Sent</div>
                             </div>
-                            <div style="background:var(--bg-dark);padding:16px;border-radius:8px;text-align:center;">
+                            <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
                                 <div style="font-size:24px;font-weight:700;color:var(--orange);">${smsStats.queued}</div>
                                 <div style="font-size:12px;color:var(--text-muted);">Queued</div>
                             </div>
-                            <div style="background:var(--bg-dark);padding:16px;border-radius:8px;text-align:center;">
+                            <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
                                 <div style="font-size:24px;font-weight:700;color:var(--red);">${smsStats.failed}</div>
                                 <div style="font-size:12px;color:var(--text-muted);">Failed</div>
                             </div>
-                            <div style="background:var(--bg-dark);padding:16px;border-radius:8px;text-align:center;">
+                            <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
                                 <div style="font-size:24px;font-weight:700;">${smsStats.total}</div>
                                 <div style="font-size:12px;color:var(--text-muted);">Total</div>
                             </div>
@@ -5687,7 +5720,7 @@ Available variables:
                         <button class="modal-close" onclick="document.getElementById('emailPreviewModal').remove()">×</button>
                     </div>
                     <div class="modal-body">
-                        <div style="background:var(--bg-dark);padding:16px;border-radius:8px;margin-bottom:16px;">
+                        <div style="background:var(--content-bg);padding:16px;border-radius:8px;margin-bottom:16px;">
                             <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">Subject:</div>
                             <div style="font-weight:600;font-size:16px;">${esc(previewSubject)}</div>
                         </div>
@@ -5805,14 +5838,14 @@ ${esc(previewBody)}
                         <td>
                             ${order.email ? `<a href="mailto:${order.email}" style="color:var(--accent);">${esc(order.email)}</a>` : '-'}
                         </td>
-                        <td><span style="background:var(--bg-hover);padding:4px 8px;border-radius:4px;font-size:12px;">${esc(order.deliveryService || '-')}</span></td>
+                        <td><span style="background:var(--card-border);padding:4px 8px;border-radius:4px;font-size:12px;">${esc(order.deliveryService || '-')}</span></td>
                         <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(eventTitle)}">
                             <span style="color:var(--green);font-weight:500;">📍 ${esc(order.lastDeliveryEvent || '-')}</span>
                             ${eventDate ? `<br><small style="color:var(--text-muted);font-size:11px;">${eventDate}</small>` : ''}
                         </td>
                         <td><strong>${order.orderTotal.toFixed(2)} ${order.currency}</strong></td>
                         <td>
-                            <select onchange="updatePaketomatStatus('${order.id}', this.value)" style="background:var(--bg-hover);border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:${statusColors[order.status]};cursor:pointer;">
+                            <select onchange="updatePaketomatStatus('${order.id}', this.value)" style="background:var(--card-border);border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:${statusColors[order.status]};cursor:pointer;">
                                 <option value="not_called" ${order.status === 'not_called' ? 'selected' : ''}>Ni poklicano</option>
                                 <option value="called" ${order.status === 'called' ? 'selected' : ''}>Poklicano</option>
                                 <option value="notified" ${order.status === 'notified' ? 'selected' : ''}>Obveščeno</option>
@@ -5869,7 +5902,7 @@ ${esc(previewBody)}
                         <button class="modal-close" onclick="document.getElementById('paketomatNotesModal').remove()">×</button>
                     </div>
                     <div class="modal-body">
-                        <textarea id="paketomatNotesText" rows="5" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);resize:vertical;">${currentNotes}</textarea>
+                        <textarea id="paketomatNotesText" rows="5" style="width:100%;background:var(--content-bg);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);resize:vertical;">${currentNotes}</textarea>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-cancel" onclick="document.getElementById('paketomatNotesModal').remove()">Prekliči</button>
