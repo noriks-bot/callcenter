@@ -1749,8 +1749,12 @@ Available variables:
                 
                 // Content tabs visibility
                 const contentTabs = document.getElementById('contentTabs');
+                const mainElement = document.getElementById('main');
                 
                 if (isDataTab) {
+                    // Show main element for data views
+                    mainElement.style.display = 'block';
+                    
                     // Show country tabs and content tabs for data views
                     document.querySelector('.stats-grid').style.display = 'grid';
                     document.querySelector('.country-tabs').style.display = 'flex';
@@ -1768,16 +1772,14 @@ Available variables:
                         loadPaketomati();
                     } else {
                         document.querySelector('.content').style.display = 'block';
+                        document.getElementById('paketomatiContent').style.display = 'none';
                         currentPage = 1;
                         renderTable();
                         setTimeout(addCustomerClickHandlers, 100);
                     }
                 } else {
-                    // Hide country/content tabs for other views
-                    document.querySelector('.stats-grid').style.display = 'none';
-                    document.querySelector('.country-tabs').style.display = 'none';
-                    contentTabs.style.display = 'none';
-                    document.querySelector('.content').style.display = 'none';
+                    // HIDE main element entirely for special tabs (dashboard, analytics, etc.)
+                    mainElement.style.display = 'none';
                     
                     // Show specific content
                     if (currentTab === 'dashboard') {
@@ -1788,10 +1790,7 @@ Available variables:
                         loadSmsDashboardQueue();
                         renderSmsTable();
                     } else if (currentTab === 'sms-settings') {
-                        console.log('[Settings] Showing SMS Settings tab');
-                        const settingsEl = document.getElementById('smsSettingsContent');
-                        console.log('[Settings] Element found:', !!settingsEl);
-                        if (settingsEl) settingsEl.style.display = 'block';
+                        document.getElementById('smsSettingsContent').style.display = 'block';
                         loadSmsSettingsUI();
                     } else if (currentTab === 'email-templates') {
                         document.getElementById('emailTemplatesContent').style.display = 'block';
@@ -1844,6 +1843,16 @@ Available variables:
                     const sidebarItem = document.querySelector(`.nav-item[data-tab="${newTab}"]`);
                     if (sidebarItem) sidebarItem.classList.add('active');
                     
+                    // Hide ALL special content areas first (prevents overlap)
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    document.getElementById('smsDashboardContent').style.display = 'none';
+                    document.getElementById('smsSettingsContent').style.display = 'none';
+                    document.getElementById('emailTemplatesContent').style.display = 'none';
+                    document.getElementById('agentsContent').style.display = 'none';
+                    document.getElementById('followupsContent').style.display = 'none';
+                    document.getElementById('analyticsContent').style.display = 'none';
+                    document.getElementById('paketomatiContent').style.display = 'none';
+                    
                     // Show appropriate content
                     if (newTab === 'paketomati') {
                         document.querySelector('.content').style.display = 'none';
@@ -1851,7 +1860,6 @@ Available variables:
                         loadPaketomati();
                     } else {
                         document.querySelector('.content').style.display = 'block';
-                        document.getElementById('paketomatiContent').style.display = 'none';
                         currentPage = 1;
                         renderTable();
                     }
@@ -1936,8 +1944,17 @@ Available variables:
                 currentContentTab = 'carts';
                 document.getElementById('pageTitle').textContent = 'Abandoned Carts';
                 
-                // Show the main content area
+                // Hide ALL special content areas first (ensures clean state)
                 document.getElementById('dashboardContent').style.display = 'none';
+                document.getElementById('smsDashboardContent').style.display = 'none';
+                document.getElementById('smsSettingsContent').style.display = 'none';
+                document.getElementById('emailTemplatesContent').style.display = 'none';
+                document.getElementById('agentsContent').style.display = 'none';
+                document.getElementById('followupsContent').style.display = 'none';
+                document.getElementById('analyticsContent').style.display = 'none';
+                document.getElementById('paketomatiContent').style.display = 'none';
+                
+                // Show the main content area
                 document.querySelector('.stats-grid').style.display = 'grid';
                 document.querySelector('.country-tabs').style.display = 'flex';
                 document.getElementById('contentTabs').style.display = 'flex';
