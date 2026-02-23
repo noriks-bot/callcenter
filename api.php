@@ -671,9 +671,13 @@ function fetchOneTimeBuyers($storeFilter = null) {
             'role' => 'customer'
         ]);
         
-        if (!is_array($customers)) continue;
+        // Skip if not array or if it's an error response
+        if (!is_array($customers) || isset($customers['error'])) continue;
         
         foreach ($customers as $customer) {
+            // Skip if customer is not an array (might be error)
+            if (!is_array($customer)) continue;
+            
             $orderCount = intval($customer['orders_count'] ?? 0);
             if ($orderCount !== 1) continue;
             

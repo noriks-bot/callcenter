@@ -15,6 +15,56 @@
         .hide-mobile { }
         @media (max-width: 640px) { .hide-mobile { display: none !important; } }
         
+        /* Content Type Tabs */
+        .content-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 24px 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .content-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .content-tab:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+        .content-tab.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+        .content-tab i { font-size: 14px; }
+        .content-tab .count {
+            background: rgba(0,0,0,0.15);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .content-tab.active .count {
+            background: rgba(255,255,255,0.25);
+        }
+        @media (max-width: 768px) {
+            .content-tabs { padding: 0 16px 12px; gap: 6px; }
+            .content-tab { padding: 8px 12px; font-size: 13px; }
+            .content-tab span:not(.count) { display: none; }
+            .content-tab i { font-size: 16px; }
+        }
+        
         /* Bulk Actions Bar */
         .bulk-bar {
             display: none;
@@ -402,6 +452,30 @@
         </div>
         
         <div class="country-tabs" id="countryTabs"></div>
+        
+        <!-- Content Type Tabs (below country tabs) -->
+        <div class="content-tabs" id="contentTabs">
+            <button class="content-tab active" data-content="carts">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Abandoned Carts</span>
+                <span class="count" id="contentCount-carts">0</span>
+            </button>
+            <button class="content-tab" data-content="pending">
+                <i class="fas fa-clock"></i>
+                <span>Pending Orders</span>
+                <span class="count" id="contentCount-pending">0</span>
+            </button>
+            <button class="content-tab" data-content="buyers">
+                <i class="fas fa-user"></i>
+                <span>Enkratni kupci</span>
+                <span class="count" id="contentCount-buyers">0</span>
+            </button>
+            <button class="content-tab" data-content="paketomati">
+                <i class="fas fa-box"></i>
+                <span>Paketomati</span>
+                <span class="count" id="contentCount-paketomati">0</span>
+            </button>
+        </div>
         
         <div class="stats-grid">
             <div class="stat-card">
@@ -1423,13 +1497,17 @@ Available variables:
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('show');
                 
+                // Data tabs that use content tabs
+                const dataTabs = ['carts', 'pending', 'buyers', 'paketomati'];
+                const isDataTab = dataTabs.includes(currentTab);
+                
                 // Update page title
                 const titles = {
                     dashboard: 'Dashboard',
                     carts: 'Abandoned Carts',
                     pending: 'Pending Orders',
                     buyers: 'Enkratni kupci',
-                    paketomati: '📦 Paketomati',
+                    paketomati: 'Paketomati',
                     'sms-dashboard': 'SMS Dashboard',
                     'sms-settings': 'SMS Provider Settings',
                     'email-templates': 'Email Templates',
@@ -1440,54 +1518,184 @@ Available variables:
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
                 
                 // Show/hide content based on tab
-                const hideTabs = ['sms-dashboard', 'sms-settings', 'email-templates', 'dashboard', 'agents', 'followups', 'analytics', 'paketomati'];
-                document.getElementById('dashboardContent').style.display = currentTab === 'dashboard' ? 'block' : 'none';
-                document.getElementById('smsDashboardContent').style.display = currentTab === 'sms-dashboard' ? 'block' : 'none';
-                document.getElementById('smsSettingsContent').style.display = currentTab === 'sms-settings' ? 'block' : 'none';
-                document.getElementById('emailTemplatesContent').style.display = currentTab === 'email-templates' ? 'block' : 'none';
-                document.getElementById('agentsContent').style.display = currentTab === 'agents' ? 'block' : 'none';
-                document.getElementById('followupsContent').style.display = currentTab === 'followups' ? 'block' : 'none';
-                document.getElementById('analyticsContent').style.display = currentTab === 'analytics' ? 'block' : 'none';
-                document.getElementById('paketomatiContent').style.display = currentTab === 'paketomati' ? 'block' : 'none';
-                document.querySelector('.stats-grid').style.display = hideTabs.includes(currentTab) ? 'none' : 'grid';
-                document.querySelector('.country-tabs').style.display = hideTabs.includes(currentTab) ? 'none' : 'flex';
-                document.querySelector('.content').style.display = hideTabs.includes(currentTab) ? 'none' : 'block';
+                const otherTabs = ['sms-dashboard', 'sms-settings', 'email-templates', 'dashboard', 'agents', 'followups', 'analytics'];
                 
-                if (currentTab === 'dashboard') {
-                    renderDashboard();
-                } else if (currentTab === 'sms-dashboard') {
-                    renderSmsTable();
-                } else if (currentTab === 'sms-settings') {
-                    loadSmsSettingsUI();
-                } else if (currentTab === 'email-templates') {
-                    loadEmailTemplatesUI();
-                } else if (currentTab === 'agents') {
-                    loadAgents();
-                } else if (currentTab === 'followups') {
-                    renderFollowups();
-                } else if (currentTab === 'analytics') {
-                    renderAnalytics();
-                } else if (currentTab === 'paketomati') {
-                    loadPaketomati();
+                // Hide all special content areas
+                document.getElementById('dashboardContent').style.display = 'none';
+                document.getElementById('smsDashboardContent').style.display = 'none';
+                document.getElementById('smsSettingsContent').style.display = 'none';
+                document.getElementById('emailTemplatesContent').style.display = 'none';
+                document.getElementById('agentsContent').style.display = 'none';
+                document.getElementById('followupsContent').style.display = 'none';
+                document.getElementById('analyticsContent').style.display = 'none';
+                document.getElementById('paketomatiContent').style.display = 'none';
+                
+                // Content tabs visibility
+                const contentTabs = document.getElementById('contentTabs');
+                
+                if (isDataTab) {
+                    // Show country tabs and content tabs for data views
+                    document.querySelector('.stats-grid').style.display = 'grid';
+                    document.querySelector('.country-tabs').style.display = 'flex';
+                    contentTabs.style.display = 'flex';
+                    
+                    // Sync content tab state
+                    currentContentTab = currentTab;
+                    contentTabs.querySelectorAll('.content-tab').forEach(t => {
+                        t.classList.toggle('active', t.dataset.content === currentTab);
+                    });
+                    
+                    if (currentTab === 'paketomati') {
+                        document.querySelector('.content').style.display = 'none';
+                        document.getElementById('paketomatiContent').style.display = 'block';
+                        loadPaketomati();
+                    } else {
+                        document.querySelector('.content').style.display = 'block';
+                        currentPage = 1;
+                        renderTable();
+                        setTimeout(addCustomerClickHandlers, 100);
+                    }
                 } else {
-                    renderTable();
-                    setTimeout(addCustomerClickHandlers, 100);
+                    // Hide country/content tabs for other views
+                    document.querySelector('.stats-grid').style.display = 'none';
+                    document.querySelector('.country-tabs').style.display = 'none';
+                    contentTabs.style.display = 'none';
+                    document.querySelector('.content').style.display = 'none';
+                    
+                    // Show specific content
+                    if (currentTab === 'dashboard') {
+                        document.getElementById('dashboardContent').style.display = 'block';
+                        renderDashboard();
+                    } else if (currentTab === 'sms-dashboard') {
+                        document.getElementById('smsDashboardContent').style.display = 'block';
+                        renderSmsTable();
+                    } else if (currentTab === 'sms-settings') {
+                        document.getElementById('smsSettingsContent').style.display = 'block';
+                        loadSmsSettingsUI();
+                    } else if (currentTab === 'email-templates') {
+                        document.getElementById('emailTemplatesContent').style.display = 'block';
+                        loadEmailTemplatesUI();
+                    } else if (currentTab === 'agents') {
+                        document.getElementById('agentsContent').style.display = 'block';
+                        loadAgents();
+                    } else if (currentTab === 'followups') {
+                        document.getElementById('followupsContent').style.display = 'block';
+                        renderFollowups();
+                    } else if (currentTab === 'analytics') {
+                        document.getElementById('analyticsContent').style.display = 'block';
+                        renderAnalytics();
+                    }
                 }
             });
         });
+        
+        // Content tab state
+        let currentContentTab = 'carts';
+        
+        // Setup content tabs
+        function setupContentTabs() {
+            const contentTabs = document.getElementById('contentTabs');
+            if (!contentTabs) return;
+            
+            contentTabs.querySelectorAll('.content-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const newTab = tab.dataset.content;
+                    
+                    // Update active state
+                    contentTabs.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update current content tab
+                    currentContentTab = newTab;
+                    currentTab = newTab; // Sync with main tab state
+                    
+                    // Update page title
+                    const titles = {
+                        carts: 'Abandoned Carts',
+                        pending: 'Pending Orders',
+                        buyers: 'Enkratni kupci',
+                        paketomati: 'Paketomati'
+                    };
+                    document.getElementById('pageTitle').textContent = titles[newTab] || newTab;
+                    
+                    // Update sidebar active state
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    const sidebarItem = document.querySelector(`.nav-item[data-tab="${newTab}"]`);
+                    if (sidebarItem) sidebarItem.classList.add('active');
+                    
+                    // Show appropriate content
+                    if (newTab === 'paketomati') {
+                        document.querySelector('.content').style.display = 'none';
+                        document.getElementById('paketomatiContent').style.display = 'block';
+                        loadPaketomati();
+                    } else {
+                        document.querySelector('.content').style.display = 'block';
+                        document.getElementById('paketomatiContent').style.display = 'none';
+                        currentPage = 1;
+                        renderTable();
+                    }
+                });
+            });
+        }
+        
+        // Update content tab counts
+        function updateContentTabCounts() {
+            // Filter by user's allowed countries
+            const shouldFilter = !hasAllCountries && !isAdmin;
+            let filteredCarts = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
+            let filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
+            let filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
+            
+            // Apply country filter if not "all"
+            if (currentStore !== 'all') {
+                filteredCarts = filteredCarts.filter(c => c.storeCode === currentStore);
+                filteredPending = filteredPending.filter(p => p.storeCode === currentStore);
+                filteredBuyers = filteredBuyers.filter(b => b.storeCode === currentStore);
+            }
+            
+            document.getElementById('contentCount-carts').textContent = filteredCarts.length;
+            document.getElementById('contentCount-pending').textContent = filteredPending.length;
+            document.getElementById('contentCount-buyers').textContent = filteredBuyers.length;
+            
+            // Paketomati count (not filtered by country as they come from MetaKocka)
+            const paketCount = paketomatiData ? paketomatiData.filter(p => p.status === 'not_called').length : 0;
+            document.getElementById('contentCount-paketomati').textContent = paketCount;
+        }
         
         // Init
         async function init() {
             const res = await fetch('api.php?action=stores');
             stores = await res.json();
             renderCountryTabs();
+            setupContentTabs();
             loadSmsData();
             await loadSmsTemplates();
             await loadAllData();
             
-            // Show dashboard by default
-            currentTab = 'dashboard';
-            renderDashboard();
+            // Also load paketomati count
+            try {
+                const paketRes = await fetch('api.php?action=paketomati');
+                paketomatiData = await paketRes.json();
+                updateContentTabCounts();
+            } catch(e) {}
+            
+            // Show carts tab by default (not dashboard)
+            currentTab = 'carts';
+            currentContentTab = 'carts';
+            document.getElementById('pageTitle').textContent = 'Abandoned Carts';
+            
+            // Show the main content area
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.querySelector('.stats-grid').style.display = 'grid';
+            document.querySelector('.country-tabs').style.display = 'flex';
+            document.getElementById('contentTabs').style.display = 'flex';
+            document.querySelector('.content').style.display = 'block';
+            
+            // Update sidebar
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelector('.nav-item[data-tab="carts"]')?.classList.add('active');
+            
+            renderTable();
         }
         
         function renderCountryTabs() {
@@ -1531,7 +1739,14 @@ Available variables:
                     container.querySelectorAll('.country-tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     updateStats();
-                    renderTable();
+                    updateContentTabCounts();
+                    
+                    // Re-render based on current content tab
+                    if (currentContentTab === 'paketomati') {
+                        renderPaketomatiTable();
+                    } else {
+                        renderTable();
+                    }
                 });
             });
             
@@ -1543,18 +1758,36 @@ Available variables:
         }
         
         async function loadAllData() {
-            const [cartsRes, pendingRes, buyersRes] = await Promise.all([
-                fetch('api.php?action=abandoned-carts'),
-                fetch('api.php?action=pending-orders'),
-                fetch('api.php?action=one-time-buyers')
-            ]);
-            carts = await cartsRes.json() || [];
-            pending = await pendingRes.json() || [];
-            buyers = await buyersRes.json() || [];
-            
-            updateCounts();
-            updateStats();
-            renderTable();
+            try {
+                const [cartsRes, pendingRes, buyersRes] = await Promise.all([
+                    fetch('api.php?action=abandoned-carts'),
+                    fetch('api.php?action=pending-orders'),
+                    fetch('api.php?action=one-time-buyers')
+                ]);
+                
+                carts = await cartsRes.json() || [];
+                pending = await pendingRes.json() || [];
+                
+                // Handle buyers response - might be array or error object
+                const buyersData = await buyersRes.json();
+                if (Array.isArray(buyersData)) {
+                    buyers = buyersData;
+                } else if (buyersData && buyersData.error) {
+                    console.warn('One-time buyers error:', buyersData.error);
+                    buyers = [];
+                } else {
+                    buyers = [];
+                }
+                
+                console.log('Data loaded:', {carts: carts.length, pending: pending.length, buyers: buyers.length});
+                
+                updateCounts();
+                updateStats();
+                renderTable();
+            } catch (e) {
+                console.error('Error loading data:', e);
+                showToast('Error loading data: ' + e.message, true);
+            }
         }
         
         async function refreshData() {
@@ -1608,6 +1841,9 @@ Available variables:
                 const el = document.getElementById(`count-${s.code}`);
                 if (el) el.textContent = carts.filter(c => c.storeCode === s.code).length;
             });
+            
+            // Also update content tab counts
+            updateContentTabCounts();
         }
         
         function updateStats() {
