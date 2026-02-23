@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Noriks Call Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --radius: 6px;
+            --radius-lg: 8px;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+        }
+
+        .login-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .login-logo {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin: 0 auto 16px;
+        }
+
+        .login-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-primary-soft);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: var(--radius);
+            color: #1a1a2e;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(254, 202, 87, 0.3);
+        }
+
+        .error-msg {
+            background: var(--accent-red-soft);
+            color: var(--accent-red);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .error-msg.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="login-header">
+            <div class="login-logo">N</div>
+            <h1 class="login-title">Call Center</h1>
+            <p class="login-subtitle">Sign in to continue</p>
+        </div>
+        
+        <div class="error-msg" id="error">Invalid username or password</div>
+        
+        <form onsubmit="login(event)">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="login-btn">Sign In</button>
+        </form>
+    </div>
+
+    <script>
+        // Check if already logged in
+        if (localStorage.getItem('callcenter-user')) {
+            window.location.href = '/callcenter/';
+        }
+
+        async function login(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('error');
+            
+            try {
+                const res = await fetch('/callcenter/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    localStorage.setItem('callcenter-user', JSON.stringify(data.user));
+                    window.location.href = '/callcenter/';
+                } else {
+                    errorEl.classList.add('visible');
+                }
+            } catch (err) {
+                errorEl.classList.add('visible');
+            }
+        }
+    </script>
+</body>
+</html>

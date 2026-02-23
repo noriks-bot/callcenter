@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noriks Call Center</title>
+    <link rel="stylesheet" href="styles.css?v=2">
+    <style>
+        /* Override border-radius - smaller everywhere */
+        :root {
+            --radius: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+        }
+
+        /* Collapsible sidebar */
+        .sidebar {
+            transition: transform 0.3s ease, width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .main {
+            transition: margin-left 0.3s ease;
+        }
+
+        .main.expanded {
+            margin-left: 0;
+        }
+
+        .sidebar-toggle-wrapper {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: auto;
+        }
+
+        .sidebar-toggle {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-overlay);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .sidebar-toggle .toggle-icon {
+            font-size: 12px;
+        }
+
+        /* When sidebar collapsed - show floating button */
+        .sidebar-expand-btn {
+            position: fixed;
+            left: 12px;
+            bottom: 12px;
+            z-index: 101;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-expand-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .sidebar-expand-btn.visible {
+            display: flex;
+        }
+
+        /* Smaller metric cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            padding: 14px 16px !important;
+        }
+
+        .metric-card::before {
+            height: 2px !important;
+        }
+
+        .metric-header {
+            margin-bottom: 6px !important;
+        }
+
+        .metric-icon {
+            width: 28px !important;
+            height: 28px !important;
+            font-size: 14px !important;
+            border-radius: 6px !important;
+        }
+
+        .metric-label {
+            font-size: 10px !important;
+            margin-bottom: 2px !important;
+        }
+
+        .metric-value {
+            font-size: 20px !important;
+        }
+        
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Smaller table */
+        .table-card {
+            border-radius: var(--radius-lg) !important;
+        }
+
+        .table-header {
+            padding: 12px 16px !important;
+        }
+
+        .table-title {
+            font-size: 13px !important;
+        }
+
+        th {
+            padding: 10px 14px !important;
+            font-size: 10px !important;
+        }
+
+        td {
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+        }
+
+        .content {
+            padding: 20px 24px 40px !important;
+        }
+
+        .topbar {
+            height: 56px !important;
+            padding: 0 24px !important;
+        }
+
+        .page-title {
+            font-size: 17px !important;
+        }
+
+        /* Main tabs above table */
+        .main-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .main-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .main-tab:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .main-tab.active {
+            background: var(--gradient-1);
+            color: #1a1a2e;
+            border-color: transparent;
+        }
+
+        .main-tab .tab-icon {
+            font-size: 15px;
+        }
+
+        .main-tab .tab-badge {
+            background: rgba(0,0,0,0.15);
+            padding: 2px 7px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .main-tab.active .tab-badge {
+            background: rgba(0,0,0,0.2);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            padding: 0 14px;
+            gap: 10px;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 13px;
+            padding: 10px 0;
+            width: 200px;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-dim);
+        }
+
+        /* Customer row styles */
+        .customer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--gradient-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+
+        .customer-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--text-primary);
+        }
+
+        .customer-info span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .contact-links {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+        }
+
+        .contact-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .contact-links a:hover {
+            color: var(--accent-primary);
+        }
+
+        .country-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .country-cell .flag {
+            font-size: 20px;
+        }
+
+        .value-cell {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .time-cell {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .time-cell strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        /* Order items display */
+        .order-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .order-products {
+            font-size: 12px;
+            color: var(--text-primary);
+            line-height: 1.5;
+            max-width: 300px;
+            background: var(--bg-subtle);
+            padding: 6px 10px;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .order-products br + br {
+            display: none;
+        }
+
+        /* Order status badges */
+        .order-status-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .order-status-badge.status-pending {
+            background: var(--accent-amber-soft);
+            color: var(--accent-amber);
+        }
+
+        .order-status-badge.status-cancelled {
+            background: var(--accent-red-soft);
+            color: var(--accent-red);
+        }
+
+        .order-status-badge.status-failed {
+            background: var(--accent-red-soft);
+            color: var(--accent-red);
+        }
+
+        .order-status-badge.status-on-hold {
+            background: var(--accent-cyan-soft);
+            color: var(--accent-cyan);
+        }
+
+        /* Status dropdown */
+        .status-select {
+            padding: 8px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 28px;
+        }
+
+        .status-select:focus {
+            outline: none;
+        }
+
+        .status-select.status-not_called { 
+            background-color: var(--bg-overlay); 
+            color: var(--text-muted); 
+        }
+
+        .status-select.status-called_no_answer { 
+            background-color: var(--accent-amber-soft); 
+            color: var(--accent-amber); 
+        }
+
+        .status-select.status-callback_scheduled { 
+            background-color: var(--accent-cyan-soft); 
+            color: var(--accent-cyan); 
+        }
+
+        .status-select.status-converted { 
+            background-color: var(--accent-green-soft); 
+            color: var(--accent-green); 
+        }
+
+        .status-select.status-not_interested { 
+            background-color: var(--accent-red-soft); 
+            color: var(--accent-red); 
+        }
+
+        .status-select option {
+            background: var(--bg-base);
+            color: var(--text-primary);
+        }
+
+        /* Action buttons */
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .action-call {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .action-call:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+
+        .action-edit {
+            background: var(--bg-overlay);
+            color: var(--text-primary);
+        }
+
+        .action-edit:hover {
+            background: var(--accent-primary);
+            color: #1a1a2e;
+        }
+
+        .action-disabled {
+            background: var(--bg-overlay);
+            color: var(--text-dim);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Empty state */
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empty p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius);
+            background: var(--bg-overlay);
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-primary-soft);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+    <button class="sidebar-expand-btn" onclick="toggleSidebarCollapse()" id="sidebarExpand">☰</button>
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo">N</div>
+                <div>
+                    <div class="sidebar-title">Noriks</div>
+                    <div class="sidebar-subtitle">Call Center</div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Menu</div>
+                <a href="/callcenter/" class="nav-item active">
+                    <span class="nav-icon">📞</span>
+                    Contacts
+                </a>
+                <a href="/callcenter/report" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    Report
+                </a>
+            </div>
+            <div class="nav-section" id="countries-section">
+                <div class="nav-section-title">Countries</div>
+                <a href="#" class="nav-item country-nav active" data-country="">
+                    <span class="nav-icon">🌍</span>
+                    All Countries
+                </a>
+                <a href="#" class="nav-item country-nav" data-country="hr">
+                    <span class="nav-icon">🇭🇷</span>
+                    Croatia
+                </a>
+                <a href="#" class="nav-item country-nav" data-country="cz">
+                    <span class="nav-icon">🇨🇿</span>
+                    Czech
+                </a>
+                <a href="#" class="nav-item country-nav" data-country="pl">
+                    <span class="nav-icon">🇵🇱</span>
+                    Poland
+                </a>
+                <a href="#" class="nav-item country-nav" data-country="sk">
+                    <span class="nav-icon">🇸🇰</span>
+                    Slovakia
+                </a>
+                <a href="#" class="nav-item country-nav" data-country="hu">
+                    <span class="nav-icon">🇭🇺</span>
+                    Hungary
+                </a>
+                <a href="#" class="nav-item country-nav" data-country="gr">
+                    <span class="nav-icon">🇬🇷</span>
+                    Greece
+                </a>
+                <a href="#" class="nav-item country-nav" data-country="it">
+                    <span class="nav-icon">🇮🇹</span>
+                    Italy
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="#" class="nav-item" onclick="loadData(); return false;">
+                    <span class="nav-icon">🔄</span>
+                    Refresh
+                </a>
+                <a href="#" class="nav-item" onclick="logout(); return false;">
+                    <span class="nav-icon">🚪</span>
+                    Logout
+                </a>
+            </div>
+        </div>
+        <div class="sidebar-toggle-wrapper">
+            <button class="sidebar-toggle" onclick="toggleSidebarCollapse()" id="sidebarToggle">
+                <span class="toggle-icon">◀</span>
+                Hide Sidebar
+            </button>
+        </div>
+    </nav>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+                <h1 class="page-title">Call Center</h1>
+            </div>
+            <div class="topbar-right">
+                <span id="userBadge" style="font-size: 13px; color: var(--text-muted);"></span>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span>
+                    <span id="themeText">Dark</span>
+                </button>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span id="lastUpdated">Live</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">📊</div>
+                    </div>
+                    <div class="metric-label">Total Contacts</div>
+                    <div class="metric-value text-primary" id="stat-total">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">📞</div>
+                    </div>
+                    <div class="metric-label">To Call</div>
+                    <div class="metric-value text-amber" id="stat-tocall">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">✅</div>
+                    </div>
+                    <div class="metric-label">Converted</div>
+                    <div class="metric-value text-green" id="stat-converted">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">💰</div>
+                    </div>
+                    <div class="metric-label">Potential Value</div>
+                    <div class="metric-value text-green" id="stat-value">€0</div>
+                </div>
+            </div>
+
+            <!-- Main Tabs -->
+            <div class="main-tabs">
+                <button class="main-tab active" data-tab="abandoned">
+                    <span class="tab-icon">🛒</span>
+                    Abandoned Carts
+                    <span class="tab-badge" id="badge-carts">0</span>
+                </button>
+                <button class="main-tab" data-tab="pending">
+                    <span class="tab-icon">⏳</span>
+                    Pending/Failed
+                    <span class="tab-badge" id="badge-pending">0</span>
+                </button>
+                <button class="main-tab" data-tab="suppressed">
+                    <span class="tab-icon">🚫</span>
+                    Suppressed
+                    <span class="tab-badge" id="badge-suppressed">0</span>
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-row">
+                <select class="filter-select" id="filter-status">
+                    <option value="">All Statuses</option>
+                    <option value="not_called">Not Called</option>
+                    <option value="called_no_answer">No Answer</option>
+                    <option value="callback_scheduled">Callback</option>
+                    <option value="converted">Converted</option>
+                    <option value="not_interested">Not Interested</option>
+                </select>
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="search" placeholder="Search contacts...">
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">
+                        <span>📋</span>
+                        Contact List
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead id="table-head">
+                            <tr>
+                                <th>Country</th>
+                                <th>Customer</th>
+                                <th>Value</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                            <tr><td colspan="6">
+                                <div class="loading">
+                                    <span class="spinner"></span>
+                                    Loading contacts...
+                                </div>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Contact</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <input type="hidden" id="edit-id">
+            <div class="form-group">
+                <label>Status</label>
+                <select id="edit-status">
+                    <option value="not_called">Not Called</option>
+                    <option value="called_no_answer">No Answer</option>
+                    <option value="callback_scheduled">Callback</option>
+                    <option value="converted">Converted</option>
+                    <option value="not_interested">Not Interested</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea id="edit-notes" placeholder="Add notes..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="save()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const user = JSON.parse(localStorage.getItem('callcenter-user') || 'null');
+        if (!user) {
+            window.location.href = '/callcenter/login';
+        } else {
+            document.getElementById('userBadge').textContent = '👤 ' + user.username;
+        }
+
+        function logout() {
+            localStorage.removeItem('callcenter-user');
+            window.location.href = '/callcenter/login';
+        }
+
+        // Hide countries section if user is limited to one country
+        if (user && !user.countries.includes('all')) {
+            document.getElementById('countries-section').style.display = 'none';
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const newTheme = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('callcenter-theme', newTheme);
+            updateThemeUI(newTheme);
+        }
+        
+        function updateThemeUI(theme) {
+            document.getElementById('themeIcon').textContent = theme === 'light' ? '☀️' : '🌙';
+            document.getElementById('themeText').textContent = theme === 'light' ? 'Light' : 'Dark';
+        }
+        
+        // Initialize theme
+        const savedTheme = localStorage.getItem('callcenter-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeUI(savedTheme);
+
+        // Mobile sidebar
+        function toggleMobileSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.sidebar-overlay').classList.toggle('open');
+        }
+
+        // Collapsible sidebar
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const main = document.querySelector('.main');
+            const expandBtn = document.getElementById('sidebarExpand');
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            
+            main.classList.toggle('expanded', isCollapsed);
+            expandBtn.classList.toggle('visible', isCollapsed);
+            
+            localStorage.setItem('sidebar-collapsed', isCollapsed);
+        }
+
+        // Restore sidebar state
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+            document.getElementById('sidebar').classList.add('collapsed');
+            document.querySelector('.main').classList.add('expanded');
+            document.getElementById('sidebarExpand').classList.add('visible');
+        }
+
+        let carts = [], profiles = [], pendingOrders = [], tab = 'abandoned', country = '';
+
+        // Main tabs (above table)
+        document.querySelectorAll('.main-tab').forEach(el => {
+            el.onclick = () => {
+                document.querySelectorAll('.main-tab').forEach(e => e.classList.remove('active'));
+                el.classList.add('active');
+                tab = el.dataset.tab;
+                render();
+            };
+        });
+
+        // Country navigation (sidebar)
+        document.querySelectorAll('.country-nav').forEach(el => {
+            el.onclick = (e) => {
+                e.preventDefault();
+                if (el.classList.contains('disabled')) return;
+                document.querySelectorAll('.country-nav').forEach(e => e.classList.remove('active'));
+                el.classList.add('active');
+                country = el.dataset.country;
+                render();
+            };
+        });
+
+        async function loadData() {
+            document.getElementById('lastUpdated').textContent = 'Loading...';
+            let [c, p, pend] = await Promise.all([
+                fetch('api/abandoned-carts').then(r => r.json()),
+                fetch('api/suppressed-profiles').then(r => r.json()),
+                fetch('api/pending-orders').then(r => r.json())
+            ]);
+            
+            // Filter by user's allowed countries
+            if (user && !user.countries.includes('all')) {
+                c = c.filter(cart => user.countries.includes(cart.storeCode));
+                pend = pend.filter(o => user.countries.includes(o.storeCode));
+            }
+            
+            carts = c; profiles = p; pendingOrders = pend;
+            
+            document.getElementById('badge-carts').textContent = carts.length;
+            document.getElementById('badge-pending').textContent = pendingOrders.length;
+            document.getElementById('badge-suppressed').textContent = profiles.length;
+            document.getElementById('lastUpdated').textContent = 'Just now';
+            
+            render();
+        }
+
+        function getData() {
+            const status = document.getElementById('filter-status').value;
+            const search = document.getElementById('search').value.toLowerCase();
+            let data = tab === 'abandoned' ? carts : (tab === 'pending' ? pendingOrders : profiles);
+            
+            return data.filter(d => {
+                if (status && d.callStatus !== status) return false;
+                if ((tab === 'abandoned' || tab === 'pending') && country && d.storeCode !== country) return false;
+                if (search) {
+                    const name = tab === 'suppressed' ? `${d.firstName} ${d.lastName}` : d.customerName;
+                    if (!`${name} ${d.email} ${d.phone||''}`.toLowerCase().includes(search)) return false;
+                }
+                return true;
+            });
+        }
+
+        function render() {
+            const data = getData();
+            let all = tab === 'abandoned' ? carts : (tab === 'pending' ? pendingOrders : profiles);
+            if ((tab === 'abandoned' || tab === 'pending') && country) all = all.filter(c => c.storeCode === country);
+
+            document.getElementById('stat-total').textContent = all.length;
+            document.getElementById('stat-tocall').textContent = all.filter(d => d.callStatus === 'not_called').length;
+            document.getElementById('stat-converted').textContent = all.filter(d => d.callStatus === 'converted').length;
+            
+            if (tab === 'abandoned') {
+                const val = all.filter(c => c.callStatus === 'not_called').reduce((s,c) => s + (c.cartValue||0), 0);
+                document.getElementById('stat-value').textContent = '€' + val.toFixed(2);
+            } else if (tab === 'pending') {
+                const val = all.filter(c => c.callStatus === 'not_called').reduce((s,c) => s + (c.orderTotal||0), 0);
+                document.getElementById('stat-value').textContent = '€' + val.toFixed(2);
+            } else {
+                // For suppressed: show total order value of profiles with orders
+                const withOrders = all.filter(p => p.lastOrder);
+                const val = withOrders.reduce((s, p) => s + parseFloat(p.lastOrder.total || 0), 0);
+                document.getElementById('stat-value').textContent = withOrders.length > 0 ? '€' + val.toFixed(0) : '—';
+            }
+
+            // Update table headers based on tab
+            const thead = document.getElementById('table-head');
+            if (tab === 'abandoned') {
+                thead.innerHTML = `<tr>
+                    <th>Country</th>
+                    <th>Customer</th>
+                    <th>Cart</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>`;
+            } else if (tab === 'pending') {
+                thead.innerHTML = `<tr>
+                    <th>Country</th>
+                    <th>Customer</th>
+                    <th>Order</th>
+                    <th>Date</th>
+                    <th>Call Status</th>
+                    <th>Actions</th>
+                </tr>`;
+            } else {
+                thead.innerHTML = `<tr>
+                    <th>Country</th>
+                    <th>Customer</th>
+                    <th>Last Order</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>`;
+            }
+
+            const tbody = document.getElementById('tbody');
+            const colspan = tab === 'abandoned' ? 6 : 6;
+            
+            if (!data.length) {
+                tbody.innerHTML = `<tr><td colspan="${colspan}"><div class="empty"><div class="empty-icon">📭</div><h3>No contacts found</h3><p>Try changing your filters</p></div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(d => {
+                if (tab === 'abandoned') {
+                    const cartItems = d.cartContents && d.cartContents.length > 0 
+                        ? d.cartContents.map(i => `${i.quantity}× ${esc(i.name)}`).join('<br>') 
+                        : '';
+                    return `<tr>
+                        <td><div class="country-cell"><span class="flag">${d.storeFlag}</span>${d.storeCode.toUpperCase()}</div></td>
+                        <td>
+                            <div class="customer">
+                                <div class="avatar">${initials(d.customerName)}</div>
+                                <div class="customer-info">
+                                    <h4>${esc(d.customerName)}${d.location ? ` <span>· ${esc(d.location)}</span>` : ''}</h4>
+                                    <div class="contact-links">
+                                        ${d.email ? `<a href="mailto:${d.email}">✉️ ${d.email}</a>` : ''}
+                                        ${d.phone ? `<a href="tel:${d.phone}">📱 ${d.phone}</a>` : '<span style="color:var(--accent-red)">No phone</span>'}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="order-items">
+                                <span class="value-cell">${formatPrice(d.cartValue, d.currency)}</span>
+                                ${cartItems ? `<div class="order-products">${cartItems}</div>` : ''}
+                            </div>
+                        </td>
+                        <td><div class="time-cell"><strong>${ago(d.abandonedAt)}</strong>${fdate(d.abandonedAt)}</div></td>
+                        <td>${statusSelect(d.id, d.callStatus)}</td>
+                        <td><div class="actions">
+                            ${d.phone ? `<a href="tel:${d.phone}" class="action-btn action-call">📞</a>` : `<span class="action-btn action-disabled">📞</span>`}
+                            <button class="action-btn action-edit" onclick="edit('${d.id}','${d.callStatus}',\`${esc(d.notes||'')}\`)">✏️</button>
+                        </div></td>
+                    </tr>`;
+                } else if (tab === 'pending') {
+                    const orderItems = d.items && d.items.length > 0 
+                        ? d.items.map(i => `${i.quantity}× ${esc(i.name)}`).join('<br>') 
+                        : '';
+                    return `<tr>
+                        <td><div class="country-cell"><span class="flag">${d.storeFlag}</span>${d.storeCode.toUpperCase()}</div></td>
+                        <td>
+                            <div class="customer">
+                                <div class="avatar">${initials(d.customerName)}</div>
+                                <div class="customer-info">
+                                    <h4>${esc(d.customerName)}${d.location ? ` <span>· ${esc(d.location)}</span>` : ''}</h4>
+                                    <div class="contact-links">
+                                        ${d.email ? `<a href="mailto:${d.email}">✉️ ${d.email}</a>` : ''}
+                                        ${d.phone ? `<a href="tel:${d.phone}">📱 ${d.phone}</a>` : '<span style="color:var(--accent-red)">No phone</span>'}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="order-items">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <span class="value-cell">${formatPrice(d.orderTotal, d.currency)}</span>
+                                    <span class="order-status-badge status-${d.orderStatus}">${orderStatusName(d.orderStatus)}</span>
+                                </div>
+                                <div class="order-products">${orderItems}</div>
+                            </div>
+                        </td>
+                        <td><div class="time-cell"><strong>${ago(d.createdAt)}</strong>${fdate(d.createdAt)}</div></td>
+                        <td>${statusSelect(d.id, d.callStatus)}</td>
+                        <td><div class="actions">
+                            ${d.phone ? `<a href="tel:${d.phone}" class="action-btn action-call">📞</a>` : `<span class="action-btn action-disabled">📞</span>`}
+                            <button class="action-btn action-edit" onclick="edit('${d.id}','${d.callStatus}',\`${esc(d.notes||'')}\`)">✏️</button>
+                        </div></td>
+                    </tr>`;
+                } else {
+                    const o = d.lastOrder;
+                    const orderItems = o && o.items && o.items.length > 0 
+                        ? o.items.map(i => `${i.quantity}× ${esc(i.name)}`).join('<br>') 
+                        : '';
+                    return `<tr>
+                        <td><div class="country-cell"><span class="flag">🇭🇷</span>HR</div></td>
+                        <td>
+                            <div class="customer">
+                                <div class="avatar">${initials(d.firstName + ' ' + d.lastName)}</div>
+                                <div class="customer-info">
+                                    <h4>${esc(d.firstName)} ${esc(d.lastName)}</h4>
+                                    <div class="contact-links">
+                                        ${d.email ? `<a href="mailto:${d.email}">✉️ ${d.email}</a>` : ''}
+                                        ${d.phone ? `<a href="tel:${d.phone}">📱 ${d.phone}</a>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${o ? `<div class="order-items"><span class="value-cell">${formatPrice(o.total, o.currency)}</span><div class="order-products">${orderItems}</div></div>` : '<span style="color:var(--text-dim)">No order</span>'}</td>
+                        <td>${o ? `<div class="time-cell"><strong>${ago(o.date)}</strong>${fdate(o.date)}</div>` : '<span style="color:var(--text-dim)">—</span>'}</td>
+                        <td>${statusSelect(d.id, d.callStatus)}</td>
+                        <td><div class="actions">
+                            ${d.phone ? `<a href="tel:${d.phone}" class="action-btn action-call">📞</a>` : ''}
+                            <button class="action-btn action-edit" onclick="edit('${d.id}','${d.callStatus}',\`${esc(d.notes||'')}\`)">✏️</button>
+                        </div></td>
+                    </tr>`;
+                }
+            }).join('');
+        }
+
+        function edit(id, status, notes) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-status').value = status;
+            document.getElementById('edit-notes').value = notes;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        async function save() {
+            const id = document.getElementById('edit-id').value;
+            const callStatus = document.getElementById('edit-status').value;
+            const notes = document.getElementById('edit-notes').value;
+            
+            await fetch('api/update-status', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id, callStatus, notes})
+            });
+            
+            [...carts, ...profiles].filter(x => x.id === id).forEach(x => {
+                x.callStatus = callStatus;
+                x.notes = notes;
+            });
+            
+            render();
+            closeModal();
+        }
+
+        function esc(s) { if(!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML.replace(/`/g,'&#96;'); }
+        function orderStatusName(s) { return {pending:'Pending',cancelled:'Cancelled',failed:'Failed','on-hold':'On Hold'}[s]||s; }
+        function currencySymbol(c) { return {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft',HRK:'€',GBP:'£',USD:'$'}[c]||c+' '; }
+        function formatPrice(amount, currency) { 
+            const sym = currencySymbol(currency || 'EUR');
+            const val = parseFloat(amount) || 0;
+            // CZK, HUF show without decimals
+            if (currency === 'CZK' || currency === 'HUF') return val.toFixed(0) + ' ' + sym;
+            return sym + val.toFixed(2);
+        }
+        function initials(n) { return (n||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+        function ago(d) { if(!d) return '—'; const ms = Date.now() - new Date(d).getTime(); const h = ms/3600000|0, dy = ms/86400000|0; return dy > 0 ? dy+'d ago' : h > 0 ? h+'h ago' : 'Just now'; }
+        function fdate(d) { if(!d) return ''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); }
+        function sname(s) { return {not_called:'Not Called',called_no_answer:'No Answer',callback_scheduled:'Callback',converted:'Converted',not_interested:'Not Interested'}[s]||s; }
+        
+        function statusSelect(id, current) {
+            const opts = ['not_called','called_no_answer','callback_scheduled','converted','not_interested'];
+            return `<select class="status-select status-${current}" onchange="updateStatus('${id}', this.value, this)">
+                ${opts.map(o => `<option value="${o}" ${o===current?'selected':''}>${sname(o)}</option>`).join('')}
+            </select>`;
+        }
+        
+        async function updateStatus(id, newStatus, el) {
+            // Update class for styling
+            el.className = 'status-select status-' + newStatus;
+            
+            // Save to server
+            await fetch('api/update-status', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id, callStatus: newStatus, notes: ''})
+            });
+            
+            // Update local data
+            [...carts, ...profiles].filter(x => x.id === id).forEach(x => {
+                x.callStatus = newStatus;
+            });
+            
+            // Update stats
+            updateStats();
+        }
+        
+        function updateStats() {
+            let all = tab === 'abandoned' ? carts : (tab === 'pending' ? pendingOrders : profiles);
+            if ((tab === 'abandoned' || tab === 'pending') && country) all = all.filter(c => c.storeCode === country);
+            
+            document.getElementById('stat-total').textContent = all.length;
+            document.getElementById('stat-tocall').textContent = all.filter(d => d.callStatus === 'not_called').length;
+            document.getElementById('stat-converted').textContent = all.filter(d => d.callStatus === 'converted').length;
+            
+            if (tab === 'abandoned') {
+                const val = all.filter(c => c.callStatus === 'not_called').reduce((s,c) => s + (c.cartValue||0), 0);
+                document.getElementById('stat-value').textContent = '€' + val.toFixed(2);
+            } else if (tab === 'pending') {
+                const val = all.filter(c => c.callStatus === 'not_called').reduce((s,c) => s + (c.orderTotal||0), 0);
+                document.getElementById('stat-value').textContent = '€' + val.toFixed(2);
+            }
+        }
+
+        document.getElementById('filter-status').onchange = render;
+        document.getElementById('search').oninput = render;
+        document.getElementById('modal').onclick = e => { if(e.target.id==='modal') closeModal(); };
+
+        loadData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+# Noriks Call Center - cPanel config
+
+# Disable caching for HTML files
+<FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate"
+</FilesMatch>
+
+# Default document
+DirectoryIndex index.html
+
+# Protect data directory
+<Directory "data">
+    Deny from all
+</Directory>
+
+# Protect sensitive files
+<FilesMatch "^(data|\.htaccess|\.git)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

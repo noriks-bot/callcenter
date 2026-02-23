@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report - Noriks Call Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --radius: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+        }
+
+        .sidebar { transition: transform 0.3s ease; }
+        .sidebar.collapsed { transform: translateX(-100%); }
+        .main { transition: margin-left 0.3s ease; }
+        .main.expanded { margin-left: 0; }
+
+        .sidebar-toggle-wrapper {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: auto;
+        }
+
+        .sidebar-toggle {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-overlay);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .sidebar-expand-btn {
+            position: fixed;
+            left: 12px;
+            bottom: 12px;
+            z-index: 101;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        .sidebar-expand-btn.visible { display: flex; }
+
+        .content { padding: 20px 24px 40px !important; }
+        .topbar { height: 56px !important; padding: 0 24px !important; }
+        .page-title { font-size: 17px !important; }
+
+        .table-card { border-radius: var(--radius-lg) !important; }
+        .table-header { padding: 12px 16px !important; }
+        .table-title { font-size: 13px !important; }
+        th { padding: 10px 14px !important; font-size: 10px !important; }
+        td { padding: 10px 14px !important; font-size: 13px !important; }
+
+        .stat-row td { font-weight: 600; }
+        .stat-row.total { background: var(--accent-primary-soft); }
+        .stat-row.total td { font-weight: 700; }
+
+        .text-green { color: var(--accent-green); }
+        .text-amber { color: var(--accent-amber); }
+        .text-red { color: var(--accent-red); }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+    <button class="sidebar-expand-btn" onclick="toggleSidebarCollapse()" id="sidebarExpand">☰</button>
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo">N</div>
+                <div>
+                    <div class="sidebar-title">Noriks</div>
+                    <div class="sidebar-subtitle">Call Center</div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Menu</div>
+                <a href="/callcenter/" class="nav-item">
+                    <span class="nav-icon">📞</span>
+                    Contacts
+                </a>
+                <a href="/callcenter/report" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    Report
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="#" class="nav-item" onclick="logout(); return false;">
+                    <span class="nav-icon">🚪</span>
+                    Logout
+                </a>
+            </div>
+        </div>
+        <div class="sidebar-toggle-wrapper">
+            <button class="sidebar-toggle" onclick="toggleSidebarCollapse()">
+                <span>◀</span> Hide Sidebar
+            </button>
+        </div>
+    </nav>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+                <h1 class="page-title">Report</h1>
+            </div>
+            <div class="topbar-right">
+                <span id="userBadge" style="font-size: 13px; color: var(--text-muted);"></span>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span>
+                    <span id="themeText">Dark</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">
+                        <span>📊</span>
+                        Call Statistics by Country
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Country</th>
+                                <th>Total</th>
+                                <th>Not Called</th>
+                                <th>No Answer</th>
+                                <th>Callback</th>
+                                <th>Converted</th>
+                                <th>Not Interested</th>
+                                <th>Conv. Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsBody">
+                            <tr><td colspan="8"><div class="loading"><span class="spinner"></span> Loading...</div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-card" style="margin-top: 20px;">
+                <div class="table-header">
+                    <div class="table-title">
+                        <span>🚫</span>
+                        Suppressed Profiles Statistics
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppressedStats">
+                            <tr><td colspan="2"><div class="loading"><span class="spinner"></span> Loading...</div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Check auth
+        const user = JSON.parse(localStorage.getItem('callcenter-user') || 'null');
+        if (!user) {
+            window.location.href = '/callcenter/login';
+        } else {
+            document.getElementById('userBadge').textContent = `👤 ${user.username}`;
+        }
+
+        function logout() {
+            localStorage.removeItem('callcenter-user');
+            window.location.href = '/callcenter/login';
+        }
+
+        // Theme
+        function toggleTheme() {
+            const html = document.documentElement;
+            const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('callcenter-theme', newTheme);
+            document.getElementById('themeIcon').textContent = newTheme === 'light' ? '☀️' : '🌙';
+            document.getElementById('themeText').textContent = newTheme === 'light' ? 'Light' : 'Dark';
+        }
+
+        const savedTheme = localStorage.getItem('callcenter-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeIcon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+        document.getElementById('themeText').textContent = savedTheme === 'light' ? 'Light' : 'Dark';
+
+        // Sidebar
+        function toggleMobileSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.sidebar-overlay').classList.toggle('open');
+        }
+
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const main = document.querySelector('.main');
+            const expandBtn = document.getElementById('sidebarExpand');
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            main.classList.toggle('expanded', isCollapsed);
+            expandBtn.classList.toggle('visible', isCollapsed);
+            localStorage.setItem('sidebar-collapsed', isCollapsed);
+        }
+
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+            document.getElementById('sidebar').classList.add('collapsed');
+            document.querySelector('.main').classList.add('expanded');
+            document.getElementById('sidebarExpand').classList.add('visible');
+        }
+
+        // Load stats
+        async function loadStats() {
+            const [carts, profiles] = await Promise.all([
+                fetch('/callcenter/api/abandoned-carts').then(r => r.json()),
+                fetch('/callcenter/api/suppressed-profiles').then(r => r.json())
+            ]);
+
+            // Filter by user countries
+            let filteredCarts = carts;
+            if (!user.countries.includes('all')) {
+                filteredCarts = carts.filter(c => user.countries.includes(c.storeCode));
+            }
+
+            // Group by country
+            const byCountry = {};
+            const flags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', gr: '🇬🇷', it: '🇮🇹', hu: '🇭🇺' };
+
+            filteredCarts.forEach(c => {
+                if (!byCountry[c.storeCode]) {
+                    byCountry[c.storeCode] = {
+                        flag: flags[c.storeCode] || '🌍',
+                        name: c.storeName,
+                        total: 0,
+                        not_called: 0,
+                        called_no_answer: 0,
+                        callback_scheduled: 0,
+                        converted: 0,
+                        not_interested: 0
+                    };
+                }
+                byCountry[c.storeCode].total++;
+                byCountry[c.storeCode][c.callStatus]++;
+            });
+
+            // Render country stats
+            const totals = { total: 0, not_called: 0, called_no_answer: 0, callback_scheduled: 0, converted: 0, not_interested: 0 };
+            let html = '';
+
+            Object.entries(byCountry).forEach(([code, s]) => {
+                const rate = s.total > 0 ? ((s.converted / s.total) * 100).toFixed(1) : '0.0';
+                html += `<tr class="stat-row">
+                    <td>${s.flag} ${s.name}</td>
+                    <td>${s.total}</td>
+                    <td>${s.not_called}</td>
+                    <td>${s.called_no_answer}</td>
+                    <td>${s.callback_scheduled}</td>
+                    <td class="text-green">${s.converted}</td>
+                    <td class="text-red">${s.not_interested}</td>
+                    <td class="${parseFloat(rate) >= 10 ? 'text-green' : parseFloat(rate) >= 5 ? 'text-amber' : ''}">${rate}%</td>
+                </tr>`;
+                
+                Object.keys(totals).forEach(k => totals[k] += s[k]);
+            });
+
+            const totalRate = totals.total > 0 ? ((totals.converted / totals.total) * 100).toFixed(1) : '0.0';
+            html += `<tr class="stat-row total">
+                <td>📊 TOTAL</td>
+                <td>${totals.total}</td>
+                <td>${totals.not_called}</td>
+                <td>${totals.called_no_answer}</td>
+                <td>${totals.callback_scheduled}</td>
+                <td class="text-green">${totals.converted}</td>
+                <td class="text-red">${totals.not_interested}</td>
+                <td class="${parseFloat(totalRate) >= 10 ? 'text-green' : parseFloat(totalRate) >= 5 ? 'text-amber' : ''}">${totalRate}%</td>
+            </tr>`;
+
+            document.getElementById('statsBody').innerHTML = html || '<tr><td colspan="8">No data</td></tr>';
+
+            // Suppressed stats
+            const suppStats = {
+                total: profiles.length,
+                not_called: profiles.filter(p => p.callStatus === 'not_called').length,
+                called: profiles.filter(p => p.callStatus !== 'not_called').length,
+                converted: profiles.filter(p => p.callStatus === 'converted').length,
+                with_orders: profiles.filter(p => p.lastOrder).length
+            };
+
+            document.getElementById('suppressedStats').innerHTML = `
+                <tr><td>Total Suppressed</td><td>${suppStats.total}</td></tr>
+                <tr><td>Not Called</td><td>${suppStats.not_called}</td></tr>
+                <tr><td>Called</td><td>${suppStats.called}</td></tr>
+                <tr><td>Converted</td><td class="text-green">${suppStats.converted}</td></tr>
+                <tr><td>With Previous Orders</td><td>${suppStats.with_orders}</td></tr>
+            `;
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>
