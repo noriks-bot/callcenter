@@ -997,6 +997,250 @@ function removeSmsFromQueue($smsId) {
     return ['success' => true];
 }
 
+// ========== PAKETOMATI FUNCTIONS ==========
+$paketomatStatusFile = __DIR__ . '/data/paketomat-status.json';
+$notificationSettingsFile = __DIR__ . '/data/notification-settings.json';
+$lastSeenFile = __DIR__ . '/data/last-seen.json';
+
+function loadPaketomatStatus() {
+    global $paketomatStatusFile;
+    if (file_exists($paketomatStatusFile)) {
+        return json_decode(file_get_contents($paketomatStatusFile), true) ?: [];
+    }
+    return [];
+}
+
+function savePaketomatStatus($data) {
+    global $paketomatStatusFile;
+    $dir = dirname($paketomatStatusFile);
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    file_put_contents($paketomatStatusFile, json_encode($data, JSON_PRETTY_PRINT));
+}
+
+function loadNotificationSettings() {
+    global $notificationSettingsFile;
+    if (file_exists($notificationSettingsFile)) {
+        return json_decode(file_get_contents($notificationSettingsFile), true) ?: [];
+    }
+    return [
+        'desktopEnabled' => true,
+        'soundEnabled' => true,
+        'pollingInterval' => 30000
+    ];
+}
+
+function saveNotificationSettings($data) {
+    global $notificationSettingsFile;
+    $dir = dirname($notificationSettingsFile);
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    file_put_contents($notificationSettingsFile, json_encode($data, JSON_PRETTY_PRINT));
+}
+
+function loadLastSeen() {
+    global $lastSeenFile;
+    if (file_exists($lastSeenFile)) {
+        return json_decode(file_get_contents($lastSeenFile), true) ?: [];
+    }
+    return ['carts' => [], 'paketomati' => []];
+}
+
+function saveLastSeen($data) {
+    global $lastSeenFile;
+    $dir = dirname($lastSeenFile);
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    file_put_contents($lastSeenFile, json_encode($data, JSON_PRETTY_PRINT));
+}
+
+function fetchPaketomatOrders($filter = 'all') {
+    global $metakocka;
+    
+    $cached = getCache('paketomat_orders_' . $filter, 120);
+    if ($cached !== null) return $cached;
+    
+    $statusData = loadPaketomatStatus();
+    $allOrders = [];
+    
+    // Fetch orders with delivery_service paketomat
+    $deliveryServices = [];
+    if ($filter === 'all' || $filter === 'paketomat') {
+        $deliveryServices[] = 'paketomat';
+        $deliveryServices[] = 'Paketomat';
+        $deliveryServices[] = 'InPost';
+        $deliveryServices[] = 'inpost';
+    }
+    if ($filter === 'all' || $filter === 'posta') {
+        $deliveryServices[] = 'posta';
+        $deliveryServices[] = 'Pošta';
+        $deliveryServices[] = 'pošta';
+        $deliveryServices[] = 'Posta Slovenije';
+    }
+    
+    foreach ($deliveryServices as $service) {
+        $payload = [
+            'secret_key' => $metakocka['secret_key'],
+            'company_id' => strval($metakocka['company_id']),
+            'doc_type' => 'sales_order',
+            'limit' => 100,
+            'offset' => 0,
+            'query_advance' => [
+                ['type' => 'delivery_service', 'value' => $service]
+            ]
+        ];
+        
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => 'https://main.metakocka.si/rest/eshop/v1/search',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_SSL_VERIFYPEER => true
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode >= 200 && $httpCode < 300) {
+            $data = json_decode($response, true);
+            if (isset($data['opr_code']) && $data['opr_code'] === '0' && isset($data['result'])) {
+                foreach ($data['result'] as $order) {
+                    $orderId = 'mk_' . ($order['mk_id'] ?? $order['count_code'] ?? uniqid());
+                    
+                    // Skip duplicates
+                    $exists = false;
+                    foreach ($allOrders as $existing) {
+                        if ($existing['id'] === $orderId) {
+                            $exists = true;
+                            break;
+                        }
+                    }
+                    if ($exists) continue;
+                    
+                    $savedStatus = $statusData[$orderId] ?? [];
+                    
+                    $allOrders[] = [
+                        'id' => $orderId,
+                        'mkId' => $order['mk_id'] ?? null,
+                        'orderNumber' => $order['count_code'] ?? '',
+                        'customerName' => trim(($order['buyer_name'] ?? '') . ' ' . ($order['buyer_surname'] ?? '')),
+                        'email' => $order['buyer_email'] ?? '',
+                        'phone' => $order['buyer_phone'] ?? $order['buyer_mobile'] ?? '',
+                        'deliveryService' => $order['delivery_service'] ?? $service,
+                        'paketomatLocation' => $order['delivery_paketomat_name'] ?? $order['delivery_address'] ?? '',
+                        'orderTotal' => floatval($order['doc_total'] ?? 0),
+                        'currency' => $order['currency'] ?? 'EUR',
+                        'createdAt' => $order['doc_date'] ?? '',
+                        'status' => $savedStatus['status'] ?? 'not_called',
+                        'notes' => $savedStatus['notes'] ?? '',
+                        'lastUpdated' => $savedStatus['lastUpdated'] ?? null,
+                        'address' => $order['delivery_address'] ?? '',
+                        'city' => $order['delivery_city'] ?? '',
+                        'postcode' => $order['delivery_postcode'] ?? ''
+                    ];
+                }
+            }
+        }
+    }
+    
+    // Sort by date desc
+    usort($allOrders, function($a, $b) {
+        return strtotime($b['createdAt'] ?: '1970-01-01') - strtotime($a['createdAt'] ?: '1970-01-01');
+    });
+    
+    setCache('paketomat_orders_' . $filter, $allOrders);
+    return $allOrders;
+}
+
+function updatePaketomatStatus($orderId, $status, $notes = '') {
+    $statusData = loadPaketomatStatus();
+    $statusData[$orderId] = [
+        'status' => $status,
+        'notes' => $notes,
+        'lastUpdated' => date('c')
+    ];
+    savePaketomatStatus($statusData);
+    
+    // Clear cache
+    global $cacheDir;
+    if (is_dir($cacheDir)) {
+        foreach (glob($cacheDir . '*paketomat*.json') as $file) {
+            @unlink($file);
+        }
+    }
+    
+    return ['success' => true];
+}
+
+function pollForNewItems($userId) {
+    $lastSeen = loadLastSeen();
+    $userLastSeen = $lastSeen[$userId] ?? ['carts' => [], 'paketomati' => [], 'lastCheck' => null];
+    
+    // Fetch current data
+    $carts = fetchAbandonedCarts();
+    $paketomati = fetchPaketomatOrders('all');
+    
+    $newCarts = [];
+    $newPaketomati = [];
+    
+    // Find new carts
+    foreach ($carts as $cart) {
+        if (!in_array($cart['id'], $userLastSeen['carts'])) {
+            $newCarts[] = [
+                'id' => $cart['id'],
+                'customerName' => $cart['customerName'],
+                'cartValue' => $cart['cartValue'],
+                'currency' => $cart['currency'],
+                'storeFlag' => $cart['storeFlag']
+            ];
+        }
+    }
+    
+    // Find new paketomati
+    foreach ($paketomati as $order) {
+        if (!in_array($order['id'], $userLastSeen['paketomati'])) {
+            $newPaketomati[] = [
+                'id' => $order['id'],
+                'customerName' => $order['customerName'],
+                'orderTotal' => $order['orderTotal'],
+                'currency' => $order['currency'],
+                'paketomatLocation' => $order['paketomatLocation']
+            ];
+        }
+    }
+    
+    return [
+        'newCarts' => $newCarts,
+        'newPaketomati' => $newPaketomati,
+        'totalCarts' => count($carts),
+        'totalPaketomati' => count($paketomati)
+    ];
+}
+
+function markItemsSeen($userId, $cartIds, $paketomatIds) {
+    $lastSeen = loadLastSeen();
+    
+    if (!isset($lastSeen[$userId])) {
+        $lastSeen[$userId] = ['carts' => [], 'paketomati' => [], 'lastCheck' => null];
+    }
+    
+    if (!empty($cartIds)) {
+        $lastSeen[$userId]['carts'] = array_unique(array_merge($lastSeen[$userId]['carts'], $cartIds));
+    }
+    if (!empty($paketomatIds)) {
+        $lastSeen[$userId]['paketomati'] = array_unique(array_merge($lastSeen[$userId]['paketomati'], $paketomatIds));
+    }
+    $lastSeen[$userId]['lastCheck'] = date('c');
+    
+    // Keep only last 500 IDs to prevent file bloat
+    $lastSeen[$userId]['carts'] = array_slice($lastSeen[$userId]['carts'], -500);
+    $lastSeen[$userId]['paketomati'] = array_slice($lastSeen[$userId]['paketomati'], -500);
+    
+    saveLastSeen($lastSeen);
+    return ['success' => true];
+}
+
 // Router
 $action = $_GET['action'] ?? '';
 $store = $_GET['store'] ?? null;
@@ -1480,10 +1724,65 @@ try {
             echo json_encode(getCallStats($filters));
             break;
             
+        // ========== PAKETOMATI ENDPOINTS ==========
+        case 'paketomati':
+            $filter = $_GET['filter'] ?? 'all';
+            echo json_encode(fetchPaketomatOrders($filter));
+            break;
+            
+        case 'paketomati-update':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $orderId = $input['id'] ?? '';
+            $status = $input['status'] ?? 'not_called';
+            $notes = $input['notes'] ?? '';
+            
+            if (!$orderId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Missing order ID']);
+                break;
+            }
+            
+            echo json_encode(updatePaketomatStatus($orderId, $status, $notes));
+            break;
+            
+        // ========== NOTIFICATION ENDPOINTS ==========
+        case 'notification-settings':
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                echo json_encode(loadNotificationSettings());
+            } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                saveNotificationSettings($input);
+                echo json_encode(['success' => true]);
+            }
+            break;
+            
+        case 'poll-new':
+            $userId = $_GET['userId'] ?? 'default';
+            echo json_encode(pollForNewItems($userId));
+            break;
+            
+        case 'mark-seen':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $userId = $input['userId'] ?? 'default';
+            $cartIds = $input['cartIds'] ?? [];
+            $paketomatIds = $input['paketomatIds'] ?? [];
+            echo json_encode(markItemsSeen($userId, $cartIds, $paketomatIds));
+            break;
+            
         case 'health':
             echo json_encode([
                 'status' => 'ok', 
-                'version' => '6.0', 
+                'version' => '7.0', 
                 'timestamp' => date('c'),
                 'features' => [
                     'enhanced_order_creation' => true,
@@ -1495,7 +1794,9 @@ try {
                     'sms_settings' => true,
                     'call_logging' => true,
                     'follow_ups' => true,
-                    'analytics' => true
+                    'analytics' => true,
+                    'paketomati' => true,
+                    'realtime_notifications' => true
                 ]
             ]);
             break;
@@ -1527,6 +1828,11 @@ try {
                     'call-logs-customer',
                     'my-followups',
                     'call-stats',
+                    'paketomati',
+                    'paketomati-update',
+                    'notification-settings',
+                    'poll-new',
+                    'mark-seen',
                     'clear-cache', 
                     'login', 
                     'health'

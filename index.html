@@ -1393,6 +1393,11 @@
                     <span>Enkratni kupci</span>
                     <span class="badge" id="navBuyers">0</span>
                 </div>
+                <div class="nav-item" data-tab="paketomati">
+                    <i class="fas fa-box"></i>
+                    <span>📦 Paketomati</span>
+                    <span class="badge" id="navPaketomati">0</span>
+                </div>
             </div>
             
             <div class="nav-section">
@@ -2091,6 +2096,89 @@
         </div>
     </div>
     
+    <!-- Paketomati Content -->
+    <div id="paketomatiContent" style="display:none;padding:24px;">
+        <div style="max-width:1400px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <div>
+                    <h3 style="margin-bottom:8px;">📦 Paketomat & Pošta Naročila</h3>
+                    <p style="color:var(--text-muted);">Naročila iz MetaKocka z dostavno službo paketomat ali pošta - za obveščanje strank.</p>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <select class="filter-select" id="paketomatFilter" onchange="renderPaketomatiTable()">
+                        <option value="all">Vse</option>
+                        <option value="paketomat">Samo Paketomat</option>
+                        <option value="posta">Samo Pošta</option>
+                    </select>
+                    <select class="filter-select" id="paketomatStatusFilter" onchange="renderPaketomatiTable()">
+                        <option value="all">Vsi statusi</option>
+                        <option value="not_called">Ni poklicano</option>
+                        <option value="called">Poklicano</option>
+                        <option value="notified">Obveščeno</option>
+                    </select>
+                    <button class="btn btn-save" onclick="refreshPaketomati()">
+                        <i class="fas fa-sync"></i> Osveži
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-card">
+                <table class="data-table" id="paketomatiTable">
+                    <thead>
+                        <tr>
+                            <th>Št. naročila</th>
+                            <th>Stranka</th>
+                            <th>Telefon</th>
+                            <th>Email</th>
+                            <th>Dostava</th>
+                            <th>Lokacija</th>
+                            <th>Znesek</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paketomatiTableBody">
+                        <tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Settings Modal -->
+    <div id="notificationSettingsModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h3>🔔 Notification Settings</h3>
+                <button class="modal-close" onclick="closeNotificationSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                        <input type="checkbox" id="notifDesktopToggle" onchange="saveNotificationSettings()">
+                        <span>🖥️ Desktop obvestila</span>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                        <input type="checkbox" id="notifSoundToggle" onchange="saveNotificationSettings()">
+                        <span>🔊 Zvočna opozorila</span>
+                    </label>
+                    <div style="margin-top:8px;">
+                        <label style="display:block;margin-bottom:8px;color:var(--text-muted);font-size:13px;">Interval preverjanja:</label>
+                        <select id="notifPollingInterval" class="filter-select" style="width:100%;" onchange="saveNotificationSettings()">
+                            <option value="30000">30 sekund</option>
+                            <option value="60000">1 minuta</option>
+                            <option value="300000">5 minut</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeNotificationSettings()">Zapri</button>
+                <button class="btn btn-save" onclick="testNotification()">🔔 Test</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Analytics Content -->
     <div id="analyticsContent" style="display:none;padding:24px;">
         <div style="max-width:1200px;">
@@ -2387,6 +2475,7 @@ Available variables:
                     carts: 'Abandoned Carts',
                     pending: 'Pending Orders',
                     buyers: 'Enkratni kupci',
+                    paketomati: '📦 Paketomati',
                     'sms-dashboard': 'SMS Dashboard',
                     'sms-settings': 'SMS Provider Settings',
                     'email-templates': 'Email Templates',
@@ -2397,7 +2486,7 @@ Available variables:
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
                 
                 // Show/hide content based on tab
-                const hideTabs = ['sms-dashboard', 'sms-settings', 'email-templates', 'dashboard', 'agents', 'followups', 'analytics'];
+                const hideTabs = ['sms-dashboard', 'sms-settings', 'email-templates', 'dashboard', 'agents', 'followups', 'analytics', 'paketomati'];
                 document.getElementById('dashboardContent').style.display = currentTab === 'dashboard' ? 'block' : 'none';
                 document.getElementById('smsDashboardContent').style.display = currentTab === 'sms-dashboard' ? 'block' : 'none';
                 document.getElementById('smsSettingsContent').style.display = currentTab === 'sms-settings' ? 'block' : 'none';
@@ -2405,6 +2494,7 @@ Available variables:
                 document.getElementById('agentsContent').style.display = currentTab === 'agents' ? 'block' : 'none';
                 document.getElementById('followupsContent').style.display = currentTab === 'followups' ? 'block' : 'none';
                 document.getElementById('analyticsContent').style.display = currentTab === 'analytics' ? 'block' : 'none';
+                document.getElementById('paketomatiContent').style.display = currentTab === 'paketomati' ? 'block' : 'none';
                 document.querySelector('.stats-grid').style.display = hideTabs.includes(currentTab) ? 'none' : 'grid';
                 document.querySelector('.country-tabs').style.display = hideTabs.includes(currentTab) ? 'none' : 'flex';
                 document.querySelector('.content').style.display = hideTabs.includes(currentTab) ? 'none' : 'block';
@@ -2423,6 +2513,8 @@ Available variables:
                     renderFollowups();
                 } else if (currentTab === 'analytics') {
                     renderAnalytics();
+                } else if (currentTab === 'paketomati') {
+                    loadPaketomati();
                 } else {
                     renderTable();
                     setTimeout(addCustomerClickHandlers, 100);
@@ -5715,6 +5807,425 @@ ${esc(previewBody)}
             `;
             document.body.appendChild(modal);
         }
+        
+        // ========== PAKETOMATI FUNCTIONS ==========
+        let paketomatiData = [];
+        
+        async function loadPaketomati() {
+            const filter = document.getElementById('paketomatFilter')?.value || 'all';
+            document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam iz MetaKocka...</td></tr>';
+            
+            try {
+                const res = await fetch(`api.php?action=paketomati&filter=${filter}`);
+                paketomatiData = await res.json();
+                renderPaketomatiTable();
+                updatePaketomatiCount();
+            } catch (e) {
+                document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" style="color:var(--red);">Napaka pri nalaganju podatkov</td></tr>';
+            }
+        }
+        
+        function renderPaketomatiTable() {
+            const statusFilter = document.getElementById('paketomatStatusFilter')?.value || 'all';
+            let filtered = paketomatiData;
+            
+            if (statusFilter !== 'all') {
+                filtered = paketomatiData.filter(o => o.status === statusFilter);
+            }
+            
+            if (filtered.length === 0) {
+                document.getElementById('paketomatiTableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;">Ni naročil za prikaz</td></tr>';
+                return;
+            }
+            
+            const html = filtered.map(order => {
+                const statusColors = {
+                    not_called: 'var(--text-muted)',
+                    called: 'var(--orange)',
+                    notified: 'var(--green)'
+                };
+                const statusLabels = {
+                    not_called: 'Ni poklicano',
+                    called: 'Poklicano',
+                    notified: 'Obveščeno'
+                };
+                
+                return `
+                    <tr>
+                        <td><strong>${esc(order.orderNumber)}</strong></td>
+                        <td>${esc(order.customerName)}</td>
+                        <td>
+                            ${order.phone ? `
+                                <a href="tel:${order.phone}" class="action-btn-mini" title="Pokliči">
+                                    <i class="fas fa-phone"></i> ${esc(order.phone)}
+                                </a>
+                            ` : '<span style="color:var(--text-muted)">-</span>'}
+                        </td>
+                        <td>
+                            ${order.email ? `<a href="mailto:${order.email}" style="color:var(--accent);">${esc(order.email)}</a>` : '-'}
+                        </td>
+                        <td><span style="background:var(--bg-hover);padding:4px 8px;border-radius:4px;font-size:12px;">${esc(order.deliveryService)}</span></td>
+                        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(order.paketomatLocation)}">${esc(order.paketomatLocation || order.city || '-')}</td>
+                        <td><strong>${order.orderTotal.toFixed(2)} ${order.currency}</strong></td>
+                        <td>
+                            <select onchange="updatePaketomatStatus('${order.id}', this.value)" style="background:var(--bg-hover);border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:${statusColors[order.status]};cursor:pointer;">
+                                <option value="not_called" ${order.status === 'not_called' ? 'selected' : ''}>Ni poklicano</option>
+                                <option value="called" ${order.status === 'called' ? 'selected' : ''}>Poklicano</option>
+                                <option value="notified" ${order.status === 'notified' ? 'selected' : ''}>Obveščeno</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div style="display:flex;gap:4px;">
+                                ${order.phone ? `
+                                    <button onclick="callCustomer('${order.phone}')" class="action-btn-mini" title="Pokliči">
+                                        <i class="fas fa-phone"></i>
+                                    </button>
+                                    <button onclick="openSmsModal('${order.id}', '${esc(order.phone)}', '${esc(order.customerName)}', 'paketomat')" class="action-btn-mini" title="Pošlji SMS">
+                                        <i class="fas fa-sms"></i>
+                                    </button>
+                                ` : ''}
+                                <button onclick="showPaketomatNotes('${order.id}', '${esc(order.notes || '')}')" class="action-btn-mini" title="Opombe">
+                                    <i class="fas fa-sticky-note"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('paketomatiTableBody').innerHTML = html;
+        }
+        
+        async function updatePaketomatStatus(orderId, status) {
+            try {
+                const order = paketomatiData.find(o => o.id === orderId);
+                await fetch('api.php?action=paketomati-update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: orderId, status: status, notes: order?.notes || ''})
+                });
+                
+                // Update local data
+                if (order) order.status = status;
+                renderPaketomatiTable();
+                showToast(`Status posodobljen: ${status}`);
+            } catch (e) {
+                showToast('Napaka pri posodabljanju statusa', 'error');
+            }
+        }
+        
+        function showPaketomatNotes(orderId, currentNotes) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'paketomatNotesModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width:500px;">
+                    <div class="modal-header">
+                        <h3>📝 Opombe</h3>
+                        <button class="modal-close" onclick="document.getElementById('paketomatNotesModal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea id="paketomatNotesText" rows="5" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);resize:vertical;">${currentNotes}</textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-cancel" onclick="document.getElementById('paketomatNotesModal').remove()">Prekliči</button>
+                        <button class="btn btn-save" onclick="savePaketomatNotes('${orderId}')">Shrani</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        async function savePaketomatNotes(orderId) {
+            const notes = document.getElementById('paketomatNotesText').value;
+            const order = paketomatiData.find(o => o.id === orderId);
+            
+            try {
+                await fetch('api.php?action=paketomati-update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: orderId, status: order?.status || 'not_called', notes: notes})
+                });
+                
+                if (order) order.notes = notes;
+                document.getElementById('paketomatNotesModal').remove();
+                showToast('Opombe shranjene');
+            } catch (e) {
+                showToast('Napaka pri shranjevanju', 'error');
+            }
+        }
+        
+        async function refreshPaketomati() {
+            await fetch('api.php?action=clear-cache');
+            await loadPaketomati();
+            showToast('Paketomati osveženi!');
+        }
+        
+        function updatePaketomatiCount() {
+            const notCalled = paketomatiData.filter(o => o.status === 'not_called').length;
+            document.getElementById('navPaketomati').textContent = notCalled;
+        }
+        
+        // ========== REAL-TIME NOTIFICATION SYSTEM ==========
+        let notificationSettings = {
+            desktopEnabled: true,
+            soundEnabled: true,
+            pollingInterval: 30000
+        };
+        let pollInterval = null;
+        let notificationSound = null;
+        
+        async function initNotificationSystem() {
+            // Load settings
+            try {
+                const res = await fetch('api.php?action=notification-settings');
+                notificationSettings = await res.json();
+            } catch (e) {
+                console.log('Using default notification settings');
+            }
+            
+            // Update UI
+            document.getElementById('notifDesktopToggle').checked = notificationSettings.desktopEnabled;
+            document.getElementById('notifSoundToggle').checked = notificationSettings.soundEnabled;
+            document.getElementById('notifPollingInterval').value = notificationSettings.pollingInterval;
+            
+            // Request notification permission
+            if (notificationSettings.desktopEnabled && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+            
+            // Create notification sound
+            createNotificationSound();
+            
+            // Start polling
+            startPolling();
+            
+            // Mark current items as seen
+            await markCurrentItemsSeen();
+        }
+        
+        function createNotificationSound() {
+            // Create a simple beep using Web Audio API
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                notificationSound = () => {
+                    if (!notificationSettings.soundEnabled) return;
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                };
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+        
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(pollForNewItems, notificationSettings.pollingInterval);
+        }
+        
+        async function pollForNewItems() {
+            try {
+                const userId = currentUser?.id || 'default';
+                const res = await fetch(`api.php?action=poll-new&userId=${userId}`);
+                const data = await res.json();
+                
+                // Update badge counts
+                document.getElementById('navCarts').textContent = data.totalCarts;
+                document.getElementById('navPaketomati').textContent = data.totalPaketomati;
+                
+                // Show notifications for new items
+                if (data.newCarts.length > 0 || data.newPaketomati.length > 0) {
+                    // Update badge with "new" indicator
+                    if (data.newCarts.length > 0) {
+                        const cartsBadge = document.getElementById('navCarts');
+                        cartsBadge.style.background = 'var(--red)';
+                        cartsBadge.style.color = 'white';
+                    }
+                    if (data.newPaketomati.length > 0) {
+                        const paketBadge = document.getElementById('navPaketomati');
+                        paketBadge.style.background = 'var(--red)';
+                        paketBadge.style.color = 'white';
+                    }
+                    
+                    // Play sound
+                    if (notificationSound) notificationSound();
+                    
+                    // Show desktop notifications
+                    if (notificationSettings.desktopEnabled && Notification.permission === 'granted') {
+                        if (data.newCarts.length > 0) {
+                            const cart = data.newCarts[0];
+                            const notif = new Notification('🛒 Nova zapuščena košarica!', {
+                                body: `${cart.customerName} - ${cart.cartValue.toFixed(2)} ${cart.currency}`,
+                                icon: '/favicon.ico',
+                                tag: 'cart-' + cart.id
+                            });
+                            notif.onclick = () => {
+                                window.focus();
+                                document.querySelector('[data-tab="carts"]').click();
+                                notif.close();
+                            };
+                        }
+                        
+                        if (data.newPaketomati.length > 0) {
+                            const order = data.newPaketomati[0];
+                            const notif = new Notification('📦 Novo paketomat naročilo!', {
+                                body: `${order.customerName} - ${order.orderTotal.toFixed(2)} ${order.currency}`,
+                                icon: '/favicon.ico',
+                                tag: 'paketomat-' + order.id
+                            });
+                            notif.onclick = () => {
+                                window.focus();
+                                document.querySelector('[data-tab="paketomati"]').click();
+                                notif.close();
+                            };
+                        }
+                    }
+                    
+                    // Mark items as seen
+                    await markItemsSeen(
+                        data.newCarts.map(c => c.id),
+                        data.newPaketomati.map(p => p.id)
+                    );
+                }
+            } catch (e) {
+                console.log('Poll error:', e);
+            }
+        }
+        
+        async function markCurrentItemsSeen() {
+            try {
+                const userId = currentUser?.id || 'default';
+                const [cartsRes, paketRes] = await Promise.all([
+                    fetch('api.php?action=abandoned-carts'),
+                    fetch('api.php?action=paketomati&filter=all')
+                ]);
+                const currentCarts = await cartsRes.json();
+                const currentPaketomati = await paketRes.json();
+                
+                await markItemsSeen(
+                    currentCarts.map(c => c.id),
+                    currentPaketomati.map(p => p.id)
+                );
+            } catch (e) {
+                console.log('Mark seen error:', e);
+            }
+        }
+        
+        async function markItemsSeen(cartIds, paketomatIds) {
+            try {
+                const userId = currentUser?.id || 'default';
+                await fetch('api.php?action=mark-seen', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId, cartIds, paketomatIds})
+                });
+            } catch (e) {
+                console.log('Mark seen error:', e);
+            }
+        }
+        
+        async function saveNotificationSettings() {
+            notificationSettings = {
+                desktopEnabled: document.getElementById('notifDesktopToggle').checked,
+                soundEnabled: document.getElementById('notifSoundToggle').checked,
+                pollingInterval: parseInt(document.getElementById('notifPollingInterval').value)
+            };
+            
+            // Request permission if enabling desktop notifications
+            if (notificationSettings.desktopEnabled && Notification.permission === 'default') {
+                await Notification.requestPermission();
+            }
+            
+            // Save to server
+            try {
+                await fetch('api.php?action=notification-settings', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(notificationSettings)
+                });
+            } catch (e) {}
+            
+            // Restart polling with new interval
+            startPolling();
+            showToast('Notification settings saved');
+        }
+        
+        function openNotificationSettings() {
+            document.getElementById('notificationSettingsModal').style.display = 'flex';
+        }
+        
+        function closeNotificationSettings() {
+            document.getElementById('notificationSettingsModal').style.display = 'none';
+        }
+        
+        function testNotification() {
+            if (notificationSound) notificationSound();
+            
+            if (Notification.permission === 'granted') {
+                new Notification('🔔 Test Notification', {
+                    body: 'Obvestila delujejo pravilno!',
+                    icon: '/favicon.ico'
+                });
+            } else if (Notification.permission === 'default') {
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        new Notification('🔔 Test Notification', {
+                            body: 'Obvestila delujejo pravilno!',
+                            icon: '/favicon.ico'
+                        });
+                    }
+                });
+            } else {
+                showToast('Desktop notifications so blokirane v brskalniku', 'error');
+            }
+        }
+        
+        // Add notification bell to top bar
+        function addNotificationBell() {
+            const topBarActions = document.querySelector('.top-bar-actions');
+            if (topBarActions && !document.getElementById('notificationBellBtn')) {
+                const bellBtn = document.createElement('button');
+                bellBtn.id = 'notificationBellBtn';
+                bellBtn.className = 'action-btn-header';
+                bellBtn.innerHTML = '<i class="fas fa-bell"></i>';
+                bellBtn.title = 'Notification Settings';
+                bellBtn.onclick = openNotificationSettings;
+                topBarActions.insertBefore(bellBtn, topBarActions.firstChild);
+            }
+        }
+        
+        // Reset badge color when tab is visited
+        document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
+            item.addEventListener('click', () => {
+                const tab = item.dataset.tab;
+                if (tab === 'carts') {
+                    const badge = document.getElementById('navCarts');
+                    badge.style.background = '';
+                    badge.style.color = '';
+                }
+                if (tab === 'paketomati') {
+                    const badge = document.getElementById('navPaketomati');
+                    badge.style.background = '';
+                    badge.style.color = '';
+                }
+            });
+        });
+        
+        // Initialize notification system after main init
+        const originalInit = init;
+        init = async function() {
+            await originalInit();
+            addNotificationBell();
+            await initNotificationSystem();
+        };
         
         init();
     </script>
