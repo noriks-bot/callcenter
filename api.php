@@ -798,6 +798,16 @@ try {
             echo json_encode($results);
             break;
             
+        case 'sms-templates':
+            $templatesFile = __DIR__ . '/sms-templates.json';
+            if (file_exists($templatesFile)) {
+                $templates = json_decode(file_get_contents($templatesFile), true);
+                echo json_encode($templates);
+            } else {
+                echo json_encode(['error' => 'Templates file not found']);
+            }
+            break;
+            
         case 'clear-cache':
             global $cacheDir;
             if (is_dir($cacheDir)) array_map('unlink', glob($cacheDir . '*.json'));
@@ -844,6 +854,7 @@ try {
                     'pending-orders', 
                     'stores', 
                     'search-products',
+                    'sms-templates',
                     'create-order', 
                     'update-status', 
                     'sms-queue',

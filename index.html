@@ -1131,7 +1131,7 @@
     
     <!-- SMS Automation Settings (shown when tab selected) -->
     <div id="smsSettingsContent" style="display:none;">
-        <div style="max-width:800px;">
+        <div style="max-width:900px;">
             <div class="table-card" style="padding:24px;">
                 <h3 style="margin-bottom:20px;">⚙️ SMS Automation Pravila</h3>
                 <p style="color:var(--text-muted);margin-bottom:24px;">
@@ -1145,6 +1145,60 @@
                 <button class="btn btn-save" style="margin-top:20px;" onclick="addAutomationRule()">
                     <i class="fas fa-plus"></i> Dodaj pravilo
                 </button>
+            </div>
+            
+            <!-- Template Preview Section -->
+            <div class="table-card" style="padding:24px;margin-top:20px;">
+                <h3 style="margin-bottom:20px;">📝 Predogled predlog</h3>
+                <p style="color:var(--text-muted);margin-bottom:16px;">
+                    Preveri kako izgledajo SMS sporočila v različnih jezikih. Variabele: <code>{ime}</code>, <code>{produkt}</code>, <code>{cena}</code>, <code>{link}</code>
+                </p>
+                
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+                    <select class="form-select" id="previewTemplate" onchange="updateTemplatePreview()" style="flex:1;min-width:150px;">
+                        <option value="">-- Izberi predlogo --</option>
+                        <option value="abandoned_cart">🛒 Opuščena košarica</option>
+                        <option value="winback">💙 Povratek kupca</option>
+                        <option value="last_chance">⏰ Zadnja prilika</option>
+                    </select>
+                    <select class="form-select" id="previewCountry" onchange="updateTemplatePreview()" style="flex:1;min-width:150px;">
+                        <option value="">-- Izberi državo --</option>
+                    </select>
+                </div>
+                
+                <div id="templatePreviewBox" style="display:none;">
+                    <div style="background:var(--bg-dark);border-radius:8px;padding:16px;margin-bottom:12px;">
+                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">
+                            <i class="fas fa-tag"></i> <span id="previewTemplateName">Template name</span>
+                        </div>
+                        <div id="previewMessage" style="font-size:14px;line-height:1.6;white-space:pre-wrap;"></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span class="char-count" id="previewCharCount">0 / 160 znakov</span>
+                        <button class="btn btn-cancel" style="padding:8px 16px;" onclick="copyTemplateToClipboard()">
+                            <i class="fas fa-copy"></i> Kopiraj
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sample Variables -->
+                <div style="margin-top:16px;padding:12px;background:var(--bg-dark);border-radius:8px;">
+                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Testni podatki za predogled:</div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:120px;">
+                            <label style="font-size:11px;color:var(--text-muted);">Ime</label>
+                            <input type="text" class="form-input" id="sampleName" value="Marko" oninput="updateTemplatePreview()" style="padding:8px;">
+                        </div>
+                        <div style="flex:1;min-width:120px;">
+                            <label style="font-size:11px;color:var(--text-muted);">Produkt</label>
+                            <input type="text" class="form-input" id="sampleProduct" value="Noriks majica" oninput="updateTemplatePreview()" style="padding:8px;">
+                        </div>
+                        <div style="flex:1;min-width:80px;">
+                            <label style="font-size:11px;color:var(--text-muted);">Cena</label>
+                            <input type="text" class="form-input" id="samplePrice" value="€29.99" oninput="updateTemplatePreview()" style="padding:8px;">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1251,6 +1305,7 @@
             stores = await res.json();
             renderCountryTabs();
             loadSmsData();
+            await loadSmsTemplates();
             await loadAllData();
         }
         
@@ -1314,9 +1369,9 @@
             // Default automation rules if empty
             if (smsAutomation.length === 0) {
                 smsAutomation = [
-                    { id: 1, name: 'Po 3 urah', delay: 3, template: 'reminder', countries: ['all'], active: false },
-                    { id: 2, name: 'Po 6 urah', delay: 6, template: 'discount', countries: ['all'], active: false },
-                    { id: 3, name: 'Po 24 urah', delay: 24, template: 'lastchance', countries: ['all'], active: false }
+                    { id: 1, name: 'Po 3 urah', delay: 3, template: 'abandoned_cart', country: 'all', active: false },
+                    { id: 2, name: 'Po 12 urah', delay: 12, template: 'winback', country: 'all', active: false },
+                    { id: 3, name: 'Po 24 urah', delay: 24, template: 'last_chance', country: 'all', active: false }
                 ];
                 saveSmsAutomation();
             }
@@ -2070,22 +2125,115 @@
             showToast('CSV izvožen!');
         }
         
+        // SMS Templates (loaded from API)
+        let smsTemplatesData = null;
+        
+        async function loadSmsTemplates() {
+            try {
+                const res = await fetch('api.php?action=sms-templates');
+                smsTemplatesData = await res.json();
+                
+                // Populate preview country dropdown
+                const previewCountry = document.getElementById('previewCountry');
+                stores.forEach(s => {
+                    previewCountry.innerHTML += `<option value="${s.code}">${s.flag} ${s.name}</option>`;
+                });
+            } catch (e) {
+                console.error('Failed to load SMS templates:', e);
+            }
+        }
+        
+        function updateTemplatePreview() {
+            const templateKey = document.getElementById('previewTemplate').value;
+            const countryCode = document.getElementById('previewCountry').value;
+            const previewBox = document.getElementById('templatePreviewBox');
+            
+            if (!templateKey || !countryCode || !smsTemplatesData) {
+                previewBox.style.display = 'none';
+                return;
+            }
+            
+            const template = smsTemplatesData.templates?.[templateKey]?.[countryCode];
+            if (!template) {
+                previewBox.style.display = 'none';
+                return;
+            }
+            
+            // Get sample values
+            const sampleName = document.getElementById('sampleName').value || 'Kupec';
+            const sampleProduct = document.getElementById('sampleProduct').value || 'Izdelek';
+            const samplePrice = document.getElementById('samplePrice').value || '€0.00';
+            const sampleLink = `noriks.com/${countryCode}/checkout`;
+            
+            // Replace variables
+            let message = template.message
+                .replace(/{ime}/g, sampleName)
+                .replace(/{produkt}/g, sampleProduct)
+                .replace(/{cena}/g, samplePrice)
+                .replace(/{link}/g, sampleLink);
+            
+            document.getElementById('previewTemplateName').textContent = template.name;
+            document.getElementById('previewMessage').textContent = message;
+            
+            // Character count
+            const len = message.length;
+            const charCount = document.getElementById('previewCharCount');
+            charCount.textContent = `${len} / 160 znakov`;
+            charCount.className = 'char-count' + (len > 160 ? ' error' : len > 140 ? ' warning' : '');
+            
+            previewBox.style.display = 'block';
+        }
+        
+        function copyTemplateToClipboard() {
+            const message = document.getElementById('previewMessage').textContent;
+            navigator.clipboard.writeText(message).then(() => {
+                showToast('📋 Sporočilo kopirano!', false, 'info');
+            });
+        }
+        
+        function getTemplateOptions() {
+            if (!smsTemplatesData?.templates) {
+                return `
+                    <option value="abandoned_cart">🛒 Opuščena košarica</option>
+                    <option value="winback">💙 Povratek kupca</option>
+                    <option value="last_chance">⏰ Zadnja prilika</option>
+                `;
+            }
+            
+            const templateNames = {
+                'abandoned_cart': '🛒 Opuščena košarica',
+                'winback': '💙 Povratek kupca',
+                'last_chance': '⏰ Zadnja prilika'
+            };
+            
+            return Object.keys(smsTemplatesData.templates).map(key => 
+                `<option value="${key}">${templateNames[key] || key}</option>`
+            ).join('');
+        }
+        
         // SMS Automation Settings
         function renderAutomationRules() {
             const container = document.getElementById('automationRules');
             
+            const countryOptions = stores.map(s => 
+                `<option value="${s.code}">${s.flag} ${s.name}</option>`
+            ).join('');
+            
             container.innerHTML = smsAutomation.map((rule, i) => `
-                <div class="order-item" style="margin-bottom:16px;">
-                    <div class="order-item-info" style="min-width:200px;">
+                <div class="order-item" style="margin-bottom:16px;flex-wrap:wrap;">
+                    <div class="order-item-info" style="min-width:200px;flex:2;">
                         <input type="text" class="form-input" value="${esc(rule.name)}" 
                                onchange="updateRule(${i}, 'name', this.value)" 
                                placeholder="Ime pravila" style="margin-bottom:8px;">
                         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <select class="form-select" style="flex:1;min-width:100px;" 
+                            <select class="form-select" style="flex:1;min-width:140px;" 
                                     onchange="updateRule(${i}, 'template', this.value)">
-                                <option value="reminder" ${rule.template === 'reminder' ? 'selected' : ''}>🔔 Opomnik</option>
-                                <option value="discount" ${rule.template === 'discount' ? 'selected' : ''}>💰 Popust</option>
-                                <option value="lastchance" ${rule.template === 'lastchance' ? 'selected' : ''}>⏰ Zadnja priložnost</option>
+                                ${getTemplateOptions().replace(`value="${rule.template}"`, `value="${rule.template}" selected`)}
+                            </select>
+                            <select class="form-select" style="flex:1;min-width:100px;" 
+                                    onchange="updateRule(${i}, 'country', this.value)">
+                                <option value="all" ${rule.country === 'all' ? 'selected' : ''}>🌍 Vse države</option>
+                                ${countryOptions.replace(`value="${rule.country}"`, `value="${rule.country}" selected`)}
                             </select>
                             <div style="display:flex;align-items:center;gap:4px;">
                                 <input type="number" min="1" max="72" value="${rule.delay}" 
@@ -2095,17 +2243,32 @@
                             </div>
                         </div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:16px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-left:auto;">
+                        <button class="action-btn" onclick="previewRuleTemplate(${i})" title="Predogled">
+                            <i class="fas fa-eye"></i>
+                        </button>
                         <div class="toggle ${rule.active ? 'active' : ''}" onclick="toggleRule(${i})"></div>
-                        <span style="font-size:12px;color:var(--text-muted);">${rule.active ? 'Aktivno' : 'Neaktivno'}</span>
+                        <span style="font-size:12px;color:var(--text-muted);min-width:60px;">${rule.active ? 'Aktivno' : 'Neaktivno'}</span>
+                        <button class="btn-remove-item" onclick="removeRule(${i})" title="Odstrani"><i class="fas fa-trash"></i></button>
                     </div>
-                    <button class="btn-remove-item" onclick="removeRule(${i})" title="Odstrani"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
             
             if (smsAutomation.length === 0) {
                 container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-cog"></i><p>Ni nastavljenih pravil</p></div>';
             }
+        }
+        
+        function previewRuleTemplate(idx) {
+            const rule = smsAutomation[idx];
+            if (!rule) return;
+            
+            document.getElementById('previewTemplate').value = rule.template || 'abandoned_cart';
+            document.getElementById('previewCountry').value = rule.country === 'all' ? 'hr' : rule.country;
+            updateTemplatePreview();
+            
+            // Scroll to preview
+            document.querySelector('.table-card:last-child').scrollIntoView({ behavior: 'smooth' });
         }
         
         function updateRule(idx, field, value) {
@@ -2134,8 +2297,8 @@
                 id: Date.now(),
                 name: 'Novo pravilo',
                 delay: 3,
-                template: 'reminder',
-                countries: ['all'],
+                template: 'abandoned_cart',
+                country: 'all',
                 active: false
             });
             saveSmsAutomation();
