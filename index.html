@@ -7,8 +7,89 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .country-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 16px 24px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .country-tab {
+            padding: 10px 20px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .country-tab:hover {
+            border-color: var(--accent);
+            background: var(--bg-hover);
+        }
+        .country-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .country-tab .flag {
+            font-size: 18px;
+        }
+        .country-tab .count {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .country-tab.active .count {
+            background: rgba(255,255,255,0.3);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-overlay.hidden { display: none; }
+        .loading-box {
+            background: var(--bg-card);
+            padding: 32px 48px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .loading-box .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <div>Loading data...</div>
+        </div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -80,16 +161,21 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search..." id="globalSearch">
                 </div>
-                <button class="header-btn" onclick="loadData()">
+                <button class="header-btn" onclick="loadData(true)">
                     <i class="fas fa-sync-alt"></i>
-                </button>
-                <button class="header-btn">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge"></span>
                 </button>
                 <div class="header-avatar" id="headerAvatar">N</div>
             </div>
         </header>
+        
+        <!-- Country Tabs -->
+        <div class="country-tabs" id="countryTabs">
+            <div class="country-tab active" data-store="">
+                <span class="flag">🌍</span>
+                <span>All Countries</span>
+                <span class="count" id="count-all">0</span>
+            </div>
+        </div>
         
         <!-- Page Content -->
         <div class="page-content">
@@ -99,10 +185,6 @@
                     <div class="stat-card-header">
                         <div class="stat-icon blue">
                             <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <div class="stat-trend up">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>12%</span>
                         </div>
                     </div>
                     <div class="stat-value" id="statAbandoned">0</div>
@@ -144,12 +226,6 @@
                         <i class="fas fa-headset"></i>
                         Call Queue
                     </h2>
-                    <div class="card-actions">
-                        <button class="btn btn-secondary" onclick="loadData()">
-                            <i class="fas fa-sync-alt"></i>
-                            Reload Data
-                        </button>
-                    </div>
                 </div>
                 
                 <div class="card-body">
@@ -174,9 +250,6 @@
                     
                     <!-- Filters -->
                     <div class="filters">
-                        <select class="filter-select" id="filterStore">
-                            <option value="">All Stores</option>
-                        </select>
                         <select class="filter-select" id="filterStatus">
                             <option value="">All Status</option>
                             <option value="not_called">Not Called</option>
@@ -206,14 +279,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="abandoned-table">
-                                    <tr>
-                                        <td colspan="8">
-                                            <div class="loading">
-                                                <div class="loading-spinner"></div>
-                                                Loading abandoned carts...
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <tr><td colspan="8"><div class="loading"><div class="loading-spinner"></div>Loading...</div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -234,14 +300,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="suppressed-table">
-                                    <tr>
-                                        <td colspan="7">
-                                            <div class="loading">
-                                                <div class="loading-spinner"></div>
-                                                Loading suppressed profiles...
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <tr><td colspan="7"><div class="loading"><div class="loading-spinner"></div>Loading...</div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -263,14 +322,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="pending-table">
-                                    <tr>
-                                        <td colspan="8">
-                                            <div class="loading">
-                                                <div class="loading-spinner"></div>
-                                                Loading pending orders...
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <tr><td colspan="8"><div class="loading"><div class="loading-spinner"></div>Loading...</div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -285,9 +337,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title">Update Call Status</h3>
-                <button class="modal-close" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -303,15 +353,12 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Notes</label>
-                    <textarea class="form-textarea" id="modalNotes" placeholder="Add notes about this call..."></textarea>
+                    <textarea class="form-textarea" id="modalNotes" placeholder="Add notes..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveStatus()">
-                    <i class="fas fa-check"></i>
-                    Save Changes
-                </button>
+                <button class="btn btn-primary" onclick="saveStatus()"><i class="fas fa-check"></i> Save</button>
             </div>
         </div>
     </div>
@@ -323,7 +370,9 @@
         let pendingOrders = [];
         let stores = [];
         let currentTab = 'abandoned';
+        let currentStore = '';
         let currentEditId = null;
+        let countryCounts = {};
         
         // Check auth
         const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
@@ -340,8 +389,7 @@
         document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
-                const tab = item.dataset.tab;
-                switchTab(tab);
+                switchTab(item.dataset.tab);
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                 item.classList.add('active');
             });
@@ -360,6 +408,16 @@
             applyFilters();
         }
         
+        // Country tabs
+        document.getElementById('countryTabs').addEventListener('click', (e) => {
+            const tab = e.target.closest('.country-tab');
+            if (!tab) return;
+            currentStore = tab.dataset.store || '';
+            document.querySelectorAll('.country-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            applyFilters();
+        });
+        
         // Mobile sidebar
         document.getElementById('menuToggle').addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('open');
@@ -371,8 +429,18 @@
             document.getElementById('sidebarOverlay').classList.remove('active');
         });
         
+        // Show/hide loading
+        function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
+        function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+        
         // Load data
-        async function loadData() {
+        async function loadData(clearCache = false) {
+            showLoading();
+            
+            if (clearCache) {
+                await fetch('api.php?action=clear-cache').catch(() => {});
+            }
+            
             await loadStores();
             await Promise.all([
                 loadAbandonedCarts(),
@@ -380,32 +448,75 @@
                 loadPendingOrders()
             ]);
             updateStats();
+            hideLoading();
         }
         
         async function loadStores() {
             try {
                 const res = await fetch('api.php?action=stores');
                 stores = await res.json();
-                const select = document.getElementById('filterStore');
-                select.innerHTML = '<option value="">All Stores</option>';
-                stores.forEach(s => {
-                    select.innerHTML += `<option value="${s.code}">${s.flag} ${s.name}</option>`;
-                });
+                renderCountryTabs();
             } catch (e) {
                 console.error('Failed to load stores:', e);
             }
+        }
+        
+        function renderCountryTabs() {
+            const container = document.getElementById('countryTabs');
+            container.innerHTML = `
+                <div class="country-tab active" data-store="">
+                    <span class="flag">🌍</span>
+                    <span>All</span>
+                    <span class="count" id="count-all">0</span>
+                </div>
+            `;
+            stores.forEach(s => {
+                container.innerHTML += `
+                    <div class="country-tab" data-store="${s.code}">
+                        <span class="flag">${s.flag}</span>
+                        <span>${s.name}</span>
+                        <span class="count" id="count-${s.code}">0</span>
+                    </div>
+                `;
+            });
+        }
+        
+        function updateCountryCounts() {
+            countryCounts = { all: 0 };
+            stores.forEach(s => countryCounts[s.code] = 0);
+            
+            const getData = () => {
+                if (currentTab === 'abandoned') return abandonedCarts;
+                if (currentTab === 'pending') return pendingOrders;
+                return [];
+            };
+            
+            getData().forEach(item => {
+                countryCounts.all++;
+                if (countryCounts[item.storeCode] !== undefined) {
+                    countryCounts[item.storeCode]++;
+                }
+            });
+            
+            Object.keys(countryCounts).forEach(code => {
+                const el = document.getElementById(`count-${code}`);
+                if (el) el.textContent = countryCounts[code];
+            });
         }
         
         async function loadAbandonedCarts() {
             try {
                 const res = await fetch('api.php?action=abandoned-carts');
                 abandonedCarts = await res.json();
+                if (!Array.isArray(abandonedCarts)) abandonedCarts = [];
                 document.getElementById('abandoned-count').textContent = abandonedCarts.length;
                 document.getElementById('tab-abandoned-count').textContent = abandonedCarts.length;
-                document.getElementById('statAbandoned').textContent = abandonedCarts.length.toLocaleString();
+                document.getElementById('statAbandoned').textContent = abandonedCarts.length;
+                updateCountryCounts();
                 renderAbandonedCarts();
             } catch (e) {
                 console.error('Failed to load abandoned carts:', e);
+                abandonedCarts = [];
             }
         }
         
@@ -413,12 +524,14 @@
             try {
                 const res = await fetch('api.php?action=suppressed-profiles');
                 suppressedProfiles = await res.json();
+                if (!Array.isArray(suppressedProfiles)) suppressedProfiles = [];
                 document.getElementById('suppressed-count').textContent = suppressedProfiles.length;
                 document.getElementById('tab-suppressed-count').textContent = suppressedProfiles.length;
-                document.getElementById('statSuppressed').textContent = suppressedProfiles.length.toLocaleString();
+                document.getElementById('statSuppressed').textContent = suppressedProfiles.length;
                 renderSuppressedProfiles();
             } catch (e) {
                 console.error('Failed to load suppressed profiles:', e);
+                suppressedProfiles = [];
             }
         }
         
@@ -426,12 +539,14 @@
             try {
                 const res = await fetch('api.php?action=pending-orders');
                 pendingOrders = await res.json();
+                if (!Array.isArray(pendingOrders)) pendingOrders = [];
                 document.getElementById('pending-count').textContent = pendingOrders.length;
                 document.getElementById('tab-pending-count').textContent = pendingOrders.length;
-                document.getElementById('statPending').textContent = pendingOrders.length.toLocaleString();
+                document.getElementById('statPending').textContent = pendingOrders.length;
                 renderPendingOrders();
             } catch (e) {
                 console.error('Failed to load pending orders:', e);
+                pendingOrders = [];
             }
         }
         
@@ -441,7 +556,7 @@
                 i.callStatus && i.callStatus !== 'not_called' && 
                 i.lastUpdated && new Date(i.lastUpdated).toDateString() === new Date().toDateString()
             ).length;
-            document.getElementById('statCalled').textContent = calledToday.toLocaleString();
+            document.getElementById('statCalled').textContent = calledToday;
         }
         
         // Render functions
@@ -465,38 +580,23 @@
                             </div>
                         </div>
                     </td>
-                    <td>
-                        <span class="store-badge">
-                            <span class="store-flag">${cart.storeFlag}</span>
-                            ${cart.storeName}
-                        </span>
-                    </td>
+                    <td><span class="store-badge"><span class="store-flag">${cart.storeFlag}</span> ${cart.storeName}</span></td>
                     <td class="amount-cell">${formatCurrency(cart.cartValue, cart.currency)}</td>
                     <td>
                         <div class="cart-items">
-                            ${cart.cartContents.slice(0, 2).map(item => `
-                                <div class="cart-item">
-                                    <span class="cart-item-qty">${item.quantity}x</span>
-                                    ${escapeHtml(item.name.substring(0, 30))}${item.name.length > 30 ? '...' : ''}
-                                </div>
+                            ${(cart.cartContents || []).slice(0, 2).map(item => `
+                                <div class="cart-item"><span class="cart-item-qty">${item.quantity}x</span> ${escapeHtml((item.name || '').substring(0, 30))}${(item.name || '').length > 30 ? '...' : ''}</div>
                             `).join('')}
-                            ${cart.cartContents.length > 2 ? `<div class="cart-item" style="color: var(--text-muted);">+${cart.cartContents.length - 2} more</div>` : ''}
+                            ${(cart.cartContents || []).length > 2 ? `<div class="cart-item" style="color: var(--text-muted);">+${cart.cartContents.length - 2} more</div>` : ''}
                         </div>
                     </td>
-                    <td>
-                        ${cart.phone ? `<a href="tel:${cart.phone}" class="phone-link"><i class="fas fa-phone"></i> ${cart.phone}</a>` : '<span style="color: var(--text-muted);">—</span>'}
-                    </td>
+                    <td>${cart.phone ? `<a href="tel:${cart.phone}" class="phone-link"><i class="fas fa-phone"></i> ${cart.phone}</a>` : '—'}</td>
                     <td><span class="status-badge ${cart.callStatus}">${formatStatus(cart.callStatus)}</span></td>
-                    <td>
-                        <div class="timestamp">
-                            <div class="timestamp-ago">${timeAgo(cart.abandonedAt)}</div>
-                            ${formatDate(cart.abandonedAt)}
-                        </div>
-                    </td>
+                    <td><div class="timestamp"><div class="timestamp-ago">${timeAgo(cart.abandonedAt)}</div>${formatDate(cart.abandonedAt)}</div></td>
                     <td>
                         <div class="action-btns">
                             ${cart.phone ? `<button class="action-btn call" onclick="makeCall('${cart.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${cart.id}', '${cart.callStatus}', '${escapeHtml(cart.notes || '')}')" title="Update Status"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn" onclick="openModal('${cart.id}', '${cart.callStatus}', '${escapeHtml(cart.notes || '')}')" title="Update"><i class="fas fa-edit"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -523,22 +623,15 @@
                             </div>
                         </div>
                     </td>
-                    <td>
-                        ${profile.phone ? `<a href="tel:${profile.phone}" class="phone-link"><i class="fas fa-phone"></i> ${profile.phone}</a>` : '<span style="color: var(--text-muted);">—</span>'}
-                    </td>
+                    <td>${profile.phone ? `<a href="tel:${profile.phone}" class="phone-link"><i class="fas fa-phone"></i> ${profile.phone}</a>` : '—'}</td>
                     <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">${formatReason(profile.suppressionReason)}</span></td>
-                    <td>
-                        <div class="timestamp">
-                            <div class="timestamp-ago">${timeAgo(profile.suppressedAt)}</div>
-                            ${formatDate(profile.suppressedAt)}
-                        </div>
-                    </td>
+                    <td><div class="timestamp"><div class="timestamp-ago">${timeAgo(profile.suppressedAt)}</div>${formatDate(profile.suppressedAt)}</div></td>
                     <td><span class="status-badge ${profile.callStatus}">${formatStatus(profile.callStatus)}</span></td>
                     <td><div class="notes-preview">${escapeHtml(profile.notes || '')}</div></td>
                     <td>
                         <div class="action-btns">
                             ${profile.phone ? `<button class="action-btn call" onclick="makeCall('${profile.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${profile.id}', '${profile.callStatus}', '${escapeHtml(profile.notes || '')}')" title="Update Status"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn" onclick="openModal('${profile.id}', '${profile.callStatus}', '${escapeHtml(profile.notes || '')}')" title="Update"><i class="fas fa-edit"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -565,23 +658,16 @@
                             </div>
                         </div>
                     </td>
-                    <td>
-                        <span class="store-badge">
-                            <span class="store-flag">${order.storeFlag}</span>
-                            ${order.storeName}
-                        </span>
-                    </td>
+                    <td><span class="store-badge"><span class="store-flag">${order.storeFlag}</span> ${order.storeName}</span></td>
                     <td><strong>#${order.orderId}</strong></td>
                     <td class="amount-cell">${formatCurrency(order.orderTotal, order.currency)}</td>
-                    <td>
-                        ${order.phone ? `<a href="tel:${order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${order.phone}</a>` : '<span style="color: var(--text-muted);">—</span>'}
-                    </td>
+                    <td>${order.phone ? `<a href="tel:${order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${order.phone}</a>` : '—'}</td>
                     <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">${order.orderStatus}</span></td>
                     <td><span class="status-badge ${order.callStatus}">${formatStatus(order.callStatus)}</span></td>
                     <td>
                         <div class="action-btns">
                             ${order.phone ? `<button class="action-btn call" onclick="makeCall('${order.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
-                            <button class="action-btn" onclick="openModal('${order.id}', '${order.callStatus}', '${escapeHtml(order.notes || '')}')" title="Update Status"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn" onclick="openModal('${order.id}', '${order.callStatus}', '${escapeHtml(order.notes || '')}')" title="Update"><i class="fas fa-edit"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -589,54 +675,54 @@
         }
         
         // Filters
-        document.getElementById('filterStore').addEventListener('change', applyFilters);
         document.getElementById('filterStatus').addEventListener('change', applyFilters);
         document.getElementById('filterSearch').addEventListener('input', applyFilters);
         document.getElementById('globalSearch').addEventListener('input', applyFilters);
         
         function applyFilters() {
-            const store = document.getElementById('filterStore').value;
             const status = document.getElementById('filterStatus').value;
             const search = (document.getElementById('filterSearch').value || document.getElementById('globalSearch').value).toLowerCase();
             
             if (currentTab === 'abandoned') {
                 let filtered = abandonedCarts;
-                if (store) filtered = filtered.filter(c => c.storeCode === store);
+                if (currentStore) filtered = filtered.filter(c => c.storeCode === currentStore);
                 if (status) filtered = filtered.filter(c => c.callStatus === status);
                 if (search) filtered = filtered.filter(c => 
-                    c.customerName.toLowerCase().includes(search) ||
-                    c.email.toLowerCase().includes(search) ||
+                    (c.customerName || '').toLowerCase().includes(search) ||
+                    (c.email || '').toLowerCase().includes(search) ||
                     (c.phone && c.phone.includes(search))
                 );
                 renderAbandonedCarts(filtered);
+                updateCountryCounts();
             } else if (currentTab === 'suppressed') {
                 let filtered = suppressedProfiles;
                 if (status) filtered = filtered.filter(p => p.callStatus === status);
                 if (search) filtered = filtered.filter(p => 
                     (p.firstName + ' ' + p.lastName).toLowerCase().includes(search) ||
-                    p.email.toLowerCase().includes(search) ||
+                    (p.email || '').toLowerCase().includes(search) ||
                     (p.phone && p.phone.includes(search))
                 );
                 renderSuppressedProfiles(filtered);
             } else if (currentTab === 'pending') {
                 let filtered = pendingOrders;
-                if (store) filtered = filtered.filter(o => o.storeCode === store);
+                if (currentStore) filtered = filtered.filter(o => o.storeCode === currentStore);
                 if (status) filtered = filtered.filter(o => o.callStatus === status);
                 if (search) filtered = filtered.filter(o => 
-                    o.customerName.toLowerCase().includes(search) ||
-                    o.email.toLowerCase().includes(search) ||
+                    (o.customerName || '').toLowerCase().includes(search) ||
+                    (o.email || '').toLowerCase().includes(search) ||
                     (o.phone && o.phone.includes(search)) ||
                     String(o.orderId).includes(search)
                 );
                 renderPendingOrders(filtered);
+                updateCountryCounts();
             }
         }
         
         // Modal
         function openModal(id, status, notes) {
             currentEditId = id;
-            document.getElementById('modalStatus').value = status;
-            document.getElementById('modalNotes').value = notes;
+            document.getElementById('modalStatus').value = status || 'not_called';
+            document.getElementById('modalNotes').value = notes || '';
             document.getElementById('statusModal').classList.add('active');
         }
         
@@ -675,64 +761,33 @@
                 updateStats();
                 closeModal();
             } catch (e) {
-                alert('Failed to save status');
+                alert('Failed to save');
             }
         }
         
-        function makeCall(phone) {
-            window.open(`tel:${phone}`, '_self');
-        }
-        
-        function logout() {
-            localStorage.removeItem('callcenter_user');
-            window.location.href = 'login.html';
-        }
+        function makeCall(phone) { window.open(`tel:${phone}`, '_self'); }
+        function logout() { localStorage.removeItem('callcenter_user'); window.location.href = 'login.html'; }
         
         // Helpers
-        function getInitials(name) {
-            return (name || '?').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text || '';
-            return div.innerHTML;
-        }
-        
+        function getInitials(name) { return (name || '?').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(); }
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text || ''; return div.innerHTML; }
         function formatCurrency(amount, currency) {
             const symbols = { EUR: '€', CZK: 'Kč', PLN: 'zł', HUF: 'Ft' };
             return `${symbols[currency] || currency} ${parseFloat(amount || 0).toFixed(2)}`;
         }
-        
         function formatStatus(status) {
-            const labels = {
-                not_called: 'Not Called',
-                called: 'Called',
-                answered: 'Answered',
-                no_answer: 'No Answer',
-                converted: 'Converted',
-                not_interested: 'Not Interested'
-            };
+            const labels = { not_called: 'Not Called', called: 'Called', answered: 'Answered', no_answer: 'No Answer', converted: 'Converted', not_interested: 'Not Interested' };
             return labels[status] || status;
         }
-        
         function formatReason(reason) {
-            const labels = {
-                user_suppressed: 'Unsubscribed',
-                hard_bounce: 'Hard Bounce',
-                spam_complaint: 'Spam Complaint',
-                invalid_email: 'Invalid Email',
-                unsubscribed: 'Unsubscribed'
-            };
+            const labels = { user_suppressed: 'Unsubscribed', hard_bounce: 'Hard Bounce', spam_complaint: 'Spam', invalid_email: 'Invalid Email', unsubscribed: 'Unsubscribed' };
             return labels[reason] || reason;
         }
-        
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const d = new Date(dateStr);
             return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
         }
-        
         function timeAgo(dateStr) {
             if (!dateStr) return '';
             const seconds = Math.floor((new Date() - new Date(dateStr)) / 1000);
@@ -742,7 +797,7 @@
             return Math.floor(seconds / 86400) + 'd ago';
         }
         
-        // Initialize
+        // Init
         loadData();
     </script>
 </body>

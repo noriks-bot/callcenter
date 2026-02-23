@@ -1,7 +1,7 @@
 <?php
 /**
  * Noriks Call Center - PHP API
- * For cPanel hosting
+ * For cPanel hosting - OPTIMIZED with parallel loading + caching
  */
 
 error_reporting(E_ALL);
@@ -79,8 +79,9 @@ $storeCurrencies = [
 // Klaviyo API Key
 $KLAVIYO_API_KEY = 'pk_961349939ac712880db8078dd802f74082';
 
-// Data storage file (JSON)
+// Data storage
 $dataFile = __DIR__ . '/data/call_data.json';
+$cacheDir = __DIR__ . '/data/cache/';
 
 function loadCallData() {
     global $dataFile;
@@ -98,154 +99,153 @@ function saveCallData($data) {
     file_put_contents($dataFile, json_encode($data, JSON_PRETTY_PRINT));
 }
 
-function wcRequest($storeCode, $endpoint, $params = []) {
-    global $stores;
-    $config = $stores[$storeCode] ?? null;
-    if (!$config) return [];
-    
-    $url = $config['url'] . '/wp-json/wc/v3/' . $endpoint;
-    if ($params) {
-        $url .= '?' . http_build_query($params);
+function getCache($key, $maxAge = 300) {
+    global $cacheDir;
+    if (!is_dir($cacheDir)) mkdir($cacheDir, 0755, true);
+    $file = $cacheDir . md5($key) . '.json';
+    if (file_exists($file) && (time() - filemtime($file)) < $maxAge) {
+        return json_decode(file_get_contents($file), true);
     }
-    
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_SSL_VERIFYPEER => true
-    ]);
-    
-    $response = curl_exec($ch);
-    $error = curl_error($ch);
-    curl_close($ch);
-    
-    if ($error) {
-        error_log("WC Request error for $storeCode: $error");
-        return [];
-    }
-    
-    return json_decode($response, true) ?: [];
+    return null;
 }
 
-function fetchAbandonedCarts() {
+function setCache($key, $data) {
+    global $cacheDir;
+    if (!is_dir($cacheDir)) mkdir($cacheDir, 0755, true);
+    $file = $cacheDir . md5($key) . '.json';
+    file_put_contents($file, json_encode($data));
+}
+
+// Parallel curl for multiple URLs
+function curlMultiGet($urls) {
+    $mh = curl_multi_init();
+    $handles = [];
+    
+    foreach ($urls as $key => $url) {
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_SSL_VERIFYPEER => true
+        ]);
+        curl_multi_add_handle($mh, $ch);
+        $handles[$key] = $ch;
+    }
+    
+    $running = null;
+    do {
+        curl_multi_exec($mh, $running);
+        curl_multi_select($mh);
+    } while ($running > 0);
+    
+    $results = [];
+    foreach ($handles as $key => $ch) {
+        $results[$key] = curl_multi_getcontent($ch);
+        curl_multi_remove_handle($mh, $ch);
+        curl_close($ch);
+    }
+    
+    curl_multi_close($mh);
+    return $results;
+}
+
+function fetchAbandonedCarts($storeFilter = null) {
     global $stores, $storeCurrencies;
     
-    $abandonedCartEndpoints = [
-        'hr' => 'https://noriks.com/hr/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355',
-        'cz' => 'https://noriks.com/cz/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355',
-        'pl' => 'https://noriks.com/pl/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355',
-        'sk' => 'https://noriks.com/sk/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355',
-        'hu' => 'https://noriks.com/hu/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355',
-        'gr' => 'https://noriks.com/gr/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355',
-        'it' => 'https://noriks.com/it/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355'
-    ];
+    // Check cache first (5 min)
+    $cacheKey = 'abandoned_carts_' . ($storeFilter ?: 'all');
+    $cached = getCache($cacheKey, 300);
+    if ($cached !== null) {
+        return $cached;
+    }
+    
+    $abandonedCartEndpoints = [];
+    foreach ($stores as $code => $config) {
+        if ($storeFilter && $storeFilter !== $code) continue;
+        $abandonedCartEndpoints[$code] = "https://noriks.com/{$code}/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355";
+    }
     
     $callData = loadCallData();
     $allCarts = [];
     
-    foreach ($abandonedCartEndpoints as $storeCode => $endpoint) {
+    // Parallel fetch all stores
+    $responses = curlMultiGet($abandonedCartEndpoints);
+    
+    foreach ($responses as $storeCode => $response) {
         $config = $stores[$storeCode] ?? null;
         if (!$config) continue;
         
-        try {
-            $ch = curl_init();
-            curl_setopt_array($ch, [
-                CURLOPT_URL => $endpoint,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_SSL_VERIFYPEER => true
-            ]);
-            $response = curl_exec($ch);
-            $error = curl_error($ch);
-            curl_close($ch);
+        $carts = json_decode($response, true);
+        if (!is_array($carts)) continue;
+        
+        foreach ($carts as $cart) {
+            if (!is_array($cart)) continue;
             
-            if ($error) {
-                error_log("Abandoned cart fetch error for $storeCode: $error");
-                continue;
-            }
+            $cartId = $storeCode . '_' . ($cart['id'] ?? 'unknown');
+            $savedData = $callData[$cartId] ?? [];
             
-            $carts = json_decode($response, true);
-            if (!is_array($carts)) continue;
-            
-            foreach ($carts as $cart) {
-                if (!is_array($cart)) continue;
-                
-                $cartId = $storeCode . '_' . ($cart['id'] ?? 'unknown');
-                $savedData = $callData[$cartId] ?? [];
-                
-                // Parse cart contents - handle associative array
-                $cartContents = [];
-                $cartData = $cart['cart_contents'] ?? [];
-                if (is_array($cartData)) {
-                    foreach ($cartData as $key => $item) {
-                        if (!is_array($item)) continue;
-                        
-                        // Get product name from _orto_lines or build from product_id
-                        $lines = $item['_orto_lines'] ?? [];
-                        $name = '';
-                        if (is_array($lines) && count($lines) > 0) {
-                            $name = implode(', ', $lines);
-                        } else {
-                            $name = 'Product #' . ($item['product_id'] ?? 'unknown');
-                        }
-                        
-                        $cartContents[] = [
-                            'name' => $name,
-                            'quantity' => intval($item['quantity'] ?? 1),
-                            'price' => floatval($item['line_total'] ?? 0),
-                            'productId' => $item['product_id'] ?? null
-                        ];
-                    }
+            // Parse cart contents
+            $cartContents = [];
+            $cartData = $cart['cart_contents'] ?? [];
+            if (is_array($cartData)) {
+                foreach ($cartData as $key => $item) {
+                    if (!is_array($item)) continue;
+                    $lines = $item['_orto_lines'] ?? [];
+                    $name = is_array($lines) && count($lines) > 0 
+                        ? implode(', ', $lines) 
+                        : 'Product #' . ($item['product_id'] ?? 'unknown');
+                    
+                    $cartContents[] = [
+                        'name' => $name,
+                        'quantity' => intval($item['quantity'] ?? 1),
+                        'price' => floatval($item['line_total'] ?? 0),
+                        'productId' => $item['product_id'] ?? null
+                    ];
                 }
-                
-                // Extract customer info
-                $fields = $cart['other_fields'] ?? [];
-                $firstName = $fields['wcf_first_name'] ?? '';
-                $lastName = $fields['wcf_last_name'] ?? '';
-                $phone = $fields['wcf_phone_number'] ?? '';
-                $location = $fields['wcf_location'] ?? '';
-                
-                $allCarts[] = [
-                    'id' => $cartId,
-                    'storeCode' => $storeCode,
-                    'storeName' => $config['name'],
-                    'storeFlag' => $config['flag'],
-                    'cartDbId' => $cart['id'] ?? null,
-                    'customerName' => trim($firstName . ' ' . $lastName) ?: 'Unknown',
-                    'email' => $cart['email'] ?? '',
-                    'phone' => $phone,
-                    'location' => ltrim($location, ', '),
-                    'cartContents' => $cartContents,
-                    'cartValue' => floatval($cart['cart_total'] ?? 0),
-                    'currency' => $storeCurrencies[$storeCode] ?? 'EUR',
-                    'abandonedAt' => $cart['time'] ?? '',
-                    'status' => $cart['order_status'] ?? '',
-                    'callStatus' => $savedData['callStatus'] ?? 'not_called',
-                    'notes' => $savedData['notes'] ?? '',
-                    'lastUpdated' => $savedData['lastUpdated'] ?? null
-                ];
             }
-        } catch (Exception $e) {
-            error_log("Exception for $storeCode: " . $e->getMessage());
-            continue;
+            
+            $fields = $cart['other_fields'] ?? [];
+            
+            $allCarts[] = [
+                'id' => $cartId,
+                'storeCode' => $storeCode,
+                'storeName' => $config['name'],
+                'storeFlag' => $config['flag'],
+                'cartDbId' => $cart['id'] ?? null,
+                'customerName' => trim(($fields['wcf_first_name'] ?? '') . ' ' . ($fields['wcf_last_name'] ?? '')) ?: 'Unknown',
+                'email' => $cart['email'] ?? '',
+                'phone' => $fields['wcf_phone_number'] ?? '',
+                'location' => ltrim($fields['wcf_location'] ?? '', ', '),
+                'cartContents' => $cartContents,
+                'cartValue' => floatval($cart['cart_total'] ?? 0),
+                'currency' => $storeCurrencies[$storeCode] ?? 'EUR',
+                'abandonedAt' => $cart['time'] ?? '',
+                'status' => $cart['order_status'] ?? '',
+                'callStatus' => $savedData['callStatus'] ?? 'not_called',
+                'notes' => $savedData['notes'] ?? '',
+                'lastUpdated' => $savedData['lastUpdated'] ?? null
+            ];
         }
     }
     
     // Sort by date (newest first)
     usort($allCarts, function($a, $b) {
-        $timeA = strtotime($a['abandonedAt'] ?: '1970-01-01');
-        $timeB = strtotime($b['abandonedAt'] ?: '1970-01-01');
-        return $timeB - $timeA;
+        return strtotime($b['abandonedAt'] ?: '1970-01-01') - strtotime($a['abandonedAt'] ?: '1970-01-01');
     });
+    
+    // Cache results
+    setCache($cacheKey, $allCarts);
     
     return $allCarts;
 }
 
 function fetchSuppressedProfiles() {
     global $KLAVIYO_API_KEY;
+    
+    // Check cache (5 min)
+    $cached = getCache('suppressed_profiles', 300);
+    if ($cached !== null) return $cached;
     
     $callData = loadCallData();
     $allProfiles = [];
@@ -254,9 +254,7 @@ function fetchSuppressedProfiles() {
     
     do {
         $url = 'https://a.klaviyo.com/api/profiles/?filter=not(equals(subscriptions.email.marketing.consent,"SUBSCRIBED"))&page[size]=100';
-        if ($cursor) {
-            $url .= '&page[cursor]=' . urlencode($cursor);
-        }
+        if ($cursor) $url .= '&page[cursor]=' . urlencode($cursor);
         
         $ch = curl_init();
         curl_setopt_array($ch, [
@@ -269,13 +267,7 @@ function fetchSuppressedProfiles() {
             ]
         ]);
         $response = curl_exec($ch);
-        $error = curl_error($ch);
         curl_close($ch);
-        
-        if ($error) {
-            error_log("Klaviyo error: $error");
-            break;
-        }
         
         $data = json_decode($response, true);
         if (!$data || empty($data['data'])) break;
@@ -289,16 +281,13 @@ function fetchSuppressedProfiles() {
             parse_str(parse_url($data['links']['next'], PHP_URL_QUERY), $params);
             $cursor = $params['page']['cursor'] ?? ($params['page[cursor]'] ?? null);
         }
-        
         $pageCount++;
     } while ($cursor && $pageCount < 100);
     
-    // Map profiles
     $profiles = array_map(function($profile) use ($callData) {
         $profileId = 'klaviyo_' . $profile['id'];
         $savedData = $callData[$profileId] ?? [];
         $attrs = $profile['attributes'] ?? [];
-        
         $suppression = $attrs['subscriptions']['email']['marketing']['suppression'] ?? [];
         
         return [
@@ -309,96 +298,131 @@ function fetchSuppressedProfiles() {
             'phone' => $attrs['phone_number'] ?? '',
             'suppressionReason' => $suppression['reason'] ?? 'unsubscribed',
             'suppressedAt' => $suppression['timestamp'] ?? ($attrs['updated'] ?? ''),
-            'lastOrder' => null,
             'callStatus' => $savedData['callStatus'] ?? 'not_called',
             'notes' => $savedData['notes'] ?? ''
         ];
     }, $allProfiles);
     
-    // Sort by suppression date
     usort($profiles, function($a, $b) {
         return strtotime($b['suppressedAt'] ?: '1970-01-01') - strtotime($a['suppressedAt'] ?: '1970-01-01');
     });
     
+    setCache('suppressed_profiles', $profiles);
     return $profiles;
 }
 
-function fetchPendingOrders() {
+function fetchPendingOrders($storeFilter = null) {
     global $stores;
+    
+    $cacheKey = 'pending_orders_' . ($storeFilter ?: 'all');
+    $cached = getCache($cacheKey, 300);
+    if ($cached !== null) return $cached;
     
     $callData = loadCallData();
     $allOrders = [];
-    $statuses = 'pending,cancelled,failed,on-hold';
     
+    // Build URLs for parallel fetch
+    $urls = [];
     foreach ($stores as $storeCode => $config) {
-        try {
-            $orders = wcRequest($storeCode, 'orders', [
-                'status' => $statuses,
-                'per_page' => 50,
-                'orderby' => 'date',
-                'order' => 'desc'
-            ]);
-            
-            if (!is_array($orders)) continue;
-            
-            foreach ($orders as $order) {
-                if (!is_array($order)) continue;
-                
-                $orderId = $storeCode . '_order_' . ($order['id'] ?? 'unknown');
-                $savedData = $callData[$orderId] ?? [];
-                
-                $billing = $order['billing'] ?? [];
-                $items = [];
-                foreach (($order['line_items'] ?? []) as $item) {
-                    if (!is_array($item)) continue;
-                    $items[] = [
-                        'name' => $item['name'] ?? '',
-                        'quantity' => $item['quantity'] ?? 1,
-                        'price' => $item['total'] ?? '0'
-                    ];
-                }
-                
-                $allOrders[] = [
-                    'id' => $orderId,
-                    'storeCode' => $storeCode,
-                    'storeName' => $config['name'],
-                    'storeFlag' => $config['flag'],
-                    'orderId' => $order['id'] ?? null,
-                    'customerName' => trim(($billing['first_name'] ?? '') . ' ' . ($billing['last_name'] ?? '')) ?: 'Unknown',
-                    'email' => $billing['email'] ?? '',
-                    'phone' => $billing['phone'] ?? '',
-                    'location' => trim(($billing['city'] ?? '') . ', ' . ($billing['country'] ?? ''), ', '),
-                    'orderStatus' => $order['status'] ?? '',
-                    'orderTotal' => floatval($order['total'] ?? 0),
-                    'currency' => $order['currency'] ?? 'EUR',
-                    'createdAt' => $order['date_created'] ?? '',
-                    'items' => $items,
-                    'callStatus' => $savedData['callStatus'] ?? 'not_called',
-                    'notes' => $savedData['notes'] ?? '',
-                    'lastUpdated' => $savedData['lastUpdated'] ?? null
-                ];
-            }
-        } catch (Exception $e) {
-            error_log("Pending orders error for $storeCode: " . $e->getMessage());
-            continue;
-        }
+        if ($storeFilter && $storeFilter !== $storeCode) continue;
+        $params = http_build_query([
+            'status' => 'pending,cancelled,failed,on-hold',
+            'per_page' => 50,
+            'orderby' => 'date',
+            'order' => 'desc'
+        ]);
+        $urls[$storeCode] = $config['url'] . '/wp-json/wc/v3/orders?' . $params;
     }
     
-    // Sort by date
+    // Parallel fetch with auth
+    $mh = curl_multi_init();
+    $handles = [];
+    
+    foreach ($urls as $storeCode => $url) {
+        $config = $stores[$storeCode];
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
+            CURLOPT_SSL_VERIFYPEER => true
+        ]);
+        curl_multi_add_handle($mh, $ch);
+        $handles[$storeCode] = $ch;
+    }
+    
+    $running = null;
+    do {
+        curl_multi_exec($mh, $running);
+        curl_multi_select($mh);
+    } while ($running > 0);
+    
+    foreach ($handles as $storeCode => $ch) {
+        $response = curl_multi_getcontent($ch);
+        $orders = json_decode($response, true);
+        curl_multi_remove_handle($mh, $ch);
+        curl_close($ch);
+        
+        if (!is_array($orders)) continue;
+        
+        $config = $stores[$storeCode];
+        foreach ($orders as $order) {
+            if (!is_array($order)) continue;
+            
+            $orderId = $storeCode . '_order_' . ($order['id'] ?? 'unknown');
+            $savedData = $callData[$orderId] ?? [];
+            $billing = $order['billing'] ?? [];
+            
+            $items = [];
+            foreach (($order['line_items'] ?? []) as $item) {
+                if (!is_array($item)) continue;
+                $items[] = [
+                    'name' => $item['name'] ?? '',
+                    'quantity' => $item['quantity'] ?? 1,
+                    'price' => $item['total'] ?? '0'
+                ];
+            }
+            
+            $allOrders[] = [
+                'id' => $orderId,
+                'storeCode' => $storeCode,
+                'storeName' => $config['name'],
+                'storeFlag' => $config['flag'],
+                'orderId' => $order['id'] ?? null,
+                'customerName' => trim(($billing['first_name'] ?? '') . ' ' . ($billing['last_name'] ?? '')) ?: 'Unknown',
+                'email' => $billing['email'] ?? '',
+                'phone' => $billing['phone'] ?? '',
+                'location' => trim(($billing['city'] ?? '') . ', ' . ($billing['country'] ?? ''), ', '),
+                'orderStatus' => $order['status'] ?? '',
+                'orderTotal' => floatval($order['total'] ?? 0),
+                'currency' => $order['currency'] ?? 'EUR',
+                'createdAt' => $order['date_created'] ?? '',
+                'items' => $items,
+                'callStatus' => $savedData['callStatus'] ?? 'not_called',
+                'notes' => $savedData['notes'] ?? '',
+                'lastUpdated' => $savedData['lastUpdated'] ?? null
+            ];
+        }
+    }
+    curl_multi_close($mh);
+    
     usort($allOrders, function($a, $b) {
         return strtotime($b['createdAt'] ?: '1970-01-01') - strtotime($a['createdAt'] ?: '1970-01-01');
     });
     
+    setCache($cacheKey, $allOrders);
     return $allOrders;
 }
 
 // Router
 $action = $_GET['action'] ?? '';
+$store = $_GET['store'] ?? null; // Store filter
 
 try {
     switch ($action) {
         case 'abandoned-carts':
-            echo json_encode(fetchAbandonedCarts());
+            echo json_encode(fetchAbandonedCarts($store));
             break;
             
         case 'suppressed-profiles':
@@ -406,7 +430,7 @@ try {
             break;
             
         case 'pending-orders':
-            echo json_encode(fetchPendingOrders());
+            echo json_encode(fetchPendingOrders($store));
             break;
             
         case 'stores':
@@ -433,20 +457,27 @@ try {
             
             if (!$id) {
                 http_response_code(400);
-                echo json_encode(['error' => 'Missing cart ID']);
+                echo json_encode(['error' => 'Missing ID']);
                 break;
             }
             
             $callData = loadCallData();
-            $existing = $callData[$id] ?? [];
             $callData[$id] = [
-                'callStatus' => $input['callStatus'] ?? ($existing['callStatus'] ?? 'not_called'),
-                'notes' => $input['notes'] ?? ($existing['notes'] ?? ''),
+                'callStatus' => $input['callStatus'] ?? 'not_called',
+                'notes' => $input['notes'] ?? '',
                 'lastUpdated' => date('c')
             ];
             saveCallData($callData);
             
             echo json_encode(['success' => true, 'data' => $callData[$id]]);
+            break;
+            
+        case 'clear-cache':
+            global $cacheDir;
+            if (is_dir($cacheDir)) {
+                array_map('unlink', glob($cacheDir . '*.json'));
+            }
+            echo json_encode(['success' => true, 'message' => 'Cache cleared']);
             break;
             
         case 'login':
@@ -485,14 +516,16 @@ try {
             echo json_encode([
                 'status' => 'ok',
                 'timestamp' => date('c'),
-                'php_version' => PHP_VERSION
+                'php_version' => PHP_VERSION,
+                'cache_enabled' => true
             ]);
             break;
             
         default:
             echo json_encode([
                 'error' => 'Unknown action',
-                'available' => ['abandoned-carts', 'suppressed-profiles', 'pending-orders', 'stores', 'update-status', 'login', 'health']
+                'available' => ['abandoned-carts', 'suppressed-profiles', 'pending-orders', 'stores', 'update-status', 'clear-cache', 'login', 'health'],
+                'params' => ['store' => 'Filter by store code (hr, cz, pl, etc.)']
             ]);
     }
 } catch (Exception $e) {
