@@ -2059,20 +2059,10 @@ Available variables:
             }
         }
         
-        // Bulletproof SMS templates loading
+        // Bulletproof SMS templates loading - uses direct JSON fetch
         async function loadSmsTemplatesBulletproof() {
-            const result = await apiFetch('api.php?action=sms-templates', { 
-                component: 'SMS Templates', 
-                silent: true 
-            });
-            
-            if (result.success && result.data) {
-                smsTemplatesData = result.data;  // FIX: was smsTemplates, should be smsTemplatesData
-                console.log('[SMS] ✓ Templates loaded:', Object.keys(result.data.templates || {}).length, 'templates');
-            } else {
-                smsTemplatesData = { templates: {} };  // FIX: proper empty structure
-                console.warn('[SMS] ✗ Templates failed, using empty object');
-            }
+            // Reuse the main loadSmsTemplates function
+            await loadSmsTemplates();
         }
         
         // Bulletproof Paketomati loading
@@ -3203,18 +3193,15 @@ Available variables:
             showToast('CSV izvožen!');
         }
         
-        // SMS Templates (loaded from API)
+        // SMS Templates (loaded directly from JSON file)
         let smsTemplatesData = null;
         
         async function loadSmsTemplates() {
-            const result = await apiFetch('api.php?action=sms-templates', {
-                component: 'SMS Templates',
-                silent: true
-            });
-            
-            if (result.success && result.data) {
-                smsTemplatesData = result.data;
-                console.log('[SMS] ✓ Templates loaded');
+            try {
+                const res = await fetch('sms-templates.json');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                smsTemplatesData = await res.json();
+                console.log('[SMS] ✓ Templates loaded from JSON:', Object.keys(smsTemplatesData.templates || {}).length, 'templates');
                 
                 // Populate preview country dropdown
                 const previewCountry = document.getElementById('previewCountry');
@@ -3223,11 +3210,14 @@ Available variables:
                         previewCountry.innerHTML += `<option value="${s.code}">${s.flag} ${s.name}</option>`;
                     });
                 }
-            } else {
-                console.warn('[SMS] ✗ Templates failed:', result.error);
-                smsTemplatesData = {};
+            } catch (e) {
+                console.error('[SMS] ✗ Failed to load SMS templates:', e);
+                smsTemplatesData = { templates: {} };
             }
         }
+        
+        // Load templates immediately on script load
+        loadSmsTemplates();
         
         function updateTemplatePreview() {
             const templateKey = document.getElementById('previewTemplate').value;
