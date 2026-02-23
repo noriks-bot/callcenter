@@ -2346,8 +2346,16 @@ Available variables:
         }
         
         function updateStats() {
-            const fc = currentStore === 'all' ? carts : carts.filter(c => c.storeCode === currentStore);
-            const fp = currentStore === 'all' ? pending : pending.filter(p => p.storeCode === currentStore);
+            // Filter by user's allowed countries first (same as updateContentTabCounts)
+            const shouldFilter = !hasAllCountries && !isAdmin;
+            let fc = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
+            let fp = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
+            
+            // Then filter by currentStore if not 'all'
+            if (currentStore !== 'all') {
+                fc = fc.filter(c => c.storeCode === currentStore);
+                fp = fp.filter(p => p.storeCode === currentStore);
+            }
             
             // Convert all values to EUR before summing
             const totalValue = fc.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
@@ -4182,17 +4190,26 @@ Available variables:
         }
         
         function updateKPIs() {
+            // Filter by user's allowed countries first (same as updateStats)
+            const shouldFilter = !hasAllCountries && !isAdmin;
+            let fc = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
+            
+            // Then filter by currentStore if not 'all'
+            if (currentStore !== 'all') {
+                fc = fc.filter(c => c.storeCode === currentStore);
+            }
+            
             // Convert all values to EUR before summing
-            const totalValue = carts.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
-            const converted = carts.filter(c => c.callStatus === 'converted').length;
-            const recoveryRate = carts.length > 0 ? Math.round((converted / carts.length) * 100) : 0;
+            const totalValue = fc.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
+            const converted = fc.filter(c => c.callStatus === 'converted').length;
+            const recoveryRate = fc.length > 0 ? Math.round((converted / fc.length) * 100) : 0;
             
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
             const smsSentWeek = smsLog.filter(s => new Date(s.date) > weekAgo && s.status === 'sent').length;
             
             // Estimate recovered revenue (converted carts value) - convert to EUR
-            const recoveredValue = carts.filter(c => c.callStatus === 'converted')
+            const recoveredValue = fc.filter(c => c.callStatus === 'converted')
                 .reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
             
             document.getElementById('kpiTotalValue').textContent = '€' + Math.round(totalValue).toLocaleString();
