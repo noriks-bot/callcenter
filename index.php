@@ -2276,7 +2276,7 @@
             const cacheResult = await apiFetch('api.php?action=buyers-cache', { 
                 component: 'BuyersCache', 
                 silent: true,
-                timeout: 5000  // Cache should be instant
+                timeout: 30000  // Increased for large cache
             });
             
             if (cacheResult.success && cacheResult.data?.buyers?.length > 0) {
@@ -2306,7 +2306,7 @@
                     
                     if (refreshData.success && refreshData.count > 0) {
                         // Now load from fresh cache
-                        const freshCache = await apiFetch('api.php?action=buyers-cache', { silent: true, timeout: 5000 });
+                        const freshCache = await apiFetch('api.php?action=buyers-cache', { silent: true, timeout: 30000 });
                         if (freshCache.success && freshCache.data?.buyers?.length > 0) {
                             buyers = freshCache.data.buyers;
                             console.log('[Data] ✓ Buyers from fresh cache:', buyers.length);
@@ -2369,7 +2369,7 @@
                 if (data.success) {
                     console.log('[Data] Background buyers refresh complete:', data.count, 'buyers in', data.fetch_time_seconds, 's');
                     // Reload from cache to get fresh data
-                    const freshCache = await apiFetch('api.php?action=buyers-cache', { silent: true, timeout: 5000 });
+                    const freshCache = await apiFetch('api.php?action=buyers-cache', { silent: true, timeout: 30000 });
                     if (freshCache.success && freshCache.data?.buyers?.length > 0) {
                         buyers = freshCache.data.buyers;
                         updateCounts();
