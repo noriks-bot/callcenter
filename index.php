@@ -1004,6 +1004,7 @@
                     <div class="form-group" style="margin:0;">
                         <label class="form-label">Država (za formatiranje)</label>
                         <select class="form-select" id="manualSmsCountry">
+                            <option value="si">🇸🇮 Slovenija (+386)</option>
                             <option value="hr">🇭🇷 Hrvaška (+385)</option>
                             <option value="cz">🇨🇿 Češka (+420)</option>
                             <option value="pl">🇵🇱 Poljska (+48)</option>

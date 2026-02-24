@@ -38,7 +38,8 @@ $phoneCountryCodes = [
     'gr' => '30',   // Greece
     'sk' => '421',  // Slovakia
     'it' => '39',   // Italy
-    'hu' => '36'    // Hungary
+    'hu' => '36',   // Hungary
+    'si' => '386'   // Slovenia
 ];
 
 $dataFile = __DIR__ . '/data/call_data.json';
@@ -212,7 +213,8 @@ function loadSmsSettings() {
             'gr' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
             'sk' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
             'it' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
-            'hu' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null]
+            'hu' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
+            'si' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null]
         ]
     ];
 }
