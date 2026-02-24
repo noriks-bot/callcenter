@@ -2238,6 +2238,24 @@ try {
             echo json_encode(['success' => true, 'warmed' => $warmed]);
             break;
         
+        case 'warm-buyers':
+            // CRON ENDPOINT: Only warm enkratni kupci cache
+            // Run every 5 min via cron: */5 * * * * curl -s https://callcenter.noriks.com/api.php?action=warm-buyers
+            ignore_user_abort(true);
+            set_time_limit(120);
+            
+            $startTime = microtime(true);
+            $buyers = fetchOneTimeBuyers();
+            $elapsed = round(microtime(true) - $startTime, 2);
+            
+            echo json_encode([
+                'success' => true, 
+                'count' => count($buyers),
+                'elapsed' => $elapsed . 's',
+                'timestamp' => date('c')
+            ]);
+            break;
+        
         case 'cache-status':
             // Check cache status for debugging
             global $cacheDir;
