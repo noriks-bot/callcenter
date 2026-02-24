@@ -14,13 +14,13 @@
     <nav class="sidebar-nav">
         <div class="nav-section">
             <div class="nav-title">Menu</div>
-            <div class="nav-item active" data-tab="dashboard">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </div>
-            <div class="nav-item" data-tab="leads">
+            <div class="nav-item active" data-tab="leads">
                 <i class="fas fa-users"></i>
                 <span>Leads</span>
+            </div>
+            <div class="nav-item" data-tab="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
             </div>
         </div>
         

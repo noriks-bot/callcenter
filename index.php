@@ -1813,7 +1813,7 @@
         let smsLog = [];
         let smsAutomation = [];
         let currentStore = 'all';
-        let currentTab = 'dashboard';
+        let currentTab = 'leads'; // Default to Leads view
         let editId = null;
         let orderCartId = null;
         let orderCart = null;
@@ -2144,10 +2144,10 @@
                 // Update counts after all data loaded
                 updateContentTabCounts();
                 
-                // 4. Set default view
-                currentTab = 'carts';
+                // 4. Set default view - LEADS (shows carts/pending/buyers tabs)
+                currentTab = 'leads';
                 currentContentTab = 'carts';
-                document.getElementById('pageTitle').textContent = 'Abandoned Carts';
+                document.getElementById('pageTitle').textContent = 'Leads';
                 
                 // Hide ALL special content areas first (ensures clean state)
                 ['dashboardContent', 'smsDashboardContent', 'smsSettingsContent', 
@@ -2164,9 +2164,9 @@
                 document.getElementById('contentTabs').style.display = 'flex';
                 document.querySelector('.content').style.display = 'block';
                 
-                // Update sidebar
+                // Update sidebar - Leads is active by default
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                document.querySelector('.nav-item[data-tab="carts"]')?.classList.add('active');
+                document.querySelector('.nav-item[data-tab="leads"]')?.classList.add('active');
                 
                 renderTable();
                 
