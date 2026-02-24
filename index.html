@@ -2167,18 +2167,39 @@ Available variables:
             });
         }
         
-        // Bulletproof data loading with graceful degradation
+        // Bulletproof data loading with PROGRESSIVE loading for better UX
         async function loadAllDataBulletproof() {
-            console.log('[Data] Loading main data...');
+            console.log('[Data] Loading main data with progressive loading...');
             
-            // Load all in parallel - each can fail independently
-            const [cartsResult, pendingResult, buyersResult] = await Promise.allSettled([
+            // Track loading status for each section
+            const loadingStatus = { carts: true, pending: true, buyers: true };
+            
+            // Helper to update tab loading indicators
+            const updateTabLoading = (tab, loading) => {
+                const tabEl = document.querySelector(`.content-tab[data-tab="${tab}"]`);
+                if (tabEl) {
+                    const countEl = tabEl.querySelector('.count');
+                    if (loading && countEl) {
+                        countEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:8px"></i>';
+                    }
+                }
+            };
+            
+            // Show loading on all tabs
+            updateTabLoading('carts', true);
+            updateTabLoading('pending', true);
+            updateTabLoading('buyers', true);
+            
+            // PROGRESSIVE LOADING: Load carts & pending first (fastest), show them immediately
+            // Then load buyers in background (slowest)
+            
+            // Phase 1: Load fast data (carts + pending) in parallel
+            const [cartsResult, pendingResult] = await Promise.allSettled([
                 apiFetch('api.php?action=abandoned-carts', { component: 'Carts', silent: true }),
-                apiFetch('api.php?action=pending-orders', { component: 'Pending', silent: true }),
-                apiFetch('api.php?action=one-time-buyers', { component: 'Buyers', silent: true })
+                apiFetch('api.php?action=pending-orders', { component: 'Pending', silent: true })
             ]);
             
-            // Process carts
+            // Process carts immediately
             if (cartsResult.status === 'fulfilled' && cartsResult.value.success) {
                 carts = Array.isArray(cartsResult.value.data) ? cartsResult.value.data : [];
                 console.log('[Data] ✓ Carts:', carts.length);
@@ -2186,8 +2207,9 @@ Available variables:
                 console.error('[Data] ✗ Carts failed:', cartsResult.reason || cartsResult.value?.error);
                 carts = [];
             }
+            loadingStatus.carts = false;
             
-            // Process pending
+            // Process pending immediately
             if (pendingResult.status === 'fulfilled' && pendingResult.value.success) {
                 pending = Array.isArray(pendingResult.value.data) ? pendingResult.value.data : [];
                 console.log('[Data] ✓ Pending:', pending.length);
@@ -2195,16 +2217,31 @@ Available variables:
                 console.error('[Data] ✗ Pending failed:', pendingResult.reason || pendingResult.value?.error);
                 pending = [];
             }
+            loadingStatus.pending = false;
             
-            // Process buyers
-            if (buyersResult.status === 'fulfilled' && buyersResult.value.success) {
-                buyers = Array.isArray(buyersResult.value.data) ? buyersResult.value.data : [];
+            // Render immediately with carts + pending (buyers will show spinner)
+            updateCounts();
+            updateStats();
+            renderTable();
+            console.log('[Data] Phase 1 complete - showing carts & pending');
+            
+            // Phase 2: Load buyers in background (this is the slow one)
+            const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
+                component: 'Buyers', 
+                silent: true 
+            });
+            
+            if (buyersResult.success) {
+                buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
                 console.log('[Data] ✓ Buyers:', buyers.length);
             } else {
-                console.error('[Data] ✗ Buyers failed:', buyersResult.reason || buyersResult.value?.error);
+                console.error('[Data] ✗ Buyers failed:', buyersResult.error);
                 buyers = [];
             }
+            loadingStatus.buyers = false;
             
+            // Final render with all data
+            console.log('[Data] Phase 2 complete - all data loaded');
             console.log('[Data] Totals:', { carts: carts.length, pending: pending.length, buyers: buyers.length });
             
             updateCounts();
@@ -2215,7 +2252,7 @@ Available variables:
             const failures = [
                 cartsResult.status !== 'fulfilled' || !cartsResult.value?.success ? 'Carts' : null,
                 pendingResult.status !== 'fulfilled' || !pendingResult.value?.success ? 'Pending' : null,
-                buyersResult.status !== 'fulfilled' || !buyersResult.value?.success ? 'Buyers' : null
+                !buyersResult.success ? 'Buyers' : null
             ].filter(Boolean);
             
             if (failures.length > 0) {

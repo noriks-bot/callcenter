@@ -827,7 +827,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
     global $stores, $storeCurrencies;
     
     $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all');
-    $cached = getCache($cacheKey, 1800);  // 30 min cache (fetching is slow)
+    $cached = getCache($cacheKey, 1800);  // 30 min cache
     if ($cached !== null) return $cached;
     
     $callData = loadCallData();
@@ -835,42 +835,93 @@ function fetchOneTimeBuyers($storeFilter = null) {
     
     $storesToFetch = $storeFilter ? [$storeFilter => $stores[$storeFilter]] : $stores;
     
-    // Use orders API and group by email to find one-time buyers
-    // (WooCommerce customers API doesn't work reliably)
-    foreach ($storesToFetch as $storeCode => $config) {
-        if (!$config) continue;
+    // OPTIMIZED: Fetch all stores in parallel using curl_multi
+    // Reduced to 5 pages per store (500 orders) - sufficient for call center needs
+    $maxPages = 5;
+    
+    // Collect all orders from all stores using parallel requests
+    $allStoreOrders = [];
+    
+    // Process pages in batches - all stores page 1, then all stores page 2, etc.
+    for ($page = 1; $page <= $maxPages; $page++) {
+        $mh = curl_multi_init();
+        $handles = [];
         
-        // FIX: Fetch ALL orders - pagination up to 30 pages (3000 orders per store)
-        // This ensures we capture all one-time buyers, not just recent ones
-        $allOrders = [];
-        $maxPages = 30;  // 30 pages × 100 = 3000 orders max per store
-        
-        error_log("[OneTimeBuyers] Fetching orders for $storeCode (max $maxPages pages)...");
-        
-        for ($page = 1; $page <= $maxPages; $page++) {
-            $orders = wcApiRequest($storeCode, 'orders', [
+        foreach ($storesToFetch as $storeCode => $config) {
+            if (!$config) continue;
+            
+            // Skip stores that already returned empty on previous page
+            if ($page > 1 && isset($allStoreOrders[$storeCode]['done'])) continue;
+            
+            $params = http_build_query([
                 'per_page' => 100,
                 'status' => 'processing,completed',
                 'orderby' => 'date',
                 'order' => 'desc',
                 'page' => $page
             ]);
+            $url = $config['url'] . '/wp-json/wc/v3/orders?' . $params;
             
-            // Skip if not array or if it's an error response
-            if (!is_array($orders) || isset($orders['error']) || empty($orders)) {
-                error_log("[OneTimeBuyers] $storeCode page $page: stopped (empty or error)");
-                break;
-            }
-            
-            $allOrders = array_merge($allOrders, $orders);
-            error_log("[OneTimeBuyers] $storeCode page $page: got " . count($orders) . " orders (total: " . count($allOrders) . ")");
-            
-            // If we got less than 100, there are no more pages
-            if (count($orders) < 100) break;
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 25,
+                CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
+                CURLOPT_SSL_VERIFYPEER => true
+            ]);
+            curl_multi_add_handle($mh, $ch);
+            $handles[$storeCode] = $ch;
         }
         
-        error_log("[OneTimeBuyers] $storeCode: fetched " . count($allOrders) . " total orders");
-        $orders = $allOrders;
+        // Execute all requests in parallel
+        $running = null;
+        do { curl_multi_exec($mh, $running); curl_multi_select($mh); } while ($running > 0);
+        
+        // Process responses
+        foreach ($handles as $storeCode => $ch) {
+            $response = curl_multi_getcontent($ch);
+            $orders = json_decode($response, true);
+            curl_multi_remove_handle($mh, $ch);
+            curl_close($ch);
+            
+            if (!isset($allStoreOrders[$storeCode])) {
+                $allStoreOrders[$storeCode] = ['orders' => [], 'done' => false];
+            }
+            
+            if (!is_array($orders) || empty($orders)) {
+                $allStoreOrders[$storeCode]['done'] = true;
+                continue;
+            }
+            
+            $allStoreOrders[$storeCode]['orders'] = array_merge(
+                $allStoreOrders[$storeCode]['orders'], 
+                $orders
+            );
+            
+            // Mark as done if less than 100 results (no more pages)
+            if (count($orders) < 100) {
+                $allStoreOrders[$storeCode]['done'] = true;
+            }
+        }
+        curl_multi_close($mh);
+        
+        // Check if all stores are done
+        $allDone = true;
+        foreach ($storesToFetch as $storeCode => $config) {
+            if (!isset($allStoreOrders[$storeCode]['done']) || !$allStoreOrders[$storeCode]['done']) {
+                $allDone = false;
+                break;
+            }
+        }
+        if ($allDone) break;
+    }
+    
+    // Process orders from all stores
+    foreach ($storesToFetch as $storeCode => $config) {
+        if (!$config || !isset($allStoreOrders[$storeCode])) continue;
+        
+        $orders = $allStoreOrders[$storeCode]['orders'];
         
         // Group orders by email
         $customerOrders = [];
@@ -1921,6 +1972,55 @@ try {
             global $cacheDir;
             if (is_dir($cacheDir)) array_map('unlink', glob($cacheDir . '*.json'));
             echo json_encode(['success' => true]);
+            break;
+        
+        case 'warm-cache':
+            // Background cache warming - call this to pre-populate cache
+            // Useful for cron job or after clear-cache
+            ignore_user_abort(true);
+            set_time_limit(120);
+            
+            $warmed = [];
+            
+            // Warm abandoned carts (fastest)
+            fetchAbandonedCarts();
+            $warmed[] = 'abandoned-carts';
+            
+            // Warm pending orders
+            fetchPendingOrders();
+            $warmed[] = 'pending-orders';
+            
+            // Warm one-time buyers (slowest - but now parallelized)
+            fetchOneTimeBuyers();
+            $warmed[] = 'one-time-buyers';
+            
+            echo json_encode(['success' => true, 'warmed' => $warmed]);
+            break;
+        
+        case 'cache-status':
+            // Check cache status for debugging
+            global $cacheDir;
+            $status = [];
+            $cacheFiles = [
+                'abandoned_carts_filtered' => 300,
+                'pending_orders' => 300,
+                'one_time_buyers_all' => 1800
+            ];
+            foreach ($cacheFiles as $key => $maxAge) {
+                $file = $cacheDir . md5($key) . '.json';
+                if (file_exists($file)) {
+                    $age = time() - filemtime($file);
+                    $status[$key] = [
+                        'cached' => true,
+                        'age_seconds' => $age,
+                        'valid' => $age < $maxAge,
+                        'expires_in' => max(0, $maxAge - $age)
+                    ];
+                } else {
+                    $status[$key] = ['cached' => false];
+                }
+            }
+            echo json_encode($status);
             break;
             
         case 'login':
