@@ -11,7 +11,7 @@
     <style>
         /* Minimal overrides for compatibility - main styles in styles.css */
         
-        /* Special view content areas - EXACTLY like .main (Leads page) */
+        /* Special view content areas - copy .main styles from styles.css */
         #dashboardContent,
         #smsDashboardContent,
         #smsSettingsContent,
@@ -20,43 +20,32 @@
         #followupsContent,
         #analyticsContent,
         #paketomatiContent {
-            margin-left: var(--sidebar-width, 260px);
-            padding-top: var(--header-height, 64px);
+            margin-left: 260px;
+            padding-top: 64px;
             min-height: 100vh;
             background: var(--content-bg);
-            transition: margin-left var(--transition-slow, 0.3s ease);
         }
         
-        /* Content wrapper inside special views - same as .content */
-        #dashboardContent > div,
-        #smsDashboardContent > div,
-        #smsSettingsContent > div,
-        #buyersSettingsContent > div,
-        #agentsContent > div,
-        #followupsContent > div,
-        #analyticsContent > div,
-        #paketomatiContent > div {
-            padding: 0 16px 12px;
-        }
-        
-        /* Page header - same padding as stats-grid */
+        /* Page header in special views */
         .page-header {
-            padding: 8px 16px !important;
-            margin-bottom: 0 !important;
+            padding: 8px 16px;
         }
         
-        /* Page title - smaller, like Leads */
+        /* Page title */
         .page-title-large {
-            font-size: 16px !important;
-            font-weight: 600 !important;
-            margin: 0 !important;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
         }
         
-        .page-title-large i {
-            font-size: 14px;
+        /* Table cards in special views - same as Leads */
+        #buyersSettingsContent .table-card,
+        #smsSettingsContent .table-card,
+        #agentsContent .table-card {
+            margin: 0 16px;
         }
         
-        /* Adjust for collapsed sidebar */
+        /* Collapsed sidebar */
         .sidebar.collapsed ~ #dashboardContent,
         .sidebar.collapsed ~ #smsDashboardContent,
         .sidebar.collapsed ~ #smsSettingsContent,
@@ -68,7 +57,7 @@
             margin-left: 70px;
         }
         
-        /* Mobile: no sidebar margin */
+        /* Mobile */
         @media (max-width: 1024px) {
             #dashboardContent,
             #smsDashboardContent,
@@ -1260,15 +1249,10 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-user-cog"></i> Options</h1>
-            <div class="page-header-actions">
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </div>
         
-        <div style="max-width:600px;">
-            <div class="table-card" style="padding:24px;">
+        <div class="content">
+            <div class="table-card" style="max-width:600px;">
                 <div style="margin-bottom:24px;">
                     <h3 style="margin-bottom:8px;">⏰ Filter nastavitve</h3>
                     <p style="color:var(--text-muted);font-size:13px;">
