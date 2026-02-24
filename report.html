@@ -9,20 +9,54 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">N</div>
-            <span class="sidebar-title">Call Center</span>
+            <div class="logo">N</div>
+            <div class="brand">
+                Noriks
+                <span>Call Center</span>
+            </div>
         </div>
         
         <nav class="sidebar-nav">
             <div class="nav-section">
-                <div class="nav-section-title">Main Menu</div>
+                <div class="nav-title">Menu</div>
                 <a href="index.html" class="nav-item">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Abandoned Carts</span>
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
                 </a>
+                <a href="index.html#leads" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Leads</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Calls</div>
+                <a href="index.html#followups" class="nav-item">
+                    <i class="fas fa-phone-volume"></i>
+                    <span>My Follow-ups</span>
+                </a>
+                <a href="index.html#analytics" class="nav-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Messaging</div>
+                <a href="index.html#sms-dashboard" class="nav-item">
+                    <i class="fas fa-comment-sms"></i>
+                    <span>SMS Dashboard</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Reports</div>
                 <a href="report.html" class="nav-item active">
                     <i class="fas fa-chart-bar"></i>
                     <span>Statistics</span>
@@ -37,14 +71,16 @@
                     <div class="user-name" id="userName">Noriks</div>
                     <div class="user-role" id="userRole">Admin</div>
                 </div>
-                <button onclick="logout()" style="background: none; border: none; color: var(--sidebar-text); cursor: pointer; padding: 8px;">
+                <button class="logout-btn" onclick="logout()" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+                <i class="fas fa-chevron-left"></i>
+                <span>Collapse</span>
+            </button>
         </div>
     </aside>
-    
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     
     <!-- Main Content -->
     <main class="main-content">
@@ -256,6 +292,24 @@
             localStorage.removeItem('callcenter_user');
             window.location.href = 'login.html';
         }
+        
+        // Sidebar collapse toggle
+        function initSidebar() {
+            const isMinimized = localStorage.getItem('callcenter_sidebar_minimized') === 'true';
+            if (isMinimized) {
+                document.getElementById('sidebar').classList.add('minimized');
+                document.body.classList.add('sidebar-minimized');
+            }
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const isMinimized = sidebar.classList.toggle('minimized');
+            document.body.classList.toggle('sidebar-minimized', isMinimized);
+            localStorage.setItem('callcenter_sidebar_minimized', isMinimized);
+        }
+        
+        initSidebar();
         
         // Load statistics
         async function loadStats() {
