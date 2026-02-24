@@ -2295,8 +2295,34 @@
                     refreshBuyersInBackground();
                 }
             } else {
-                // No cache available - fall back to direct API call
-                console.log('[Data] No cache, loading buyers directly (may take longer)...');
+                // No cache available - refresh cache first, then load
+                console.log('[Data] No cache, refreshing cache first...');
+                
+                try {
+                    // Trigger cache refresh (this populates the cache file)
+                    const refreshResult = await fetch('api.php?action=refresh-buyers-cache');
+                    const refreshData = await refreshResult.json();
+                    console.log('[Data] Cache refresh result:', refreshData);
+                    
+                    if (refreshData.success && refreshData.count > 0) {
+                        // Now load from fresh cache
+                        const freshCache = await apiFetch('api.php?action=buyers-cache', { silent: true, timeout: 5000 });
+                        if (freshCache.success && freshCache.data?.buyers?.length > 0) {
+                            buyers = freshCache.data.buyers;
+                            console.log('[Data] ✓ Buyers from fresh cache:', buyers.length);
+                            globalLoadingStatus.buyersError = null;
+                            globalLoadingStatus.buyers = false;
+                            updateCounts();
+                            renderTable();
+                            return; // Exit early, we're done
+                        }
+                    }
+                } catch (refreshErr) {
+                    console.error('[Data] Cache refresh failed:', refreshErr);
+                }
+                
+                // Final fallback - direct API call
+                console.log('[Data] Fallback: loading buyers directly...');
                 const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
                     component: 'Buyers', 
                     silent: true,
