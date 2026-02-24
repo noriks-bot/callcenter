@@ -11,6 +11,48 @@
     <style>
         /* Minimal overrides for compatibility - main styles in styles.css */
         
+        /* Special view content areas - need sidebar margin */
+        #dashboardContent,
+        #smsDashboardContent,
+        #smsSettingsContent,
+        #buyersSettingsContent,
+        #agentsContent,
+        #followupsContent,
+        #analyticsContent,
+        #paketomatiContent {
+            margin-left: 240px;
+            padding: 24px;
+            min-height: 100vh;
+            background: var(--content-bg);
+        }
+        
+        /* Adjust for collapsed sidebar */
+        .sidebar.collapsed ~ #dashboardContent,
+        .sidebar.collapsed ~ #smsDashboardContent,
+        .sidebar.collapsed ~ #smsSettingsContent,
+        .sidebar.collapsed ~ #buyersSettingsContent,
+        .sidebar.collapsed ~ #agentsContent,
+        .sidebar.collapsed ~ #followupsContent,
+        .sidebar.collapsed ~ #analyticsContent,
+        .sidebar.collapsed ~ #paketomatiContent {
+            margin-left: 70px;
+        }
+        
+        /* Mobile: no sidebar margin */
+        @media (max-width: 1024px) {
+            #dashboardContent,
+            #smsDashboardContent,
+            #smsSettingsContent,
+            #buyersSettingsContent,
+            #agentsContent,
+            #followupsContent,
+            #analyticsContent,
+            #paketomatiContent {
+                margin-left: 0;
+                padding: 16px;
+            }
+        }
+        
         /* Inline Status Select */
         .inline-status-select {
             padding: 4px 8px;
