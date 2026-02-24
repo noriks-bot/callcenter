@@ -526,6 +526,10 @@
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+                <i class="fas fa-chevron-left"></i>
+                <span>Collapse</span>
+            </button>
         </div>
     </aside>
     
@@ -1753,8 +1757,25 @@
             }
         }
         
-        // Initialize theme on load
+        // Sidebar collapse toggle
+        function initSidebar() {
+            const isMinimized = localStorage.getItem('callcenter_sidebar_minimized') === 'true';
+            if (isMinimized) {
+                document.getElementById('sidebar').classList.add('minimized');
+                document.body.classList.add('sidebar-minimized');
+            }
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const isMinimized = sidebar.classList.toggle('minimized');
+            document.body.classList.toggle('sidebar-minimized', isMinimized);
+            localStorage.setItem('callcenter_sidebar_minimized', isMinimized);
+        }
+        
+        // Initialize theme and sidebar on load
         initTheme();
+        initSidebar();
         
         console.log('[Auth] User:', user);
         console.log('[Auth] isAdmin:', isAdmin);

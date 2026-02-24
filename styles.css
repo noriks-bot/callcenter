@@ -136,6 +136,76 @@ a:hover {
     transform: translateX(-100%);
 }
 
+/* Sidebar Minimized State (icons only) */
+.sidebar.minimized {
+    width: 70px;
+}
+
+.sidebar.minimized .brand,
+.sidebar.minimized .nav-title,
+.sidebar.minimized .nav-item span,
+.sidebar.minimized .nav-item .badge,
+.sidebar.minimized .user-info,
+.sidebar.minimized .logout-btn {
+    display: none;
+}
+
+.sidebar.minimized .sidebar-header {
+    justify-content: center;
+    padding: 16px;
+}
+
+.sidebar.minimized .nav-item {
+    justify-content: center;
+    padding: 14px;
+}
+
+.sidebar.minimized .user-card {
+    justify-content: center;
+    padding: 12px;
+}
+
+.sidebar.minimized .sidebar-toggle {
+    justify-content: center;
+}
+
+.sidebar.minimized .sidebar-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--sidebar-hover);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--sidebar-text);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all var(--transition-normal);
+    margin-top: 12px;
+}
+
+.sidebar-toggle:hover {
+    background: var(--sidebar-active);
+    color: var(--sidebar-text-active);
+}
+
+.sidebar-toggle i {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+/* Adjust main content when sidebar is minimized */
+body.sidebar-minimized .main-content,
+body.sidebar-minimized .top-bar {
+    margin-left: 70px;
+}
+
 /* Sidebar Header / Logo */
 .sidebar-header {
     padding: 20px;
