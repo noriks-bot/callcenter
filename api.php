@@ -201,43 +201,22 @@ function saveAgents($data) {
 }
 
 function loadSmsSettings() {
-    global $smsSettingsFile;
+    // HARDCODED SMS eshop_sync_id - SAME FOR ALL COUNTRIES
+    // IMPORTANT: Do NOT read from settings file - always use this value!
+    $SMS_ESHOP_SYNC_ID = '637100000075'; // HARDCODED - use for ALL countries
     
-    // Correct SMS eshop_sync_id for each Noriks store (MetaKocka SMS Connection IDs)
-    // IMPORTANT: These are SMS Connection IDs, NOT Webshop IDs!
-    // ALL countries use the same NTH SMS connection: 637100000075
-    $eshopSyncIds = [
-        'hr' => '637100000075',
-        'cz' => '637100000075',
-        'pl' => '637100000075',
-        'sk' => '637100000075',
-        'gr' => '637100000075',
-        'it' => '637100000075',
-        'hu' => '637100000075',
-        'si' => '637100000075'  // Same SMS connection for all countries
-    ];
-    
-    if (file_exists($smsSettingsFile)) {
-        $settings = json_decode(file_get_contents($smsSettingsFile), true) ?: [];
-        // ALWAYS force the correct eshop_sync_id (ignore any cached/old values)
-        foreach ($eshopSyncIds as $country => $eshopId) {
-            $settings['providers'][$country]['eshop_sync_id'] = $eshopId;
-            $settings['providers'][$country]['enabled'] = true;
-        }
-        return $settings;
-    }
-    
-    // Default settings with correct eshop_sync_ids per country
+    // ALWAYS return hardcoded ID, ignoring any cached/saved values
+    // This ensures the correct SMS connection is used regardless of server cache
     return [
         'providers' => [
-            'hr' => ['eshop_sync_id' => $eshopSyncIds['hr'], 'enabled' => true, 'lastTest' => null],
-            'cz' => ['eshop_sync_id' => $eshopSyncIds['cz'], 'enabled' => true, 'lastTest' => null],
-            'pl' => ['eshop_sync_id' => $eshopSyncIds['pl'], 'enabled' => true, 'lastTest' => null],
-            'gr' => ['eshop_sync_id' => $eshopSyncIds['gr'], 'enabled' => true, 'lastTest' => null],
-            'sk' => ['eshop_sync_id' => $eshopSyncIds['sk'], 'enabled' => true, 'lastTest' => null],
-            'it' => ['eshop_sync_id' => $eshopSyncIds['it'], 'enabled' => true, 'lastTest' => null],
-            'hu' => ['eshop_sync_id' => $eshopSyncIds['hu'], 'enabled' => true, 'lastTest' => null],
-            'si' => ['eshop_sync_id' => $eshopSyncIds['si'], 'enabled' => true, 'lastTest' => null]
+            'hr' => ['eshop_sync_id' => $SMS_ESHOP_SYNC_ID, 'enabled' => true, 'lastTest' => null],
+            'cz' => ['eshop_sync_id' => $SMS_ESHOP_SYNC_ID, 'enabled' => true, 'lastTest' => null],
+            'pl' => ['eshop_sync_id' => $SMS_ESHOP_SYNC_ID, 'enabled' => true, 'lastTest' => null],
+            'gr' => ['eshop_sync_id' => $SMS_ESHOP_SYNC_ID, 'enabled' => true, 'lastTest' => null],
+            'sk' => ['eshop_sync_id' => $SMS_ESHOP_SYNC_ID, 'enabled' => true, 'lastTest' => null],
+            'it' => ['eshop_sync_id' => $SMS_ESHOP_SYNC_ID, 'enabled' => true, 'lastTest' => null],
+            'hu' => ['eshop_sync_id' => $SMS_ESHOP_SYNC_ID, 'enabled' => true, 'lastTest' => null],
+            'si' => ['eshop_sync_id' => $SMS_ESHOP_SYNC_ID, 'enabled' => true, 'lastTest' => null]
         ]
     ];
 }
@@ -438,12 +417,8 @@ function getCallStats($filters = []) {
 function testSmsConnection($storeCode) {
     global $metakocka;
     
-    $settings = loadSmsSettings();
-    $eshopSyncId = $settings['providers'][$storeCode]['eshop_sync_id'] ?? '';
-    
-    if (empty($eshopSyncId)) {
-        return ['success' => false, 'error' => 'Eshop Sync ID ni nastavljen za to državo'];
-    }
+    // HARDCODED SMS ID - do NOT read from settings file!
+    $eshopSyncId = '637100000075'; // HARDCODED - use for ALL countries
     
     // Test connection by sending a test request (without actually sending SMS)
     $payload = [
@@ -521,21 +496,12 @@ function sendQueuedSms($smsId, $overridePhone = null) {
         return ['success' => false, 'error' => 'SMS already processed (status: ' . $sms['status'] . ')', 'debug' => 'already_processed'];
     }
     
-    $settings = loadSmsSettings();
     $storeCode = $sms['storeCode'];
-    $eshopSyncId = $settings['providers'][$storeCode]['eshop_sync_id'] ?? '';
     
-    $logMsg("[SMS-SEND] Store: $storeCode, eshop_sync_id: " . ($eshopSyncId ?: 'EMPTY!'));
+    // HARDCODED SMS ID - do NOT read from settings file!
+    $eshopSyncId = '637100000075'; // HARDCODED - use for ALL countries
     
-    if (empty($eshopSyncId)) {
-        $logMsg("[SMS-SEND] ERROR: Missing eshop_sync_id for $storeCode");
-        return [
-            'success' => false, 
-            'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode) . '. Nastavi ga v SMS Settings!',
-            'debug' => 'missing_eshop_sync_id',
-            'storeCode' => $storeCode
-        ];
-    }
+    $logMsg("[SMS-SEND] Store: $storeCode, eshop_sync_id: $eshopSyncId (HARDCODED)");
     
     // Use overridden phone if provided, otherwise use the one from the queue
     $rawPhone = $overridePhone ?: $sms['recipient'];
@@ -695,20 +661,10 @@ function sendDirectSms($data) {
     $storeCode = $data['storeCode'] ?? 'hr';
     $message = $data['message'] ?? '';
     
-    // Get eshop_sync_id from settings
-    $settings = loadSmsSettings();
-    $eshopSyncId = $settings['providers'][$storeCode]['eshop_sync_id'] ?? '';
+    // HARDCODED SMS ID - do NOT read from settings file!
+    $eshopSyncId = '637100000075'; // HARDCODED - use for ALL countries
     
-    $logMsg("[SMS-DIRECT] Phone: $phone, Store: $storeCode, eshop_sync_id: " . ($eshopSyncId ?: 'EMPTY!'));
-    
-    if (empty($eshopSyncId)) {
-        $logMsg("[SMS-DIRECT] ERROR: Missing eshop_sync_id for $storeCode");
-        return [
-            'success' => false,
-            'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode) . '. Nastavi ga v SMS Settings!',
-            'debug' => 'missing_eshop_sync_id'
-        ];
-    }
+    $logMsg("[SMS-DIRECT] Phone: $phone, Store: $storeCode, eshop_sync_id: $eshopSyncId (HARDCODED)");
     
     // Validate phone
     $validation = validatePhoneForSms($phone, $storeCode);
