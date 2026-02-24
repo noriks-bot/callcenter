@@ -872,7 +872,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $logMsg("Min days from purchase: $minDaysFromPurchase");
     
     $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all') . '_' . $minDaysFromPurchase;
-    $cached = getCache($cacheKey, 3600);  // 1 hour cache (was 30 min)
+    $cached = getCache($cacheKey, 7200);  // 2 hour cache - stale-while-revalidate handles freshness
     if ($cached !== null) {
         $logMsg("✓ Returning cached data: " . count($cached) . " buyers");
         return $cached;
@@ -884,9 +884,9 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $storesToFetch = $storeFilter ? [$storeFilter => $stores[$storeFilter]] : $stores;
     $logMsg("Stores to fetch: " . implode(', ', array_keys($storesToFetch)));
     
-    // OPTIMIZED: Fetch all stores in parallel using curl_multi
-    // Reduced to 2 pages per store (100 orders) for much faster loading
-    $maxPages = 2;
+    // Fetch all stores in parallel using curl_multi
+    // Keep all pages to get ALL buyers
+    $maxPages = 3;
     
     // Collect all orders from all stores using parallel requests
     $allStoreOrders = [];
@@ -913,7 +913,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 if ($page > 1 && isset($allStoreOrders[$storeCode]['done'])) continue;
                 
                 $params = http_build_query([
-                    'per_page' => 50,  // Reduced from 100 to 50 for faster API calls
+                    'per_page' => 100,  // Full page size for ALL buyers
                     'status' => 'processing,completed',
                     'orderby' => 'date',
                     'order' => 'desc',
@@ -925,8 +925,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 curl_setopt_array($ch, [
                     CURLOPT_URL => $url,
                     CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_TIMEOUT => 12,  // Reduced timeout for faster fail
-                    CURLOPT_CONNECTTIMEOUT => 8,
+                    CURLOPT_TIMEOUT => 20,  // Keep reasonable timeout
+                    CURLOPT_CONNECTTIMEOUT => 10,
                     CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
                     CURLOPT_SSL_VERIFYPEER => true
                 ]);
@@ -991,8 +991,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 );
                 $logMsg("$storeCode: Got " . count($orders) . " orders (total: " . count($allStoreOrders[$storeCode]['orders']) . ")");
                 
-                // Mark as done if less than 50 results (no more pages)
-                if (count($orders) < 50) {
+                // Mark as done if less than 100 results (no more pages)
+                if (count($orders) < 100) {
                     $allStoreOrders[$storeCode]['done'] = true;
                 }
             }
@@ -1030,7 +1030,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
             
             for ($page = 1; $page <= $maxPages; $page++) {
                 $params = http_build_query([
-                    'per_page' => 50,  // Reduced from 100 to 50
+                    'per_page' => 100,  // Full page size
                     'status' => 'processing,completed',
                     'orderby' => 'date',
                     'order' => 'desc',
@@ -1042,8 +1042,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 curl_setopt_array($ch, [
                     CURLOPT_URL => $url,
                     CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_TIMEOUT => 10,  // Shorter timeout for sequential
-                    CURLOPT_CONNECTTIMEOUT => 6,
+                    CURLOPT_TIMEOUT => 15,
+                    CURLOPT_CONNECTTIMEOUT => 10,
                     CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
                     CURLOPT_SSL_VERIFYPEER => true
                 ]);
@@ -1071,7 +1071,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 );
                 $logMsg("$storeCode (seq): Got " . count($orders) . " orders (total: " . count($allStoreOrders[$storeCode]['orders']) . ")");
                 
-                if (count($orders) < 50) break;  // Updated from 100 to 50
+                if (count($orders) < 100) break;
             }
         }
     }
@@ -1831,8 +1831,8 @@ try {
             }
             $cacheKey = 'one_time_buyers_' . ($store ?: 'all') . '_' . $minDaysFromPurchase;
             
-            // Check cache - allow stale data up to 4 hours
-            $cacheMeta = getCacheWithMeta($cacheKey, 3600, 14400);  // fresh=1hr, stale-max=4hrs
+            // Check cache - fresh=2hr, allow stale data up to 6 hours
+            $cacheMeta = getCacheWithMeta($cacheKey, 7200, 21600);  // fresh=2hr, stale-max=6hrs
             
             if ($cacheMeta['data'] !== null) {
                 // Return cached data with metadata
