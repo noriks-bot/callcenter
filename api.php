@@ -203,32 +203,44 @@ function saveAgents($data) {
 function loadSmsSettings() {
     global $smsSettingsFile;
     
-    // Default working eshop_sync_id from MetaKocka (verified 2024-02)
-    $defaultEshopSyncId = '637100000075';
+    // Correct eshop_sync_id for each Noriks store (MetaKocka)
+    // SI uses HR's eshop_sync_id for testing
+    $eshopSyncIds = [
+        'hr' => '637100017347',
+        'cz' => '637100017357',
+        'pl' => '637100017358',
+        'sk' => '637100017356',
+        'gr' => '637100017359',
+        'it' => '637100365893',
+        'hu' => '637100367604',
+        'si' => '637100017347'  // Uses HR's ID for testing
+    ];
     
     if (file_exists($smsSettingsFile)) {
         $settings = json_decode(file_get_contents($smsSettingsFile), true) ?: [];
-        // Ensure all countries have the default ID if not set
-        foreach (['hr', 'cz', 'pl', 'gr', 'sk', 'it', 'hu', 'si'] as $country) {
-            if (empty($settings['providers'][$country]['eshop_sync_id'])) {
-                $settings['providers'][$country]['eshop_sync_id'] = $defaultEshopSyncId;
+        // Ensure all countries have the correct eshop_sync_id
+        foreach ($eshopSyncIds as $country => $eshopId) {
+            if (empty($settings['providers'][$country]['eshop_sync_id']) || 
+                $settings['providers'][$country]['eshop_sync_id'] === '637100000075') {
+                // Update old default or empty values to correct ID
+                $settings['providers'][$country]['eshop_sync_id'] = $eshopId;
                 $settings['providers'][$country]['enabled'] = true;
             }
         }
         return $settings;
     }
     
-    // Default settings with working eshop_sync_id
+    // Default settings with correct eshop_sync_ids per country
     return [
         'providers' => [
-            'hr' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
-            'cz' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
-            'pl' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
-            'gr' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
-            'sk' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
-            'it' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
-            'hu' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
-            'si' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null]
+            'hr' => ['eshop_sync_id' => $eshopSyncIds['hr'], 'enabled' => true, 'lastTest' => null],
+            'cz' => ['eshop_sync_id' => $eshopSyncIds['cz'], 'enabled' => true, 'lastTest' => null],
+            'pl' => ['eshop_sync_id' => $eshopSyncIds['pl'], 'enabled' => true, 'lastTest' => null],
+            'gr' => ['eshop_sync_id' => $eshopSyncIds['gr'], 'enabled' => true, 'lastTest' => null],
+            'sk' => ['eshop_sync_id' => $eshopSyncIds['sk'], 'enabled' => true, 'lastTest' => null],
+            'it' => ['eshop_sync_id' => $eshopSyncIds['it'], 'enabled' => true, 'lastTest' => null],
+            'hu' => ['eshop_sync_id' => $eshopSyncIds['hu'], 'enabled' => true, 'lastTest' => null],
+            'si' => ['eshop_sync_id' => $eshopSyncIds['si'], 'enabled' => true, 'lastTest' => null]
         ]
     ];
 }
