@@ -202,19 +202,33 @@ function saveAgents($data) {
 
 function loadSmsSettings() {
     global $smsSettingsFile;
+    
+    // Default working eshop_sync_id from MetaKocka (verified 2024-02)
+    $defaultEshopSyncId = '637100000075';
+    
     if (file_exists($smsSettingsFile)) {
-        return json_decode(file_get_contents($smsSettingsFile), true) ?: [];
+        $settings = json_decode(file_get_contents($smsSettingsFile), true) ?: [];
+        // Ensure all countries have the default ID if not set
+        foreach (['hr', 'cz', 'pl', 'gr', 'sk', 'it', 'hu', 'si'] as $country) {
+            if (empty($settings['providers'][$country]['eshop_sync_id'])) {
+                $settings['providers'][$country]['eshop_sync_id'] = $defaultEshopSyncId;
+                $settings['providers'][$country]['enabled'] = true;
+            }
+        }
+        return $settings;
     }
+    
+    // Default settings with working eshop_sync_id
     return [
         'providers' => [
-            'hr' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
-            'cz' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
-            'pl' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
-            'gr' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
-            'sk' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
-            'it' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
-            'hu' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null],
-            'si' => ['eshop_sync_id' => '', 'enabled' => false, 'lastTest' => null]
+            'hr' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
+            'cz' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
+            'pl' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
+            'gr' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
+            'sk' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
+            'it' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
+            'hu' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null],
+            'si' => ['eshop_sync_id' => $defaultEshopSyncId, 'enabled' => true, 'lastTest' => null]
         ]
     ];
 }
