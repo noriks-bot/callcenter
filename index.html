@@ -2055,14 +2055,12 @@
                 document.getElementById('pageTitle').textContent = 'Abandoned Carts';
                 
                 // Hide ALL special content areas first (ensures clean state)
-                document.getElementById('dashboardContent').style.display = 'none';
-                document.getElementById('smsDashboardContent').style.display = 'none';
-                document.getElementById('smsSettingsContent').style.display = 'none';
-                // emailTemplatesContent removed
-                document.getElementById('agentsContent').style.display = 'none';
-                document.getElementById('followupsContent').style.display = 'none';
-                document.getElementById('analyticsContent').style.display = 'none';
-                document.getElementById('paketomatiContent').style.display = 'none';
+                ['dashboardContent', 'smsDashboardContent', 'smsSettingsContent', 
+                 'buyersSettingsContent', 'agentsContent', 'followupsContent', 
+                 'analyticsContent', 'paketomatiContent'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
                 
                 // Show the main content area
                 document.getElementById('main').style.display = 'block';
