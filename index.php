@@ -986,6 +986,51 @@
             </div>
         </div>
         
+        <!-- Manual SMS Send Section -->
+        <div class="table-card" style="margin-bottom:20px;border:2px solid var(--accent-green);">
+            <div style="padding:20px;border-bottom:1px solid var(--card-border);background:rgba(34,197,94,0.1);">
+                <h3 style="margin:0 0 4px 0;">📱 Ročno pošiljanje SMS (Test)</h3>
+                <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji SMS na poljubno številko — za testiranje</p>
+            </div>
+            <div style="padding:20px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                    <div class="form-group" style="margin:0;">
+                        <label class="form-label">Telefonska številka</label>
+                        <input type="tel" class="form-input" id="manualSmsPhone" placeholder="+38598xxxxxxx ali 098xxxxxxx">
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+                            Podprti formati: +385xxx, 385xxx, 098xxx
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label class="form-label">Država (za formatiranje)</label>
+                        <select class="form-select" id="manualSmsCountry">
+                            <option value="hr">🇭🇷 Hrvaška (+385)</option>
+                            <option value="cz">🇨🇿 Češka (+420)</option>
+                            <option value="pl">🇵🇱 Poljska (+48)</option>
+                            <option value="sk">🇸🇰 Slovaška (+421)</option>
+                            <option value="hu">🇭🇺 Madžarska (+36)</option>
+                            <option value="gr">🇬🇷 Grčija (+30)</option>
+                            <option value="it">🇮🇹 Italija (+39)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label class="form-label">Sporočilo</label>
+                    <textarea class="form-textarea" id="manualSmsMessage" placeholder="Vpiši sporočilo..." style="min-height:80px;" oninput="updateManualSmsCharCount()"></textarea>
+                    <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                        <span class="char-count" id="manualSmsCharCount">0 / 160 znakov</span>
+                        <span style="font-size:11px;color:var(--text-muted);">1 SMS = 160 znakov</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:center;">
+                    <button class="btn btn-save" onclick="sendManualSms()" style="background:var(--accent-green);">
+                        <i class="fas fa-paper-plane"></i> Pošlji SMS
+                    </button>
+                    <span id="manualSmsStatus" style="font-size:13px;"></span>
+                </div>
+            </div>
+        </div>
+        
         <!-- SMS Queue Section (from API) -->
         <div class="table-card" style="margin-bottom:20px;">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);">
@@ -3624,6 +3669,90 @@
                 showToast('SMS odstranjen iz čakalne vrste');
             } catch (e) {
                 showToast('Napaka pri odstranjevanju', true);
+            }
+        }
+        
+        // ========== MANUAL SMS SEND ==========
+        function updateManualSmsCharCount() {
+            const msg = document.getElementById('manualSmsMessage').value;
+            const len = msg.length;
+            const counter = document.getElementById('manualSmsCharCount');
+            const smsCount = Math.ceil(len / 160) || 1;
+            counter.textContent = `${len} / 160 znakov (${smsCount} SMS)`;
+            counter.className = 'char-count' + (len > 160 ? ' warning' : '');
+        }
+        
+        async function sendManualSms() {
+            const phone = document.getElementById('manualSmsPhone').value.trim();
+            const country = document.getElementById('manualSmsCountry').value;
+            const message = document.getElementById('manualSmsMessage').value.trim();
+            const statusEl = document.getElementById('manualSmsStatus');
+            
+            // Basic validation
+            if (!phone) {
+                showToast('❌ Vnesi telefonsko številko!', true);
+                return;
+            }
+            
+            const digitsOnly = phone.replace(/[^0-9]/g, '');
+            if (digitsOnly.length < 7) {
+                showToast('❌ Telefonska številka je prekratka (min. 7 številk)', true);
+                return;
+            }
+            
+            if (!message) {
+                showToast('❌ Vnesi sporočilo!', true);
+                return;
+            }
+            
+            if (!confirm(`📱 Pošlji SMS?\n\nŠtevilka: ${phone}\nDržava: ${country.toUpperCase()}\nSporočilo: ${message.substring(0, 50)}...`)) {
+                return;
+            }
+            
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pošiljam...';
+            statusEl.style.color = 'var(--text-muted)';
+            
+            try {
+                const res = await fetch('api.php?action=sms-send-direct', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phone: phone,
+                        storeCode: country,
+                        message: message
+                    })
+                });
+                
+                const result = await res.json();
+                console.log('[Manual SMS] Response:', result);
+                
+                if (result.success) {
+                    statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Poslano na ${result.recipient || phone}`;
+                    statusEl.style.color = 'var(--accent-green)';
+                    showToast(`✅ SMS uspešno poslan na ${result.recipient || phone}!`);
+                    
+                    // Clear form
+                    document.getElementById('manualSmsPhone').value = '';
+                    document.getElementById('manualSmsMessage').value = '';
+                    updateManualSmsCharCount();
+                    
+                    // Refresh history
+                    await loadSmsData();
+                    renderSmsTable();
+                } else {
+                    statusEl.innerHTML = `<i class="fas fa-times-circle"></i> ${result.error || 'Napaka'}`;
+                    statusEl.style.color = 'var(--accent-red)';
+                    showToast('❌ ' + (result.error || 'Napaka pri pošiljanju'), true);
+                    
+                    if (result.metakockaResponse) {
+                        console.error('[Manual SMS] MK Response:', result.metakockaResponse);
+                    }
+                }
+            } catch (e) {
+                console.error('[Manual SMS] Error:', e);
+                statusEl.innerHTML = `<i class="fas fa-times-circle"></i> ${e.message}`;
+                statusEl.style.color = 'var(--accent-red)';
+                showToast('❌ Napaka: ' + e.message, true);
             }
         }
         

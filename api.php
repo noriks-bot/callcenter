@@ -650,6 +650,180 @@ function sendQueuedSms($smsId, $overridePhone = null) {
     ];
 }
 
+/**
+ * Send SMS directly without using queue (for manual testing)
+ */
+function sendDirectSms($data) {
+    global $metakocka;
+    
+    // File-based logging
+    $logFile = __DIR__ . '/data/sms-debug.log';
+    $logMsg = function($msg) use ($logFile) {
+        $line = '[' . date('Y-m-d H:i:s') . '] ' . $msg . "\n";
+        file_put_contents($logFile, $line, FILE_APPEND);
+        error_log($msg);
+    };
+    
+    $logMsg("[SMS-DIRECT] ========== START ==========");
+    
+    $phone = $data['phone'] ?? '';
+    $storeCode = $data['storeCode'] ?? 'hr';
+    $message = $data['message'] ?? '';
+    
+    // Get eshop_sync_id from settings
+    $settings = loadSmsSettings();
+    $eshopSyncId = $settings['providers'][$storeCode]['eshop_sync_id'] ?? '';
+    
+    $logMsg("[SMS-DIRECT] Phone: $phone, Store: $storeCode, eshop_sync_id: " . ($eshopSyncId ?: 'EMPTY!'));
+    
+    if (empty($eshopSyncId)) {
+        $logMsg("[SMS-DIRECT] ERROR: Missing eshop_sync_id for $storeCode");
+        return [
+            'success' => false,
+            'error' => 'Eshop Sync ID ni nastavljen za ' . strtoupper($storeCode) . '. Nastavi ga v SMS Settings!',
+            'debug' => 'missing_eshop_sync_id'
+        ];
+    }
+    
+    // Validate phone
+    $validation = validatePhoneForSms($phone, $storeCode);
+    if (!$validation['valid']) {
+        $logMsg("[SMS-DIRECT] ERROR: Invalid phone: $phone - {$validation['error']}");
+        return [
+            'success' => false,
+            'error' => $validation['error'],
+            'debug' => 'invalid_phone'
+        ];
+    }
+    
+    // Validate message
+    if (empty(trim($message))) {
+        return [
+            'success' => false,
+            'error' => 'Sporočilo je prazno',
+            'debug' => 'empty_message'
+        ];
+    }
+    
+    $recipientPhone = $validation['formatted'];
+    $logMsg("[SMS-DIRECT] Phone formatted: $phone -> $recipientPhone");
+    
+    // Prepare MetaKocka SMS payload
+    $payload = [
+        'secret_key' => $metakocka['secret_key'],
+        'company_id' => strval($metakocka['company_id']),
+        'message_list' => [
+            [
+                'type' => 'sms',
+                'eshop_sync_id' => $eshopSyncId,
+                'to_number' => $recipientPhone,
+                'message' => $message
+            ]
+        ]
+    ];
+    
+    $logMsg("[SMS-DIRECT] API URL: " . $metakocka['api_url']);
+    $logMsg("[SMS-DIRECT] Payload: " . json_encode($payload));
+    
+    // Make API request
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $metakocka['api_url'],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => true
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+    
+    $logMsg("[SMS-DIRECT] HTTP Code: $httpCode");
+    $logMsg("[SMS-DIRECT] Response: $response");
+    if ($curlError) $logMsg("[SMS-DIRECT] CURL Error: $curlError");
+    
+    if ($curlError) {
+        return [
+            'success' => false,
+            'error' => 'Connection error: ' . $curlError,
+            'debug' => 'curl_error'
+        ];
+    }
+    
+    $responseData = json_decode($response, true);
+    
+    // Check for MetaKocka error
+    if (isset($responseData['opr_code']) && $responseData['opr_code'] !== '0') {
+        $errorMsg = $responseData['opr_desc'] ?? 'MetaKocka error (code: ' . $responseData['opr_code'] . ')';
+        $logMsg("[SMS-DIRECT] MK ERROR: opr_code={$responseData['opr_code']}, opr_desc=$errorMsg");
+        return [
+            'success' => false,
+            'error' => $errorMsg,
+            'debug' => 'mk_opr_code_error',
+            'metakockaResponse' => $responseData
+        ];
+    }
+    
+    // Check individual message status
+    if (isset($responseData['message_list'])) {
+        foreach ($responseData['message_list'] as $msgResult) {
+            if (isset($msgResult['status']) && $msgResult['status'] === 'error') {
+                $errorMsg = $msgResult['error_desc'] ?? 'Napaka pri pošiljanju';
+                $logMsg("[SMS-DIRECT] Message ERROR: $errorMsg");
+                return [
+                    'success' => false,
+                    'error' => $errorMsg,
+                    'debug' => 'mk_message_error',
+                    'metakockaResponse' => $responseData
+                ];
+            }
+        }
+    }
+    
+    if ($httpCode >= 400) {
+        $errorMsg = $responseData['error'] ?? 'API Error (HTTP ' . $httpCode . ')';
+        $logMsg("[SMS-DIRECT] HTTP ERROR: $httpCode - $errorMsg");
+        return [
+            'success' => false,
+            'error' => $errorMsg,
+            'debug' => 'http_error',
+            'httpCode' => $httpCode
+        ];
+    }
+    
+    // Success!
+    $logMsg("[SMS-DIRECT] ✅ SUCCESS! SMS sent to $recipientPhone");
+    
+    // Log to SMS history
+    $queue = loadSmsQueue();
+    $queue[] = [
+        'id' => 'direct_' . time() . '_' . rand(1000, 9999),
+        'date' => date('c'),
+        'recipient' => $recipientPhone,
+        'recipientOriginal' => $phone,
+        'customerName' => 'Manual Test',
+        'storeCode' => $storeCode,
+        'message' => $message,
+        'status' => 'sent',
+        'sentAt' => date('c'),
+        'addedBy' => 'manual',
+        'metakockaResponse' => $responseData
+    ];
+    saveSmsQueue($queue);
+    
+    return [
+        'success' => true,
+        'message' => 'SMS uspešno poslan na ' . $recipientPhone,
+        'recipient' => $recipientPhone,
+        'metakockaResponse' => $responseData,
+        'httpCode' => $httpCode
+    ];
+}
+
 function loadCallData() {
     global $dataFile;
     if (file_exists($dataFile)) {
@@ -2092,6 +2266,17 @@ try {
             echo json_encode(sendQueuedSms($smsId, $overridePhone));
             break;
             
+        case 'sms-send-direct':
+            // Direct SMS send (without queue) - for manual testing
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            echo json_encode(sendDirectSms($input));
+            break;
+            
         case 'search-products':
             $storeCode = $_GET['store'] ?? null;
             $query = $_GET['q'] ?? '';
@@ -2664,6 +2849,7 @@ try {
                     'sms-settings',
                     'sms-test-connection',
                     'sms-send',
+                    'sms-send-direct',
                     'agents-list',
                     'agents-add',
                     'agents-update',
