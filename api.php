@@ -826,6 +826,17 @@ function fetchAbandonedCarts() {
 function fetchOneTimeBuyers($storeFilter = null) {
     global $stores, $storeCurrencies;
     
+    $logFile = __DIR__ . '/data/buyers-debug.log';
+    $logMsg = function($msg) use ($logFile) {
+        $line = '[' . date('Y-m-d H:i:s') . '] ' . $msg . "\n";
+        file_put_contents($logFile, $line, FILE_APPEND);
+        error_log("[OneTimeBuyers] " . $msg);
+    };
+    
+    $logMsg("========== START fetchOneTimeBuyers ==========");
+    $logMsg("Store filter: " . ($storeFilter ?: 'all'));
+    $startTime = microtime(true);
+    
     // Load buyers settings for min days filter
     $buyersSettingsFile = __DIR__ . '/data/buyers-settings.json';
     $minDaysFromPurchase = 10; // default
@@ -833,96 +844,211 @@ function fetchOneTimeBuyers($storeFilter = null) {
         $buyersSettings = json_decode(file_get_contents($buyersSettingsFile), true);
         $minDaysFromPurchase = $buyersSettings['minDaysFromPurchase'] ?? 10;
     }
+    $logMsg("Min days from purchase: $minDaysFromPurchase");
     
     $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all') . '_' . $minDaysFromPurchase;
     $cached = getCache($cacheKey, 1800);  // 30 min cache
-    if ($cached !== null) return $cached;
+    if ($cached !== null) {
+        $logMsg("✓ Returning cached data: " . count($cached) . " buyers");
+        return $cached;
+    }
     
     $callData = loadCallData();
     $allBuyers = [];
     
     $storesToFetch = $storeFilter ? [$storeFilter => $stores[$storeFilter]] : $stores;
+    $logMsg("Stores to fetch: " . implode(', ', array_keys($storesToFetch)));
     
     // OPTIMIZED: Fetch all stores in parallel using curl_multi
-    // Reduced to 5 pages per store (500 orders) - sufficient for call center needs
-    $maxPages = 5;
+    // Reduced to 3 pages per store (300 orders) for faster loading on cPanel
+    $maxPages = 3;
     
     // Collect all orders from all stores using parallel requests
     $allStoreOrders = [];
+    $curlMultiFailed = false;
     
-    // Process pages in batches - all stores page 1, then all stores page 2, etc.
-    for ($page = 1; $page <= $maxPages; $page++) {
-        $mh = curl_multi_init();
-        $handles = [];
+    try {
+        // Process pages in batches - all stores page 1, then all stores page 2, etc.
+        for ($page = 1; $page <= $maxPages; $page++) {
+            $logMsg("Processing page $page...");
+            
+            $mh = curl_multi_init();
+            if ($mh === false) {
+                $logMsg("✗ curl_multi_init failed! Falling back to sequential.");
+                $curlMultiFailed = true;
+                break;
+            }
+            
+            $handles = [];
+            
+            foreach ($storesToFetch as $storeCode => $config) {
+                if (!$config) continue;
+                
+                // Skip stores that already returned empty on previous page
+                if ($page > 1 && isset($allStoreOrders[$storeCode]['done'])) continue;
+                
+                $params = http_build_query([
+                    'per_page' => 100,
+                    'status' => 'processing,completed',
+                    'orderby' => 'date',
+                    'order' => 'desc',
+                    'page' => $page
+                ]);
+                $url = $config['url'] . '/wp-json/wc/v3/orders?' . $params;
+                
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 15,  // Reduced from 25 to 15 for cPanel
+                    CURLOPT_CONNECTTIMEOUT => 10,
+                    CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
+                    CURLOPT_SSL_VERIFYPEER => true
+                ]);
+                curl_multi_add_handle($mh, $ch);
+                $handles[$storeCode] = $ch;
+            }
+            
+            if (empty($handles)) {
+                curl_multi_close($mh);
+                break;
+            }
+            
+            // Execute all requests in parallel with timeout protection
+            $running = null;
+            $startExec = microtime(true);
+            $maxExecTime = 20; // Max 20 seconds per batch
+            
+            do { 
+                $status = curl_multi_exec($mh, $running);
+                if ($status !== CURLM_OK) {
+                    $logMsg("✗ curl_multi_exec error: $status");
+                    $curlMultiFailed = true;
+                    break;
+                }
+                curl_multi_select($mh, 0.5);
+                
+                // Timeout protection
+                if (microtime(true) - $startExec > $maxExecTime) {
+                    $logMsg("✗ curl_multi timeout after {$maxExecTime}s!");
+                    break;
+                }
+            } while ($running > 0);
+            
+            // Process responses
+            foreach ($handles as $storeCode => $ch) {
+                $response = curl_multi_getcontent($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                
+                if ($curlError) {
+                    $logMsg("✗ $storeCode: CURL error - $curlError");
+                } else {
+                    $logMsg("$storeCode page $page: HTTP $httpCode, " . strlen($response) . " bytes");
+                }
+                
+                $orders = json_decode($response, true);
+                curl_multi_remove_handle($mh, $ch);
+                curl_close($ch);
+                
+                if (!isset($allStoreOrders[$storeCode])) {
+                    $allStoreOrders[$storeCode] = ['orders' => [], 'done' => false];
+                }
+                
+                if (!is_array($orders) || empty($orders)) {
+                    $allStoreOrders[$storeCode]['done'] = true;
+                    continue;
+                }
+                
+                $allStoreOrders[$storeCode]['orders'] = array_merge(
+                    $allStoreOrders[$storeCode]['orders'], 
+                    $orders
+                );
+                $logMsg("$storeCode: Got " . count($orders) . " orders (total: " . count($allStoreOrders[$storeCode]['orders']) . ")");
+                
+                // Mark as done if less than 100 results (no more pages)
+                if (count($orders) < 100) {
+                    $allStoreOrders[$storeCode]['done'] = true;
+                }
+            }
+            curl_multi_close($mh);
+            
+            if ($curlMultiFailed) break;
+            
+            // Check if all stores are done
+            $allDone = true;
+            foreach ($storesToFetch as $storeCode => $config) {
+                if (!isset($allStoreOrders[$storeCode]['done']) || !$allStoreOrders[$storeCode]['done']) {
+                    $allDone = false;
+                    break;
+                }
+            }
+            if ($allDone) {
+                $logMsg("All stores done at page $page");
+                break;
+            }
+        }
+    } catch (Exception $e) {
+        $logMsg("✗ Exception in curl_multi: " . $e->getMessage());
+        $curlMultiFailed = true;
+    }
+    
+    // FALLBACK: Sequential requests if curl_multi failed
+    if ($curlMultiFailed) {
+        $logMsg("Falling back to sequential requests...");
+        $allStoreOrders = [];
         
         foreach ($storesToFetch as $storeCode => $config) {
             if (!$config) continue;
             
-            // Skip stores that already returned empty on previous page
-            if ($page > 1 && isset($allStoreOrders[$storeCode]['done'])) continue;
+            $allStoreOrders[$storeCode] = ['orders' => [], 'done' => false];
             
-            $params = http_build_query([
-                'per_page' => 100,
-                'status' => 'processing,completed',
-                'orderby' => 'date',
-                'order' => 'desc',
-                'page' => $page
-            ]);
-            $url = $config['url'] . '/wp-json/wc/v3/orders?' . $params;
-            
-            $ch = curl_init();
-            curl_setopt_array($ch, [
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 25,
-                CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
-                CURLOPT_SSL_VERIFYPEER => true
-            ]);
-            curl_multi_add_handle($mh, $ch);
-            $handles[$storeCode] = $ch;
-        }
-        
-        // Execute all requests in parallel
-        $running = null;
-        do { curl_multi_exec($mh, $running); curl_multi_select($mh); } while ($running > 0);
-        
-        // Process responses
-        foreach ($handles as $storeCode => $ch) {
-            $response = curl_multi_getcontent($ch);
-            $orders = json_decode($response, true);
-            curl_multi_remove_handle($mh, $ch);
-            curl_close($ch);
-            
-            if (!isset($allStoreOrders[$storeCode])) {
-                $allStoreOrders[$storeCode] = ['orders' => [], 'done' => false];
-            }
-            
-            if (!is_array($orders) || empty($orders)) {
-                $allStoreOrders[$storeCode]['done'] = true;
-                continue;
-            }
-            
-            $allStoreOrders[$storeCode]['orders'] = array_merge(
-                $allStoreOrders[$storeCode]['orders'], 
-                $orders
-            );
-            
-            // Mark as done if less than 100 results (no more pages)
-            if (count($orders) < 100) {
-                $allStoreOrders[$storeCode]['done'] = true;
+            for ($page = 1; $page <= $maxPages; $page++) {
+                $params = http_build_query([
+                    'per_page' => 100,
+                    'status' => 'processing,completed',
+                    'orderby' => 'date',
+                    'order' => 'desc',
+                    'page' => $page
+                ]);
+                $url = $config['url'] . '/wp-json/wc/v3/orders?' . $params;
+                
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 12,  // Shorter timeout for sequential
+                    CURLOPT_CONNECTTIMEOUT => 8,
+                    CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
+                    CURLOPT_SSL_VERIFYPEER => true
+                ]);
+                
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                curl_close($ch);
+                
+                if ($curlError) {
+                    $logMsg("✗ $storeCode (seq): CURL error - $curlError");
+                    break; // Skip to next store
+                }
+                
+                $orders = json_decode($response, true);
+                
+                if (!is_array($orders) || empty($orders)) {
+                    $logMsg("$storeCode (seq): No more orders at page $page");
+                    break;
+                }
+                
+                $allStoreOrders[$storeCode]['orders'] = array_merge(
+                    $allStoreOrders[$storeCode]['orders'], 
+                    $orders
+                );
+                $logMsg("$storeCode (seq): Got " . count($orders) . " orders (total: " . count($allStoreOrders[$storeCode]['orders']) . ")");
+                
+                if (count($orders) < 100) break;
             }
         }
-        curl_multi_close($mh);
-        
-        // Check if all stores are done
-        $allDone = true;
-        foreach ($storesToFetch as $storeCode => $config) {
-            if (!isset($allStoreOrders[$storeCode]['done']) || !$allStoreOrders[$storeCode]['done']) {
-                $allDone = false;
-                break;
-            }
-        }
-        if ($allDone) break;
     }
     
     // Process orders from all stores
@@ -990,6 +1116,10 @@ function fetchOneTimeBuyers($storeFilter = null) {
     usort($allBuyers, function($a, $b) {
         return strtotime($b['registeredAt'] ?: '1970-01-01') - strtotime($a['registeredAt'] ?: '1970-01-01');
     });
+    
+    $elapsed = round(microtime(true) - $startTime, 2);
+    $logMsg("✓ COMPLETE: " . count($allBuyers) . " buyers found in {$elapsed}s");
+    $logMsg("========== END fetchOneTimeBuyers ==========\n");
     
     setCache($cacheKey, $allBuyers);
     return $allBuyers;
