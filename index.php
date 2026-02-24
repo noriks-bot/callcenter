@@ -11,7 +11,7 @@
     <style>
         /* Minimal overrides for compatibility - main styles in styles.css */
         
-        /* Special view content areas - match Leads page styling */
+        /* Special view content areas - EXACTLY like .main (Leads page) */
         #dashboardContent,
         #smsDashboardContent,
         #smsSettingsContent,
@@ -24,47 +24,36 @@
             padding-top: var(--header-height, 64px);
             min-height: 100vh;
             background: var(--content-bg);
+            transition: margin-left var(--transition-slow, 0.3s ease);
         }
         
-        /* Inner padding for special views - match .content */
-        #dashboardContent > *,
-        #smsDashboardContent > *,
-        #smsSettingsContent > *,
-        #buyersSettingsContent > *,
-        #agentsContent > *,
-        #followupsContent > *,
-        #analyticsContent > *,
-        #paketomatiContent > * {
-            padding-left: 16px;
-            padding-right: 16px;
+        /* Content wrapper inside special views - same as .content */
+        #dashboardContent > div,
+        #smsDashboardContent > div,
+        #smsSettingsContent > div,
+        #buyersSettingsContent > div,
+        #agentsContent > div,
+        #followupsContent > div,
+        #analyticsContent > div,
+        #paketomatiContent > div {
+            padding: 0 16px 12px;
         }
         
-        /* Page header in special views */
-        #dashboardContent .page-header,
-        #smsDashboardContent .page-header,
-        #smsSettingsContent .page-header,
-        #buyersSettingsContent .page-header,
-        #agentsContent .page-header,
-        #followupsContent .page-header,
-        #analyticsContent .page-header,
-        #paketomatiContent .page-header {
-            padding: 8px 16px;
-            margin-bottom: 0;
+        /* Page header - same padding as stats-grid */
+        .page-header {
+            padding: 8px 16px !important;
+            margin-bottom: 0 !important;
         }
         
-        /* Page title - match Leads */
+        /* Page title - smaller, like Leads */
         .page-title-large {
-            font-size: 18px !important;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            margin: 0 !important;
         }
         
         .page-title-large i {
-            font-size: 16px;
-            color: var(--accent-blue);
+            font-size: 14px;
         }
         
         /* Adjust for collapsed sidebar */
@@ -90,7 +79,6 @@
             #analyticsContent,
             #paketomatiContent {
                 margin-left: 0;
-                padding-top: 60px;
             }
         }
         
