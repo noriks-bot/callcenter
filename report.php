@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report - Noriks Call Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Override for report page main content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left var(--transition-slow);
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 70px;
+        }
+    </style>
+</head>
+<body>
+    <?php include 'sidebar.php'; ?>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <a href="index.php">Call Center</a>
+                    <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+                    <span class="current">Statistics</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" onclick="loadStats()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <div class="header-avatar" id="headerAvatar">N</div>
+            </div>
+        </header>
+        
+        <!-- Page Content -->
+        <div class="page-content">
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statCountries">0</div>
+                    <div class="stat-label">Active Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statTotalCarts">0</div>
+                    <div class="stat-label">Total Abandoned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statConverted">0</div>
+                    <div class="stat-label">Converted</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statConvRate">0%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                </div>
+            </div>
+            
+            <!-- Country Stats Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Call Statistics by Country
+                    </h2>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary" onclick="loadStats()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Country</th>
+                                    <th>Total</th>
+                                    <th>Not Called</th>
+                                    <th>Called</th>
+                                    <th>Answered</th>
+                                    <th>No Answer</th>
+                                    <th>Converted</th>
+                                    <th>Not Interested</th>
+                                    <th>Conv. Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="countryStats">
+                                <tr>
+                                    <td colspan="9">
+                                        <div class="loading">
+                                            <div class="loading-spinner"></div>
+                                            Loading statistics...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suppressed Profiles Stats -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-user-slash"></i>
+                        Suppressed Profiles Statistics
+                    </h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suppressedStats">
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="loading">
+                                            <div class="loading-spinner"></div>
+                                            Loading...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Orders Stats -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-clock"></i>
+                        Pending Orders Statistics
+                    </h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Country</th>
+                                    <th>Pending</th>
+                                    <th>Cancelled</th>
+                                    <th>Failed</th>
+                                    <th>On Hold</th>
+                                    <th>Total Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingStats">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="loading">
+                                            <div class="loading-spinner"></div>
+                                            Loading...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // Check auth - use same key as index.php
+        const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
+        if (!user) {
+            window.location.href = 'login.php';
+        } else {
+            document.getElementById('userName').textContent = user.username;
+            document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Agent';
+            document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
+            document.getElementById('headerAvatar').textContent = user.username[0].toUpperCase();
+        }
+        
+        // Mobile sidebar
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        });
+        
+        document.getElementById('sidebarOverlay').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        });
+        
+        function logout() {
+            localStorage.removeItem('callcenter_user');
+            window.location.href = 'login.php';
+        }
+        
+        // Load statistics
+        async function loadStats() {
+            try {
+                const [carts, profiles, orders] = await Promise.all([
+                    fetch('api.php?action=abandoned-carts').then(r => r.json()).catch(() => []),
+                    fetch('api.php?action=suppressed-profiles').then(r => r.json()).catch(() => []),
+                    fetch('api.php?action=pending-orders').then(r => r.json()).catch(() => [])
+                ]);
+                
+                // Filter by user countries if not admin
+                let filteredCarts = carts;
+                let filteredOrders = orders;
+                if (user && !user.countries.includes('all')) {
+                    filteredCarts = carts.filter(c => user.countries.includes(c.storeCode));
+                    filteredOrders = orders.filter(o => user.countries.includes(o.storeCode));
+                }
+                
+                renderCountryStats(filteredCarts);
+                renderSuppressedStats(profiles);
+                renderPendingStats(filteredOrders);
+                
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+            }
+        }
+        
+        function renderCountryStats(carts) {
+            const byCountry = {};
+            const flags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', gr: '🇬🇷', it: '🇮🇹', hu: '🇭🇺' };
+            
+            carts.forEach(c => {
+                if (!byCountry[c.storeCode]) {
+                    byCountry[c.storeCode] = {
+                        flag: flags[c.storeCode] || '🌍',
+                        name: c.storeName || c.storeCode.toUpperCase(),
+                        total: 0,
+                        not_called: 0,
+                        called: 0,
+                        answered: 0,
+                        no_answer: 0,
+                        converted: 0,
+                        not_interested: 0
+                    };
+                }
+                byCountry[c.storeCode].total++;
+                const status = c.callStatus || 'not_called';
+                if (byCountry[c.storeCode][status] !== undefined) {
+                    byCountry[c.storeCode][status]++;
+                }
+            });
+            
+            const totals = { total: 0, not_called: 0, called: 0, answered: 0, no_answer: 0, converted: 0, not_interested: 0 };
+            let html = '';
+            
+            Object.entries(byCountry).sort((a, b) => b[1].total - a[1].total).forEach(([code, s]) => {
+                const rate = s.total > 0 ? ((s.converted / s.total) * 100).toFixed(1) : '0.0';
+                const rateClass = parseFloat(rate) >= 10 ? 'converted' : parseFloat(rate) >= 5 ? 'answered' : '';
+                
+                html += `<tr>
+                    <td><span class="store-badge"><span class="store-flag">${s.flag}</span> ${s.name}</span></td>
+                    <td><strong>${s.total}</strong></td>
+                    <td>${s.not_called}</td>
+                    <td>${s.called}</td>
+                    <td>${s.answered}</td>
+                    <td>${s.no_answer}</td>
+                    <td><span class="status-badge converted">${s.converted}</span></td>
+                    <td><span class="status-badge not_interested">${s.not_interested}</span></td>
+                    <td><span class="status-badge ${rateClass}">${rate}%</span></td>
+                </tr>`;
+                
+                Object.keys(totals).forEach(k => totals[k] += (s[k] || 0));
+            });
+            
+            const totalRate = totals.total > 0 ? ((totals.converted / totals.total) * 100).toFixed(1) : '0.0';
+            html += `<tr style="background: var(--bg-hover); font-weight: 600;">
+                <td>📊 <strong>TOTAL</strong></td>
+                <td><strong>${totals.total}</strong></td>
+                <td>${totals.not_called}</td>
+                <td>${totals.called}</td>
+                <td>${totals.answered}</td>
+                <td>${totals.no_answer}</td>
+                <td><span class="status-badge converted">${totals.converted}</span></td>
+                <td><span class="status-badge not_interested">${totals.not_interested}</span></td>
+                <td><span class="status-badge ${parseFloat(totalRate) >= 10 ? 'converted' : ''}">${totalRate}%</span></td>
+            </tr>`;
+            
+            document.getElementById('countryStats').innerHTML = html || '<tr><td colspan="9">No data available</td></tr>';
+            
+            // Update top stats
+            document.getElementById('statCountries').textContent = Object.keys(byCountry).length;
+            document.getElementById('statTotalCarts').textContent = totals.total.toLocaleString();
+            document.getElementById('statConverted').textContent = totals.converted.toLocaleString();
+            document.getElementById('statConvRate').textContent = totalRate + '%';
+        }
+        
+        function renderSuppressedStats(profiles) {
+            const total = profiles.length;
+            const stats = {
+                not_called: profiles.filter(p => p.callStatus === 'not_called').length,
+                called: profiles.filter(p => p.callStatus === 'called').length,
+                answered: profiles.filter(p => p.callStatus === 'answered').length,
+                no_answer: profiles.filter(p => p.callStatus === 'no_answer').length,
+                converted: profiles.filter(p => p.callStatus === 'converted').length,
+                not_interested: profiles.filter(p => p.callStatus === 'not_interested').length
+            };
+            
+            const pct = (n) => total > 0 ? ((n / total) * 100).toFixed(1) + '%' : '0%';
+            
+            document.getElementById('suppressedStats').innerHTML = `
+                <tr><td><strong>Total Suppressed Profiles</strong></td><td><strong>${total}</strong></td><td>100%</td></tr>
+                <tr><td>Not Called</td><td>${stats.not_called}</td><td>${pct(stats.not_called)}</td></tr>
+                <tr><td>Called</td><td>${stats.called}</td><td>${pct(stats.called)}</td></tr>
+                <tr><td>Answered</td><td>${stats.answered}</td><td>${pct(stats.answered)}</td></tr>
+                <tr><td>No Answer</td><td>${stats.no_answer}</td><td>${pct(stats.no_answer)}</td></tr>
+                <tr><td><span class="status-badge converted">Converted</span></td><td><strong>${stats.converted}</strong></td><td><strong>${pct(stats.converted)}</strong></td></tr>
+                <tr><td><span class="status-badge not_interested">Not Interested</span></td><td>${stats.not_interested}</td><td>${pct(stats.not_interested)}</td></tr>
+            `;
+        }
+        
+        function renderPendingStats(orders) {
+            const byCountry = {};
+            const flags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', gr: '🇬🇷', it: '🇮🇹', hu: '🇭🇺' };
+            
+            orders.forEach(o => {
+                if (!byCountry[o.storeCode]) {
+                    byCountry[o.storeCode] = {
+                        flag: flags[o.storeCode] || '🌍',
+                        name: o.storeName || o.storeCode.toUpperCase(),
+                        pending: 0,
+                        cancelled: 0,
+                        failed: 0,
+                        'on-hold': 0,
+                        totalValue: 0,
+                        currency: o.currency || 'EUR'
+                    };
+                }
+                const status = o.orderStatus || 'pending';
+                if (byCountry[o.storeCode][status] !== undefined) {
+                    byCountry[o.storeCode][status]++;
+                }
+                byCountry[o.storeCode].totalValue += parseFloat(o.orderTotal || 0);
+            });
+            
+            let html = '';
+            Object.entries(byCountry).forEach(([code, s]) => {
+                const symbols = { EUR: '€', CZK: 'Kč', PLN: 'zł', HUF: 'Ft' };
+                const sym = symbols[s.currency] || s.currency;
+                html += `<tr>
+                    <td><span class="store-badge"><span class="store-flag">${s.flag}</span> ${s.name}</span></td>
+                    <td>${s.pending}</td>
+                    <td>${s.cancelled}</td>
+                    <td>${s.failed}</td>
+                    <td>${s['on-hold']}</td>
+                    <td><strong>${sym} ${s.totalValue.toFixed(2)}</strong></td>
+                </tr>`;
+            });
+            
+            document.getElementById('pendingStats').innerHTML = html || '<tr><td colspan="6">No pending orders</td></tr>';
+        }
+        
+        // Initialize
+        loadStats();
+    </script>
+</body>
+</html>
