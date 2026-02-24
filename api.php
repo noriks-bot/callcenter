@@ -2163,6 +2163,15 @@ try {
             echo json_encode(['success' => true, 'warmed' => $warmed]);
             break;
         
+        case 'warm-buyers':
+            // CRON: Only warm enkratni kupci
+            // */5 * * * * curl -s https://callcenter.noriks.com/api.php?action=warm-buyers
+            ignore_user_abort(true);
+            set_time_limit(120);
+            $buyers = fetchOneTimeBuyers();
+            echo json_encode(['success' => true, 'count' => count($buyers), 'time' => date('c')]);
+            break;
+        
         case 'cache-status':
             // Check cache status for debugging
             global $cacheDir;
