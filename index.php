@@ -11,7 +11,7 @@
     <style>
         /* Minimal overrides for compatibility - main styles in styles.css */
         
-        /* Special view content areas - need sidebar margin */
+        /* Special view content areas - match Leads page styling */
         #dashboardContent,
         #smsDashboardContent,
         #smsSettingsContent,
@@ -20,10 +20,51 @@
         #followupsContent,
         #analyticsContent,
         #paketomatiContent {
-            margin-left: 240px;
-            padding: 32px 48px;
+            margin-left: var(--sidebar-width, 260px);
+            padding-top: var(--header-height, 64px);
             min-height: 100vh;
             background: var(--content-bg);
+        }
+        
+        /* Inner padding for special views - match .content */
+        #dashboardContent > *,
+        #smsDashboardContent > *,
+        #smsSettingsContent > *,
+        #buyersSettingsContent > *,
+        #agentsContent > *,
+        #followupsContent > *,
+        #analyticsContent > *,
+        #paketomatiContent > * {
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+        
+        /* Page header in special views */
+        #dashboardContent .page-header,
+        #smsDashboardContent .page-header,
+        #smsSettingsContent .page-header,
+        #buyersSettingsContent .page-header,
+        #agentsContent .page-header,
+        #followupsContent .page-header,
+        #analyticsContent .page-header,
+        #paketomatiContent .page-header {
+            padding: 8px 16px;
+            margin-bottom: 0;
+        }
+        
+        /* Page title - match Leads */
+        .page-title-large {
+            font-size: 18px !important;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .page-title-large i {
+            font-size: 16px;
+            color: var(--accent-blue);
         }
         
         /* Adjust for collapsed sidebar */
@@ -49,7 +90,7 @@
             #analyticsContent,
             #paketomatiContent {
                 margin-left: 0;
-                padding: 20px 24px;
+                padding-top: 60px;
             }
         }
         
