@@ -1096,8 +1096,7 @@
             <div class="table-card" style="padding:12px 16px;margin-bottom:12px;">
                 <h3 style="margin-bottom:4px;font-size:14px;">📱 MetaKocka SMS Provider Settings</h3>
                 <p style="color:var(--text-muted);margin-bottom:12px;font-size:12px;">
-                    Nastavi <code>eshop_sync_id</code> za vsako državo. ID najdeš v:<br>
-                    <strong>MetaKocka → Dodatne nastavitve → Obvestila → Povezave → stolpec "ID"</strong>
+                    <i class="fas fa-info-circle"></i> SMS ID-ji so konfigurirani v kodi in niso nastavljivi preko vmesnika.
                 </p>
                 
                 <div class="table-wrapper">
@@ -1106,8 +1105,7 @@
                             <tr>
                                 <th>Država</th>
                                 <th>Eshop Sync ID</th>
-                                <th>Status</th>
-                                <th>Zadnji test</th>
+                                <th>Store</th>
                                 <th>Akcije</th>
                             </tr>
                         </thead>
@@ -1115,15 +1113,6 @@
                             <!-- Rows will be rendered by JS -->
                         </tbody>
                     </table>
-                </div>
-                
-                <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-                    <button class="btn btn-save" onclick="saveSmsSettings()">
-                        <i class="fas fa-save"></i> Shrani nastavitve
-                    </button>
-                    <button class="btn btn-cancel" onclick="loadSmsSettingsUI()">
-                        <i class="fas fa-undo"></i> Razveljavi
-                    </button>
                 </div>
             </div>
             
@@ -4083,45 +4072,34 @@
             const tbody = document.getElementById('smsProviderRows');
             if (!tbody) return;
             
+            // Hardcoded SMS eshop_sync_id values (configured in code)
             const countries = [
-                { code: 'si', flag: '🇸🇮', name: 'Slovenia' },
-                { code: 'hr', flag: '🇭🇷', name: 'Croatia' },
-                { code: 'cz', flag: '🇨🇿', name: 'Czech' },
-                { code: 'pl', flag: '🇵🇱', name: 'Poland' },
-                { code: 'gr', flag: '🇬🇷', name: 'Greece' },
-                { code: 'sk', flag: '🇸🇰', name: 'Slovakia' },
-                { code: 'it', flag: '🇮🇹', name: 'Italy' },
-                { code: 'hu', flag: '🇭🇺', name: 'Hungary' }
+                { code: 'hr', flag: '🇭🇷', name: 'Croatia', eshop_sync_id: '637100000075', store: 'noriks.com/hr' },
+                { code: 'cz', flag: '🇨🇿', name: 'Czech', eshop_sync_id: '637100000075', store: 'noriks.com/cz' },
+                { code: 'pl', flag: '🇵🇱', name: 'Poland', eshop_sync_id: '637100000075', store: 'noriks.com/pl' },
+                { code: 'sk', flag: '🇸🇰', name: 'Slovakia', eshop_sync_id: '637100000075', store: 'noriks.com/sk' },
+                { code: 'gr', flag: '🇬🇷', name: 'Greece', eshop_sync_id: '637100000075', store: 'noriks.com/gr' },
+                { code: 'it', flag: '🇮🇹', name: 'Italy', eshop_sync_id: '637100000075', store: 'noriks.com/it' },
+                { code: 'hu', flag: '🇭🇺', name: 'Hungary', eshop_sync_id: '637100000075', store: 'noriks.com/hu' },
+                { code: 'si', flag: '🇸🇮', name: 'Slovenia', eshop_sync_id: '637100367725', store: 'noriks.com/si' }
             ];
             
             tbody.innerHTML = countries.map(c => {
-                const provider = smsProviderSettings?.providers?.[c.code] || {};
-                const hasId = !!provider.eshop_sync_id;
-                const lastTest = provider.lastTest ? new Date(provider.lastTest).toLocaleString('sl-SI') : 'Nikoli';
-                const testResult = provider.lastTestResult;
-                
                 return `
                     <tr>
                         <td><span style="font-size:18px;">${c.flag}</span> <strong>${c.name}</strong> (${c.code.toUpperCase()})</td>
                         <td>
-                            <input type="text" 
-                                   class="form-input" 
-                                   id="eshop_${c.code}" 
-                                   value="${provider.eshop_sync_id || ''}" 
-                                   placeholder="Vnesi eshop_sync_id..."
-                                   style="max-width:200px;">
+                            <code style="background:var(--content-bg);padding:4px 8px;border-radius:4px;font-family:monospace;font-size:13px;">${c.eshop_sync_id}</code>
                         </td>
                         <td>
-                            <span class="badge ${hasId ? (testResult === true ? 'converted' : testResult === false ? 'not_interested' : 'called') : 'not_called'}">
-                                ${hasId ? (testResult === true ? '✅ OK' : testResult === false ? '❌ Napaka' : '⏳ Ni testirano') : '❌ Ni nastavljeno'}
-                            </span>
+                            <a href="https://${c.store}" target="_blank" style="color:var(--accent-blue);text-decoration:none;">
+                                <i class="fas fa-external-link-alt" style="font-size:10px;margin-right:4px;"></i>${c.store}
+                            </a>
                         </td>
-                        <td style="font-size:12px;color:var(--text-muted);">${lastTest}</td>
                         <td>
-                            <button class="action-btn ${hasId ? 'order' : ''}" 
+                            <button class="action-btn order" 
                                     onclick="testSmsConnection('${c.code}')" 
-                                    title="Test Connection"
-                                    ${!hasId ? 'disabled style="opacity:0.5;"' : ''}>
+                                    title="Test Connection">
                                 <i class="fas fa-plug"></i>
                             </button>
                         </td>
@@ -4130,40 +4108,17 @@
             }).join('');
         }
         
-        async function saveSmsSettings() {
-            const countries = ['si', 'hr', 'cz', 'pl', 'gr', 'sk', 'it', 'hu'];
-            const providers = {};
-            
-            countries.forEach(code => {
-                const input = document.getElementById(`eshop_${code}`);
-                const existing = smsProviderSettings?.providers?.[code] || {};
-                providers[code] = {
-                    eshop_sync_id: input?.value?.trim() || '',
-                    enabled: !!input?.value?.trim(),
-                    lastTest: existing.lastTest || null,
-                    lastTestResult: existing.lastTestResult
-                };
-            });
-            
-            try {
-                const res = await fetch('api.php?action=sms-settings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ providers })
-                });
-                const result = await res.json();
-                
-                if (result.success) {
-                    smsProviderSettings = { providers };
-                    showToast('✅ SMS nastavitve shranjene!');
-                    renderSmsProviderTable();
-                } else {
-                    showToast(result.error || 'Napaka pri shranjevanju', true);
-                }
-            } catch (e) {
-                showToast('Napaka pri povezavi', true);
-            }
-        }
+        // SMS eshop_sync_id values are hardcoded - no save function needed
+        const SMS_ESHOP_IDS = {
+            'hr': '637100000075',
+            'cz': '637100000075',
+            'pl': '637100000075',
+            'sk': '637100000075',
+            'gr': '637100000075',
+            'it': '637100000075',
+            'hu': '637100000075',
+            'si': '637100367725'
+        };
         
         async function testSmsConnection(storeCode) {
             const btn = event.target.closest('button');
@@ -4235,7 +4190,7 @@
                             <tbody>
                                 ${queue.map(sms => {
                                     const store = stores.find(s => s.code === sms.storeCode);
-                                    const hasProvider = smsProviderSettings?.providers?.[sms.storeCode]?.eshop_sync_id;
+                                    const hasProvider = SMS_ESHOP_IDS[sms.storeCode]; // Always configured
                                     return `
                                         <tr>
                                             <td style="font-size:12px;">${new Date(sms.date).toLocaleString('sl-SI')}</td>
@@ -4268,7 +4223,6 @@
                     <div style="margin-top:16px;padding:12px;background:rgba(34,197,94,0.1);border:1px solid var(--accent-green);border-radius:8px;">
                         <i class="fas fa-info-circle" style="color:var(--accent-green);"></i>
                         <strong style="color:var(--accent-green);">Pošlji SMS:</strong> Klikni zeleni gumb <i class="fas fa-paper-plane"></i> za pošiljanje SMS-a preko MetaKocka.
-                        ${!Object.values(smsProviderSettings?.providers || {}).some(p => p.eshop_sync_id) ? '<br><span style="color:var(--accent-orange);margin-top:4px;display:inline-block;"><i class="fas fa-exclamation-triangle"></i> Nastavi <code>eshop_sync_id</code> v SMS Settings!</span>' : ''}
                     </div>
                 `;
             } catch (e) {
