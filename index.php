@@ -2515,10 +2515,13 @@
             const filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
             const filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
             
-            // Update nav sidebar counts
-            document.getElementById('navCarts').textContent = filteredCarts.length;
-            document.getElementById('navPending').textContent = filteredPending.length;
-            document.getElementById('navBuyers').textContent = filteredBuyers.length;
+            // Update nav sidebar counts (guard against missing elements)
+            const navCarts = document.getElementById('navCarts');
+            const navPending = document.getElementById('navPending');
+            const navBuyers = document.getElementById('navBuyers');
+            if (navCarts) navCarts.textContent = filteredCarts.length;
+            if (navPending) navPending.textContent = filteredPending.length;
+            if (navBuyers) navBuyers.textContent = filteredBuyers.length;
             
             // Update content tab counts
             updateContentTabCounts();
