@@ -1101,7 +1101,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 if (!$config) continue;
                 
                 // Skip stores that already returned empty on previous page
-                if ($page > 1 && isset($allStoreOrders[$storeCode]['done'])) continue;
+                // BUG FIX: must check if done === true, not just isset()
+                if ($page > 1 && !empty($allStoreOrders[$storeCode]['done'])) continue;
                 
                 $params = http_build_query([
                     'per_page' => 100,
