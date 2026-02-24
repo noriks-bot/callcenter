@@ -826,7 +826,15 @@ function fetchAbandonedCarts() {
 function fetchOneTimeBuyers($storeFilter = null) {
     global $stores, $storeCurrencies;
     
-    $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all');
+    // Load buyers settings for min days filter
+    $buyersSettingsFile = __DIR__ . '/data/buyers-settings.json';
+    $minDaysFromPurchase = 10; // default
+    if (file_exists($buyersSettingsFile)) {
+        $buyersSettings = json_decode(file_get_contents($buyersSettingsFile), true);
+        $minDaysFromPurchase = $buyersSettings['minDaysFromPurchase'] ?? 10;
+    }
+    
+    $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all') . '_' . $minDaysFromPurchase;
     $cached = getCache($cacheKey, 1800);  // 30 min cache
     if ($cached !== null) return $cached;
     
@@ -947,6 +955,11 @@ function fetchOneTimeBuyers($storeFilter = null) {
             
             $order = $data['firstOrder'];
             $billing = $data['billing'];
+            
+            // Check if enough days have passed since the purchase
+            $orderDate = strtotime($order['date_created'] ?? '');
+            $daysSincePurchase = $orderDate ? (time() - $orderDate) / (60 * 60 * 24) : 0;
+            if ($daysSincePurchase < $minDaysFromPurchase) continue;
             
             $customerId = $storeCode . '_buyer_' . md5($email);
             $savedData = $callData[$customerId] ?? [];
@@ -1752,6 +1765,29 @@ try {
                 saveSmsSettings($input);
                 echo json_encode(['success' => true]);
             }
+            break;
+            
+        case 'buyers-settings':
+            $buyersSettingsFile = __DIR__ . '/data/buyers-settings.json';
+            if (file_exists($buyersSettingsFile)) {
+                $settings = json_decode(file_get_contents($buyersSettingsFile), true) ?? ['minDaysFromPurchase' => 10];
+            } else {
+                $settings = ['minDaysFromPurchase' => 10];
+            }
+            echo json_encode(['success' => true, 'settings' => $settings]);
+            break;
+            
+        case 'buyers-settings-save':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $buyersSettingsFile = __DIR__ . '/data/buyers-settings.json';
+            $settings = $input['settings'] ?? ['minDaysFromPurchase' => 10];
+            file_put_contents($buyersSettingsFile, json_encode($settings, JSON_PRETTY_PRINT));
+            echo json_encode(['success' => true]);
             break;
             
         case 'sms-test-connection':

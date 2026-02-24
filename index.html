@@ -11,6 +11,71 @@
     <style>
         /* Minimal overrides for compatibility - main styles in styles.css */
         
+        /* Inline Status Select */
+        .inline-status-select {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            min-width: 130px;
+        }
+        .inline-status-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        /* Inline Notes Input */
+        .inline-notes-input {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-primary);
+            width: 150px;
+            transition: all 0.2s;
+        }
+        .inline-notes-input:hover {
+            background: var(--content-bg);
+        }
+        .inline-notes-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: var(--card-bg);
+        }
+        .inline-notes-input::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        
+        /* Large CREATE ORDER Button */
+        .action-btn-order-large {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .action-btn-order-large:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .action-btn-order-large i {
+            font-size: 14px;
+        }
+        
         /* Hide show classes for mobile compatibility */
         .hide-mobile { }
         @media (max-width: 640px) { .hide-mobile { display: none !important; } }
@@ -385,9 +450,9 @@
                     <i class="fas fa-cog"></i>
                     <span>SMS Settings</span>
                 </div>
-                <div class="nav-item" data-tab="email-templates">
-                    <i class="fas fa-envelope"></i>
-                    <span>Email Templates</span>
+                <div class="nav-item" data-tab="buyers-settings">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Enkratni kupci Settings</span>
                 </div>
             </div>
             
@@ -721,48 +786,6 @@
                 <button class="btn btn-cancel" onclick="closeModal('smsModal')">Prekliči</button>
                 <button class="btn btn-save" onclick="queueSms()" id="sendSmsBtn" disabled title="SMS pošilja samo Dejan ročno">
                     <i class="fas fa-clock"></i> Dodaj v čakalno vrsto
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Push Notification Modal -->
-    <div class="modal-bg" id="pushModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">🔔 Push Obvestilo</div>
-                <button class="modal-close" onclick="closeModal('pushModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="customer-info-card">
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <div class="avatar" id="pushAvatar">?</div>
-                        <div>
-                            <div style="font-weight:600;" id="pushCustomerName">Customer Name</div>
-                            <div style="font-size:13px;color:var(--text-muted);" id="pushCustomerEmail">email@example.com</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Naslov</label>
-                    <input type="text" class="form-input" id="pushTitle" placeholder="Naslov obvestila" value="Pozabili ste na košarico! 🛒">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Sporočilo</label>
-                    <textarea class="form-textarea" id="pushMessage" placeholder="Vsebina obvestila...">Vaša košarica vas čaka! Dokončajte nakup zdaj.</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">URL (opcijsko)</label>
-                    <input type="text" class="form-input" id="pushUrl" placeholder="https://noriks.com/checkout">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal('pushModal')">Prekliči</button>
-                <button class="btn btn-save" onclick="sendPush()" id="sendPushBtn" disabled title="Push ni implementiran">
-                    <i class="fas fa-paper-plane"></i> Pošlji Push
                 </button>
             </div>
         </div>
@@ -1125,6 +1148,56 @@
         </div>
     </div>
     
+    <!-- Enkratni kupci Settings -->
+    <div id="buyersSettingsContent" style="display:none;">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title-large"><i class="fas fa-user-cog"></i> Enkratni kupci Settings</h1>
+            <div class="page-header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div style="max-width:600px;">
+            <div class="table-card" style="padding:24px;">
+                <div style="margin-bottom:24px;">
+                    <h3 style="margin-bottom:8px;">⏰ Filter nastavitve</h3>
+                    <p style="color:var(--text-muted);font-size:13px;">
+                        Nastavi koliko dni mora miniti od prvega nakupa, preden se kupec prikaže v tabeli "Enkratni kupci".
+                        To pomaga fokusirati klice na kupce, ki so že imeli čas za ponovno naročilo.
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Prikaži naročila po X dneh od prvega nakupa</label>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <input type="number" class="form-input" id="buyersMinDays" min="1" max="365" value="10" style="width:100px;text-align:center;font-size:18px;font-weight:600;">
+                        <span style="color:var(--text-muted);">dni</span>
+                    </div>
+                    <small style="color:var(--text-muted);margin-top:8px;display:block;">
+                        Privzeto: 10 dni. Kupci z enim samim nakupom se prikažejo šele po tem obdobju.
+                    </small>
+                </div>
+                
+                <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--card-border);">
+                    <button class="btn btn-save" onclick="saveBuyersSettings()">
+                        <i class="fas fa-save"></i> Shrani nastavitve
+                    </button>
+                </div>
+                
+                <div style="margin-top:24px;padding:16px;background:var(--content-bg);border-radius:8px;">
+                    <div style="font-size:12px;color:var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> <strong>Kako deluje:</strong><br>
+                        Če nastaviš 10 dni, bodo kupci z enim nakupom prikazani šele 10 dni po njihovem nakupu.
+                        To omogoča, da kličeš kupce, ki so imeli dovolj časa za razmislek o ponovnem nakupu.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Agents Management Content (Admin Only) -->
     <div id="agentsContent" style="display:none;">
         <!-- Page Header -->
@@ -1342,88 +1415,6 @@
             
             <div class="analytics-grid" id="analyticsContainer">
                 <div class="loading"><div class="spinner"></div>Loading...</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Email Templates Content -->
-    <div id="emailTemplatesContent" style="display:none;">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title-large"><i class="fas fa-envelope"></i> Email Templates</h1>
-            <div class="page-header-actions">
-                <button class="action-btn-header" onclick="loadEmailTemplatesUI()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
-        </div>
-        
-        <div style="max-width:1000px;">
-            <div class="table-card" style="padding:24px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                    <div>
-                        <h3 style="margin-bottom:8px;">📧 Email Templates</h3>
-                        <p style="color:var(--text-muted);">Urejaj email predloge za abandoned cart in winback kampanje.</p>
-                    </div>
-                    <div style="display:flex;gap:8px;">
-                        <select class="filter-select" id="emailTemplateTypeFilter" onchange="filterEmailTemplates()">
-                            <option value="">All Types</option>
-                            <option value="abandoned_cart">Abandoned Cart</option>
-                            <option value="winback">Winback</option>
-                        </select>
-                        <select class="filter-select" id="emailTemplateCountryFilter" onchange="filterEmailTemplates()">
-                            <option value="">All Countries</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="emailTemplatesContainer">
-                    <div class="loading"><div class="spinner"></div>Loading...</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Email Template Edit Modal -->
-    <div class="modal-bg" id="emailTemplateModal">
-        <div class="modal" style="max-width:600px;">
-            <div class="modal-header">
-                <div class="modal-title">✏️ Edit Email Template</div>
-                <button class="modal-close" onclick="closeModal('emailTemplateModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="emailTemplateId">
-                
-                <div class="form-group">
-                    <label class="form-label">Subject Line</label>
-                    <input type="text" class="form-input" id="emailTemplateSubject" placeholder="Email subject...">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Email Body</label>
-                    <textarea class="form-textarea" id="emailTemplateBody" rows="12" placeholder="Email content...
-                    
-Available variables:
-{ime} - Customer first name
-{produkt} - Product name
-{link} - Store link"></textarea>
-                </div>
-                
-                <div style="background:var(--content-bg);padding:12px;border-radius:8px;font-size:12px;color:var(--text-muted);">
-                    <strong>Dostopne spremenljivke:</strong><br>
-                    <code>{ime}</code> - Ime stranke<br>
-                    <code>{produkt}</code> - Ime produkta<br>
-                    <code>{link}</code> - Link do trgovine
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal('emailTemplateModal')">Prekliči</button>
-                <button class="btn btn-save" onclick="saveEmailTemplate()">
-                    <i class="fas fa-save"></i> Shrani
-                </button>
             </div>
         </div>
     </div>
@@ -1751,7 +1742,6 @@ Available variables:
         let orderItems = [];
         let freeShipping = false;
         let smsTarget = null;
-        let pushTarget = null;
         
         // Pagination & Sorting State
         let currentPage = 1;
@@ -1779,7 +1769,7 @@ Available variables:
             // Hide all special content areas
             const specialAreas = [
                 'dashboardContent', 'smsDashboardContent', 'smsSettingsContent',
-                'emailTemplatesContent', 'agentsContent', 'followupsContent',
+                'buyersSettingsContent', 'agentsContent', 'followupsContent',
                 'analyticsContent', 'paketomatiContent'
             ];
             specialAreas.forEach(id => {
@@ -1860,7 +1850,7 @@ Available variables:
                     paketomati: 'Paketomati',
                     'sms-dashboard': 'SMS Dashboard',
                     'sms-settings': 'SMS Provider Settings',
-                    'email-templates': 'Email Templates',
+                    'buyers-settings': 'Enkratni kupci Settings',
                     'agents': 'Agent Management',
                     'followups': 'My Follow-ups',
                     'analytics': 'Analytics'
@@ -1914,9 +1904,9 @@ Available variables:
                     } else if (currentTab === 'sms-settings') {
                         showSpecialView('smsSettingsContent');
                         loadSmsSettingsUI();
-                    } else if (currentTab === 'email-templates') {
-                        showSpecialView('emailTemplatesContent');
-                        loadEmailTemplatesUI();
+                    } else if (currentTab === 'buyers-settings') {
+                        showSpecialView('buyersSettingsContent');
+                        loadBuyersSettings();
                     } else if (currentTab === 'agents') {
                         showSpecialView('agentsContent');
                         loadAgents();
@@ -2559,8 +2549,9 @@ Available variables:
                         <th class="sortable ${getSortClass('cartValue')}" onclick="sortTable('cartValue')">Value</th>
                         <th>Phone</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
+                        <th>Notes</th>
                         <th class="sortable ${getSortClass('abandonedAt')}" onclick="sortTable('abandonedAt')">Time</th>
-                        <th>Actions</th>
+                        <th style="text-align:right;">Actions</th>
                     </tr></thead>
                     <tbody>
                         ${data.map(c => {
@@ -2571,14 +2562,24 @@ Available variables:
                                 <td>${c.storeFlag} ${c.storeName}</td>
                                 <td><strong>${sym}${(c.cartValue||0).toFixed(2)}</strong></td>
                                 <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '—'}</td>
-                                <td><span class="badge ${c.callStatus}">${statusLabel(c.callStatus)}</span></td>
+                                <td>
+                                    <select class="inline-status-select" data-id="${c.id}" data-type="cart" onchange="inlineStatusChange(this)">
+                                        <option value="not_called" ${c.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
+                                        <option value="no_answer" ${c.callStatus==='no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="callback" ${c.callStatus==='callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="converted" ${c.callStatus==='converted'?'selected':''}>✅ Converted</option>
+                                        <option value="not_interested" ${c.callStatus==='not_interested'?'selected':''}>❌ Not Interested</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="inline-notes-input" data-id="${c.id}" data-type="cart" value="${escAttr(c.notes||'')}" placeholder="Add notes..." onblur="inlineNotesChange(this)" onkeypress="if(event.key==='Enter')this.blur()">
+                                </td>
                                 <td style="font-size:12px;">${timeAgo(c.abandonedAt)}</td>
-                                <td style="white-space:nowrap;">
+                                <td style="white-space:nowrap;text-align:right;">
                                     ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
                                     <button class="action-btn" onclick="openCallLogModal(carts.find(x=>x.id==='${c.id}'))" title="Log Call" style="background:rgba(168,85,247,0.2);color:#a855f7;"><i class="fas fa-headset"></i></button>
-                                    <button class="action-btn order" onclick="openOrderModal('${c.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i></button>
-                                    <button class="action-btn push" onclick="openPushModal('${c.id}','cart')" title="Push Notification"><i class="fas fa-bell"></i></button>
                                     ${c.phone ? `<button class="action-btn sms" onclick="openSmsModal('${c.id}','cart')" title="Send SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
+                                    <button class="action-btn-order-large" onclick="openOrderModal('${c.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i> CREATE ORDER</button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -2600,6 +2601,7 @@ Available variables:
                         <th class="sortable ${getSortClass('orderTotal')}" onclick="sortTable('orderTotal')">Total</th>
                         <th>Phone</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
+                        <th>Notes</th>
                         <th>Actions</th>
                     </tr></thead>
                     <tbody>
@@ -2611,12 +2613,21 @@ Available variables:
                                 <td><strong>#${o.orderId}</strong></td>
                                 <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
                                 <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '—'}</td>
-                                <td><span class="badge ${o.callStatus}">${statusLabel(o.callStatus)}</span></td>
+                                <td>
+                                    <select class="inline-status-select" data-id="${o.id}" data-type="pending" onchange="inlineStatusChange(this)">
+                                        <option value="not_called" ${o.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
+                                        <option value="no_answer" ${o.callStatus==='no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="callback" ${o.callStatus==='callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="converted" ${o.callStatus==='converted'?'selected':''}>✅ Converted</option>
+                                        <option value="not_interested" ${o.callStatus==='not_interested'?'selected':''}>❌ Not Interested</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="inline-notes-input" data-id="${o.id}" data-type="pending" value="${escAttr(o.notes||'')}" placeholder="Add notes..." onblur="inlineNotesChange(this)" onkeypress="if(event.key==='Enter')this.blur()">
+                                </td>
                                 <td style="white-space:nowrap;">
                                     ${o.phone ? `<button class="action-btn call" onclick="call('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
-                                    <button class="action-btn push" onclick="openPushModal('${o.id}','pending')" title="Push"><i class="fas fa-bell"></i></button>
                                     ${o.phone ? `<button class="action-btn sms" onclick="openSmsModal('${o.id}','pending')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openStatusModal('${o.id}','${o.callStatus}','${escAttr(o.notes||'')}')"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -2638,6 +2649,7 @@ Available variables:
                         <th>Phone</th>
                         <th class="sortable ${getSortClass('registeredAt')}" onclick="sortTable('registeredAt')">Registered</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
+                        <th>Notes</th>
                         <th>Actions</th>
                     </tr></thead>
                     <tbody>
@@ -2649,12 +2661,21 @@ Available variables:
                                 <td><strong>${sym}${(b.totalSpent||0).toFixed(2)}</strong></td>
                                 <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '—'}</td>
                                 <td style="font-size:12px;">${formatDate(b.registeredAt)}</td>
-                                <td><span class="badge ${b.callStatus}">${statusLabel(b.callStatus)}</span></td>
+                                <td>
+                                    <select class="inline-status-select" data-id="${b.id}" data-type="buyer" onchange="inlineStatusChange(this)">
+                                        <option value="not_called" ${b.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
+                                        <option value="no_answer" ${b.callStatus==='no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="callback" ${b.callStatus==='callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="converted" ${b.callStatus==='converted'?'selected':''}>✅ Converted</option>
+                                        <option value="not_interested" ${b.callStatus==='not_interested'?'selected':''}>❌ Not Interested</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="inline-notes-input" data-id="${b.id}" data-type="buyer" value="${escAttr(b.notes||'')}" placeholder="Add notes..." onblur="inlineNotesChange(this)" onkeypress="if(event.key==='Enter')this.blur()">
+                                </td>
                                 <td style="white-space:nowrap;">
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
-                                    <button class="action-btn push" onclick="openPushModal('${b.id}','buyer')" title="Push"><i class="fas fa-bell"></i></button>
                                     ${b.phone ? `<button class="action-btn sms" onclick="openSmsModal('${b.id}','buyer')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openStatusModal('${b.id}','${b.callStatus}','${escAttr(b.notes||'')}')"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -2687,6 +2708,60 @@ Available variables:
             closeModal('statusModal');
             renderTable();
             showToast('Status updated!');
+        }
+        
+        // Inline Status Change
+        async function inlineStatusChange(select) {
+            const id = select.dataset.id;
+            const type = select.dataset.type;
+            const newStatus = select.value;
+            
+            // Find the item and get current notes
+            let item = null;
+            if (type === 'cart') item = carts.find(c => c.id === id);
+            else if (type === 'pending') item = pending.find(p => p.id === id);
+            else if (type === 'buyer') item = buyers.find(b => b.id === id);
+            
+            const currentNotes = item?.notes || '';
+            
+            try {
+                await fetch('api.php?action=update-status', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({id, callStatus: newStatus, notes: currentNotes})
+                });
+                if (item) item.callStatus = newStatus;
+                showToast('Status updated!');
+            } catch (err) {
+                showToast('Error updating status', false, 'error');
+            }
+        }
+        
+        // Inline Notes Change
+        async function inlineNotesChange(input) {
+            const id = input.dataset.id;
+            const type = input.dataset.type;
+            const newNotes = input.value;
+            
+            // Find the item and get current status
+            let item = null;
+            if (type === 'cart') item = carts.find(c => c.id === id);
+            else if (type === 'pending') item = pending.find(p => p.id === id);
+            else if (type === 'buyer') item = buyers.find(b => b.id === id);
+            
+            const currentStatus = item?.callStatus || 'not_called';
+            
+            try {
+                await fetch('api.php?action=update-status', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({id, callStatus: currentStatus, notes: newNotes})
+                });
+                if (item) item.notes = newNotes;
+                // Don't show toast for notes to avoid too many notifications
+            } catch (err) {
+                showToast('Error updating notes', false, 'error');
+            }
         }
         
         // Order Modal (Enhanced)
@@ -3158,28 +3233,6 @@ Available variables:
                 console.error('SMS queue error:', e);
                 showToast('Napaka pri dodajanju SMS', true);
             }
-        }
-        
-        // Push Modal
-        function openPushModal(id, type) {
-            const data = type === 'cart' ? carts : type === 'pending' ? pending : buyers;
-            const item = data.find(d => d.id === id);
-            if (!item) return;
-            
-            pushTarget = { ...item, type };
-            
-            document.getElementById('pushAvatar').textContent = initials(item.customerName);
-            document.getElementById('pushCustomerName').textContent = item.customerName;
-            document.getElementById('pushCustomerEmail').textContent = item.email || 'No email';
-            document.getElementById('pushUrl').value = `https://noriks.com/${item.storeCode}/checkout`;
-            
-            document.getElementById('pushModal').classList.add('open');
-        }
-        
-        function sendPush() {
-            // Push not implemented - just show message
-            showToast('🔔 Push obvestila še niso implementirana', false, 'info');
-            closeModal('pushModal');
         }
         
         // SMS Dashboard - Load Queue from API
@@ -5584,206 +5637,43 @@ Available variables:
             }, 100);
         };
         
-        // ========== EMAIL TEMPLATES ==========
-        let emailTemplates = [];
-        let editingEmailTemplateId = null;
+        // ========== ENKRATNI KUPCI SETTINGS ==========
+        let buyersSettings = { minDaysFromPurchase: 10 };
         
-        async function loadEmailTemplatesUI() {
-            const container = document.getElementById('emailTemplatesContainer');
-            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
-            
+        async function loadBuyersSettings() {
             try {
-                const res = await fetch('api.php?action=email-templates');
+                const res = await fetch('api.php?action=buyers-settings');
                 const data = await res.json();
-                emailTemplates = data.templates || [];
-                
-                // Populate country filter
-                const countryFilter = document.getElementById('emailTemplateCountryFilter');
-                const countrySet = new Set(emailTemplates.map(t => t.storeCode));
-                countryFilter.innerHTML = '<option value="">All Countries</option>' +
-                    Array.from(countrySet).map(code => {
-                        const store = stores.find(s => s.code === code);
-                        return `<option value="${code}">${store?.flag || ''} ${code.toUpperCase()}</option>`;
-                    }).join('');
-                
-                filterEmailTemplates();
-            } catch (e) {
-                container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
-            }
-        }
-        
-        function filterEmailTemplates() {
-            const typeFilter = document.getElementById('emailTemplateTypeFilter').value;
-            const countryFilter = document.getElementById('emailTemplateCountryFilter').value;
-            
-            let filtered = emailTemplates;
-            if (typeFilter) filtered = filtered.filter(t => t.type === typeFilter);
-            if (countryFilter) filtered = filtered.filter(t => t.storeCode === countryFilter);
-            
-            renderEmailTemplates(filtered);
-        }
-        
-        function renderEmailTemplates(templates) {
-            const container = document.getElementById('emailTemplatesContainer');
-            
-            if (templates.length === 0) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-envelope-open"></i><p>No email templates found</p></div>';
-                return;
-            }
-            
-            const typeIcons = {
-                abandoned_cart: '🛒',
-                winback: '💚',
-                order_confirmation: '✅'
-            };
-            
-            const typeLabels = {
-                abandoned_cart: 'Abandoned Cart',
-                winback: 'Winback',
-                order_confirmation: 'Order Confirmation'
-            };
-            
-            container.innerHTML = `
-                <div class="table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Country</th>
-                                <th>Type</th>
-                                <th>Subject</th>
-                                <th>Preview</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${templates.map(t => {
-                                const store = stores.find(s => s.code === t.storeCode);
-                                return `
-                                    <tr>
-                                        <td>${store?.flag || ''} ${t.storeCode.toUpperCase()}</td>
-                                        <td>
-                                            <span class="badge" style="background:rgba(59,130,246,0.2);color:var(--accent-blue);">
-                                                ${typeIcons[t.type] || '📧'} ${typeLabels[t.type] || t.type}
-                                            </span>
-                                        </td>
-                                        <td><strong>${esc(t.subject)}</strong></td>
-                                        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-muted);font-size:13px;">
-                                            ${esc(t.template.substring(0, 80))}...
-                                        </td>
-                                        <td>
-                                            <button class="action-btn" onclick="editEmailTemplate('${t.id}')" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="action-btn" onclick="previewEmailTemplate('${t.id}')" title="Preview" style="background:rgba(168,85,247,0.2);color:var(--accent-purple);">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-        
-        function editEmailTemplate(templateId) {
-            const template = emailTemplates.find(t => t.id === templateId);
-            if (!template) return;
-            
-            editingEmailTemplateId = templateId;
-            document.getElementById('emailTemplateId').value = templateId;
-            document.getElementById('emailTemplateSubject').value = template.subject;
-            document.getElementById('emailTemplateBody').value = template.template;
-            
-            document.getElementById('emailTemplateModal').classList.add('open');
-        }
-        
-        async function saveEmailTemplate() {
-            const templateId = document.getElementById('emailTemplateId').value;
-            const subject = document.getElementById('emailTemplateSubject').value;
-            const body = document.getElementById('emailTemplateBody').value;
-            
-            if (!subject || !body) {
-                showToast('Please fill in all fields', true);
-                return;
-            }
-            
-            // Update in local array
-            const idx = emailTemplates.findIndex(t => t.id === templateId);
-            if (idx >= 0) {
-                emailTemplates[idx].subject = subject;
-                emailTemplates[idx].template = body;
-            }
-            
-            // Save to server
-            try {
-                const res = await fetch('api.php?action=email-templates-save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ templates: emailTemplates })
-                });
-                
-                const result = await res.json();
-                if (result.success) {
-                    showToast('Email template saved!');
-                    closeModal('emailTemplateModal');
-                    filterEmailTemplates();
-                } else {
-                    showToast(result.error || 'Failed to save template', true);
+                if (data.success && data.settings) {
+                    buyersSettings = data.settings;
+                    document.getElementById('buyersMinDays').value = buyersSettings.minDaysFromPurchase || 10;
                 }
             } catch (e) {
-                showToast('Error: ' + e.message, true);
+                console.error('Failed to load buyers settings:', e);
             }
         }
         
-        function previewEmailTemplate(templateId) {
-            const template = emailTemplates.find(t => t.id === templateId);
-            if (!template) return;
+        async function saveBuyersSettings() {
+            const minDays = parseInt(document.getElementById('buyersMinDays').value) || 10;
+            buyersSettings.minDaysFromPurchase = minDays;
             
-            // Sample data for preview
-            const previewData = {
-                ime: 'Marko',
-                produkt: 'Noriks Ortopedski Čevlji',
-                link: 'https://noriks.com/' + template.storeCode
-            };
-            
-            let previewSubject = template.subject;
-            let previewBody = template.template;
-            
-            // Replace variables
-            Object.entries(previewData).forEach(([key, value]) => {
-                previewSubject = previewSubject.replace(new RegExp(`{${key}}`, 'g'), value);
-                previewBody = previewBody.replace(new RegExp(`{${key}}`, 'g'), value);
-            });
-            
-            // Show in alert or modal
-            const store = stores.find(s => s.code === template.storeCode);
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal-bg open';
-            modal.id = 'emailPreviewModal';
-            modal.innerHTML = `
-                <div class="modal" style="max-width:600px;">
-                    <div class="modal-header">
-                        <div class="modal-title">📧 Email Preview - ${store?.flag || ''} ${template.storeCode.toUpperCase()}</div>
-                        <button class="modal-close" onclick="document.getElementById('emailPreviewModal').remove()">×</button>
-                    </div>
-                    <div class="modal-body">
-                        <div style="background:var(--content-bg);padding:16px;border-radius:8px;margin-bottom:16px;">
-                            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">Subject:</div>
-                            <div style="font-weight:600;font-size:16px;">${esc(previewSubject)}</div>
-                        </div>
-                        <div style="background:white;color:#333;padding:24px;border-radius:8px;white-space:pre-wrap;line-height:1.6;font-size:14px;">
-${esc(previewBody)}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-cancel" onclick="document.getElementById('emailPreviewModal').remove()">Close</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            try {
+                const res = await fetch('api.php?action=buyers-settings-save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ settings: buyersSettings })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Nastavitve shranjene!');
+                    // Reload buyers data with new settings
+                    loadBuyers();
+                } else {
+                    showToast(data.error || 'Napaka pri shranjevanju', true);
+                }
+            } catch (e) {
+                showToast('Napaka: ' + e.message, true);
+            }
         }
         
         // ========== PAKETOMATI FUNCTIONS ==========
