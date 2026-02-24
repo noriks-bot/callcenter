@@ -532,6 +532,7 @@ function sendQueuedSms($smsId, $overridePhone = null) {
     $logMsg("[SMS-SEND] Phone formatted: {$rawPhone} -> {$recipientPhone}");
     
     // Prepare MetaKocka SMS payload (correct format per API docs)
+    // SENDER MUST BE "Narocilo" - ALWAYS!
     $payload = [
         'secret_key' => $metakocka['secret_key'],
         'company_id' => strval($metakocka['company_id']),
@@ -539,6 +540,7 @@ function sendQueuedSms($smsId, $overridePhone = null) {
             [
                 'type' => 'sms',
                 'eshop_sync_id' => $eshopSyncId,
+                'sender' => 'Narocilo',
                 'to_number' => $recipientPhone,
                 'message' => $sms['message']
             ]
@@ -690,6 +692,7 @@ function sendDirectSms($data) {
     $logMsg("[SMS-DIRECT] Phone formatted: $phone -> $recipientPhone");
     
     // Prepare MetaKocka SMS payload
+    // SENDER MUST BE "Narocilo" - ALWAYS!
     $payload = [
         'secret_key' => $metakocka['secret_key'],
         'company_id' => strval($metakocka['company_id']),
@@ -697,6 +700,7 @@ function sendDirectSms($data) {
             [
                 'type' => 'sms',
                 'eshop_sync_id' => $eshopSyncId,
+                'sender' => 'Narocilo',
                 'to_number' => $recipientPhone,
                 'message' => $message
             ]
