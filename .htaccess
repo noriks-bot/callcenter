@@ -1,20 +1,14 @@
-# Noriks Call Center - cPanel config
+# Redirect old .html URLs to new .php
+RewriteEngine On
 
-# Disable caching for HTML files
-<FilesMatch "\.(html|php)$">
-    Header set Cache-Control "no-store, no-cache, must-revalidate"
-</FilesMatch>
+# Redirect index.html to index.php
+RewriteRule ^index\.html$ index.php [R=301,L]
 
-# Default document
-DirectoryIndex index.html
+# Redirect login.html to login.php
+RewriteRule ^login\.html$ login.php [R=301,L]
 
-# Protect data directory
-<Directory "data">
-    Deny from all
-</Directory>
+# Redirect report.html to report.php
+RewriteRule ^report\.html$ report.php [R=301,L]
 
-# Protect sensitive files
-<FilesMatch "^(data|\.htaccess|\.git)">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
+# Default index to index.php
+DirectoryIndex index.php index.html
