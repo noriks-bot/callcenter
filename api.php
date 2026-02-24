@@ -634,6 +634,31 @@ function getCache($key, $maxAge = 300) {
     return null;
 }
 
+// Get cache with metadata (for stale-while-revalidate pattern)
+function getCacheWithMeta($key, $maxAge = 300, $staleAge = null) {
+    global $cacheDir;
+    if (!is_dir($cacheDir)) @mkdir($cacheDir, 0755, true);
+    $file = $cacheDir . md5($key) . '.json';
+    
+    if (!file_exists($file)) {
+        return ['data' => null, 'age' => null, 'isStale' => true, 'isFresh' => false];
+    }
+    
+    $age = time() - filemtime($file);
+    $data = json_decode(file_get_contents($file), true);
+    $isFresh = $age < $maxAge;
+    $isStale = $staleAge !== null ? ($age >= $maxAge && $age < $staleAge) : !$isFresh;
+    
+    return [
+        'data' => $data,
+        'age' => $age,
+        'ageMinutes' => round($age / 60),
+        'cachedAt' => date('c', filemtime($file)),
+        'isStale' => !$isFresh,
+        'isFresh' => $isFresh
+    ];
+}
+
 function setCache($key, $data) {
     global $cacheDir;
     if (!is_dir($cacheDir)) @mkdir($cacheDir, 0755, true);
@@ -847,7 +872,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $logMsg("Min days from purchase: $minDaysFromPurchase");
     
     $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all') . '_' . $minDaysFromPurchase;
-    $cached = getCache($cacheKey, 1800);  // 30 min cache
+    $cached = getCache($cacheKey, 3600);  // 1 hour cache (was 30 min)
     if ($cached !== null) {
         $logMsg("✓ Returning cached data: " . count($cached) . " buyers");
         return $cached;
@@ -860,8 +885,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $logMsg("Stores to fetch: " . implode(', ', array_keys($storesToFetch)));
     
     // OPTIMIZED: Fetch all stores in parallel using curl_multi
-    // Reduced to 3 pages per store (300 orders) for faster loading on cPanel
-    $maxPages = 3;
+    // Reduced to 2 pages per store (100 orders) for much faster loading
+    $maxPages = 2;
     
     // Collect all orders from all stores using parallel requests
     $allStoreOrders = [];
@@ -888,7 +913,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 if ($page > 1 && isset($allStoreOrders[$storeCode]['done'])) continue;
                 
                 $params = http_build_query([
-                    'per_page' => 100,
+                    'per_page' => 50,  // Reduced from 100 to 50 for faster API calls
                     'status' => 'processing,completed',
                     'orderby' => 'date',
                     'order' => 'desc',
@@ -900,8 +925,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 curl_setopt_array($ch, [
                     CURLOPT_URL => $url,
                     CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_TIMEOUT => 15,  // Reduced from 25 to 15 for cPanel
-                    CURLOPT_CONNECTTIMEOUT => 10,
+                    CURLOPT_TIMEOUT => 12,  // Reduced timeout for faster fail
+                    CURLOPT_CONNECTTIMEOUT => 8,
                     CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
                     CURLOPT_SSL_VERIFYPEER => true
                 ]);
@@ -966,8 +991,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 );
                 $logMsg("$storeCode: Got " . count($orders) . " orders (total: " . count($allStoreOrders[$storeCode]['orders']) . ")");
                 
-                // Mark as done if less than 100 results (no more pages)
-                if (count($orders) < 100) {
+                // Mark as done if less than 50 results (no more pages)
+                if (count($orders) < 50) {
                     $allStoreOrders[$storeCode]['done'] = true;
                 }
             }
@@ -1005,7 +1030,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
             
             for ($page = 1; $page <= $maxPages; $page++) {
                 $params = http_build_query([
-                    'per_page' => 100,
+                    'per_page' => 50,  // Reduced from 100 to 50
                     'status' => 'processing,completed',
                     'orderby' => 'date',
                     'order' => 'desc',
@@ -1017,8 +1042,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 curl_setopt_array($ch, [
                     CURLOPT_URL => $url,
                     CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_TIMEOUT => 12,  // Shorter timeout for sequential
-                    CURLOPT_CONNECTTIMEOUT => 8,
+                    CURLOPT_TIMEOUT => 10,  // Shorter timeout for sequential
+                    CURLOPT_CONNECTTIMEOUT => 6,
                     CURLOPT_USERPWD => $config['ck'] . ':' . $config['cs'],
                     CURLOPT_SSL_VERIFYPEER => true
                 ]);
@@ -1046,7 +1071,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 );
                 $logMsg("$storeCode (seq): Got " . count($orders) . " orders (total: " . count($allStoreOrders[$storeCode]['orders']) . ")");
                 
-                if (count($orders) < 100) break;
+                if (count($orders) < 50) break;  // Updated from 100 to 50
             }
         }
     }
@@ -1793,6 +1818,55 @@ try {
             
         case 'one-time-buyers':
             echo json_encode(fetchOneTimeBuyers($store));
+            break;
+        
+        case 'one-time-buyers-cached':
+            // Stale-while-revalidate: Return cached data immediately with metadata
+            // Frontend can decide to trigger background refresh if stale
+            $buyersSettingsFile = __DIR__ . '/data/buyers-settings.json';
+            $minDaysFromPurchase = 10;
+            if (file_exists($buyersSettingsFile)) {
+                $buyersSettings = json_decode(file_get_contents($buyersSettingsFile), true);
+                $minDaysFromPurchase = $buyersSettings['minDaysFromPurchase'] ?? 10;
+            }
+            $cacheKey = 'one_time_buyers_' . ($store ?: 'all') . '_' . $minDaysFromPurchase;
+            
+            // Check cache - allow stale data up to 4 hours
+            $cacheMeta = getCacheWithMeta($cacheKey, 3600, 14400);  // fresh=1hr, stale-max=4hrs
+            
+            if ($cacheMeta['data'] !== null) {
+                // Return cached data with metadata
+                echo json_encode([
+                    'data' => $cacheMeta['data'],
+                    'cached' => true,
+                    'isStale' => $cacheMeta['isStale'],
+                    'cacheAge' => $cacheMeta['ageMinutes'],
+                    'cachedAt' => $cacheMeta['cachedAt'],
+                    'count' => count($cacheMeta['data'])
+                ]);
+            } else {
+                // No cache at all - fetch fresh (this will be slow)
+                $buyers = fetchOneTimeBuyers($store);
+                echo json_encode([
+                    'data' => $buyers,
+                    'cached' => false,
+                    'isStale' => false,
+                    'cacheAge' => 0,
+                    'cachedAt' => date('c'),
+                    'count' => count($buyers)
+                ]);
+            }
+            break;
+        
+        case 'refresh-buyers-cache':
+            // Background refresh endpoint - fetches fresh data and updates cache
+            // Called by frontend after showing stale data
+            $buyers = fetchOneTimeBuyers($store);
+            echo json_encode([
+                'success' => true,
+                'count' => count($buyers),
+                'refreshedAt' => date('c')
+            ]);
             break;
             
         case 'one-time-buyers-debug':

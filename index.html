@@ -1748,7 +1748,11 @@
             carts: true,
             pending: true,
             buyers: true,
-            buyersError: null  // Will store error message if buyers fail
+            buyersError: null,  // Will store error message if buyers fail
+            buyersCacheAge: 0,  // Minutes since last cache
+            buyersCachedAt: null,  // ISO timestamp of cache
+            buyersIsStale: false,  // Is cache stale?
+            buyersRefreshing: false  // Is background refresh in progress?
         };
         
         // Pagination & Sorting State
@@ -2003,12 +2007,15 @@
             document.getElementById('contentCount-carts').textContent = filteredCarts.length;
             document.getElementById('contentCount-pending').textContent = filteredPending.length;
             
-            // Buyers: Show spinner if still loading, error icon if failed
+            // Buyers: Show spinner if still loading, error icon if failed, or count with cache indicator
             const buyersCountEl = document.getElementById('contentCount-buyers');
             if (globalLoadingStatus.buyers) {
                 buyersCountEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:9px"></i>';
             } else if (globalLoadingStatus.buyersError) {
                 buyersCountEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--accent-red);font-size:9px" title="' + globalLoadingStatus.buyersError + '"></i>';
+            } else if (globalLoadingStatus.buyersRefreshing) {
+                // Show count with a subtle refresh indicator
+                buyersCountEl.innerHTML = filteredBuyers.length + ' <i class="fas fa-sync fa-spin" style="font-size:7px;opacity:0.6"></i>';
             } else {
                 buyersCountEl.textContent = filteredBuyers.length;
             }
@@ -2233,24 +2240,93 @@
             renderTable();
             console.log('[Data] Phase 1 complete - showing carts & pending');
             
-            // Phase 2: Load buyers in background (this is the slow one)
-            console.log('[Data] Phase 2: Loading buyers (may take longer)...');
-            const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
+            // Phase 2: Load buyers with stale-while-revalidate pattern
+            // First try to get cached data (instant), then refresh in background if stale
+            console.log('[Data] Phase 2: Loading buyers (stale-while-revalidate)...');
+            
+            const cachedBuyersResult = await apiFetch('api.php?action=one-time-buyers-cached', { 
                 component: 'Buyers', 
                 silent: true,
-                timeout: 45000  // 45 second timeout for buyers (it's slow)
+                timeout: 5000  // Cached endpoint should be very fast
             });
             
-            if (buyersResult.success) {
-                buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
-                console.log('[Data] ✓ Buyers:', buyers.length);
+            if (cachedBuyersResult.success && cachedBuyersResult.data?.data) {
+                // Got cached data - show it immediately!
+                const cacheData = cachedBuyersResult.data;
+                buyers = Array.isArray(cacheData.data) ? cacheData.data : [];
+                globalLoadingStatus.buyersCacheAge = cacheData.cacheAge || 0;
+                globalLoadingStatus.buyersCachedAt = cacheData.cachedAt;
+                globalLoadingStatus.buyersIsStale = cacheData.isStale;
+                console.log(`[Data] ✓ Buyers (cached): ${buyers.length} items, ${cacheData.cacheAge}min old, stale=${cacheData.isStale}`);
                 globalLoadingStatus.buyersError = null;
+                globalLoadingStatus.buyers = false;
+                
+                // Update UI immediately with cached data
+                updateCounts();
+                renderTable();
+                
+                // If data is stale, trigger background refresh
+                if (cacheData.isStale) {
+                    console.log('[Data] Cache is stale, refreshing in background...');
+                    globalLoadingStatus.buyersRefreshing = true;
+                    renderTable();  // Show refreshing indicator
+                    
+                    // Background refresh (don't await)
+                    apiFetch('api.php?action=refresh-buyers-cache', { 
+                        component: 'Buyers Refresh', 
+                        silent: true,
+                        timeout: 45000
+                    }).then(refreshResult => {
+                        if (refreshResult.success) {
+                            console.log('[Data] ✓ Background refresh complete, reloading buyers...');
+                            // Now fetch the fresh cached data
+                            return apiFetch('api.php?action=one-time-buyers-cached', { 
+                                component: 'Buyers', 
+                                silent: true,
+                                timeout: 5000
+                            });
+                        }
+                        return null;
+                    }).then(freshResult => {
+                        if (freshResult?.success && freshResult.data?.data) {
+                            buyers = Array.isArray(freshResult.data.data) ? freshResult.data.data : [];
+                            globalLoadingStatus.buyersCacheAge = 0;
+                            globalLoadingStatus.buyersCachedAt = new Date().toISOString();
+                            globalLoadingStatus.buyersIsStale = false;
+                            console.log(`[Data] ✓ Fresh buyers: ${buyers.length}`);
+                        }
+                        globalLoadingStatus.buyersRefreshing = false;
+                        updateCounts();
+                        renderTable();
+                    }).catch(err => {
+                        console.warn('[Data] Background refresh failed:', err);
+                        globalLoadingStatus.buyersRefreshing = false;
+                        renderTable();
+                    });
+                }
             } else {
-                console.error('[Data] ✗ Buyers failed:', buyersResult.error);
-                buyers = [];
-                globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju podatkov';
+                // No cached data - need to fetch fresh (will be slow)
+                console.log('[Data] No cached buyers, fetching fresh...');
+                const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
+                    component: 'Buyers', 
+                    silent: true,
+                    timeout: 45000
+                });
+                
+                if (buyersResult.success) {
+                    buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
+                    console.log('[Data] ✓ Buyers (fresh):', buyers.length);
+                    globalLoadingStatus.buyersCacheAge = 0;
+                    globalLoadingStatus.buyersCachedAt = new Date().toISOString();
+                    globalLoadingStatus.buyersIsStale = false;
+                    globalLoadingStatus.buyersError = null;
+                } else {
+                    console.error('[Data] ✗ Buyers failed:', buyersResult.error);
+                    buyers = [];
+                    globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju podatkov';
+                }
+                globalLoadingStatus.buyers = false;
             }
-            globalLoadingStatus.buyers = false;
             
             // Final render with all data
             console.log('[Data] Phase 2 complete - all data loaded');
@@ -2272,10 +2348,10 @@
             }
         }
         
-        // Function to retry loading buyers only
+        // Function to retry loading buyers only (forces fresh fetch)
         async function retryLoadBuyers() {
-            console.log('[Data] Retrying buyers load...');
-            globalLoadingStatus.buyers = true;
+            console.log('[Data] Retrying buyers load (fresh)...');
+            globalLoadingStatus.buyersRefreshing = true;
             globalLoadingStatus.buyersError = null;
             
             // Update UI immediately
@@ -2284,24 +2360,42 @@
                 const countEl = tabEl.querySelector('.count');
                 if (countEl) countEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:8px"></i>';
             }
-            renderTable();  // Show loading spinner
+            renderTable();  // Show refreshing indicator
             
-            const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
-                component: 'Buyers', 
-                silent: false,  // Show errors this time
-                timeout: 45000
-            });
-            
-            if (buyersResult.success) {
-                buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
-                console.log('[Data] ✓ Buyers retry success:', buyers.length);
-                globalLoadingStatus.buyersError = null;
-                showToast(`✓ Enkratni kupci naloženi: ${buyers.length}`);
-            } else {
-                console.error('[Data] ✗ Buyers retry failed:', buyersResult.error);
-                buyers = [];
-                globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju';
+            try {
+                // First refresh the cache
+                const refreshResult = await apiFetch('api.php?action=refresh-buyers-cache', { 
+                    component: 'Buyers Refresh', 
+                    silent: true,
+                    timeout: 45000
+                });
+                
+                if (refreshResult.success) {
+                    // Now fetch the fresh cached data
+                    const cachedResult = await apiFetch('api.php?action=one-time-buyers-cached', { 
+                        component: 'Buyers', 
+                        silent: false,
+                        timeout: 5000
+                    });
+                    
+                    if (cachedResult.success && cachedResult.data?.data) {
+                        buyers = Array.isArray(cachedResult.data.data) ? cachedResult.data.data : [];
+                        globalLoadingStatus.buyersCacheAge = 0;
+                        globalLoadingStatus.buyersCachedAt = new Date().toISOString();
+                        globalLoadingStatus.buyersIsStale = false;
+                        console.log('[Data] ✓ Buyers refresh success:', buyers.length);
+                        showToast(`✓ Enkratni kupci osveženi: ${buyers.length}`);
+                    }
+                } else {
+                    throw new Error(refreshResult.error || 'Refresh failed');
+                }
+            } catch (err) {
+                console.error('[Data] ✗ Buyers retry failed:', err);
+                globalLoadingStatus.buyersError = err.message || 'Napaka pri osvežitvi';
+                showToast('⚠️ Napaka pri osvežitvi podatkov', 'error');
             }
+            
+            globalLoadingStatus.buyersRefreshing = false;
             globalLoadingStatus.buyers = false;
             
             updateCounts();
@@ -2727,7 +2821,24 @@
         
         function renderBuyersTable(data, totalItems, totalPages) {
             const getSortClass = (col) => sortColumn === col ? sortDirection : '';
-            document.getElementById('tableContainer').innerHTML = `
+            
+            // Cache age indicator
+            let cacheIndicator = '';
+            if (globalLoadingStatus.buyersCacheAge > 0) {
+                const ageText = globalLoadingStatus.buyersCacheAge < 60 
+                    ? `${globalLoadingStatus.buyersCacheAge} min` 
+                    : `${Math.round(globalLoadingStatus.buyersCacheAge / 60)} h`;
+                const staleClass = globalLoadingStatus.buyersIsStale ? 'stale' : 'fresh';
+                const refreshingText = globalLoadingStatus.buyersRefreshing ? ' <i class="fas fa-sync fa-spin" style="font-size:10px"></i> osvežujem...' : '';
+                cacheIndicator = `<div class="cache-indicator ${staleClass}" style="margin-bottom:12px;padding:8px 12px;background:var(--content-bg);border-radius:6px;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-clock" style="opacity:0.6"></i>
+                    <span>Zadnja osvežitev: <strong>${ageText} nazaj</strong></span>
+                    ${refreshingText}
+                    ${!globalLoadingStatus.buyersRefreshing ? `<button onclick="retryLoadBuyers()" style="margin-left:auto;padding:4px 10px;font-size:11px;background:var(--accent-blue);color:white;border:none;border-radius:4px;cursor:pointer;"><i class="fas fa-refresh"></i> Osveži</button>` : ''}
+                </div>`;
+            }
+            
+            document.getElementById('tableContainer').innerHTML = cacheIndicator + `
                 <div class="table-wrapper">
                 <table class="data-table">
                     <thead><tr>
