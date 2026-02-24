@@ -1752,7 +1752,8 @@
             buyersCacheAge: 0,  // Minutes since last cache
             buyersCachedAt: null,  // ISO timestamp of cache
             buyersIsStale: false,  // Is cache stale?
-            buyersRefreshing: false  // Is background refresh in progress?
+            buyersRefreshing: false,  // Is background refresh in progress?
+            buyersNeedsRefresh: false  // No cache exists, user needs to click refresh
         };
         
         // Pagination & Sorting State
@@ -2305,27 +2306,39 @@
                     });
                 }
             } else {
-                // No cached data - need to fetch fresh (will be slow)
-                console.log('[Data] No cached buyers, fetching fresh...');
-                const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
-                    component: 'Buyers', 
-                    silent: true,
-                    timeout: 45000
-                });
-                
-                if (buyersResult.success) {
-                    buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
-                    console.log('[Data] ✓ Buyers (fresh):', buyers.length);
-                    globalLoadingStatus.buyersCacheAge = 0;
-                    globalLoadingStatus.buyersCachedAt = new Date().toISOString();
-                    globalLoadingStatus.buyersIsStale = false;
-                    globalLoadingStatus.buyersError = null;
-                } else {
-                    console.error('[Data] ✗ Buyers failed:', buyersResult.error);
+                // No cached data or empty - check if API says needsRefresh
+                const cacheData = cachedBuyersResult.data || {};
+                if (cacheData.needsRefresh || cacheData.count === 0) {
+                    console.log('[Data] No cache, user needs to click refresh');
                     buyers = [];
-                    globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju podatkov';
+                    globalLoadingStatus.buyers = false;
+                    globalLoadingStatus.buyersNeedsRefresh = true;
+                    globalLoadingStatus.buyersError = null;
+                    updateCounts();
+                    renderTable();
+                } else {
+                    // Fallback - try to fetch fresh (will be slow)
+                    console.log('[Data] No cached buyers, fetching fresh...');
+                    const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
+                        component: 'Buyers', 
+                        silent: true,
+                        timeout: 45000
+                    });
+                    
+                    if (buyersResult.success) {
+                        buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
+                        console.log('[Data] ✓ Buyers (fresh):', buyers.length);
+                        globalLoadingStatus.buyersCacheAge = 0;
+                        globalLoadingStatus.buyersCachedAt = new Date().toISOString();
+                        globalLoadingStatus.buyersIsStale = false;
+                        globalLoadingStatus.buyersError = null;
+                    } else {
+                        console.error('[Data] ✗ Buyers failed:', buyersResult.error);
+                        buyers = [];
+                        globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju podatkov';
+                    }
+                    globalLoadingStatus.buyers = false;
                 }
-                globalLoadingStatus.buyers = false;
             }
             
             // Final render with all data
@@ -2351,7 +2364,9 @@
         // Function to retry loading buyers only (forces fresh fetch)
         async function retryLoadBuyers() {
             console.log('[Data] Retrying buyers load (fresh)...');
+            globalLoadingStatus.buyers = true;  // Show loading spinner
             globalLoadingStatus.buyersRefreshing = true;
+            globalLoadingStatus.buyersNeedsRefresh = false;  // Reset
             globalLoadingStatus.buyersError = null;
             
             // Update UI immediately
@@ -2629,6 +2644,17 @@
             const totalItems = data.length;
             
             if (!totalItems) {
+                // Special handling for buyers - show loading state if still loading
+                if (currentTab === 'buyers') {
+                    if (globalLoadingStatus.buyers || globalLoadingStatus.buyersRefreshing) {
+                        container.innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin" style="font-size:32px;color:var(--accent-blue);"></i><p>Nalagam enkratne kupce...</p><small style="color:var(--text-muted);">Prvič lahko traja do 30 sekund</small></div>';
+                        return;
+                    } else if (globalLoadingStatus.buyersNeedsRefresh) {
+                        container.innerHTML = '<div class="empty"><i class="fas fa-sync" style="font-size:32px;color:var(--accent-orange);"></i><p>Podatki niso na voljo</p><small style="color:var(--text-muted);">Klikni "Osveži" za nalaganje enkratnih kupcev</small><br><button class="btn btn-save" style="margin-top:16px;" onclick="retryLoadBuyers()"><i class="fas fa-sync"></i> Osveži zdaj</button></div>';
+                        return;
+                    }
+                }
+                
                 const emptyMessages = {
                     'carts': '<div class="empty"><i class="fas fa-shopping-cart"></i><p>Ni zapuščenih košaric</p><small style="color:var(--text-muted);">Vse košarice so bile pretvorjene ali filtrirane</small></div>',
                     'pending': '<div class="empty"><i class="fas fa-clock"></i><p>Ni čakajočih naročil</p><small style="color:var(--text-muted);">Vsa naročila so bila obdelana</small></div>',

@@ -1821,8 +1821,7 @@ try {
             break;
         
         case 'one-time-buyers-cached':
-            // Stale-while-revalidate: Return cached data immediately with metadata
-            // Frontend can decide to trigger background refresh if stale
+            // BULLETPROOF: Always return immediately, NEVER block
             $buyersSettingsFile = __DIR__ . '/data/buyers-settings.json';
             $minDaysFromPurchase = 10;
             if (file_exists($buyersSettingsFile)) {
@@ -1831,29 +1830,31 @@ try {
             }
             $cacheKey = 'one_time_buyers_' . ($store ?: 'all') . '_' . $minDaysFromPurchase;
             
-            // Check cache - fresh=2hr, allow stale data up to 6 hours
-            $cacheMeta = getCacheWithMeta($cacheKey, 7200, 21600);  // fresh=2hr, stale-max=6hrs
+            // Check cache - fresh=2hr, allow stale data up to 24 hours
+            $cacheMeta = getCacheWithMeta($cacheKey, 7200, 86400);  // fresh=2hr, stale-max=24hrs
             
             if ($cacheMeta['data'] !== null) {
-                // Return cached data with metadata
+                // Return cached data immediately
                 echo json_encode([
                     'data' => $cacheMeta['data'],
                     'cached' => true,
                     'isStale' => $cacheMeta['isStale'],
                     'cacheAge' => $cacheMeta['ageMinutes'],
                     'cachedAt' => $cacheMeta['cachedAt'],
-                    'count' => count($cacheMeta['data'])
+                    'count' => count($cacheMeta['data']),
+                    'needsRefresh' => $cacheMeta['isStale']
                 ]);
             } else {
-                // No cache at all - fetch fresh (this will be slow)
-                $buyers = fetchOneTimeBuyers($store);
+                // NO CACHE - return empty immediately, tell frontend to refresh
                 echo json_encode([
-                    'data' => $buyers,
+                    'data' => [],
                     'cached' => false,
-                    'isStale' => false,
+                    'isStale' => true,
                     'cacheAge' => 0,
-                    'cachedAt' => date('c'),
-                    'count' => count($buyers)
+                    'cachedAt' => null,
+                    'count' => 0,
+                    'needsRefresh' => true,
+                    'message' => 'No cache yet - click Refresh to load buyers'
                 ]);
             }
             break;
