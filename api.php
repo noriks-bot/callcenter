@@ -203,17 +203,18 @@ function saveAgents($data) {
 function loadSmsSettings() {
     global $smsSettingsFile;
     
-    // Correct eshop_sync_id for each Noriks store (MetaKocka)
-    // SI uses HR's eshop_sync_id for testing
+    // Correct SMS eshop_sync_id for each Noriks store (MetaKocka SMS Connection IDs)
+    // IMPORTANT: These are SMS Connection IDs, NOT Webshop IDs!
+    // SI has its own SMS connection (637100367725), others share 637100000075
     $eshopSyncIds = [
-        'hr' => '637100017347',
-        'cz' => '637100017357',
-        'pl' => '637100017358',
-        'sk' => '637100017356',
-        'gr' => '637100017359',
-        'it' => '637100365893',
-        'hu' => '637100367604',
-        'si' => '637100017347'  // Uses HR's ID for testing
+        'hr' => '637100000075',
+        'cz' => '637100000075',
+        'pl' => '637100000075',
+        'sk' => '637100000075',
+        'gr' => '637100000075',
+        'it' => '637100000075',
+        'hu' => '637100000075',
+        'si' => '637100367725'  // SI has dedicated SMS connection
     ];
     
     if (file_exists($smsSettingsFile)) {
