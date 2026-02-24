@@ -59,13 +59,14 @@ $callLogsFile = __DIR__ . '/data/call-logs.json';
 // ========== PHONE NUMBER FORMATTING ==========
 /**
  * Format phone number for MetaKocka SMS API
- * MetaKocka requires international format WITH + prefix
+ * MetaKocka requires international format WITHOUT + prefix
+ * Format: "385 98 216 102" (country code + national number with spaces)
  * 
  * Examples:
- *   098216102      → +385 98 216 102 (HR)
- *   +38598216102   → +385 98 216 102
- *   0038598216102  → +385 98 216 102
- *   38598216102    → +385 98 216 102
+ *   098216102      → 385 98 216 102 (HR)
+ *   +38598216102   → 385 98 216 102
+ *   0038598216102  → 385 98 216 102
+ *   38598216102    → 385 98 216 102
  */
 function formatPhoneForSms($phone, $storeCode) {
     global $phoneCountryCodes;
@@ -106,18 +107,14 @@ function formatPhoneForSms($phone, $storeCode) {
         $phone = $countryCode . $phone;
     }
     
-    // MetaKocka REQUIRES + prefix - always ensure it's there
-    $phone = '+' . $phone;
-    
-    // Format with spaces for readability
-    // Country code lengths: HR=385(3), CZ=420(3), SK=421(3), PL=48(2), GR=30(2), IT=39(2), HU=36(2)
+    // MetaKocka format: NO + prefix, with spaces for readability
+    // Format: "385 98 216 102" (country code, then groups of digits)
     $countryCodeLen = strlen($countryCode);
-    $nationalPart = substr($phone, 1 + $countryCodeLen); // Part after +XXX
+    $nationalPart = substr($phone, $countryCodeLen); // Part after country code
     
-    // Format: +XXX XX XXX XXX (space after country code, then groups of 2-3)
-    // First 2 digits, then rest in groups of 3
+    // Format: XXX XX XXX XXX (country code + space + first 2 digits + rest in groups of 3)
     if (strlen($nationalPart) >= 2) {
-        $formatted = '+' . $countryCode . ' ' . substr($nationalPart, 0, 2);
+        $formatted = $countryCode . ' ' . substr($nationalPart, 0, 2);
         $rest = substr($nationalPart, 2);
         // Split rest into chunks of 3
         $chunks = str_split($rest, 3);
