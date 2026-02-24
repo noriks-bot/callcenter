@@ -205,7 +205,7 @@ function loadSmsSettings() {
     
     // Correct SMS eshop_sync_id for each Noriks store (MetaKocka SMS Connection IDs)
     // IMPORTANT: These are SMS Connection IDs, NOT Webshop IDs!
-    // SI has its own SMS connection (637100367725), others share 637100000075
+    // ALL countries use the same NTH SMS connection: 637100000075
     $eshopSyncIds = [
         'hr' => '637100000075',
         'cz' => '637100000075',
@@ -214,7 +214,7 @@ function loadSmsSettings() {
         'gr' => '637100000075',
         'it' => '637100000075',
         'hu' => '637100000075',
-        'si' => '637100367725'  // SI has dedicated SMS connection
+        'si' => '637100000075'  // Same SMS connection for all countries
     ];
     
     if (file_exists($smsSettingsFile)) {
