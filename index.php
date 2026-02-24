@@ -21,7 +21,7 @@
         #analyticsContent,
         #paketomatiContent {
             margin-left: 240px;
-            padding: 24px;
+            padding: 32px 48px;
             min-height: 100vh;
             background: var(--content-bg);
         }
@@ -49,7 +49,7 @@
             #analyticsContent,
             #paketomatiContent {
                 margin-left: 0;
-                padding: 16px;
+                padding: 20px 24px;
             }
         }
         
