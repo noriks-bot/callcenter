@@ -2269,77 +2269,53 @@
             renderTable();
             console.log('[Data] Phase 1 complete - showing carts & pending');
             
-            // Phase 2: Load buyers with CACHE-FIRST strategy (instant loading!)
-            console.log('[Data] Phase 2: Loading buyers from cache...');
+            // Phase 2: Load buyers - SIMPLE AND DIRECT
+            console.log('[Data] Phase 2: Loading buyers...');
             
-            // First, try to get from cache (instant)
-            const cacheResult = await apiFetch('api.php?action=buyers-cache', { 
-                component: 'BuyersCache', 
-                silent: true,
-                timeout: 30000  // Increased for large cache
-            });
-            
-            if (cacheResult.success && cacheResult.data?.buyers?.length > 0) {
-                buyers = cacheResult.data.buyers;
-                console.log('[Data] ✓ Buyers from cache:', buyers.length, '(age:', cacheResult.data.cache_age_seconds, 's)');
-                globalLoadingStatus.buyersError = null;
-                globalLoadingStatus.buyers = false;
-                
-                // Update UI immediately with cached data
-                updateCounts();
-                renderTable();
-                
-                // If cache is older than 30 minutes, refresh in background
-                if (cacheResult.data.cache_age_seconds > 1800) {
-                    console.log('[Data] Cache is stale, refreshing in background...');
-                    refreshBuyersInBackground();
-                }
-            } else {
-                // No cache available - refresh cache first, then load
-                console.log('[Data] No cache, refreshing cache first...');
-                
-                try {
-                    // Trigger cache refresh (this populates the cache file)
-                    const refreshResult = await fetch('api.php?action=refresh-buyers-cache');
-                    const refreshData = await refreshResult.json();
-                    console.log('[Data] Cache refresh result:', refreshData);
-                    
-                    if (refreshData.success && refreshData.count > 0) {
-                        // Now load from fresh cache
-                        const freshCache = await apiFetch('api.php?action=buyers-cache', { silent: true, timeout: 30000 });
-                        if (freshCache.success && freshCache.data?.buyers?.length > 0) {
-                            buyers = freshCache.data.buyers;
-                            console.log('[Data] ✓ Buyers from fresh cache:', buyers.length);
-                            globalLoadingStatus.buyersError = null;
-                            globalLoadingStatus.buyers = false;
-                            updateCounts();
-                            renderTable();
-                            return; // Exit early, we're done
-                        }
-                    }
-                } catch (refreshErr) {
-                    console.error('[Data] Cache refresh failed:', refreshErr);
-                }
-                
-                // Final fallback - direct API call
-                console.log('[Data] Fallback: loading buyers directly...');
-                const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
-                    component: 'Buyers', 
+            try {
+                // Try cache first (instant if available)
+                const cacheResult = await apiFetch('api.php?action=buyers-cache', { 
+                    component: 'BuyersCache', 
                     silent: true,
-                    timeout: 45000
+                    timeout: 30000
                 });
                 
-                if (buyersResult.success) {
-                    buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
-                    console.log('[Data] ✓ Buyers:', buyers.length);
-                    globalLoadingStatus.buyersError = null;
+                console.log('[Data] Cache result:', cacheResult.success, cacheResult.data?.buyers?.length || 0);
+                
+                if (cacheResult.success && cacheResult.data?.buyers?.length > 0) {
+                    buyers = cacheResult.data.buyers;
+                    console.log('[Data] ✓ Buyers from cache:', buyers.length);
                 } else {
-                    console.error('[Data] ✗ Buyers failed:', buyersResult.error);
-                    buyers = [];
-                    globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju podatkov';
+                    // No cache - load directly (slower but works)
+                    console.log('[Data] No cache, loading directly...');
+                    const directResult = await apiFetch('api.php?action=one-time-buyers', { 
+                        component: 'Buyers', 
+                        silent: true,
+                        timeout: 120000  // 2 minutes for full fetch
+                    });
+                    
+                    if (directResult.success && Array.isArray(directResult.data)) {
+                        buyers = directResult.data;
+                        console.log('[Data] ✓ Buyers direct:', buyers.length);
+                    } else {
+                        console.error('[Data] ✗ Buyers failed');
+                        buyers = [];
+                        globalLoadingStatus.buyersError = 'Napaka pri nalaganju';
+                    }
                 }
-                globalLoadingStatus.buyers = false;
+            } catch (err) {
+                console.error('[Data] Buyers error:', err);
+                buyers = [];
+                globalLoadingStatus.buyersError = err.message || 'Napaka';
             }
+            
+            // Always mark as loaded
+            globalLoadingStatus.buyers = false;
+            globalLoadingStatus.buyersError = buyers.length === 0 ? (globalLoadingStatus.buyersError || null) : null;
+            
+            // Update UI
+            updateCounts();
+            renderTable();
             
             // Final render with all data
             console.log('[Data] Phase 2 complete - all data loaded');
