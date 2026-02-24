@@ -219,14 +219,10 @@ function loadSmsSettings() {
     
     if (file_exists($smsSettingsFile)) {
         $settings = json_decode(file_get_contents($smsSettingsFile), true) ?: [];
-        // Ensure all countries have the correct eshop_sync_id
+        // ALWAYS force the correct eshop_sync_id (ignore any cached/old values)
         foreach ($eshopSyncIds as $country => $eshopId) {
-            if (empty($settings['providers'][$country]['eshop_sync_id']) || 
-                $settings['providers'][$country]['eshop_sync_id'] === '637100000075') {
-                // Update old default or empty values to correct ID
-                $settings['providers'][$country]['eshop_sync_id'] = $eshopId;
-                $settings['providers'][$country]['enabled'] = true;
-            }
+            $settings['providers'][$country]['eshop_sync_id'] = $eshopId;
+            $settings['providers'][$country]['enabled'] = true;
         }
         return $settings;
     }
