@@ -2266,79 +2266,20 @@
                 updateCounts();
                 renderTable();
                 
-                // If data is stale, trigger background refresh
+                // If data is stale, just show it anyway - user can click refresh manually
                 if (cacheData.isStale) {
-                    console.log('[Data] Cache is stale, refreshing in background...');
-                    globalLoadingStatus.buyersRefreshing = true;
-                    renderTable();  // Show refreshing indicator
-                    
-                    // Background refresh (don't await)
-                    apiFetch('api.php?action=refresh-buyers-cache', { 
-                        component: 'Buyers Refresh', 
-                        silent: true,
-                        timeout: 45000
-                    }).then(refreshResult => {
-                        if (refreshResult.success) {
-                            console.log('[Data] ✓ Background refresh complete, reloading buyers...');
-                            // Now fetch the fresh cached data
-                            return apiFetch('api.php?action=one-time-buyers-cached', { 
-                                component: 'Buyers', 
-                                silent: true,
-                                timeout: 5000
-                            });
-                        }
-                        return null;
-                    }).then(freshResult => {
-                        if (freshResult?.success && freshResult.data?.data) {
-                            buyers = Array.isArray(freshResult.data.data) ? freshResult.data.data : [];
-                            globalLoadingStatus.buyersCacheAge = 0;
-                            globalLoadingStatus.buyersCachedAt = new Date().toISOString();
-                            globalLoadingStatus.buyersIsStale = false;
-                            console.log(`[Data] ✓ Fresh buyers: ${buyers.length}`);
-                        }
-                        globalLoadingStatus.buyersRefreshing = false;
-                        updateCounts();
-                        renderTable();
-                    }).catch(err => {
-                        console.warn('[Data] Background refresh failed:', err);
-                        globalLoadingStatus.buyersRefreshing = false;
-                        renderTable();
-                    });
+                    console.log('[Data] Cache is stale but showing anyway - user can refresh manually');
+                    // Don't auto-refresh, just show the data
                 }
             } else {
-                // No cached data or empty - check if API says needsRefresh
-                const cacheData = cachedBuyersResult.data || {};
-                if (cacheData.needsRefresh || cacheData.count === 0) {
-                    console.log('[Data] No cache, user needs to click refresh');
-                    buyers = [];
-                    globalLoadingStatus.buyers = false;
-                    globalLoadingStatus.buyersNeedsRefresh = true;
-                    globalLoadingStatus.buyersError = null;
-                    updateCounts();
-                    renderTable();
-                } else {
-                    // Fallback - try to fetch fresh (will be slow)
-                    console.log('[Data] No cached buyers, fetching fresh...');
-                    const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
-                        component: 'Buyers', 
-                        silent: true,
-                        timeout: 45000
-                    });
-                    
-                    if (buyersResult.success) {
-                        buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
-                        console.log('[Data] ✓ Buyers (fresh):', buyers.length);
-                        globalLoadingStatus.buyersCacheAge = 0;
-                        globalLoadingStatus.buyersCachedAt = new Date().toISOString();
-                        globalLoadingStatus.buyersIsStale = false;
-                        globalLoadingStatus.buyersError = null;
-                    } else {
-                        console.error('[Data] ✗ Buyers failed:', buyersResult.error);
-                        buyers = [];
-                        globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju podatkov';
-                    }
-                    globalLoadingStatus.buyers = false;
-                }
+                // No cached data, error, or needs refresh - just show refresh button, NEVER auto-fetch
+                console.log('[Data] No cache or error - showing refresh button (no auto-fetch!)');
+                buyers = [];
+                globalLoadingStatus.buyers = false;
+                globalLoadingStatus.buyersNeedsRefresh = true;
+                globalLoadingStatus.buyersError = null;
+                updateCounts();
+                renderTable();
             }
             
             // Final render with all data
