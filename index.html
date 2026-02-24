@@ -5892,7 +5892,7 @@
                 if (data.success) {
                     showToast('Nastavitve shranjene!');
                     // Reload buyers data with new settings
-                    loadBuyers();
+                    retryLoadBuyers();
                 } else {
                     showToast(data.error || 'Napaka pri shranjevanju', true);
                 }
