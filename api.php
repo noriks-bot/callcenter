@@ -1075,8 +1075,9 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $logMsg("Stores to fetch: " . implode(', ', array_keys($storesToFetch)));
     
     // OPTIMIZED: Fetch all stores in parallel using curl_multi
-    // Reduced to 3 pages per store (300 orders) for faster loading on cPanel
-    $maxPages = 3;
+    // 30 pages = 3000 orders per store - enough for all stores
+    // Caching ensures this only runs once per 30 min
+    $maxPages = 30;
     
     // Collect all orders from all stores using parallel requests
     $allStoreOrders = [];
