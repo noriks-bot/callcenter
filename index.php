@@ -1096,7 +1096,8 @@
             <div class="table-card" style="padding:12px 16px;margin-bottom:12px;">
                 <h3 style="margin-bottom:4px;font-size:14px;">📱 MetaKocka SMS Provider Settings</h3>
                 <p style="color:var(--text-muted);margin-bottom:12px;font-size:12px;">
-                    Nastavi <code>eshop_sync_id</code> za vsako državo. SMS-e pošilja Dejan ročno iz čakalne vrste.
+                    Nastavi <code>eshop_sync_id</code> za vsako državo. ID najdeš v:<br>
+                    <strong>MetaKocka → Dodatne nastavitve → Obvestila → Povezave → stolpec "ID"</strong>
                 </p>
                 
                 <div class="table-wrapper">
@@ -4083,6 +4084,7 @@
             if (!tbody) return;
             
             const countries = [
+                { code: 'si', flag: '🇸🇮', name: 'Slovenia' },
                 { code: 'hr', flag: '🇭🇷', name: 'Croatia' },
                 { code: 'cz', flag: '🇨🇿', name: 'Czech' },
                 { code: 'pl', flag: '🇵🇱', name: 'Poland' },
@@ -4129,7 +4131,7 @@
         }
         
         async function saveSmsSettings() {
-            const countries = ['hr', 'cz', 'pl', 'gr', 'sk', 'it', 'hu'];
+            const countries = ['si', 'hr', 'cz', 'pl', 'gr', 'sk', 'it', 'hu'];
             const providers = {};
             
             countries.forEach(code => {
