@@ -1074,10 +1074,10 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $storesToFetch = $storeFilter ? [$storeFilter => $stores[$storeFilter]] : $stores;
     $logMsg("Stores to fetch: " . implode(', ', array_keys($storesToFetch)));
     
-    // OPTIMIZED: Fetch all stores in parallel using curl_multi
-    // 30 pages = 3000 orders per store - enough for all stores
+    // Fetch ALL orders - no page limit
+    // Loop until no more results (empty response = done)
     // Caching ensures this only runs once per 30 min
-    $maxPages = 30;
+    $maxPages = 999; // Effectively unlimited - will stop when empty
     
     // Collect all orders from all stores using parallel requests
     $allStoreOrders = [];
