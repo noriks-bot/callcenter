@@ -811,9 +811,9 @@
                 
                 <div class="form-group">
                     <label class="form-label">Telefonska številka</label>
-                    <input type="tel" class="form-input" id="smsEditPhone" placeholder="385xxxxxxxxx">
+                    <input type="tel" class="form-input" id="smsEditPhone" placeholder="+38598xxxxxxx ali 098xxxxxxx">
                     <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
-                        <i class="fas fa-info-circle"></i> HR format: 385xxxxxxxxx (brez + ali vodilne 0)
+                        <i class="fas fa-info-circle"></i> Podprti formati: +38598xxx, 38598xxx, 098xxx (sistem avtomatsko formatira)
                     </div>
                 </div>
                 
@@ -3438,11 +3438,13 @@
                 const result = await res.json();
                 if (result.success) {
                     closeModal('smsModal');
-                    showToast('📱 SMS dodan v čakalno vrsto. Dejan bo poslal ročno.', false, 'info');
+                    const phoneInfo = result.formattedPhone ? ` (${result.formattedPhone})` : '';
+                    showToast(`📱 SMS dodan v čakalno vrsto${phoneInfo}. Dejan bo poslal ročno.`, false, 'info');
                     await loadSmsData(); // Refresh from API
                     updateStats();
                 } else {
-                    showToast('Napaka: ' + (result.error || 'Neznana napaka'), true);
+                    showToast('❌ Napaka: ' + (result.error || 'Neznana napaka'), true);
+                    alert('⚠️ SMS ni bil dodan!\n\n' + (result.error || 'Neznana napaka'));
                 }
             } catch (e) {
                 console.error('SMS queue error:', e);
@@ -3542,9 +3544,14 @@
                 return;
             }
             
-            // Validate phone format (basic check for HR: should start with 385)
-            if (editedPhone.startsWith('+')) {
-                showToast('❌ Odstrani + iz številke (uporabi format: 385xxxxxxxxx)', true);
+            // Basic validation - at least 7 digits
+            const digitsOnly = editedPhone.replace(/[^0-9]/g, '');
+            if (digitsOnly.length < 7) {
+                showToast('❌ Telefonska številka je prekratka (min. 7 številk)', true);
+                return;
+            }
+            if (digitsOnly.length > 15) {
+                showToast('❌ Telefonska številka je predolga (max. 15 številk)', true);
                 return;
             }
             

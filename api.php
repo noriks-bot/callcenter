@@ -127,6 +127,49 @@ function formatPhoneForSms($phone, $storeCode) {
     return $phone;
 }
 
+/**
+ * Validate phone number for SMS
+ * Returns array with 'valid' (bool) and 'error' (string if invalid)
+ */
+function validatePhoneForSms($phone, $storeCode) {
+    global $phoneCountryCodes;
+    
+    if (empty(trim($phone))) {
+        return ['valid' => false, 'error' => 'Telefonska številka je prazna'];
+    }
+    
+    // Clean the phone number
+    $cleaned = preg_replace('/[^0-9]/', '', $phone);
+    
+    // Minimum 7 digits (very short numbers exist in some countries)
+    if (strlen($cleaned) < 7) {
+        return ['valid' => false, 'error' => 'Telefonska številka je prekratka (min. 7 številk)'];
+    }
+    
+    // Maximum 15 digits (E.164 standard)
+    if (strlen($cleaned) > 15) {
+        return ['valid' => false, 'error' => 'Telefonska številka je predolga (max. 15 številk)'];
+    }
+    
+    // Format the number and check if it looks reasonable
+    $formatted = formatPhoneForSms($phone, $storeCode);
+    $countryCode = $phoneCountryCodes[$storeCode] ?? '385';
+    
+    // After formatting, check the national number length (varies by country)
+    $digitsOnly = preg_replace('/[^0-9]/', '', $formatted);
+    $nationalPart = substr($digitsOnly, strlen($countryCode));
+    
+    // Most mobile numbers have 8-10 digits national part
+    if (strlen($nationalPart) < 6) {
+        return ['valid' => false, 'error' => 'Nacionalni del številke je prekratek'];
+    }
+    if (strlen($nationalPart) > 12) {
+        return ['valid' => false, 'error' => 'Nacionalni del številke je predolg'];
+    }
+    
+    return ['valid' => true, 'formatted' => $formatted];
+}
+
 // ========== AGENT MANAGEMENT FUNCTIONS ==========
 function loadAgents() {
     global $agentsFile;
@@ -477,8 +520,24 @@ function sendQueuedSms($smsId, $overridePhone = null) {
         $logMsg("[SMS-SEND] Phone overridden: {$sms['recipient']} -> {$overridePhone}");
     }
     
-    // Format phone number for MetaKocka (international format without +)
-    $recipientPhone = formatPhoneForSms($rawPhone, $storeCode);
+    // Validate phone number first
+    $validation = validatePhoneForSms($rawPhone, $storeCode);
+    if (!$validation['valid']) {
+        $logMsg("[SMS-SEND] ERROR: Invalid phone: {$rawPhone} - {$validation['error']}");
+        $queue[$smsIndex]['status'] = 'failed';
+        $queue[$smsIndex]['error'] = $validation['error'];
+        $queue[$smsIndex]['sentAt'] = date('c');
+        saveSmsQueue($queue);
+        return [
+            'success' => false,
+            'error' => $validation['error'],
+            'debug' => 'invalid_phone',
+            'rawPhone' => $rawPhone
+        ];
+    }
+    
+    // Use the validated and formatted phone number
+    $recipientPhone = $validation['formatted'];
     $logMsg("[SMS-SEND] Phone formatted: {$rawPhone} -> {$recipientPhone}");
     
     // Prepare MetaKocka SMS payload (correct format per API docs)
@@ -1420,15 +1479,31 @@ function createOrderFromCart($input) {
 
 // SMS QUEUE FUNCTIONS (NOT SENDING - JUST QUEUEING!)
 function addSmsToQueue($data) {
+    $phone = $data['phone'] ?? '';
+    $storeCode = $data['storeCode'] ?? 'hr';
+    $message = $data['message'] ?? '';
+    
+    // Validate phone number
+    $validation = validatePhoneForSms($phone, $storeCode);
+    if (!$validation['valid']) {
+        return ['success' => false, 'error' => $validation['error']];
+    }
+    
+    // Validate message
+    if (empty(trim($message))) {
+        return ['success' => false, 'error' => 'Sporočilo je prazno'];
+    }
+    
     $queue = loadSmsQueue();
     
     $smsEntry = [
         'id' => time() . '_' . rand(1000, 9999),
         'date' => date('c'),
-        'recipient' => $data['phone'] ?? '',
+        'recipient' => $validation['formatted'], // Store pre-formatted phone
+        'recipientOriginal' => $phone, // Keep original for reference
         'customerName' => $data['customerName'] ?? '',
-        'storeCode' => $data['storeCode'] ?? '',
-        'message' => $data['message'] ?? '',
+        'storeCode' => $storeCode,
+        'message' => $message,
         'status' => 'queued', // Always queued - NEVER sent automatically!
         'cartId' => $data['cartId'] ?? null,
         'addedBy' => $data['addedBy'] ?? 'system'
@@ -1437,7 +1512,12 @@ function addSmsToQueue($data) {
     $queue[] = $smsEntry;
     saveSmsQueue($queue);
     
-    return ['success' => true, 'id' => $smsEntry['id'], 'status' => 'queued'];
+    return [
+        'success' => true, 
+        'id' => $smsEntry['id'], 
+        'status' => 'queued',
+        'formattedPhone' => $validation['formatted']
+    ];
 }
 
 function getSmsQueue($filters = []) {
