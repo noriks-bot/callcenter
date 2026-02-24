@@ -1794,6 +1794,68 @@ try {
         case 'one-time-buyers':
             echo json_encode(fetchOneTimeBuyers($store));
             break;
+        
+        case 'buyers-cache':
+            // INSTANT endpoint - returns cached buyers from file
+            $buyersCacheFile = __DIR__ . '/data/buyers-cache.json';
+            if (file_exists($buyersCacheFile)) {
+                $cacheData = json_decode(file_get_contents($buyersCacheFile), true);
+                $cacheAge = time() - ($cacheData['generated_at'] ?? 0);
+                
+                // Return cached data
+                $buyers = $cacheData['buyers'] ?? [];
+                
+                // Apply store filter if provided
+                if ($store) {
+                    $buyers = array_values(array_filter($buyers, fn($b) => $b['storeCode'] === $store));
+                }
+                
+                echo json_encode([
+                    'success' => true,
+                    'buyers' => $buyers,
+                    'cached' => true,
+                    'cache_age_seconds' => $cacheAge,
+                    'generated_at' => $cacheData['generated_at'] ?? null
+                ]);
+            } else {
+                // No cache exists - return empty but trigger background refresh
+                echo json_encode([
+                    'success' => true,
+                    'buyers' => [],
+                    'cached' => false,
+                    'message' => 'Cache not available, use /api.php?action=refresh-buyers-cache to generate'
+                ]);
+            }
+            break;
+        
+        case 'refresh-buyers-cache':
+            // CRON endpoint - regenerates the buyers cache
+            // Call this from cron: */30 * * * * curl -s https://callcenter.noriks.com/api.php?action=refresh-buyers-cache
+            ignore_user_abort(true);
+            set_time_limit(180); // 3 minutes max
+            
+            $startTime = microtime(true);
+            $buyers = fetchOneTimeBuyers($store);
+            $elapsed = round(microtime(true) - $startTime, 2);
+            
+            $buyersCacheFile = __DIR__ . '/data/buyers-cache.json';
+            $cacheData = [
+                'generated_at' => time(),
+                'generated_date' => date('c'),
+                'count' => count($buyers),
+                'fetch_time_seconds' => $elapsed,
+                'buyers' => $buyers
+            ];
+            
+            file_put_contents($buyersCacheFile, json_encode($cacheData, JSON_PRETTY_PRINT));
+            
+            echo json_encode([
+                'success' => true,
+                'count' => count($buyers),
+                'fetch_time_seconds' => $elapsed,
+                'message' => 'Buyers cache refreshed'
+            ]);
+            break;
             
         case 'one-time-buyers-debug':
             // Debug endpoint to see raw data

@@ -351,6 +351,56 @@
         .skeleton-text { height: 14px; flex: 1; }
         .skeleton-text.short { max-width: 100px; }
         
+        /* Notes Button */
+        .notes-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .notes-btn:hover {
+            background: var(--content-bg);
+            border-color: var(--accent-blue);
+        }
+        .notes-btn.has-notes {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-blue);
+        }
+        .notes-btn .notes-dot {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+        }
+        
+        /* Notes Modal */
+        .notes-modal-content {
+            max-width: 500px;
+        }
+        .notes-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            background: var(--content-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .notes-textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
         /* Toast container */
         .toast-container {
             position: fixed;
@@ -610,6 +660,23 @@
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeModal('statusModal')">Cancel</button>
                 <button class="btn btn-save" onclick="saveStatus()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notes Modal -->
+    <div class="modal-bg" id="notesModal">
+        <div class="modal notes-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📝 Notes</div>
+                <button class="modal-close" onclick="closeModal('notesModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <textarea class="notes-textarea" id="notesModalText" placeholder="Enter notes..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal('notesModal')">Cancel</button>
+                <button class="btn btn-save" onclick="saveNotesFromModal()">💾 Save Notes</button>
             </div>
         </div>
     </div>
@@ -2233,24 +2300,51 @@
             renderTable();
             console.log('[Data] Phase 1 complete - showing carts & pending');
             
-            // Phase 2: Load buyers in background (this is the slow one)
-            console.log('[Data] Phase 2: Loading buyers (may take longer)...');
-            const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
-                component: 'Buyers', 
+            // Phase 2: Load buyers with CACHE-FIRST strategy (instant loading!)
+            console.log('[Data] Phase 2: Loading buyers from cache...');
+            
+            // First, try to get from cache (instant)
+            const cacheResult = await apiFetch('api.php?action=buyers-cache', { 
+                component: 'BuyersCache', 
                 silent: true,
-                timeout: 45000  // 45 second timeout for buyers (it's slow)
+                timeout: 5000  // Cache should be instant
             });
             
-            if (buyersResult.success) {
-                buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
-                console.log('[Data] ✓ Buyers:', buyers.length);
+            if (cacheResult.success && cacheResult.data?.buyers?.length > 0) {
+                buyers = cacheResult.data.buyers;
+                console.log('[Data] ✓ Buyers from cache:', buyers.length, '(age:', cacheResult.data.cache_age_seconds, 's)');
                 globalLoadingStatus.buyersError = null;
+                globalLoadingStatus.buyers = false;
+                
+                // Update UI immediately with cached data
+                updateCounts();
+                renderTable();
+                
+                // If cache is older than 30 minutes, refresh in background
+                if (cacheResult.data.cache_age_seconds > 1800) {
+                    console.log('[Data] Cache is stale, refreshing in background...');
+                    refreshBuyersInBackground();
+                }
             } else {
-                console.error('[Data] ✗ Buyers failed:', buyersResult.error);
-                buyers = [];
-                globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju podatkov';
+                // No cache available - fall back to direct API call
+                console.log('[Data] No cache, loading buyers directly (may take longer)...');
+                const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
+                    component: 'Buyers', 
+                    silent: true,
+                    timeout: 45000
+                });
+                
+                if (buyersResult.success) {
+                    buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
+                    console.log('[Data] ✓ Buyers:', buyers.length);
+                    globalLoadingStatus.buyersError = null;
+                } else {
+                    console.error('[Data] ✗ Buyers failed:', buyersResult.error);
+                    buyers = [];
+                    globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju podatkov';
+                }
+                globalLoadingStatus.buyers = false;
             }
-            globalLoadingStatus.buyers = false;
             
             // Final render with all data
             console.log('[Data] Phase 2 complete - all data loaded');
@@ -2272,6 +2366,26 @@
             }
         }
         
+        // Background refresh for buyers cache
+        async function refreshBuyersInBackground() {
+            try {
+                const result = await fetch('api.php?action=refresh-buyers-cache');
+                const data = await result.json();
+                if (data.success) {
+                    console.log('[Data] Background buyers refresh complete:', data.count, 'buyers in', data.fetch_time_seconds, 's');
+                    // Reload from cache to get fresh data
+                    const freshCache = await apiFetch('api.php?action=buyers-cache', { silent: true, timeout: 5000 });
+                    if (freshCache.success && freshCache.data?.buyers?.length > 0) {
+                        buyers = freshCache.data.buyers;
+                        updateCounts();
+                        if (currentContentTab === 'buyers') renderTable();
+                    }
+                }
+            } catch (err) {
+                console.error('[Data] Background buyers refresh failed:', err);
+            }
+        }
+        
         // Function to retry loading buyers only
         async function retryLoadBuyers() {
             console.log('[Data] Retrying buyers load...');
@@ -2286,21 +2400,44 @@
             }
             renderTable();  // Show loading spinner
             
-            const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
+            // Force refresh the cache first
+            showToast('🔄 Osveževanje podatkov...', 'info');
+            try {
+                await fetch('api.php?action=refresh-buyers-cache');
+            } catch (e) {
+                console.error('[Data] Cache refresh failed:', e);
+            }
+            
+            // Then load from cache
+            const cacheResult = await apiFetch('api.php?action=buyers-cache', { 
                 component: 'Buyers', 
-                silent: false,  // Show errors this time
-                timeout: 45000
+                silent: false,
+                timeout: 5000
             });
             
-            if (buyersResult.success) {
-                buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
+            if (cacheResult.success && cacheResult.data?.buyers) {
+                buyers = cacheResult.data.buyers;
                 console.log('[Data] ✓ Buyers retry success:', buyers.length);
                 globalLoadingStatus.buyersError = null;
                 showToast(`✓ Enkratni kupci naloženi: ${buyers.length}`);
             } else {
-                console.error('[Data] ✗ Buyers retry failed:', buyersResult.error);
-                buyers = [];
-                globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju';
+                // Fallback to direct API
+                const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
+                    component: 'Buyers', 
+                    silent: false,
+                    timeout: 45000
+                });
+                
+                if (buyersResult.success) {
+                    buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
+                    console.log('[Data] ✓ Buyers retry success:', buyers.length);
+                    globalLoadingStatus.buyersError = null;
+                    showToast(`✓ Enkratni kupci naloženi: ${buyers.length}`);
+                } else {
+                    console.error('[Data] ✗ Buyers retry failed:', buyersResult.error);
+                    buyers = [];
+                    globalLoadingStatus.buyersError = buyersResult.error || 'Napaka pri nalaganju';
+                }
             }
             globalLoadingStatus.buyers = false;
             
@@ -2653,19 +2790,22 @@
                                 <td>
                                     <select class="inline-status-select" data-id="${c.id}" data-type="cart" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${c.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
-                                        <option value="no_answer" ${c.callStatus==='no_answer'?'selected':''}>📵 No Answer</option>
-                                        <option value="callback" ${c.callStatus==='callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="called_no_answer" ${c.callStatus==='called_no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="called_callback" ${c.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="called_interested" ${c.callStatus==='called_interested'?'selected':''}>💡 Interested</option>
+                                        <option value="called_not_interested" ${c.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
                                         <option value="converted" ${c.callStatus==='converted'?'selected':''}>✅ Converted</option>
-                                        <option value="not_interested" ${c.callStatus==='not_interested'?'selected':''}>❌ Not Interested</option>
+                                        <option value="invalid_number" ${c.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="text" class="inline-notes-input" data-id="${c.id}" data-type="cart" value="${escAttr(c.notes||'')}" placeholder="Add notes..." onblur="inlineNotesChange(this)" onkeypress="if(event.key==='Enter')this.blur()">
+                                    <button class="notes-btn ${c.notes ? 'has-notes' : ''}" onclick="openNotesModal('${c.id}', 'cart')" title="${c.notes ? escAttr(c.notes) : 'Add notes'}">
+                                        📝${c.notes ? '<span class="notes-dot"></span>' : ''}
+                                    </button>
                                 </td>
                                 <td style="font-size:12px;">${timeAgo(c.abandonedAt)}</td>
                                 <td style="white-space:nowrap;text-align:right;">
                                     ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openCallLogModal(carts.find(x=>x.id==='${c.id}'))" title="Log Call" style="background:rgba(168,85,247,0.2);color:#a855f7;"><i class="fas fa-headset"></i></button>
                                     ${c.phone ? `<button class="action-btn sms" onclick="openSmsModal('${c.id}','cart')" title="Send SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
                                     <button class="action-btn-order-large" onclick="openOrderModal('${c.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i> CREATE ORDER</button>
                                 </td>
@@ -2704,14 +2844,18 @@
                                 <td>
                                     <select class="inline-status-select" data-id="${o.id}" data-type="pending" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${o.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
-                                        <option value="no_answer" ${o.callStatus==='no_answer'?'selected':''}>📵 No Answer</option>
-                                        <option value="callback" ${o.callStatus==='callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="called_no_answer" ${o.callStatus==='called_no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="called_callback" ${o.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="called_interested" ${o.callStatus==='called_interested'?'selected':''}>💡 Interested</option>
+                                        <option value="called_not_interested" ${o.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
                                         <option value="converted" ${o.callStatus==='converted'?'selected':''}>✅ Converted</option>
-                                        <option value="not_interested" ${o.callStatus==='not_interested'?'selected':''}>❌ Not Interested</option>
+                                        <option value="invalid_number" ${o.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="text" class="inline-notes-input" data-id="${o.id}" data-type="pending" value="${escAttr(o.notes||'')}" placeholder="Add notes..." onblur="inlineNotesChange(this)" onkeypress="if(event.key==='Enter')this.blur()">
+                                    <button class="notes-btn ${o.notes ? 'has-notes' : ''}" onclick="openNotesModal('${o.id}', 'pending')" title="${o.notes ? escAttr(o.notes) : 'Add notes'}">
+                                        📝${o.notes ? '<span class="notes-dot"></span>' : ''}
+                                    </button>
                                 </td>
                                 <td style="white-space:nowrap;">
                                     ${o.phone ? `<button class="action-btn call" onclick="call('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
@@ -2752,14 +2896,18 @@
                                 <td>
                                     <select class="inline-status-select" data-id="${b.id}" data-type="buyer" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${b.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
-                                        <option value="no_answer" ${b.callStatus==='no_answer'?'selected':''}>📵 No Answer</option>
-                                        <option value="callback" ${b.callStatus==='callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="called_no_answer" ${b.callStatus==='called_no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="called_callback" ${b.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
+                                        <option value="called_interested" ${b.callStatus==='called_interested'?'selected':''}>💡 Interested</option>
+                                        <option value="called_not_interested" ${b.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
                                         <option value="converted" ${b.callStatus==='converted'?'selected':''}>✅ Converted</option>
-                                        <option value="not_interested" ${b.callStatus==='not_interested'?'selected':''}>❌ Not Interested</option>
+                                        <option value="invalid_number" ${b.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="text" class="inline-notes-input" data-id="${b.id}" data-type="buyer" value="${escAttr(b.notes||'')}" placeholder="Add notes..." onblur="inlineNotesChange(this)" onkeypress="if(event.key==='Enter')this.blur()">
+                                    <button class="notes-btn ${b.notes ? 'has-notes' : ''}" onclick="openNotesModal('${b.id}', 'buyer')" title="${b.notes ? escAttr(b.notes) : 'Add notes'}">
+                                        📝${b.notes ? '<span class="notes-dot"></span>' : ''}
+                                    </button>
                                 </td>
                                 <td style="white-space:nowrap;">
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
@@ -2825,17 +2973,33 @@
             }
         }
         
-        // Inline Notes Change
-        async function inlineNotesChange(input) {
-            const id = input.dataset.id;
-            const type = input.dataset.type;
-            const newNotes = input.value;
+        // Notes Modal
+        let notesEditId = null;
+        let notesEditType = null;
+        
+        function openNotesModal(id, type) {
+            notesEditId = id;
+            notesEditType = type;
             
-            // Find the item and get current status
+            // Find the item and get current notes
             let item = null;
             if (type === 'cart') item = carts.find(c => c.id === id);
             else if (type === 'pending') item = pending.find(p => p.id === id);
             else if (type === 'buyer') item = buyers.find(b => b.id === id);
+            
+            document.getElementById('notesModalText').value = item?.notes || '';
+            document.getElementById('notesModal').classList.add('open');
+            document.getElementById('notesModalText').focus();
+        }
+        
+        async function saveNotesFromModal() {
+            const newNotes = document.getElementById('notesModalText').value;
+            
+            // Find the item and get current status
+            let item = null;
+            if (notesEditType === 'cart') item = carts.find(c => c.id === notesEditId);
+            else if (notesEditType === 'pending') item = pending.find(p => p.id === notesEditId);
+            else if (notesEditType === 'buyer') item = buyers.find(b => b.id === notesEditId);
             
             const currentStatus = item?.callStatus || 'not_called';
             
@@ -2843,12 +3007,14 @@
                 await fetch('api.php?action=update-status', {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({id, callStatus: currentStatus, notes: newNotes})
+                    body: JSON.stringify({id: notesEditId, callStatus: currentStatus, notes: newNotes})
                 });
                 if (item) item.notes = newNotes;
-                // Don't show toast for notes to avoid too many notifications
+                closeModal('notesModal');
+                renderTable();
+                showToast('Notes saved!');
             } catch (err) {
-                showToast('Error updating notes', false, 'error');
+                showToast('Error saving notes', false, 'error');
             }
         }
         
