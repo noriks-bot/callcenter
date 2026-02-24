@@ -2272,14 +2272,35 @@
                     // Don't auto-refresh, just show the data
                 }
             } else {
-                // No cached data, error, or needs refresh - just show refresh button, NEVER auto-fetch
-                console.log('[Data] No cache or error - showing refresh button (no auto-fetch!)');
+                // No cached data - trigger background warm and show loading
+                console.log('[Data] No cache - warming cache in background...');
                 buyers = [];
-                globalLoadingStatus.buyers = false;
-                globalLoadingStatus.buyersNeedsRefresh = true;
+                globalLoadingStatus.buyers = true;  // Show loading
                 globalLoadingStatus.buyersError = null;
                 updateCounts();
                 renderTable();
+                
+                // Trigger cache warm in background (fire and forget)
+                fetch('api.php?action=warm-cache').then(() => {
+                    console.log('[Data] Cache warm triggered, fetching cached data...');
+                    return apiFetch('api.php?action=one-time-buyers-cached', { 
+                        component: 'Buyers', silent: true, timeout: 5000 
+                    });
+                }).then(result => {
+                    if (result?.success && result.data?.data) {
+                        buyers = Array.isArray(result.data.data) ? result.data.data : [];
+                        console.log('[Data] ✓ Buyers loaded after warm:', buyers.length);
+                    }
+                    globalLoadingStatus.buyers = false;
+                    globalLoadingStatus.buyersNeedsRefresh = false;
+                    updateCounts();
+                    renderTable();
+                }).catch(err => {
+                    console.warn('[Data] Cache warm failed:', err);
+                    globalLoadingStatus.buyers = false;
+                    updateCounts();
+                    renderTable();
+                });
             }
             
             // Final render with all data
