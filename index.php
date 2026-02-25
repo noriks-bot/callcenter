@@ -2770,7 +2770,9 @@
 
                     // Re-render based on current content tab
                     if (currentContentTab === 'paketomati') {
-                        renderPaketomatiTable();
+                        renderPaketomatiInline();
+                    } else if (currentContentTab === 'urgent') {
+                        renderUrgentTableInline();
                     } else {
                         renderTable();
                     }
