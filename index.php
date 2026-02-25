@@ -2314,6 +2314,7 @@
         let buyers = [];
         let smsLog = [];
         let smsAutomation = [];
+        let paketomatiData = [];
         let currentStore = 'all';
         let currentTab = 'leads'; // Default to Leads view
         let editId = null;
@@ -3013,6 +3014,7 @@
             if (result.success && Array.isArray(result.data)) {
                 paketomatiData = result.data;
                 console.log('[Paketomati] ✓ Loaded:', paketomatiData.length);
+                updatePaketomatiCount();
             } else {
                 paketomatiData = [];
                 console.warn('[Paketomati] ✗ Failed, using empty array');
@@ -7615,7 +7617,6 @@
         }
 
         // ========== PAKETOMATI FUNCTIONS ==========
-        let paketomatiData = [];
 
         async function loadPaketomati() {
             const filter = document.getElementById('paketomatFilter')?.value || 'all';
