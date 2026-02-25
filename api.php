@@ -2177,10 +2177,10 @@ function fetchPaketomatOrders($filter = 'all') {
         $mkId = $order['mk_id'] ?? null;
         if (!$mkId) continue;
         
-        // Limit API calls - max 30 shipped orders to check (balance speed vs coverage)
+        // Limit API calls - max 60 shipped orders to check
         $processedCount++;
         $debugInfo['processed'] = $processedCount;
-        if ($processedCount > 30) break;
+        if ($processedCount > 60) break;
         
         // Fetch delivery events for this order
         $getDocPayload = [
