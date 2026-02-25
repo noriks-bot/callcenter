@@ -14,56 +14,56 @@
     <nav class="sidebar-nav">
         <div class="nav-section">
             <div class="nav-title">Menu</div>
-            <div class="nav-item active" data-tab="leads">
+            <a href="index.php#leads" class="nav-item" data-tab="leads">
                 <i class="fas fa-users"></i>
                 <span>Leads</span>
-            </div>
-            <div class="nav-item" data-tab="dashboard">
+            </a>
+            <a href="index.php#dashboard" class="nav-item" data-tab="dashboard">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
-            </div>
+            </a>
         </div>
         
         <div class="nav-section">
             <div class="nav-title">Calls</div>
-            <div class="nav-item" data-tab="followups">
+            <a href="index.php#followups" class="nav-item" data-tab="followups">
                 <i class="fas fa-phone-volume"></i>
                 <span>My Follow-ups</span>
                 <span class="badge followup-badge" id="navFollowups">0</span>
-            </div>
-            <div class="nav-item" data-tab="analytics">
+            </a>
+            <a href="index.php#analytics" class="nav-item" data-tab="analytics">
                 <i class="fas fa-chart-pie"></i>
                 <span>Analytics</span>
-            </div>
+            </a>
         </div>
         
         <div class="nav-section">
             <div class="nav-title">Messaging</div>
-            <div class="nav-item" data-tab="sms-automation">
+            <a href="index.php#sms-automation" class="nav-item" data-tab="sms-automation">
                 <i class="fas fa-robot"></i>
                 <span>SMS Automation</span>
-            </div>
-            <div class="nav-item" data-tab="sms-dashboard">
+            </a>
+            <a href="index.php#sms-dashboard" class="nav-item" data-tab="sms-dashboard">
                 <i class="fas fa-comment-sms"></i>
                 <span>SMS Dashboard</span>
                 <span class="badge" id="navSms">0</span>
-            </div>
-            <div class="nav-item" data-tab="sms-settings">
+            </a>
+            <a href="index.php#sms-settings" class="nav-item" data-tab="sms-settings">
                 <i class="fas fa-cog"></i>
                 <span>SMS Settings</span>
-            </div>
-            <div class="nav-item" data-tab="buyers-settings">
+            </a>
+            <a href="index.php#buyers-settings" class="nav-item" data-tab="buyers-settings">
                 <i class="fas fa-user-cog"></i>
                 <span>Options</span>
-            </div>
+            </a>
         </div>
         
         <div class="nav-section admin-only" id="adminSection">
             <div class="nav-title">Admin</div>
-            <div class="nav-item" data-tab="agents">
+            <a href="index.php#agents" class="nav-item" data-tab="agents">
                 <i class="fas fa-users-cog"></i>
                 <span>Agents</span>
-            </div>
+            </a>
         </div>
         
         <div class="nav-section">

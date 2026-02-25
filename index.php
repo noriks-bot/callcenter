@@ -2437,6 +2437,15 @@
                 const loadTime = Date.now() - startTime;
                 console.log(`[Init] ✓ Application ready in ${loadTime}ms`);
                 
+                // Handle hash navigation (from sidebar links)
+                if (window.location.hash) {
+                    const hash = window.location.hash.substring(1); // Remove #
+                    const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
+                    if (navItem) {
+                        navItem.click();
+                    }
+                }
+                
             } catch (error) {
                 console.error('[Init] Critical error:', error);
                 showToast(`❌ Napaka pri zagonu: ${error.message}`, 'error');
