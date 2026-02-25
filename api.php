@@ -1012,6 +1012,11 @@ function fetchAbandonedCarts() {
         foreach ($carts as $cart) {
             if (!is_array($cart)) continue;
             
+            // Skip carts that are less than 1 hour old (give customers time to complete purchase)
+            $cartTime = strtotime($cart['time'] ?? '');
+            $cartAgeHours = $cartTime ? (time() - $cartTime) / 3600 : 0;
+            if ($cartAgeHours < 1) continue;
+            
             // Check if this cart is converted (customer made an order)
             $cartEmail = strtolower($cart['email'] ?? '');
             $cartPhone = preg_replace('/[^0-9]/', '', $cart['other_fields']['wcf_phone_number'] ?? '');
