@@ -3538,9 +3538,17 @@ try {
             // CRON: */15 * * * * curl -s "https://your-domain/api.php?action=refresh-paketomati-cache"
             // Builds full paketomati cache checking ALL shipped orders
             set_time_limit(300); // 5 minutes max
+            ini_set('display_errors', 1);
+            error_reporting(E_ALL);
             
-            $result = buildPaketomatiCacheFull();
-            echo json_encode($result);
+            try {
+                $result = buildPaketomatiCacheFull();
+                echo json_encode($result);
+            } catch (Exception $e) {
+                echo json_encode(['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            } catch (Error $e) {
+                echo json_encode(['error' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+            }
             break;
         
         case 'paketomati-debug':
