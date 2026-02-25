@@ -4008,6 +4008,9 @@
                         <button class="btn btn-sm btn-secondary" onclick="editAutomation('${a.id}')" title="Uredi">
                             <i class="fas fa-edit"></i>
                         </button>
+                        <button class="btn btn-sm btn-secondary" onclick="resetAutomationQueue('${a.id}')" title="Reset evidenco (omogoči ponovno pošiljanje)">
+                            <i class="fas fa-redo"></i>
+                        </button>
                         <button class="btn btn-sm btn-danger" onclick="deleteAutomation('${a.id}')" title="Izbriši">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -4273,6 +4276,28 @@
                 }
             } catch (err) {
                 showToast('Napaka pri brisanju', true);
+            }
+        }
+        
+        async function resetAutomationQueue(id) {
+            if (!confirm('Reset evidenco? To bo omogočilo ponovno pošiljanje SMS za vse košarice te avtomatizacije.')) return;
+            
+            try {
+                const res = await fetch('api.php?action=reset-automation-queue', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ automation_id: id })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast(`Evidenca resetirana (${result.reset_count || 0} košaric)`);
+                    loadSmsAutomations();
+                } else {
+                    showToast(result.error || 'Napaka pri resetiranju', true);
+                }
+            } catch (err) {
+                showToast('Napaka pri resetiranju', true);
             }
         }
         

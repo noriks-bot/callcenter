@@ -1706,8 +1706,34 @@ function getSmsQueue($filters = []) {
 
 function removeSmsFromQueue($smsId) {
     $queue = loadSmsQueue();
+    
+    // Find the SMS to get cartId before removing
+    $removedSms = null;
+    foreach ($queue as $sms) {
+        if ($sms['id'] === $smsId) {
+            $removedSms = $sms;
+            break;
+        }
+    }
+    
     $queue = array_filter($queue, fn($s) => $s['id'] !== $smsId);
     saveSmsQueue(array_values($queue));
+    
+    // Also remove from automation-queued-carts tracking
+    if ($removedSms && !empty($removedSms['cartId'])) {
+        $queuedCartsFile = __DIR__ . '/data/automation-queued-carts.json';
+        if (file_exists($queuedCartsFile)) {
+            $queuedCarts = json_decode(file_get_contents($queuedCartsFile), true) ?: [];
+            // Extract just the cart DB ID (remove store prefix like "hr_")
+            $cartDbId = preg_replace('/^[a-z]+_/', '', $removedSms['cartId']);
+            foreach ($queuedCarts as $autoId => &$carts) {
+                $carts = array_values(array_filter($carts, fn($c) => $c !== $cartDbId && $c !== $removedSms['cartId']));
+            }
+            unset($carts);
+            file_put_contents($queuedCartsFile, json_encode($queuedCarts, JSON_PRETTY_PRINT));
+        }
+    }
+    
     return ['success' => true];
 }
 
