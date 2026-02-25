@@ -678,7 +678,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-icon green"><i class="fas fa-euro-sign"></i></div>
-                <div><div class="stat-value" id="statValue">€0</div><div class="stat-label">Total Value</div></div>
+                <div><div class="stat-value" id="statValue">€0</div><div class="stat-label">Total Value of Abandoned</div></div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
