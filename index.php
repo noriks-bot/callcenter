@@ -8285,7 +8285,8 @@
 
                 // Update badge counts
                 document.getElementById('navCarts').textContent = data.totalCarts;
-                document.getElementById('contentCount-paketomati').textContent = data.totalPaketomati;
+                // Paketomati count - filter by country locally (don't use server's unfiltered total)
+                updateContentTabCounts();
 
                 // Show notifications for new items
                 if (data.newCarts.length > 0 || data.newPaketomati.length > 0) {
