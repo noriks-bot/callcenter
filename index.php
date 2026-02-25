@@ -7872,27 +7872,36 @@
                         <th>Telefon</th>
                         <th>Navodilo / Razlog</th>
                         <th>Dodano</th>
-                        <th>Status</th>
+                        <th>Rešeno</th>
+                        <th>Kako rešeno</th>
                         <th>Akcije</th>
                     </tr></thead>
                     <tbody>
                         ${urgentLeads.map((lead, idx) => `
-                            <tr data-idx="${idx}" class="${lead.called ? 'called-row' : ''}">
+                            <tr data-idx="${idx}" class="${lead.resolved ? 'called-row' : ''}">
                                 <td class="checkbox-cell"><input type="checkbox" class="urgent-checkbox row-checkbox" data-idx="${idx}" onchange="updateUrgentSelection()"></td>
                                 <td>
                                     <div style="font-weight:500;">${esc(lead.phone)}</div>
                                     <a href="tel:${lead.phone}" class="action-btn" title="Pokliči"><i class="fas fa-phone"></i></a>
                                 </td>
-                                <td style="max-width:300px;">
+                                <td style="max-width:250px;">
                                     <div class="note-text">${esc(lead.note)}</div>
                                 </td>
                                 <td style="font-size:12px;color:var(--text-muted);">
                                     ${new Date(lead.addedAt).toLocaleString('sl-SI', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})}
                                 </td>
+                                <td style="text-align:center;">
+                                    <input type="checkbox" ${lead.resolved ? 'checked' : ''} onchange="toggleUrgentResolved(${idx}, this.checked)" style="width:18px;height:18px;cursor:pointer;">
+                                </td>
                                 <td>
-                                    <span class="badge ${lead.called ? 'converted' : 'not_called'}" style="cursor:pointer;" onclick="toggleUrgentCalled(${idx}, ${!lead.called})">
-                                        ${lead.called ? '✓ Poklicano' : 'Čaka'}
-                                    </span>
+                                    <div class="inline-notes-wrapper">
+                                        <input type="text" class="inline-notes-input ${lead.resolution ? 'has-notes' : ''}"
+                                               data-idx="${idx}"
+                                               value="${lead.resolution ? esc(lead.resolution) : ''}"
+                                               placeholder="Kako rešeno..."
+                                               onkeypress="if(event.key==='Enter'){saveUrgentResolution(${idx}, this.value)}">
+                                        <button class="inline-notes-save" onclick="saveUrgentResolution(${idx}, this.previousElementSibling.value)" title="Shrani">💾</button>
+                                    </div>
                                 </td>
                                 <td>
                                     <button class="action-btn" onclick="editUrgentLead(${idx})" title="Uredi"><i class="fas fa-edit"></i></button>
@@ -7979,6 +7988,23 @@
             if (called) urgentLeads[idx].calledAt = new Date().toISOString();
             saveUrgentLeads();
             renderUrgentTableInline();
+        }
+        
+        function toggleUrgentResolved(idx, resolved) {
+            urgentLeads[idx].resolved = resolved;
+            if (resolved) urgentLeads[idx].resolvedAt = new Date().toISOString();
+            saveUrgentLeads();
+            renderUrgentTableInline();
+            showToast(resolved ? '✓ Označeno kot rešeno' : 'Oznaka rešeno odstranjena');
+        }
+        
+        function saveUrgentResolution(idx, resolution) {
+            urgentLeads[idx].resolution = resolution;
+            saveUrgentLeads();
+            showToast('✓ Rešitev shranjena');
+            // Don't re-render, just update the class
+            const input = document.querySelector(`input.inline-notes-input[data-idx="${idx}"]`);
+            if (input) input.classList.toggle('has-notes', !!resolution);
         }
         
         function updateUrgentSelection() {
