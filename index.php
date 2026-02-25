@@ -7674,6 +7674,45 @@
             document.getElementById('navPaketomati').textContent = notCalled;
         }
 
+        // Inline status change for paketomati (from select dropdown)
+        async function updatePaketomatStatusFromSelect(selectEl) {
+            const orderId = selectEl.dataset.id;
+            const newStatus = selectEl.value;
+            await updatePaketomatStatus(orderId, newStatus);
+        }
+
+        // Inline notes save for paketomati
+        async function savePaketomatNotesInline(inputEl) {
+            const orderId = inputEl.dataset.id;
+            const notes = inputEl.value;
+            const order = paketomatiData.find(o => o.id === orderId);
+
+            try {
+                await fetch('api.php?action=paketomati-update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: orderId, status: order?.status || 'not_called', notes: notes})
+                });
+
+                if (order) order.notes = notes;
+                inputEl.classList.toggle('has-notes', !!notes);
+                showToast('✓ Opombe shranjene');
+            } catch (e) {
+                showToast('Napaka pri shranjevanju', 'error');
+            }
+        }
+
+        // Open SMS modal for paketomati order
+        function openSmsModalForPaketomat(orderId) {
+            const order = paketomatiData.find(o => o.id === orderId);
+            if (!order || !order.phone) {
+                showToast('Ni telefonske številke', 'error');
+                return;
+            }
+            // Use generic SMS modal with order data
+            openSmsModal(orderId, 'paketomat');
+        }
+
         // ========== URGENT LEADS FUNCTIONS ==========
         let urgentLeads = [];
         
@@ -7723,39 +7762,63 @@
                 return;
             }
             
+            const sym = (curr) => ({EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[curr] || '€');
+            
             container.innerHTML = `
                 <div class="table-wrapper">
                 <table class="data-table">
                     <thead><tr>
-                        <th>Št. naročila</th>
-                        <th>Stranka</th>
-                        <th>Telefon</th>
-                        <th>Dostava</th>
-                        <th>Zadnji event</th>
-                        <th>Znesek</th>
+                        <th>Customer</th>
+                        <th>Order</th>
+                        <th>Value</th>
+                        <th>Phone</th>
+                        <th>Delivery</th>
                         <th>Status</th>
-                        <th>Akcije</th>
+                        <th>Notes</th>
+                        <th style="text-align:right;">Actions</th>
                     </tr></thead>
                     <tbody>
                         ${paketomatiData.map(order => `
                             <tr>
                                 <td>
-                                    <strong>${esc(order.orderNumber)}</strong>
-                                    ${order.trackingCode ? `<br><small style="color:var(--text-muted);">${esc(order.trackingCode)}</small>` : ''}
-                                </td>
-                                <td>${esc(order.customerName)}</td>
-                                <td>${order.phone ? `<a href="tel:${order.phone}">${esc(order.phone)}</a>` : '-'}</td>
-                                <td><span class="badge">${esc(order.deliveryService || '-')}</span></td>
-                                <td>${esc(order.lastDeliveryEvent || '-')}</td>
-                                <td><strong>${order.orderTotal?.toFixed(2) || '0.00'} ${order.currency || 'EUR'}</strong></td>
-                                <td>
-                                    <span class="badge ${order.status === 'notified' ? 'converted' : order.status === 'called' ? 'called' : 'not_called'}" 
-                                          style="cursor:pointer;" onclick="cyclePaketomatStatus('${order.id}')">
-                                        ${order.status === 'notified' ? '✓ Obveščeno' : order.status === 'called' ? 'Poklicano' : 'Čaka'}
-                                    </span>
+                                    <div class="customer-cell">
+                                        <div class="avatar">${order.customerName ? order.customerName.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : '?'}</div>
+                                        <div>
+                                            <div class="customer-name">${esc(order.customerName)}</div>
+                                            <div class="customer-email">${esc(order.city || '')} ${esc(order.country || '')}</div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
-                                    ${order.phone ? `<button class="action-btn" onclick="window.location='tel:${order.phone}'" title="Pokliči"><i class="fas fa-phone"></i></button>` : ''}
+                                    <strong>#${esc(order.orderNumber)}</strong>
+                                    ${order.trackingCode ? `<br><small style="color:var(--text-muted);">📦 ${esc(order.trackingCode)}</small>` : ''}
+                                </td>
+                                <td><strong>${sym(order.currency)}${(order.orderTotal||0).toFixed(2)}</strong></td>
+                                <td>${order.phone ? `<a href="tel:${order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${esc(order.phone)}</a>` : '-'}</td>
+                                <td>
+                                    <span class="badge">${esc(order.deliveryService || '-')}</span>
+                                    ${order.lastDeliveryEvent ? `<br><small style="color:var(--text-muted);">${esc(order.lastDeliveryEvent)}</small>` : ''}
+                                </td>
+                                <td>
+                                    <select class="inline-status-select" data-id="${order.id}" onchange="updatePaketomatStatusFromSelect(this)">
+                                        <option value="not_called" ${order.status==='not_called'?'selected':''}>⚪ Čaka</option>
+                                        <option value="called" ${order.status==='called'?'selected':''}>📞 Poklicano</option>
+                                        <option value="notified" ${order.status==='notified'?'selected':''}>✅ Obveščeno</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <div class="inline-notes-wrapper">
+                                        <input type="text" class="inline-notes-input ${order.notes ? 'has-notes' : ''}"
+                                               data-id="${order.id}"
+                                               value="${order.notes ? esc(order.notes) : ''}"
+                                               placeholder="Add notes..."
+                                               onkeypress="if(event.key==='Enter'){savePaketomatNotesInline(this)}">
+                                        <button class="inline-notes-save" onclick="savePaketomatNotesInline(this.previousElementSibling)" title="Save">💾</button>
+                                    </div>
+                                </td>
+                                <td style="white-space:nowrap;text-align:right;">
+                                    ${order.phone ? `<button class="action-btn call" onclick="call('${order.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
+                                    ${order.phone ? `<button class="action-btn sms" onclick="openSmsModalForPaketomat('${order.id}')" title="Send SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
                                 </td>
                             </tr>
                         `).join('')}
