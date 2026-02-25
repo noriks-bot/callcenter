@@ -3583,8 +3583,73 @@ try {
             echo json_encode([
                 'all_orders' => fetchPaketomatOrders('all_orders'),
                 'paketomat_only' => fetchPaketomatOrders('all'),
-                'cache_info' => 'Cache TTL: 60 seconds'
+                'cache_info' => 'Cache disabled for debugging'
             ]);
+            break;
+            
+        case 'paketomati-raw':
+            // Raw debug - check specific orders
+            $rawDebug = [];
+            $testOrders = ['1200043985993', '1200043941068']; // 5278 and 5239
+            
+            // First get mk_id for 5239
+            $searchPayload = [
+                'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+                'company_id' => '6371',
+                'doc_type' => 'sales_order',
+                'result_type' => 'doc',
+                'limit' => 100,
+                'order_direction' => 'desc'
+            ];
+            $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/search');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS => json_encode($searchPayload),
+                CURLOPT_TIMEOUT => 30
+            ]);
+            $searchResp = curl_exec($ch);
+            curl_close($ch);
+            $searchData = json_decode($searchResp, true);
+            
+            // Find 5278 and 5239
+            $found = [];
+            foreach ($searchData['result'] ?? [] as $i => $o) {
+                if (strpos($o['count_code'] ?? '', '5278') !== false || strpos($o['count_code'] ?? '', '5239') !== false) {
+                    $found[] = ['position' => $i, 'mk_id' => $o['mk_id'], 'count_code' => $o['count_code']];
+                }
+            }
+            $rawDebug['found_orders'] = $found;
+            
+            // Check delivery events for each
+            foreach ($found as $f) {
+                $docPayload = [
+                    'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+                    'company_id' => '6371',
+                    'doc_type' => 'sales_order',
+                    'doc_id' => $f['mk_id'],
+                    'return_delivery_service_events' => 'true'
+                ];
+                $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/get_document');
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_POST => true,
+                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                    CURLOPT_POSTFIELDS => json_encode($docPayload),
+                    CURLOPT_TIMEOUT => 10
+                ]);
+                $docResp = curl_exec($ch);
+                curl_close($ch);
+                $docData = json_decode($docResp, true);
+                $events = $docData['delivery_service_events'] ?? [];
+                if (is_array($events) && isset($events['event_status'])) {
+                    $events = [$events];
+                }
+                $rawDebug['events_' . $f['count_code']] = $events;
+            }
+            
+            echo json_encode($rawDebug, JSON_PRETTY_PRINT);
             break;
             
         case 'paketomati-update':
