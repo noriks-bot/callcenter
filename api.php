@@ -2306,7 +2306,6 @@ function updatePaketomatStatus($orderId, $status, $notes = '') {
         @unlink($cacheFile);
     }
 }
-}
 
 function pollForNewItems($userId) {
     $lastSeen = loadLastSeen();
