@@ -1079,8 +1079,20 @@
     <style>
     /* Automation Modal Styles */
     #automationModal {
+        position: fixed;
+        inset: 0;
         background: rgba(0,0,0,0.6);
         backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+        overflow-y: auto;
+    }
+    #automationModal[style*="display: flex"],
+    #automationModal[style*="display:flex"] {
+        display: flex !important;
     }
     #automationModal .automation-modal-content {
         max-width: 520px;
