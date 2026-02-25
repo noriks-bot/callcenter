@@ -1814,14 +1814,21 @@ function runSmsAutomations() {
                 }
                 
                 // Get template message
-                $templateType = explode('_', $templateId)[0] ?? $type; // Get type from template ID
-                // The template ID can be just the type (e.g., "abandoned_cart") - in that case use store from automation
+                // Template ID format: "{type}_{store}" e.g., "abandoned_cart_hr"
+                // Type can contain underscores, so we extract by removing the store suffix
+                $templateType = $templateId;
+                if (str_ends_with($templateId, '_' . $store)) {
+                    $templateType = substr($templateId, 0, -(strlen($store) + 1));
+                }
+                
                 $message = '';
                 if (isset($templates[$templateType][$store])) {
                     $message = $templates[$templateType][$store]['message'] ?? '';
                 } elseif (isset($templates[$type][$store])) {
                     $message = $templates[$type][$store]['message'] ?? '';
                 }
+                
+                $log("Template lookup: templateId=$templateId, templateType=$templateType, store=$store");
                 
                 if (empty($message)) {
                     $log("No template message found for type=$type, store=$store");
