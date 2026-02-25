@@ -3464,14 +3464,17 @@
                     <tbody>
                         ${data.map(b => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[b.currency] || '€';
-                            return `<tr>
-                                <td><div class="customer-cell"><div class="avatar">${initials(b.customerName)}</div><div><div class="customer-name">${esc(b.customerName)}</div><div class="customer-email">${esc(b.email)}</div></div></div></td>
+                            const isConverted = b.converted === true;
+                            const rowStyle = isConverted ? 'background: linear-gradient(90deg, #d4edda 0%, #f8f9fa 100%); opacity: 0.85;' : '';
+                            const convertedBadge = isConverted ? '<span style="background:#28a745;color:white;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:6px;">PONOVNI ✓</span>' : '';
+                            return `<tr style="${rowStyle}">
+                                <td><div class="customer-cell"><div class="avatar" style="${isConverted ? 'background:#28a745;' : ''}">${initials(b.customerName)}</div><div><div class="customer-name">${esc(b.customerName)}${convertedBadge}</div><div class="customer-email">${esc(b.email)}</div></div></div></td>
                                 <td>${b.storeFlag} ${b.storeName}</td>
                                 <td><strong>${sym}${(b.totalSpent||0).toFixed(2)}</strong></td>
                                 <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '-'}</td>
                                 <td style="font-size:12px;">${formatDate(b.registeredAt)}</td>
                                 <td>
-                                    <select class="inline-status-select" data-id="${b.id}" data-type="buyer" onchange="inlineStatusChange(this)">
+                                    ${isConverted ? '<span style="color:#28a745;font-weight:600;">✅ Repeat Customer</span>' : `<select class="inline-status-select" data-id="${b.id}" data-type="buyer" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${b.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
                                         <option value="called_no_answer" ${b.callStatus==='called_no_answer'?'selected':''}>📵 No Answer</option>
                                         <option value="called_callback" ${b.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
@@ -3479,22 +3482,25 @@
                                         <option value="called_not_interested" ${b.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
                                         <option value="converted" ${b.callStatus==='converted'?'selected':''}>✅ Converted</option>
                                         <option value="invalid_number" ${b.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
-                                    </select>
+                                    </select>`}
                                 </td>
                                 <td>
                                     <div class="inline-notes-wrapper">
                                         <input type="text" class="inline-notes-input ${b.notes ? 'has-notes' : ''}"
                                                data-id="${b.id}" data-type="buyer"
                                                value="${escAttr(b.notes || '')}"
-                                               placeholder="Add notes..."
+                                               placeholder="${isConverted ? 'Repeat customer' : 'Add notes...'}"
+                                               ${isConverted ? 'disabled' : ''}
                                                onchange="markNotesChanged(this)"
                                                onkeypress="if(event.key==='Enter'){saveInlineNotes(this)}">
-                                        <button class="inline-notes-save" onclick="saveInlineNotes(this.previousElementSibling)" title="Save">💾</button>
+                                        ${isConverted ? '' : '<button class="inline-notes-save" onclick="saveInlineNotes(this.previousElementSibling)" title="Save">💾</button>'}
                                     </div>
                                 </td>
                                 <td style="white-space:nowrap;">
+                                    ${isConverted ? '<span style="color:#28a745;font-size:11px;">No action needed</span>' : `
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
                                     ${b.phone ? `<button class="action-btn sms" onclick="openSmsModal('${b.id}','buyer')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
+                                    `}
                                 </td>
                             </tr>`;
                         }).join('')}

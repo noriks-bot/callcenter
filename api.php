@@ -1116,7 +1116,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $logMsg("Min days from purchase: $minDaysFromPurchase");
     
     $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all') . '_' . $minDaysFromPurchase;
-    $cached = getCache($cacheKey, 1800);  // 30 min cache
+    $cached = getCache($cacheKey, 300);  // 5 min cache - match auto-refresh for conversion detection
     if ($cached !== null) {
         $logMsg("✓ Returning cached data: " . count($cached) . " buyers");
         return $cached;
@@ -1364,6 +1364,26 @@ function fetchOneTimeBuyers($storeFilter = null) {
             // Skip if already marked as converted
             if (($savedData['callStatus'] ?? '') === 'converted') continue;
             
+            // Check if this buyer made a NEW order recently (became repeat customer)
+            $recentContacts = getRecentOrderContacts($storeCode);
+            $buyerPhone = preg_replace('/[^0-9]/', '', $billing['phone'] ?? '');
+            $buyerPhoneLast9 = strlen($buyerPhone) > 9 ? substr($buyerPhone, -9) : $buyerPhone;
+            
+            $isConverted = false;
+            // Check if email appears in recent orders more than once (new order)
+            $emailCount = array_count_values($recentContacts['emails'])[$email] ?? 0;
+            if ($emailCount > 0) {
+                // They have a recent order - check if it's newer than their original order
+                $isConverted = true;
+            }
+            // Also check by phone
+            if (!$isConverted && $buyerPhone && (
+                in_array($buyerPhone, $recentContacts['phones']) || 
+                in_array($buyerPhoneLast9, $recentContacts['phones'])
+            )) {
+                $isConverted = true;
+            }
+            
             $allBuyers[] = [
                 'id' => $customerId,
                 'storeCode' => $storeCode,
@@ -1379,7 +1399,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 'registeredAt' => $order['date_created'] ?? '',
                 'orderStatus' => $order['status'] ?? '',
                 'callStatus' => $savedData['callStatus'] ?? 'not_called',
-                'notes' => $savedData['notes'] ?? ''
+                'notes' => $savedData['notes'] ?? '',
+                'converted' => $isConverted
             ];
         }
     }
