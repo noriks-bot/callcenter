@@ -1968,8 +1968,8 @@
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-exclamation-triangle"></i> Nujno</h1>
             <div class="page-header-actions">
-                <button class="btn btn-save" onclick="showAddUrgentModal()" style="margin-right:12px;">
-                    <i class="fas fa-plus"></i> Dodaj lead
+                <button class="action-btn-header" onclick="showAddUrgentModal()">
+                    <i class="fas fa-plus"></i> Dodaj
                 </button>
                 <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
                     <i class="fas fa-moon"></i>
@@ -1977,8 +1977,8 @@
             </div>
         </div>
 
-        <div style="max-width:1200px;">
-            <div class="table-card" style="margin-top:20px;">
+        <div class="content" style="max-width:1200px;">
+            <div class="table-card">
                 <table class="data-table" id="urgentTable">
                     <thead>
                         <tr>
