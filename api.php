@@ -2118,47 +2118,54 @@ function fetchPaketomatOrders($filter = 'all') {
     ];
     
     // STEP 1: Fetch recent orders from MetaKocka (search endpoint)
-    // Get most recent 100 orders (newest first)
+    // Get 200 most recent orders (2 pages of 100 each, newest first)
     $mkSearchUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
-    $mkPayload = [
-        'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
-        'company_id' => '6371',
-        'doc_type' => 'sales_order',
-        'result_type' => 'doc',
-        'limit' => 100,
-        'order_direction' => 'desc'
-    ];
+    $orders = [];
     
-    $ch = curl_init($mkSearchUrl);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_POSTFIELDS => json_encode($mkPayload),
-        CURLOPT_TIMEOUT => 30
-    ]);
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlError = curl_error($ch);
-    curl_close($ch);
-    
-    if ($curlError || $httpCode !== 200) {
-        error_log("[Paketomati] MetaKocka search error: HTTP $httpCode, error: $curlError");
-        return [];
+    foreach ([0, 100] as $offset) {
+        $mkPayload = [
+            'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+            'company_id' => '6371',
+            'doc_type' => 'sales_order',
+            'result_type' => 'doc',
+            'limit' => 100,
+            'offset' => $offset,
+            'order_direction' => 'desc'
+        ];
+        
+        $ch = curl_init($mkSearchUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode($mkPayload),
+            CURLOPT_TIMEOUT => 30
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+        
+        if ($curlError || $httpCode !== 200) {
+            error_log("[Paketomati] MetaKocka search error: HTTP $httpCode, error: $curlError");
+            continue;
+        }
+        
+        $data = json_decode($response, true);
+        if (!$data || !isset($data['opr_code']) || $data['opr_code'] !== '0') {
+            error_log("[Paketomati] MetaKocka search error response: " . json_encode($data));
+            continue;
+        }
+        
+        $pageOrders = $data['result'] ?? [];
+        $orders = array_merge($orders, $pageOrders);
     }
     
-    $data = json_decode($response, true);
-    if (!$data || !isset($data['opr_code']) || $data['opr_code'] !== '0') {
-        error_log("[Paketomati] MetaKocka search error response: " . json_encode($data));
-        return [];
-    }
-    
-    $orders = $data['result'] ?? [];
-    error_log("[Paketomati] Found " . count($orders) . " open orders, fetching delivery events...");
+    error_log("[Paketomati] Found " . count($orders) . " orders, fetching delivery events...");
     
     // STEP 2: For each order, fetch delivery events using get_document
-    // Only process shipped orders (not completed/closed)
+    // Check ALL orders - paketomat status is determined by delivery events, not order status
     $mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
     $processedCount = 0;
     
@@ -2166,15 +2173,9 @@ function fetchPaketomatOrders($filter = 'all') {
         $mkId = $order['mk_id'] ?? null;
         if (!$mkId) continue;
         
-        // Skip completed/closed orders - only shipped orders can be at pickup points
-        $orderStatusDesc = $order['status_desc'] ?? '';
-        if (in_array($orderStatusDesc, ['completed', 'manually_closed', 'finished', 'closed'])) {
-            continue;
-        }
-        
-        // Limit API calls - max 50 orders
+        // Limit API calls - max 100 orders to check
         $processedCount++;
-        if ($processedCount > 50) break;
+        if ($processedCount > 100) break;
         
         // Fetch delivery events for this order
         $getDocPayload = [
