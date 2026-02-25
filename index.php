@@ -7878,7 +7878,7 @@
                     </tr></thead>
                     <tbody>
                         ${urgentLeads.map((lead, idx) => `
-                            <tr data-idx="${idx}" class="${lead.resolved ? 'called-row' : ''}">
+                            <tr data-idx="${idx}" style="${lead.resolved ? 'background:rgba(34,197,94,0.15);' : ''}">
                                 <td class="checkbox-cell"><input type="checkbox" class="urgent-checkbox row-checkbox" data-idx="${idx}" onchange="updateUrgentSelection()"></td>
                                 <td>
                                     <div style="font-weight:500;">${esc(lead.phone)}</div>
