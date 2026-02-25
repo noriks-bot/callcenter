@@ -2971,6 +2971,9 @@ try {
         case 'clear-cache':
             global $cacheDir;
             if (is_dir($cacheDir)) array_map('unlink', glob($cacheDir . '*.json'));
+            // Also delete buyers-cache.json (separate file)
+            $buyersCacheFile = __DIR__ . '/data/buyers-cache.json';
+            if (file_exists($buyersCacheFile)) unlink($buyersCacheFile);
             echo json_encode(['success' => true]);
             break;
         
