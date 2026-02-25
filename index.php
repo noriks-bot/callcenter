@@ -1105,6 +1105,9 @@
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-robot"></i> SMS Automation</h1>
             <div class="page-header-actions">
+                <button class="action-btn-header" onclick="runSmsAutomations()" id="runAutomationsBtn" title="Preveri pogoje in dodaj SMS-e v vrsto">
+                    <i class="fas fa-play"></i> Zaženi preverjanje
+                </button>
                 <button class="action-btn-header primary" onclick="showAddAutomationModal()">
                     <i class="fas fa-plus"></i> Nova avtomatizacija
                 </button>
@@ -1115,6 +1118,16 @@
         </div>
         
         <div class="content">
+            <!-- Info Banner -->
+            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-info-circle" style="color: var(--accent-blue); font-size: 20px;"></i>
+                <div style="font-size: 13px; color: var(--text-secondary);">
+                    <strong style="color: var(--text-primary);">Kako deluje:</strong> 
+                    Avtomatizacija NE pošilja SMS direktno — samo dodaja v čakalno vrsto. 
+                    Pošiljanje vedno sproži uporabnik ročno iz SMS Dashboard strani.
+                    <span id="lastAutomationRun" style="margin-left: 12px; color: var(--text-muted);"></span>
+                </div>
+            </div>
             <!-- Filters Bar -->
             <div class="filters-bar" style="margin-bottom: 12px;">
                 <select class="filter-select" id="automationCountryFilter" onchange="filterAutomations()">
@@ -4151,6 +4164,46 @@
                 }
             } catch (err) {
                 showToast('Napaka pri brisanju', true);
+            }
+        }
+        
+        // Run SMS automations - check conditions and add to queue
+        async function runSmsAutomations() {
+            const btn = document.getElementById('runAutomationsBtn');
+            const originalHtml = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preverjam...';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch('api.php?action=run-sms-automations');
+                const result = await res.json();
+                
+                if (result.success) {
+                    const totalQueued = result.totalQueued || 0;
+                    if (totalQueued > 0) {
+                        showToast(`✅ Dodano ${totalQueued} SMS-ov v čakalno vrsto!`);
+                    } else {
+                        showToast('ℹ️ Ni novih SMS za dodati v vrsto');
+                    }
+                    
+                    // Update last run time display
+                    const lastRunSpan = document.getElementById('lastAutomationRun');
+                    if (lastRunSpan) {
+                        lastRunSpan.textContent = '| Zadnje preverjanje: ' + new Date().toLocaleTimeString('sl-SI');
+                    }
+                    
+                    // Reload automations to show updated queued counts
+                    loadSmsAutomations();
+                } else {
+                    showToast(result.error || 'Napaka pri zagonu avtomatizacij', true);
+                }
+            } catch (err) {
+                console.error('Run automations error:', err);
+                showToast('Napaka pri zagonu avtomatizacij', true);
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
             }
         }
         

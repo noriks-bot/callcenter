@@ -1711,6 +1711,200 @@ function removeSmsFromQueue($smsId) {
     return ['success' => true];
 }
 
+// ========== SMS AUTOMATION RUNNER ==========
+// This function checks automations and ADDS to queue (never sends directly)
+
+function runSmsAutomations() {
+    $automationsFile = __DIR__ . '/data/sms-automations.json';
+    $queuedCartsFile = __DIR__ . '/data/automation-queued-carts.json';
+    $logFile = __DIR__ . '/data/automation-runner.log';
+    
+    $log = function($msg) use ($logFile) {
+        $line = '[' . date('Y-m-d H:i:s') . '] ' . $msg . "\n";
+        file_put_contents($logFile, $line, FILE_APPEND);
+    };
+    
+    $log("=== Starting automation run ===");
+    
+    // Load automations
+    $automations = [];
+    if (file_exists($automationsFile)) {
+        $automations = json_decode(file_get_contents($automationsFile), true) ?: [];
+    }
+    
+    // Filter enabled automations
+    $enabledAutomations = array_filter($automations, fn($a) => $a['enabled'] ?? false);
+    $log("Found " . count($enabledAutomations) . " enabled automations");
+    
+    if (empty($enabledAutomations)) {
+        return ['success' => true, 'message' => 'No enabled automations', 'queued' => 0];
+    }
+    
+    // Load already queued carts (to prevent duplicates)
+    $queuedCarts = [];
+    if (file_exists($queuedCartsFile)) {
+        $queuedCarts = json_decode(file_get_contents($queuedCartsFile), true) ?: [];
+    }
+    
+    // Load SMS templates
+    $templatesFile = __DIR__ . '/sms-templates.json';
+    $templates = [];
+    if (file_exists($templatesFile)) {
+        $data = json_decode(file_get_contents($templatesFile), true);
+        $templates = $data['templates'] ?? $data;
+    }
+    
+    $totalQueued = 0;
+    $results = [];
+    
+    foreach ($enabledAutomations as $automation) {
+        $autoId = $automation['id'];
+        $store = $automation['store'];
+        $type = $automation['type'];
+        $templateId = $automation['template']; // e.g., "abandoned_cart_hr" or just "abandoned_cart"
+        $delayHours = (int)($automation['delay_hours'] ?? 2);
+        
+        $log("Processing automation: {$automation['name']} (store: $store, type: $type, delay: {$delayHours}h)");
+        
+        // Initialize queued carts tracking for this automation
+        if (!isset($queuedCarts[$autoId])) {
+            $queuedCarts[$autoId] = [];
+        }
+        
+        // Handle abandoned_cart type
+        if ($type === 'abandoned_cart') {
+            $carts = fetchAbandonedCarts();
+            $log("Fetched " . count($carts) . " total abandoned carts");
+            
+            // Filter carts for this store
+            $storeCarts = array_filter($carts, fn($c) => $c['storeCode'] === $store);
+            $log("Found " . count($storeCarts) . " carts for store $store");
+            
+            $queuedThisRun = 0;
+            
+            foreach ($storeCarts as $cart) {
+                $cartId = $cart['cartDbId'] ?? $cart['id'] ?? null;
+                if (!$cartId) continue;
+                
+                // Skip if already queued by this automation
+                if (in_array($cartId, $queuedCarts[$autoId])) {
+                    continue;
+                }
+                
+                // Skip if cart was already converted or has an order
+                if (!empty($cart['orderId'])) {
+                    continue;
+                }
+                
+                // Check delay - abandonedAt + delay_hours < now
+                $abandonedAt = strtotime($cart['abandonedAt'] ?? '');
+                if (!$abandonedAt) continue;
+                
+                $sendAfter = $abandonedAt + ($delayHours * 3600);
+                if (time() < $sendAfter) {
+                    // Not yet time to send
+                    continue;
+                }
+                
+                // Skip if no phone number
+                $phone = $cart['phone'] ?? '';
+                if (empty($phone)) {
+                    $log("Skipping cart $cartId - no phone number");
+                    continue;
+                }
+                
+                // Get template message
+                $templateType = explode('_', $templateId)[0] ?? $type; // Get type from template ID
+                // The template ID can be just the type (e.g., "abandoned_cart") - in that case use store from automation
+                $message = '';
+                if (isset($templates[$templateType][$store])) {
+                    $message = $templates[$templateType][$store]['message'] ?? '';
+                } elseif (isset($templates[$type][$store])) {
+                    $message = $templates[$type][$store]['message'] ?? '';
+                }
+                
+                if (empty($message)) {
+                    $log("No template message found for type=$type, store=$store");
+                    continue;
+                }
+                
+                // Replace variables in message
+                $firstName = $cart['firstName'] ?? '';
+                $productName = '';
+                if (!empty($cart['cartContents']) && is_array($cart['cartContents'])) {
+                    $firstItem = reset($cart['cartContents']);
+                    $productName = $firstItem['name'] ?? 'proizvod';
+                }
+                $checkoutLink = "https://noriks.com/{$store}/cart/";
+                
+                $message = str_replace(
+                    ['{ime}', '{produkt}', '{link}', '{cena}'],
+                    [$firstName ?: 'Kupac', $productName ?: 'proizvod', $checkoutLink, number_format($cart['cartValue'] ?? 0, 2)],
+                    $message
+                );
+                
+                // Add to queue
+                $result = addSmsToQueue([
+                    'phone' => $phone,
+                    'storeCode' => $store,
+                    'message' => $message,
+                    'customerName' => $cart['customerName'] ?? '',
+                    'cartId' => $cartId,
+                    'addedBy' => 'automation:' . $autoId
+                ]);
+                
+                if ($result['success']) {
+                    $queuedCarts[$autoId][] = $cartId;
+                    $queuedThisRun++;
+                    $totalQueued++;
+                    $log("Queued SMS for cart $cartId to " . ($result['formattedPhone'] ?? $phone));
+                } else {
+                    $log("Failed to queue SMS for cart $cartId: " . ($result['error'] ?? 'Unknown error'));
+                }
+            }
+            
+            $results[$autoId] = [
+                'name' => $automation['name'],
+                'queued' => $queuedThisRun
+            ];
+            
+            // Update queued_count on automation
+            foreach ($automations as &$a) {
+                if ($a['id'] === $autoId) {
+                    $a['queued_count'] = count($queuedCarts[$autoId]);
+                    break;
+                }
+            }
+            unset($a);
+        }
+    }
+    
+    // Save updated automations with queued_count
+    file_put_contents($automationsFile, json_encode(array_values($automations), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    
+    // Save queued carts tracking
+    file_put_contents($queuedCartsFile, json_encode($queuedCarts, JSON_PRETTY_PRINT));
+    
+    $log("=== Automation run complete. Total queued: $totalQueued ===");
+    
+    return [
+        'success' => true,
+        'totalQueued' => $totalQueued,
+        'results' => $results
+    ];
+}
+
+// Clean up old queued cart entries (run periodically)
+function cleanupAutomationTracking($maxAgeDays = 30) {
+    $queuedCartsFile = __DIR__ . '/data/automation-queued-carts.json';
+    
+    if (!file_exists($queuedCartsFile)) return;
+    
+    // For now, we keep all entries. In the future, could compare against
+    // abandoned carts that are no longer present (converted or deleted)
+    // This is a placeholder for future cleanup logic
+}
+
 // ========== PAKETOMATI FUNCTIONS ==========
 $paketomatStatusFile = __DIR__ . '/data/paketomat-status.json';
 $notificationSettingsFile = __DIR__ . '/data/notification-settings.json';
@@ -2520,6 +2714,12 @@ try {
             
             file_put_contents($automationsFile, json_encode(array_values($automations), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             echo json_encode(['success' => true]);
+            break;
+            
+        case 'run-sms-automations':
+            // Run automation check - adds to queue, never sends directly
+            $result = runSmsAutomations();
+            echo json_encode($result);
             break;
             
         case 'email-templates':
