@@ -2165,6 +2165,9 @@ function fetchPaketomatOrders($filter = 'all') {
     
     error_log("[Paketomati] Found " . count($orders) . " orders, fetching delivery events...");
     
+    // DEBUG: Track processing
+    $debugInfo = ['total_orders' => count($orders), 'processed' => 0, 'with_events' => 0, 'matched' => 0];
+    
     // STEP 2: For each order, fetch delivery events using get_document
     // Check ALL orders - paketomat status is determined by delivery events, not order status
     $mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
@@ -2176,6 +2179,7 @@ function fetchPaketomatOrders($filter = 'all') {
         
         // Limit API calls - max 100 orders to check
         $processedCount++;
+        $debugInfo['processed'] = $processedCount;
         if ($processedCount > 100) break;
         
         // Fetch delivery events for this order
@@ -2215,9 +2219,17 @@ function fetchPaketomatOrders($filter = 'all') {
         // Skip orders without delivery events
         if (empty($events)) continue;
         
+        $debugInfo['with_events']++;
+        
         // Get the FIRST (newest) event - MetaKocka returns events newest first
         $lastEvent = $events[0] ?? [];
         $lastEventStatus = $lastEvent['event_status'] ?? '';
+        
+        // DEBUG: Check specific orders
+        $isDebugOrder = strpos($order['count_code'] ?? '', '5278') !== false || strpos($order['count_code'] ?? '', '5239') !== false;
+        if ($isDebugOrder) {
+            error_log("[Paketomati] DEBUG ORDER {$order['count_code']}: lastEventStatus = '$lastEventStatus'");
+        }
         
         // Check if last event status is a paketomat status
         $isPaketomat = false;
@@ -2225,15 +2237,19 @@ function fetchPaketomatOrders($filter = 'all') {
             if (stripos($lastEventStatus, $paketStatus) !== false || strtolower($lastEventStatus) === strtolower($paketStatus)) {
                 $isPaketomat = true;
                 error_log("[Paketomati] MATCH: Order {$order['count_code']} - '$lastEventStatus' matches '$paketStatus'");
+                $debugInfo['matched']++;
                 break;
             }
         }
         
+        if ($isDebugOrder) {
+            error_log("[Paketomati] DEBUG ORDER {$order['count_code']}: isPaketomat = " . ($isPaketomat ? 'true' : 'false'));
+        }
+        
         // If filter is not 'all_orders', only show paketomat orders
         if ($filter !== 'all_orders' && !$isPaketomat) {
-            // Debug: log some skipped orders
-            if (strpos($lastEventStatus, 'InPost') !== false || strpos($lastEventStatus, 'paketomat') !== false) {
-                error_log("[Paketomati] SKIPPED but has keyword: Order {$order['count_code']} - '$lastEventStatus'");
+            if ($isDebugOrder) {
+                error_log("[Paketomati] DEBUG ORDER {$order['count_code']}: SKIPPED (filter=$filter, isPaketomat=false)");
             }
             continue;
         }
@@ -2349,7 +2365,14 @@ function fetchPaketomatOrders($filter = 'all') {
         return strtotime($dateB) - strtotime($dateA);
     });
     
-    setCache('paketomat_orders_' . $filter, $allOrders);
+    // Don't cache while debugging
+    // setCache('paketomat_orders_' . $filter, $allOrders);
+    
+    // Add debug info to response if filter is 'debug'
+    if ($filter === 'debug') {
+        return ['debug' => $debugInfo, 'orders' => $allOrders];
+    }
+    
     return $allOrders;
 }
 
@@ -3581,8 +3604,8 @@ try {
         case 'paketomati-debug':
             // Show ALL orders for debugging
             echo json_encode([
-                'all_orders' => fetchPaketomatOrders('all_orders'),
-                'paketomat_only' => fetchPaketomatOrders('all'),
+                'debug_info' => fetchPaketomatOrders('debug'),
+                'paketomat_only_count' => count(fetchPaketomatOrders('all')),
                 'cache_info' => 'Cache disabled for debugging'
             ]);
             break;
