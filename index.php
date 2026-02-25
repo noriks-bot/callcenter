@@ -1482,42 +1482,54 @@
     <div id="buyersSettingsContent" style="display:none;">
         <!-- Page Header -->
         <div class="page-header">
-            <h1 class="page-title-large"><i class="fas fa-user-cog"></i> Options</h1>
+            <h1 class="page-title-large"><i class="fas fa-sliders-h"></i> Options</h1>
+            <div class="page-header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
         </div>
         
-        <div class="content">
-            <div class="table-card" style="max-width:600px;">
-                <div style="margin-bottom:24px;">
-                    <h3 style="margin-bottom:8px;">⏰ Filter nastavitve</h3>
-                    <p style="color:var(--text-muted);font-size:13px;">
-                        Nastavi koliko dni mora miniti od prvega nakupa, preden se kupec prikaže v tabeli "Enkratni kupci".
-                        To pomaga fokusirati klice na kupce, ki so že imeli čas za ponovno naročilo.
-                    </p>
+        <div class="content" style="max-width:800px;">
+            <!-- Filter Settings Card -->
+            <div class="table-card" style="padding:16px 20px;margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+                    <div>
+                        <h3 style="margin:0 0 6px 0;font-size:15px;display:flex;align-items:center;gap:8px;">
+                            <i class="fas fa-filter" style="color:var(--accent-blue);"></i> Filter nastavitve
+                        </h3>
+                        <p style="color:var(--text-muted);font-size:12px;margin:0;">
+                            Nastavi koliko dni mora miniti od prvega nakupa, preden se kupec prikaže v tabeli "Enkratni kupci".
+                        </p>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Prikaži naročila po X dneh od prvega nakupa</label>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label class="form-label" style="font-size:13px;">Prikaži naročila po X dneh od prvega nakupa</label>
                     <div style="display:flex;align-items:center;gap:12px;">
                         <input type="number" class="form-input" id="buyersMinDays" min="1" max="365" value="10" style="width:100px;text-align:center;font-size:18px;font-weight:600;">
                         <span style="color:var(--text-muted);">dni</span>
                     </div>
-                    <small style="color:var(--text-muted);margin-top:8px;display:block;">
+                    <small style="color:var(--text-muted);margin-top:6px;display:block;font-size:11px;">
                         Privzeto: 10 dni. Kupci z enim samim nakupom se prikažejo šele po tem obdobju.
                     </small>
                 </div>
                 
-                <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--card-border);">
-                    <button class="btn btn-save" onclick="saveBuyersSettings()">
+                <div style="display:flex;gap:12px;align-items:center;padding-top:12px;border-top:1px solid var(--card-border);">
+                    <button class="btn btn-save" onclick="saveBuyersSettings()" style="padding:10px 20px;">
                         <i class="fas fa-save"></i> Shrani nastavitve
                     </button>
+                    <span id="buyersSettingsStatus" style="font-size:12px;color:var(--text-muted);"></span>
                 </div>
-                
-                <div style="margin-top:24px;padding:16px;background:var(--content-bg);border-radius:8px;">
-                    <div style="font-size:12px;color:var(--text-muted);">
-                        <i class="fas fa-info-circle"></i> <strong>Kako deluje:</strong><br>
-                        Če nastaviš 10 dni, bodo kupci z enim nakupom prikazani šele 10 dni po njihovem nakupu.
-                        To omogoča, da kličeš kupce, ki so imeli dovolj časa za razmislek o ponovnem nakupu.
-                    </div>
+            </div>
+            
+            <!-- Info Box -->
+            <div style="background:rgba(59,130,246,0.1);border:1px solid var(--accent-blue);border-radius:8px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;">
+                <i class="fas fa-info-circle" style="color:var(--accent-blue);font-size:18px;margin-top:2px;"></i>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">
+                    <strong style="color:var(--text-primary);">Kako deluje:</strong><br>
+                    Če nastaviš 10 dni, bodo kupci z enim nakupom prikazani šele 10 dni po njihovem nakupu.
+                    To omogoča, da kličeš kupce, ki so imeli dovolj časa za razmislek o ponovnem nakupu.
                 </div>
             </div>
         </div>
