@@ -5054,10 +5054,13 @@
                 return;
             }
             
-            const templates = await loadTestSmsTemplates();
-            const template = templates.templates?.[templateKey]?.[country];
+            const data = await loadTestSmsTemplates();
+            // API returns array: templates: [{id, name, messages: {hr: "...", cz: "..."}}]
+            const templateList = data.templates || [];
+            const template = templateList.find(t => t.id === templateKey);
+            const message = template?.messages?.[country];
             
-            if (!template) {
+            if (!message) {
                 preview.innerHTML = '<span style="color:var(--accent-red);">Predloga ni najdena za izbrano državo</span>';
                 return;
             }
@@ -5068,7 +5071,7 @@
             const shopLink = `https://noriks.com/${country}/`;
             
             // Replace variables
-            let message = template.message
+            let finalMessage = message
                 .replace(/{ime}/g, name)
                 .replace(/{produkt}/g, product)
                 .replace(/{link_coupon}/g, checkoutLinkCoupon)
@@ -5076,9 +5079,9 @@
                 .replace(/{shop_link}/g, shopLink)
                 .replace(/{cena}/g, '29.99');
             
-            preview.textContent = message;
+            preview.textContent = finalMessage;
             
-            const len = message.length;
+            const len = finalMessage.length;
             const smsCount = Math.ceil(len / 160) || 1;
             charCount.textContent = `${len} / 160 znakov (${smsCount} SMS)`;
             charCount.className = 'char-count' + (len > 160 ? ' warning' : '');
