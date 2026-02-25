@@ -1076,7 +1076,7 @@
     </div>
     
     <!-- Add/Edit Automation Modal -->
-    <div id="automationModalBg" class="modal-bg" onclick="if(event.target===this)closeAutomationModal()">
+    <div id="automationModalBg" class="modal-bg" style="position:fixed;inset:0;z-index:200;" onclick="if(event.target===this)closeAutomationModal()">
         <div class="modal" style="max-width: 480px;">
             <div class="modal-header">
                 <h3 class="modal-title" id="automationModalTitle">Nova SMS avtomatizacija</h3>
