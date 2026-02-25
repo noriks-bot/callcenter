@@ -2599,9 +2599,12 @@
                 buyersCountEl.textContent = filteredBuyers.length;
             }
 
-            // Paketomati count (not filtered by country as they come from MetaKocka)
-            const paketCount = paketomatiData ? paketomatiData.filter(p => p.status === 'not_called').length : 0;
-            document.getElementById('contentCount-paketomati').textContent = paketCount;
+            // Paketomati count (filtered by country like other tabs)
+            let filteredPaketomati = paketomatiData ? paketomatiData.filter(p => p.status === 'not_called') : [];
+            if (currentStore !== 'all') {
+                filteredPaketomati = filteredPaketomati.filter(p => p.storeCode === currentStore);
+            }
+            document.getElementById('contentCount-paketomati').textContent = filteredPaketomati.length;
         }
 
         // Init - Bulletproof version
@@ -7660,8 +7663,14 @@
             const statusFilter = document.getElementById('paketomatStatusFilter')?.value || 'all';
             let filtered = paketomatiData;
 
+            // Filter by country
+            if (currentStore !== 'all') {
+                filtered = filtered.filter(o => o.storeCode === currentStore);
+            }
+
+            // Filter by status
             if (statusFilter !== 'all') {
-                filtered = paketomatiData.filter(o => o.status === statusFilter);
+                filtered = filtered.filter(o => o.status === statusFilter);
             }
 
             if (filtered.length === 0) {
@@ -7819,8 +7828,12 @@
         }
 
         function updatePaketomatiCount() {
-            const notCalled = paketomatiData.filter(o => o.status === 'not_called').length;
-            document.getElementById('contentCount-paketomati').textContent = notCalled;
+            let filtered = paketomatiData.filter(o => o.status === 'not_called');
+            // Filter by country if not 'all'
+            if (currentStore !== 'all') {
+                filtered = filtered.filter(o => o.storeCode === currentStore);
+            }
+            document.getElementById('contentCount-paketomati').textContent = filtered.length;
         }
 
         // Inline status change for paketomati (from select dropdown)
@@ -7927,7 +7940,7 @@
                         <th style="text-align:right;">Actions</th>
                     </tr></thead>
                     <tbody>
-                        ${paketomatiData.map(order => `
+                        ${(currentStore !== 'all' ? paketomatiData.filter(o => o.storeCode === currentStore) : paketomatiData).map(order => `
                             <tr>
                                 <td>
                                     <div class="customer-cell">
