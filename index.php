@@ -7931,6 +7931,13 @@
             
             const sym = (curr) => ({EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[curr] || '€');
             
+            // Filter by country
+            let displayData = paketomatiData;
+            if (currentStore !== 'all') {
+                displayData = paketomatiData.filter(o => o.storeCode === currentStore);
+                console.log('[Paketomati Render] Filtering by', currentStore, '- showing', displayData.length, 'of', paketomatiData.length);
+            }
+            
             container.innerHTML = `
                 <div class="table-wrapper">
                 <table class="data-table">
@@ -7945,7 +7952,7 @@
                         <th style="text-align:right;">Actions</th>
                     </tr></thead>
                     <tbody>
-                        ${(currentStore !== 'all' ? paketomatiData.filter(o => o.storeCode === currentStore) : paketomatiData).map(order => `
+                        ${displayData.map(order => `
                             <tr>
                                 <td>
                                     <div class="customer-cell">
