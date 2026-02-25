@@ -2762,11 +2762,7 @@
                 });
             });
             
-            // Also populate SMS country filter (only allowed countries)
-            const smsFilter = document.getElementById('smsCountryFilter');
-            allowedStores.forEach(s => {
-                smsFilter.innerHTML += `<option value="${s.code}">${s.flag} ${s.name}</option>`;
-            });
+            // SMS country filter is now using pills, no need to populate select
         }
         
         // Bulletproof data loading with PROGRESSIVE loading for better UX
