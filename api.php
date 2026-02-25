@@ -1057,7 +1057,7 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $minDaysFromPurchase = 10; // default
     if (file_exists($buyersSettingsFile)) {
         $buyersSettings = json_decode(file_get_contents($buyersSettingsFile), true);
-        $minDaysFromPurchase = $buyersSettings['minDaysFromPurchase'] ?? 10;
+        $minDaysFromPurchase = isset($buyersSettings['minDaysFromPurchase']) ? (int)$buyersSettings['minDaysFromPurchase'] : 10;
     }
     $logMsg("Min days from purchase: $minDaysFromPurchase");
     

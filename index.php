@@ -1789,7 +1789,7 @@
                 <div class="form-group" style="margin-bottom:16px;">
                     <label class="form-label" style="font-size:13px;">Prikaži naročila po X dneh od prvega nakupa</label>
                     <div style="display:flex;align-items:center;gap:12px;">
-                        <input type="number" class="form-input" id="buyersMinDays" min="1" max="365" value="10" style="width:100px;text-align:center;font-size:18px;font-weight:600;">
+                        <input type="number" class="form-input" id="buyersMinDays" min="0" max="365" value="10" style="width:100px;text-align:center;font-size:18px;font-weight:600;">
                         <span style="color:var(--text-muted);">dni</span>
                     </div>
                     <small style="color:var(--text-muted);margin-top:6px;display:block;font-size:11px;">
@@ -7436,7 +7436,7 @@
                 const data = await res.json();
                 if (data.success && data.settings) {
                     buyersSettings = data.settings;
-                    document.getElementById('buyersMinDays').value = buyersSettings.minDaysFromPurchase || 10;
+                    document.getElementById('buyersMinDays').value = buyersSettings.minDaysFromPurchase !== undefined ? buyersSettings.minDaysFromPurchase : 10;
                 }
             } catch (e) {
                 console.error('Failed to load buyers settings:', e);
@@ -7444,7 +7444,8 @@
         }
 
         async function saveBuyersSettings() {
-            const minDays = parseInt(document.getElementById('buyersMinDays').value) || 10;
+            const val = document.getElementById('buyersMinDays').value;
+            const minDays = val !== '' ? parseInt(val) : 10;
             buyersSettings.minDaysFromPurchase = minDays;
 
             try {
