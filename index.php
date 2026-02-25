@@ -1077,73 +1077,164 @@
     
     <!-- Add/Edit Automation Modal -->
     <div id="automationModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3 id="automationModalTitle"><i class="fas fa-robot"></i> Nova SMS avtomatizacija</h3>
-                <button class="modal-close" onclick="closeAutomationModal()">&times;</button>
+        <div class="modal-content" style="max-width: 560px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); padding: 28px 32px; border: none;">
+                <div>
+                    <h3 id="automationModalTitle" style="color: white; font-size: 22px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-robot" style="font-size: 24px;"></i> 
+                        <span>Nova SMS avtomatizacija</span>
+                    </h3>
+                    <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0 0; font-size: 14px;">Nastavi avtomatsko pošiljanje SMS sporočil</p>
+                </div>
+                <button class="modal-close" onclick="closeAutomationModal()" style="background: rgba(255,255,255,0.2); color: white; border: none;">&times;</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="padding: 32px;">
                 <form id="automationForm">
                     <input type="hidden" id="automationId" value="">
                     
-                    <div class="form-group">
-                        <label for="automationName">Ime avtomatizacije</label>
-                        <input type="text" id="automationName" class="form-control" placeholder="npr. HR Zapuščena košarica 2h" required>
+                    <!-- Name -->
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label for="automationName" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
+                            <i class="fas fa-tag" style="color: var(--primary); width: 18px;"></i>
+                            Ime avtomatizacije
+                        </label>
+                        <input type="text" id="automationName" class="form-control" placeholder="npr. HR Zapuščena košarica 2h" required
+                            style="padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 2px solid var(--card-border); transition: all 0.2s;">
                     </div>
                     
-                    <div class="form-group">
-                        <label for="automationStore">Trgovina</label>
-                        <select id="automationStore" class="form-control" required>
-                            <option value="">-- Izberi trgovino --</option>
-                            <option value="hr">🇭🇷 Hrvaška (HR)</option>
-                            <option value="cz">🇨🇿 Češka (CZ)</option>
-                            <option value="pl">🇵🇱 Poljska (PL)</option>
-                            <option value="sk">🇸🇰 Slovaška (SK)</option>
-                            <option value="hu">🇭🇺 Madžarska (HU)</option>
-                            <option value="gr">🇬🇷 Grčija (GR)</option>
-                            <option value="it">🇮🇹 Italija (IT)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="automationType">Tip avtomatizacije</label>
-                        <select id="automationType" class="form-control" required>
-                            <option value="abandoned_cart">🛒 Zapuščena košarica</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="automationTemplate">SMS predloga</label>
-                        <select id="automationTemplate" class="form-control" required>
-                            <option value="">-- Izberi predlogo --</option>
-                        </select>
-                        <small class="form-text">Predloge se naložijo glede na izbrano trgovino</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="automationDelay">Zamik (ure)</label>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="number" id="automationDelay" class="form-control" min="1" max="72" value="2" style="width: 100px;" required>
-                            <span style="color: var(--text-muted);">ur po zapustitvi košarice</span>
+                    <!-- Store & Type Row -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="automationStore" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
+                                <i class="fas fa-store" style="color: var(--primary); width: 18px;"></i>
+                                Trgovina
+                            </label>
+                            <select id="automationStore" class="form-control" required style="padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 2px solid var(--card-border);">
+                                <option value="">Izberi...</option>
+                                <option value="hr">🇭🇷 Hrvaška</option>
+                                <option value="cz">🇨🇿 Češka</option>
+                                <option value="pl">🇵🇱 Poljska</option>
+                                <option value="sk">🇸🇰 Slovaška</option>
+                                <option value="hu">🇭🇺 Madžarska</option>
+                                <option value="gr">🇬🇷 Grčija</option>
+                                <option value="it">🇮🇹 Italija</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="automationType" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
+                                <i class="fas fa-cogs" style="color: var(--primary); width: 18px;"></i>
+                                Tip
+                            </label>
+                            <select id="automationType" class="form-control" required style="padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 2px solid var(--card-border);">
+                                <option value="abandoned_cart">🛒 Zapuščena košarica</option>
+                            </select>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="automationEnabled" checked>
-                            Avtomatizacija aktivna
+                    <!-- Template -->
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label for="automationTemplate" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
+                            <i class="fas fa-comment-alt" style="color: var(--primary); width: 18px;"></i>
+                            SMS predloga
+                        </label>
+                        <select id="automationTemplate" class="form-control" required style="padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 2px solid var(--card-border);">
+                            <option value="">Najprej izberi trgovino</option>
+                        </select>
+                        <p style="margin: 8px 0 0 0; font-size: 13px; color: var(--text-muted);">
+                            <i class="fas fa-info-circle"></i> Predloge se naložijo glede na izbrano trgovino
+                        </p>
+                    </div>
+                    
+                    <!-- Delay -->
+                    <div class="form-group" style="margin-bottom: 28px;">
+                        <label for="automationDelay" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
+                            <i class="fas fa-clock" style="color: var(--primary); width: 18px;"></i>
+                            Zamik pošiljanja
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 12px; background: var(--content-bg); padding: 14px 18px; border-radius: 10px; border: 2px solid var(--card-border);">
+                            <input type="number" id="automationDelay" class="form-control" min="1" max="72" value="2" required
+                                style="width: 70px; padding: 10px 12px; border-radius: 8px; font-size: 18px; font-weight: 700; text-align: center; border: 2px solid var(--primary); background: var(--card-bg);">
+                            <span style="color: var(--text-secondary); font-size: 15px;">ur po zapustitvi košarice</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Toggle -->
+                    <div style="background: linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(34,197,94,0.05) 100%); padding: 18px 20px; border-radius: 12px; border: 2px solid rgba(34,197,94,0.2);">
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 0;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i class="fas fa-power-off" style="color: #22c55e; font-size: 20px;"></i>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary);">Avtomatizacija aktivna</div>
+                                    <div style="font-size: 13px; color: var(--text-muted);">SMS se bo pošiljal avtomatsko</div>
+                                </div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="automationEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
                         </label>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeAutomationModal()">Prekliči</button>
-                <button type="button" class="btn btn-primary" onclick="saveAutomation()">
-                    <i class="fas fa-save"></i> Shrani
+            <div class="modal-footer" style="padding: 20px 32px 28px; border: none; background: var(--content-bg); gap: 12px;">
+                <button type="button" class="btn btn-secondary" onclick="closeAutomationModal()" style="padding: 14px 28px; border-radius: 10px; font-weight: 600;">
+                    Prekliči
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveAutomation()" style="padding: 14px 32px; border-radius: 10px; font-weight: 600; background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); border: none;">
+                    <i class="fas fa-check"></i> Shrani avtomatizacijo
                 </button>
             </div>
         </div>
     </div>
+    
+    <style>
+    /* Toggle Switch */
+    .toggle-switch {
+        position: relative;
+        width: 52px;
+        height: 28px;
+    }
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .3s;
+        border-radius: 28px;
+    }
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .toggle-switch input:checked + .toggle-slider {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    }
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+    }
+    #automationModal .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        outline: none;
+    }
+    </style>
 
     <!-- SMS Dashboard Content (shown when tab selected) -->
     <div id="smsDashboardContent" style="display:none;">
