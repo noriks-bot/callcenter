@@ -7959,7 +7959,7 @@
             
             saveUrgentLeads();
             closeAddUrgentModal();
-            renderUrgentTable();
+            renderUrgentTableInline();
         }
         
         function editUrgentLead(idx) {
@@ -7970,7 +7970,7 @@
             if (!confirm('Ali res želiš izbrisati ta lead?')) return;
             urgentLeads.splice(idx, 1);
             saveUrgentLeads();
-            renderUrgentTable();
+            renderUrgentTableInline();
             showToast('Lead izbrisan');
         }
         
@@ -7978,7 +7978,7 @@
             urgentLeads[idx].called = called;
             if (called) urgentLeads[idx].calledAt = new Date().toISOString();
             saveUrgentLeads();
-            renderUrgentTable();
+            renderUrgentTableInline();
         }
         
         function updateUrgentSelection() {
@@ -8000,7 +8000,7 @@
                 urgentLeads[idx].calledAt = new Date().toISOString();
             });
             saveUrgentLeads();
-            renderUrgentTable();
+            renderUrgentTableInline();
             showToast('Označeno kot poklicano');
         }
         
@@ -8012,7 +8012,7 @@
             // Delete from highest index to lowest to preserve indices
             selected.sort((a, b) => b - a).forEach(idx => urgentLeads.splice(idx, 1));
             saveUrgentLeads();
-            renderUrgentTable();
+            renderUrgentTableInline();
             showToast(`${selected.length} leadov izbrisanih`);
         }
         
