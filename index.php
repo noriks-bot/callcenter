@@ -1124,9 +1124,10 @@
                 <i class="fas fa-info-circle" style="color: var(--accent-blue); font-size: 20px;"></i>
                 <div style="font-size: 13px; color: var(--text-secondary);">
                     <strong style="color: var(--text-primary);">Kako deluje:</strong> 
-                    Avtomatizacija NE pošilja SMS direktno — samo dodaja v čakalno vrsto. 
-                    Pošiljanje vedno sproži uporabnik ročno iz SMS Dashboard strani.
-                    <span id="lastAutomationRun" style="margin-left: 12px; color: var(--text-muted);"></span>
+                    Avtomatizacija preveri pogoje vsakih 30 min in dodaja SMS-e v čakalno vrsto.
+                    <span style="color: var(--text-muted);">•</span>
+                    Pošiljanje vedno sproži uporabnik <strong>ročno</strong> iz SMS Dashboard strani.
+                    <span id="lastAutomationRun" style="margin-left: 12px; color: var(--accent-green); font-weight: 500;"></span>
                 </div>
             </div>
             <!-- Filters Bar -->
@@ -3813,6 +3814,71 @@
         let smsAutomations = [];
         let smsAutomationsFiltered = [];
         let smsTemplatesCache = {};
+        let automationCheckInterval = null;
+        const AUTOMATION_CHECK_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+        
+        // Auto-run automations check if needed
+        async function checkAndRunAutomations(forceRun = false) {
+            const lastRunKey = 'smsAutomationLastRun';
+            const lastRun = parseInt(localStorage.getItem(lastRunKey) || '0');
+            const now = Date.now();
+            const timeSinceLastRun = now - lastRun;
+            
+            // Update last run display
+            const lastRunSpan = document.getElementById('lastAutomationRun');
+            if (lastRunSpan && lastRun > 0) {
+                const minutes = Math.floor(timeSinceLastRun / 60000);
+                if (minutes < 1) {
+                    lastRunSpan.textContent = '| Zadnje preverjanje: ravnokar';
+                } else if (minutes < 60) {
+                    lastRunSpan.textContent = `| Zadnje preverjanje: pred ${minutes} min`;
+                } else {
+                    lastRunSpan.textContent = '| Zadnje preverjanje: ' + new Date(lastRun).toLocaleTimeString('sl-SI');
+                }
+            }
+            
+            // Check if we should auto-run
+            const hasEnabledAutomations = smsAutomations.some(a => a.enabled);
+            const shouldAutoRun = hasEnabledAutomations && (forceRun || timeSinceLastRun > AUTOMATION_CHECK_INTERVAL_MS);
+            
+            if (shouldAutoRun) {
+                console.log('Auto-running SMS automation check...');
+                try {
+                    const res = await fetch('api.php?action=run-sms-automations');
+                    const result = await res.json();
+                    localStorage.setItem(lastRunKey, now.toString());
+                    
+                    if (result.success && result.totalQueued > 0) {
+                        showToast(`🤖 Auto-check: ${result.totalQueued} SMS dodano v vrsto`);
+                        loadSmsAutomations(); // Refresh to show updated counts
+                    }
+                    
+                    // Update last run display
+                    if (lastRunSpan) {
+                        lastRunSpan.textContent = '| Zadnje preverjanje: ravnokar';
+                    }
+                } catch (err) {
+                    console.error('Auto-run error:', err);
+                }
+            }
+        }
+        
+        // Start/stop periodic automation checking
+        function startAutomationChecking() {
+            if (automationCheckInterval) return;
+            automationCheckInterval = setInterval(() => {
+                if (document.getElementById('smsAutomationContent')?.style.display !== 'none') {
+                    checkAndRunAutomations();
+                }
+            }, AUTOMATION_CHECK_INTERVAL_MS);
+        }
+        
+        function stopAutomationChecking() {
+            if (automationCheckInterval) {
+                clearInterval(automationCheckInterval);
+                automationCheckInterval = null;
+            }
+        }
         
         async function loadSmsAutomations() {
             const tbody = document.getElementById('automationsTableBody');
@@ -3838,6 +3904,12 @@
                 }
                 
                 renderAutomationsTable();
+                
+                // Auto-run check if enabled automations exist and enough time passed
+                checkAndRunAutomations();
+                
+                // Start periodic checking
+                startAutomationChecking();
                 
             } catch (err) {
                 console.error('Error loading automations:', err);
@@ -4200,14 +4272,24 @@
                         showToast('ℹ️ Ni novih SMS za dodati v vrsto');
                     }
                     
+                    // Save last run time
+                    localStorage.setItem('smsAutomationLastRun', Date.now().toString());
+                    
                     // Update last run time display
                     const lastRunSpan = document.getElementById('lastAutomationRun');
                     if (lastRunSpan) {
-                        lastRunSpan.textContent = '| Zadnje preverjanje: ' + new Date().toLocaleTimeString('sl-SI');
+                        lastRunSpan.textContent = '| Zadnje preverjanje: ravnokar';
                     }
                     
-                    // Reload automations to show updated queued counts
-                    loadSmsAutomations();
+                    // Reload automations to show updated queued counts (without triggering auto-run again)
+                    const tbody = document.getElementById('automationsTableBody');
+                    if (tbody) {
+                        const res2 = await fetch('api.php?action=sms-automations');
+                        smsAutomations = await res2.json();
+                        if (Array.isArray(smsAutomations)) {
+                            renderAutomationsTable();
+                        }
+                    }
                 } else {
                     showToast(result.error || 'Napaka pri zagonu avtomatizacij', true);
                 }
