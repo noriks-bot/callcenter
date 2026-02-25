@@ -1977,7 +1977,7 @@
             </div>
         </div>
 
-        <div class="content" style="max-width:1200px;">
+        <div class="urgent-content-inner" style="max-width:1200px;padding:20px;">
             <!-- Table container (rendered by JS) -->
             <div id="urgentTableContainer">
                 <div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p></div>
