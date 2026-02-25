@@ -724,7 +724,7 @@
 
         <div class="content">
             <!-- Urgent Add Button Bar (shown only for Nujno tab) -->
-            <div id="urgentActionBar" style="display:none;margin-bottom:12px;">
+            <div id="urgentActionBar" style="display:none;margin-top:16px;margin-bottom:12px;">
                 <button class="btn btn-save" id="addUrgentBtn" style="padding:10px 20px;font-size:14px;" onclick="showAddUrgentModal()">
                     <i class="fas fa-plus"></i> Dodaj nujni lead
                 </button>
