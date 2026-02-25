@@ -3986,9 +3986,14 @@
             const storeCode = item.storeCode || 'hr';
             templateSelect.innerHTML = '<option value="">-- Izberi predlogo --</option>';
             
+            console.log('[SMS Modal] Opening for store:', storeCode);
+            console.log('[SMS Modal] smsTemplatesData:', smsTemplatesData);
+            console.log('[SMS Modal] Templates keys:', smsTemplatesData?.templates ? Object.keys(smsTemplatesData.templates) : 'none');
+            
             if (smsTemplatesData?.templates) {
                 Object.keys(smsTemplatesData.templates).forEach(key => {
                     const tpl = smsTemplatesData.templates[key][storeCode];
+                    console.log('[SMS Modal] Template', key, 'for', storeCode, ':', tpl);
                     if (tpl) {
                         const icon = key.includes('abandoned') ? '🛒' : key.includes('winback') ? '💙' : '📱';
                         templateSelect.innerHTML += `<option value="${key}">${icon} ${tpl.name}</option>`;
