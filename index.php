@@ -2601,8 +2601,11 @@
 
             // Paketomati count (filtered by country like other tabs)
             let filteredPaketomati = paketomatiData ? paketomatiData.filter(p => p.status === 'not_called') : [];
+            console.log('[Paketomati Count] Total not_called:', filteredPaketomati.length, 'currentStore:', currentStore);
             if (currentStore !== 'all') {
+                const beforeFilter = filteredPaketomati.length;
                 filteredPaketomati = filteredPaketomati.filter(p => p.storeCode === currentStore);
+                console.log('[Paketomati Count] After country filter:', filteredPaketomati.length, 'storeCodes in data:', [...new Set(paketomatiData.map(p => p.storeCode))]);
             }
             document.getElementById('contentCount-paketomati').textContent = filteredPaketomati.length;
         }
@@ -3017,7 +3020,7 @@
             if (result.success && Array.isArray(result.data)) {
                 paketomatiData = result.data;
                 console.log('[Paketomati] ✓ Loaded:', paketomatiData.length);
-                updatePaketomatiCount();
+                // Count is updated by updateContentTabCounts() after init
             } else {
                 paketomatiData = [];
                 console.warn('[Paketomati] ✗ Failed, using empty array');
