@@ -725,8 +725,8 @@
         <div class="content">
             <div class="filters-bar">
                 <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone...">
-                <button class="btn btn-save" id="addUrgentBtn" style="display:none;" onclick="showAddUrgentModal()">
-                    <i class="fas fa-plus"></i> Dodaj
+                <button class="btn btn-save" id="addUrgentBtn" style="display:none;margin-left:auto;padding:8px 16px;" onclick="showAddUrgentModal()">
+                    <i class="fas fa-plus"></i> Dodaj nujni lead
                 </button>
                 <select class="filter-select" id="statusFilter">
                     <option value="">All Status</option>
@@ -1901,10 +1901,10 @@
     </div>
 
     <!-- Add Urgent Lead Modal -->
-    <div id="addUrgentModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:500px;">
+    <div class="modal-bg" id="addUrgentModal" style="display:none;">
+        <div class="modal">
             <div class="modal-header">
-                <h3><i class="fas fa-plus"></i> Dodaj nujni lead</h3>
+                <div class="modal-title"><i class="fas fa-plus"></i> Dodaj nujni lead</div>
                 <button class="modal-close" onclick="closeAddUrgentModal()">×</button>
             </div>
             <div class="modal-body">
@@ -7695,6 +7695,13 @@
         
         async function renderPaketomatiInline() {
             const container = document.getElementById('tableContainer');
+            if (!container) {
+                console.error('[Paketomati] tableContainer not found!');
+                return;
+            }
+            
+            // Make sure container is visible
+            container.style.display = 'block';
             container.innerHTML = '<div class="loading"><div class="spinner"></div>Nalagam paketomati...</div>';
             
             // Load data if not loaded
@@ -7703,7 +7710,12 @@
             }
             
             if (!paketomatiData || paketomatiData.length === 0) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-box"></i><p>Ni paketov v paketomatih</p><small style="color:var(--text-muted);">Noben paket trenutno ne čaka na prevzem</small></div>';
+                container.innerHTML = `
+                    <div class="empty" style="padding:60px;text-align:center;">
+                        <i class="fas fa-box" style="font-size:48px;opacity:0.3;margin-bottom:16px;display:block;"></i>
+                        <p style="font-size:16px;margin-bottom:8px;">Ni paketov v paketomatih</p>
+                        <small style="color:var(--text-muted);">Noben paket trenutno ne čaka na prevzem</small>
+                    </div>`;
                 return;
             }
             
