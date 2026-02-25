@@ -1984,7 +1984,7 @@
         function hideAllContent() {
             // Hide all special content areas
             const specialAreas = [
-                'dashboardContent', 'smsDashboardContent', 'smsSettingsContent',
+                'dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent',
                 'buyersSettingsContent', 'agentsContent', 'followupsContent',
                 'analyticsContent', 'paketomatiContent'
             ];
