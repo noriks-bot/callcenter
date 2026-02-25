@@ -2169,18 +2169,24 @@ function fetchPaketomatOrders($filter = 'all') {
     $debugInfo = ['total_orders' => count($orders), 'processed' => 0, 'with_events' => 0, 'matched' => 0];
     
     // STEP 2: For each order, fetch delivery events using get_document
-    // Check ALL orders - paketomat status is determined by delivery events, not order status
+    // Only check SHIPPED orders - those are the only ones that can be at pickup points
     $mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
     $processedCount = 0;
     
-    foreach ($orders as $order) {
+    // Filter to only shipped orders first (reduces API calls significantly)
+    $shippedOrders = array_filter($orders, function($o) {
+        return ($o['status_desc'] ?? '') === 'shipped';
+    });
+    $debugInfo['shipped_orders'] = count($shippedOrders);
+    
+    foreach ($shippedOrders as $order) {
         $mkId = $order['mk_id'] ?? null;
         if (!$mkId) continue;
         
-        // Limit API calls - max 100 orders to check
+        // Limit API calls - max 50 shipped orders to check
         $processedCount++;
         $debugInfo['processed'] = $processedCount;
-        if ($processedCount > 100) break;
+        if ($processedCount > 50) break;
         
         // Fetch delivery events for this order
         $getDocPayload = [
