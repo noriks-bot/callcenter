@@ -1164,7 +1164,7 @@
                                 <th>Trgovina</th>
                                 <th>Tip</th>
                                 <th>Predloga</th>
-                                <th>Zamik</th>
+                                <th title="Zamik pošiljanja / Max starost">Zamik / Max</th>
                                 <th>V vrsti</th>
                                 <th>Akcije</th>
                             </tr>
@@ -1235,11 +1235,24 @@
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Zamik pošiljanja</label>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <input type="number" id="automationDelay" class="form-input" style="width: 80px; text-align: center;" min="1" max="72" value="2" required>
-                            <span style="color: var(--text-secondary); font-size: 14px;">ur po zapustitvi košarice</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label">Zamik pošiljanja</label>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="number" id="automationDelay" class="form-input" style="width: 70px; text-align: center;" min="1" max="72" value="2" required>
+                                <span style="color: var(--text-secondary); font-size: 13px;">ur</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Max starost košarice</label>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="number" id="automationMaxDays" class="form-input" style="width: 70px; text-align: center;" min="1" max="30" value="7">
+                                <span style="color: var(--text-secondary); font-size: 13px;">dni</span>
+                            </div>
+                            <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">
+                                Košarice starejše od tega se ne obdelujejo
+                            </small>
                         </div>
                     </div>
                     
@@ -3989,7 +4002,7 @@
                             ${escapeHtml(a.template)}
                         </code>
                     </td>
-                    <td>${a.delay_hours}h</td>
+                    <td>${a.delay_hours}h <span style="color:var(--text-muted)">/ ${a.max_days || 7}d</span></td>
                     <td>${a.queued_count || 0}</td>
                     <td>
                         <button class="btn btn-sm btn-secondary" onclick="editAutomation('${a.id}')" title="Uredi">
@@ -4159,6 +4172,7 @@
                 type: document.getElementById('automationType').value,
                 template: document.getElementById('automationTemplate').value,
                 delay_hours: parseInt(document.getElementById('automationDelay').value) || 2,
+                max_days: parseInt(document.getElementById('automationMaxDays').value) || 7,
                 enabled: document.getElementById('automationEnabled').checked
             };
             
@@ -4198,6 +4212,7 @@
             document.getElementById('automationStore').value = automation.store;
             document.getElementById('automationType').value = automation.type;
             document.getElementById('automationDelay').value = automation.delay_hours;
+            document.getElementById('automationMaxDays').value = automation.max_days || 7;
             document.getElementById('automationEnabled').checked = automation.enabled;
             
             // Load templates then select the right one and show preview

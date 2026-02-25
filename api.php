@@ -1806,6 +1806,14 @@ function runSmsAutomations() {
                     continue;
                 }
                 
+                // Check max_days - skip carts older than max_days
+                $maxDays = $automation['max_days'] ?? 7;
+                $maxAgeSeconds = $maxDays * 24 * 3600;
+                if ((time() - $abandonedAt) > $maxAgeSeconds) {
+                    $log("Skipping cart $cartId - older than $maxDays days");
+                    continue;
+                }
+                
                 // Skip if no phone number
                 $phone = $cart['phone'] ?? '';
                 if (empty($phone)) {
