@@ -5055,13 +5055,18 @@
             }
             
             const data = await loadTestSmsTemplates();
+            console.log('[TestSMS] API data:', data);
             // API returns array: templates: [{id, name, messages: {hr: "...", cz: "..."}}]
             const templateList = data.templates || [];
+            console.log('[TestSMS] Looking for templateKey:', templateKey, 'country:', country);
+            console.log('[TestSMS] templateList:', templateList.map(t => t.id));
             const template = templateList.find(t => t.id === templateKey);
+            console.log('[TestSMS] Found template:', template);
             const message = template?.messages?.[country];
+            console.log('[TestSMS] Message:', message);
             
             if (!message) {
-                preview.innerHTML = '<span style="color:var(--accent-red);">Predloga ni najdena za izbrano državo</span>';
+                preview.innerHTML = `<span style="color:var(--accent-red);">Predloga ni najdena (key=${templateKey}, country=${country}, templates=${templateList.length})</span>`;
                 return;
             }
             
