@@ -2273,13 +2273,49 @@ function buildPaketomatiCacheFull() {
                 }
             }
             
-            // Get store code
-            $eshopName = $fullOrder['eshop_name'] ?? '';
-            $storeCode = 'si';
+            // Get store code - try multiple sources
+            $eshopName = strtolower($fullOrder['eshop_name'] ?? '');
+            $country = $partner['country'] ?? '';
+            $storeCode = 'hr'; // Default to HR (most common)
+            
+            // 1. Try eshop_name patterns
             if (preg_match('/\.([a-z]{2})\./', $eshopName, $m)) {
                 $storeCode = $m[1];
-            } elseif (preg_match('/(sk|cz|pl|hr|hu|gr|it)/i', $eshopName, $m)) {
+            } elseif (preg_match('/(sk|cz|pl|hr|hu|gr|it|si)/i', $eshopName, $m)) {
                 $storeCode = strtolower($m[1]);
+            } elseif (strpos($eshopName, 'slovakia') !== false || strpos($eshopName, 'sk') !== false) {
+                $storeCode = 'sk';
+            } elseif (strpos($eshopName, 'czech') !== false || strpos($eshopName, 'cz') !== false) {
+                $storeCode = 'cz';
+            } elseif (strpos($eshopName, 'poland') !== false || strpos($eshopName, 'pl') !== false) {
+                $storeCode = 'pl';
+            } elseif (strpos($eshopName, 'croatia') !== false || strpos($eshopName, 'hr') !== false) {
+                $storeCode = 'hr';
+            } elseif (strpos($eshopName, 'hungary') !== false || strpos($eshopName, 'hu') !== false) {
+                $storeCode = 'hu';
+            } elseif (strpos($eshopName, 'greece') !== false || strpos($eshopName, 'gr') !== false) {
+                $storeCode = 'gr';
+            } elseif (strpos($eshopName, 'italy') !== false || strpos($eshopName, 'it') !== false) {
+                $storeCode = 'it';
+            }
+            // 2. Fallback to country name mapping
+            else {
+                $countryMap = [
+                    'Slovakia' => 'sk', 'Slovensko' => 'sk',
+                    'Czech Republic' => 'cz', 'Česká republika' => 'cz', 'Czechia' => 'cz',
+                    'Poland' => 'pl', 'Polska' => 'pl',
+                    'Croatia' => 'hr', 'Hrvatska' => 'hr',
+                    'Hungary' => 'hu', 'Magyarország' => 'hu',
+                    'Greece' => 'gr', 'Ελλάδα' => 'gr',
+                    'Italy' => 'it', 'Italia' => 'it',
+                    'Slovenia' => 'si', 'Slovenija' => 'si'
+                ];
+                foreach ($countryMap as $name => $code) {
+                    if (stripos($country, $name) !== false) {
+                        $storeCode = $code;
+                        break;
+                    }
+                }
             }
             
             $paketomatOrders[] = [
