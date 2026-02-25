@@ -215,6 +215,11 @@
             document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Agent';
             document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
             document.getElementById('headerAvatar').textContent = user.username[0].toUpperCase();
+            
+            // Show admin sections if admin
+            if (user.role === 'admin') {
+                document.body.classList.add('is-admin');
+            }
         }
         
         // Mobile sidebar
