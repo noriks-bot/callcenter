@@ -2587,6 +2587,10 @@
                         t.classList.toggle('active', t.dataset.content === currentContentTab);
                     });
 
+                    // First hide all special content tabs
+                    document.getElementById('paketomatiContent').style.display = 'none';
+                    document.getElementById('urgentContent').style.display = 'none';
+                    
                     if (currentContentTab === 'paketomati') {
                         document.querySelector('.content').style.display = 'none';
                         document.getElementById('paketomatiContent').style.display = 'block';
@@ -2596,6 +2600,7 @@
                         document.getElementById('urgentContent').style.display = 'block';
                         renderUrgentTable();
                     } else {
+                        document.querySelector('.content').style.display = 'block';
                         currentPage = 1;
                         renderTable();
                         setTimeout(addCustomerClickHandlers, 100);
