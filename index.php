@@ -1031,6 +1031,120 @@
         </div>
     </div>
     
+    <!-- SMS Automation Content -->
+    <div id="smsAutomationContent" style="display:none;">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title-large"><i class="fas fa-robot"></i> SMS Automation</h1>
+            <div class="page-header-actions">
+                <button class="action-btn-header primary" onclick="showAddAutomationModal()">
+                    <i class="fas fa-plus"></i> Nova avtomatizacija
+                </button>
+                <button class="action-btn-header" onclick="loadSmsAutomations()">
+                    <i class="fas fa-sync-alt"></i> Osveži
+                </button>
+            </div>
+        </div>
+        
+        <!-- Automations List -->
+        <div class="card" style="margin: 20px;">
+            <div class="card-header">
+                <h3><i class="fas fa-list"></i> Aktivne avtomatizacije</h3>
+            </div>
+            <div class="card-body">
+                <div id="automationsTableContainer">
+                    <table class="data-table" id="automationsTable">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Ime</th>
+                                <th>Trgovina</th>
+                                <th>Tip</th>
+                                <th>Predloga</th>
+                                <th>Zamik</th>
+                                <th>Poslanih</th>
+                                <th>Akcije</th>
+                            </tr>
+                        </thead>
+                        <tbody id="automationsTableBody">
+                            <tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-muted);">Nalagam avtomatizacije...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Automation Modal -->
+    <div id="automationModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 id="automationModalTitle"><i class="fas fa-robot"></i> Nova SMS avtomatizacija</h3>
+                <button class="modal-close" onclick="closeAutomationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="automationForm">
+                    <input type="hidden" id="automationId" value="">
+                    
+                    <div class="form-group">
+                        <label for="automationName">Ime avtomatizacije</label>
+                        <input type="text" id="automationName" class="form-control" placeholder="npr. HR Zapuščena košarica 2h" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="automationStore">Trgovina</label>
+                        <select id="automationStore" class="form-control" required>
+                            <option value="">-- Izberi trgovino --</option>
+                            <option value="hr">🇭🇷 Hrvaška (HR)</option>
+                            <option value="cz">🇨🇿 Češka (CZ)</option>
+                            <option value="pl">🇵🇱 Poljska (PL)</option>
+                            <option value="sk">🇸🇰 Slovaška (SK)</option>
+                            <option value="hu">🇭🇺 Madžarska (HU)</option>
+                            <option value="gr">🇬🇷 Grčija (GR)</option>
+                            <option value="it">🇮🇹 Italija (IT)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="automationType">Tip avtomatizacije</label>
+                        <select id="automationType" class="form-control" required>
+                            <option value="abandoned_cart">🛒 Zapuščena košarica</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="automationTemplate">SMS predloga</label>
+                        <select id="automationTemplate" class="form-control" required>
+                            <option value="">-- Izberi predlogo --</option>
+                        </select>
+                        <small class="form-text">Predloge se naložijo glede na izbrano trgovino</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="automationDelay">Zamik (ure)</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="automationDelay" class="form-control" min="1" max="72" value="2" style="width: 100px;" required>
+                            <span style="color: var(--text-muted);">ur po zapustitvi košarice</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="automationEnabled" checked>
+                            Avtomatizacija aktivna
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeAutomationModal()">Prekliči</button>
+                <button type="button" class="btn btn-primary" onclick="saveAutomation()">
+                    <i class="fas fa-save"></i> Shrani
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- SMS Dashboard Content (shown when tab selected) -->
     <div id="smsDashboardContent" style="display:none;">
         <!-- Page Header -->
@@ -1947,6 +2061,7 @@
                     pending: 'Pending Orders',
                     buyers: 'Enkratni kupci',
                     paketomati: 'Paketomati',
+                    'sms-automation': 'SMS Automation',
                     'sms-dashboard': 'SMS Dashboard',
                     'sms-settings': 'SMS Provider Settings',
                     'buyers-settings': 'Options',
@@ -1996,6 +2111,9 @@
                     if (currentTab === 'dashboard') {
                         showSpecialView('dashboardContent');
                         renderDashboard();
+                    } else if (currentTab === 'sms-automation') {
+                        showSpecialView('smsAutomationContent');
+                        loadSmsAutomations();
                     } else if (currentTab === 'sms-dashboard') {
                         showSpecialView('smsDashboardContent');
                         loadSmsDashboardQueue();
@@ -3547,6 +3665,227 @@
                 showToast('Napaka pri dodajanju SMS', true);
             }
         }
+        
+        // =============================================
+        // SMS AUTOMATION FUNCTIONS
+        // =============================================
+        
+        let smsAutomations = [];
+        let smsTemplatesCache = {};
+        
+        async function loadSmsAutomations() {
+            const tbody = document.getElementById('automationsTableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px;"><div class="spinner"></div></td></tr>';
+            
+            try {
+                const res = await fetch('api.php?action=sms-automations');
+                smsAutomations = await res.json();
+                
+                if (!Array.isArray(smsAutomations) || smsAutomations.length === 0) {
+                    tbody.innerHTML = `
+                        <tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-robot" style="font-size: 48px; margin-bottom: 15px; display: block; opacity: 0.3;"></i>
+                            Ni še nobene avtomatizacije.<br>
+                            <button class="btn btn-primary" style="margin-top: 15px;" onclick="showAddAutomationModal()">
+                                <i class="fas fa-plus"></i> Dodaj prvo avtomatizacijo
+                            </button>
+                        </td></tr>
+                    `;
+                    return;
+                }
+                
+                const storeNames = {
+                    hr: '🇭🇷 HR', cz: '🇨🇿 CZ', pl: '🇵🇱 PL', 
+                    sk: '🇸🇰 SK', hu: '🇭🇺 HU', gr: '🇬🇷 GR', it: '🇮🇹 IT'
+                };
+                
+                const typeNames = {
+                    abandoned_cart: '🛒 Zapuščena košarica'
+                };
+                
+                tbody.innerHTML = smsAutomations.map(a => `
+                    <tr>
+                        <td>
+                            <span class="status-badge ${a.enabled ? 'status-success' : 'status-muted'}" style="cursor: pointer;" onclick="toggleAutomation('${a.id}')">
+                                <i class="fas fa-${a.enabled ? 'check-circle' : 'pause-circle'}"></i>
+                                ${a.enabled ? 'Aktivno' : 'Zaustavljeno'}
+                            </span>
+                        </td>
+                        <td><strong>${escapeHtml(a.name)}</strong></td>
+                        <td>${storeNames[a.store] || a.store}</td>
+                        <td>${typeNames[a.type] || a.type}</td>
+                        <td><code>${escapeHtml(a.template)}</code></td>
+                        <td>${a.delay_hours}h</td>
+                        <td>${a.sent_count || 0}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editAutomation('${a.id}')" title="Uredi">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAutomation('${a.id}')" title="Izbriši">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (err) {
+                console.error('Error loading automations:', err);
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--danger);">Napaka pri nalaganju</td></tr>';
+            }
+        }
+        
+        function showAddAutomationModal() {
+            document.getElementById('automationModalTitle').innerHTML = '<i class="fas fa-robot"></i> Nova SMS avtomatizacija';
+            document.getElementById('automationForm').reset();
+            document.getElementById('automationId').value = '';
+            document.getElementById('automationEnabled').checked = true;
+            document.getElementById('automationTemplate').innerHTML = '<option value="">-- Najprej izberi trgovino --</option>';
+            document.getElementById('automationModal').style.display = 'flex';
+        }
+        
+        function closeAutomationModal() {
+            document.getElementById('automationModal').style.display = 'none';
+        }
+        
+        async function loadTemplatesForStore(store) {
+            const templateSelect = document.getElementById('automationTemplate');
+            templateSelect.innerHTML = '<option value="">Nalagam predloge...</option>';
+            
+            try {
+                const res = await fetch(`api.php?action=sms-templates&store=${store}`);
+                const templates = await res.json();
+                smsTemplatesCache[store] = templates;
+                
+                if (!templates || templates.length === 0) {
+                    templateSelect.innerHTML = '<option value="">-- Ni predlog za to trgovino --</option>';
+                    return;
+                }
+                
+                templateSelect.innerHTML = '<option value="">-- Izberi predlogo --</option>' + 
+                    templates.map(t => `<option value="${escapeHtml(t.id || t.name)}">${escapeHtml(t.name)}</option>`).join('');
+                    
+            } catch (err) {
+                console.error('Error loading templates:', err);
+                templateSelect.innerHTML = '<option value="">-- Napaka pri nalaganju --</option>';
+            }
+        }
+        
+        // Listen for store change
+        document.addEventListener('DOMContentLoaded', () => {
+            const storeSelect = document.getElementById('automationStore');
+            if (storeSelect) {
+                storeSelect.addEventListener('change', (e) => {
+                    if (e.target.value) {
+                        loadTemplatesForStore(e.target.value);
+                    }
+                });
+            }
+        });
+        
+        async function saveAutomation() {
+            const id = document.getElementById('automationId').value;
+            const data = {
+                id: id || null,
+                name: document.getElementById('automationName').value.trim(),
+                store: document.getElementById('automationStore').value,
+                type: document.getElementById('automationType').value,
+                template: document.getElementById('automationTemplate').value,
+                delay_hours: parseInt(document.getElementById('automationDelay').value) || 2,
+                enabled: document.getElementById('automationEnabled').checked
+            };
+            
+            if (!data.name || !data.store || !data.template) {
+                showToast('Prosim izpolni vsa polja', true);
+                return;
+            }
+            
+            try {
+                const res = await fetch('api.php?action=save-sms-automation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast(id ? 'Avtomatizacija posodobljena!' : 'Avtomatizacija dodana!');
+                    closeAutomationModal();
+                    loadSmsAutomations();
+                } else {
+                    showToast(result.error || 'Napaka pri shranjevanju', true);
+                }
+            } catch (err) {
+                console.error('Error saving automation:', err);
+                showToast('Napaka pri shranjevanju', true);
+            }
+        }
+        
+        function editAutomation(id) {
+            const automation = smsAutomations.find(a => a.id === id);
+            if (!automation) return;
+            
+            document.getElementById('automationModalTitle').innerHTML = '<i class="fas fa-edit"></i> Uredi avtomatizacijo';
+            document.getElementById('automationId').value = automation.id;
+            document.getElementById('automationName').value = automation.name;
+            document.getElementById('automationStore').value = automation.store;
+            document.getElementById('automationType').value = automation.type;
+            document.getElementById('automationDelay').value = automation.delay_hours;
+            document.getElementById('automationEnabled').checked = automation.enabled;
+            
+            // Load templates then select the right one
+            loadTemplatesForStore(automation.store).then(() => {
+                document.getElementById('automationTemplate').value = automation.template;
+            });
+            
+            document.getElementById('automationModal').style.display = 'flex';
+        }
+        
+        async function toggleAutomation(id) {
+            const automation = smsAutomations.find(a => a.id === id);
+            if (!automation) return;
+            
+            automation.enabled = !automation.enabled;
+            
+            try {
+                await fetch('api.php?action=save-sms-automation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(automation)
+                });
+                showToast(automation.enabled ? 'Avtomatizacija aktivirana' : 'Avtomatizacija zaustavljena');
+                loadSmsAutomations();
+            } catch (err) {
+                showToast('Napaka pri posodabljanju', true);
+            }
+        }
+        
+        async function deleteAutomation(id) {
+            if (!confirm('Si prepričan, da želiš izbrisati to avtomatizacijo?')) return;
+            
+            try {
+                const res = await fetch('api.php?action=delete-sms-automation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast('Avtomatizacija izbrisana');
+                    loadSmsAutomations();
+                } else {
+                    showToast(result.error || 'Napaka pri brisanju', true);
+                }
+            } catch (err) {
+                showToast('Napaka pri brisanju', true);
+            }
+        }
+        
+        // =============================================
+        // SMS DASHBOARD FUNCTIONS  
+        // =============================================
         
         // SMS Dashboard - Load Queue from API
         async function loadSmsDashboardQueue() {

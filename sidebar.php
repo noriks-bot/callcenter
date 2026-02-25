@@ -39,6 +39,10 @@
         
         <div class="nav-section">
             <div class="nav-title">Messaging</div>
+            <div class="nav-item" data-tab="sms-automation">
+                <i class="fas fa-robot"></i>
+                <span>SMS Automation</span>
+            </div>
             <div class="nav-item" data-tab="sms-dashboard">
                 <i class="fas fa-comment-sms"></i>
                 <span>SMS Dashboard</span>

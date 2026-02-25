@@ -2414,13 +2414,112 @@ try {
             break;
             
         case 'sms-templates':
+            $store = $_GET['store'] ?? null;
             $templatesFile = __DIR__ . '/sms-templates.json';
             if (file_exists($templatesFile)) {
-                $templates = json_decode(file_get_contents($templatesFile), true);
-                echo json_encode($templates);
+                $data = json_decode(file_get_contents($templatesFile), true);
+                $templates = $data['templates'] ?? $data;
+                
+                // If store specified, filter templates for that store
+                if ($store) {
+                    $result = [];
+                    foreach ($templates as $typeKey => $stores) {
+                        if (isset($stores[$store])) {
+                            $result[] = [
+                                'id' => $typeKey . '_' . $store,
+                                'type' => $typeKey,
+                                'name' => $stores[$store]['name'],
+                                'message' => $stores[$store]['message']
+                            ];
+                        }
+                    }
+                    echo json_encode($result);
+                } else {
+                    echo json_encode($templates);
+                }
             } else {
                 echo json_encode(['error' => 'Templates file not found']);
             }
+            break;
+            
+        case 'sms-automations':
+            $automationsFile = __DIR__ . '/data/sms-automations.json';
+            if (file_exists($automationsFile)) {
+                $automations = json_decode(file_get_contents($automationsFile), true);
+                echo json_encode($automations ?: []);
+            } else {
+                echo json_encode([]);
+            }
+            break;
+            
+        case 'save-sms-automation':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $automationsFile = __DIR__ . '/data/sms-automations.json';
+            
+            // Load existing
+            $automations = [];
+            if (file_exists($automationsFile)) {
+                $automations = json_decode(file_get_contents($automationsFile), true) ?: [];
+            }
+            
+            // Generate ID if new
+            if (empty($input['id'])) {
+                $input['id'] = 'auto_' . uniqid();
+                $input['created_at'] = date('c');
+                $input['sent_count'] = 0;
+                $automations[] = $input;
+            } else {
+                // Update existing
+                $found = false;
+                foreach ($automations as &$a) {
+                    if ($a['id'] === $input['id']) {
+                        $input['sent_count'] = $a['sent_count'] ?? 0;
+                        $input['created_at'] = $a['created_at'] ?? date('c');
+                        $a = $input;
+                        $found = true;
+                        break;
+                    }
+                }
+                unset($a);
+                if (!$found) {
+                    $automations[] = $input;
+                }
+            }
+            
+            file_put_contents($automationsFile, json_encode($automations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            echo json_encode(['success' => true, 'id' => $input['id']]);
+            break;
+            
+        case 'delete-sms-automation':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $automationsFile = __DIR__ . '/data/sms-automations.json';
+            
+            if (empty($input['id'])) {
+                echo json_encode(['error' => 'ID required']);
+                break;
+            }
+            
+            $automations = [];
+            if (file_exists($automationsFile)) {
+                $automations = json_decode(file_get_contents($automationsFile), true) ?: [];
+            }
+            
+            $automations = array_filter($automations, function($a) use ($input) {
+                return $a['id'] !== $input['id'];
+            });
+            
+            file_put_contents($automationsFile, json_encode(array_values($automations), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            echo json_encode(['success' => true]);
             break;
             
         case 'email-templates':
