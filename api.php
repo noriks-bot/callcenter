@@ -2091,11 +2091,16 @@ function fetchPaketomatOrders($filter = 'all') {
         "Placed in the (collection) parcel machine",
         "Parcel stored in temporary parcel machine",
         "Packet has been delivered to its destination branch and is waiting for pickup",
-        // InPost / Packeta
+        // InPost / Packeta / Expedico
         "It's waiting to be collected at the Parcel Service Point",
         "Awaiting collection",
         "Accepted at an InPost branch",
         "Rerouted to parcel machine",
+        // Croatian - Hrvatska Pošta / Overseas Express
+        "predana u paketomat",      // Delivered to paketomat
+        "Pošiljka predana u paketomat",
+        "predana na pickup",
+        "čeka preuzimanje",         // Waiting for pickup (HR)
         // Generic waiting statuses (multiple languages)
         "Čaka na prevzem",
         "Waiting for pickup",
@@ -2106,23 +2111,22 @@ function fetchPaketomatOrders($filter = 'all') {
         "Dostavljen v paketnik",
         "Dostavljen na prevzemno mesto",
         "Delivered to parcel locker",
-        "Delivered to pickup point"
+        "Delivered to pickup point",
+        // Additional pickup indicators
+        "waiting at pickup",
+        "at collection point"
     ];
     
     // STEP 1: Fetch recent orders from MetaKocka (search endpoint)
-    // Get orders from last 14 days to reduce API calls, then filter by delivery events
+    // Get most recent 100 orders (newest first)
     $mkSearchUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
-    $dateFrom = date('Y-m-d', strtotime('-14 days')) . '+01:00';
     $mkPayload = [
         'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
         'company_id' => '6371',
         'doc_type' => 'sales_order',
         'result_type' => 'doc',
         'limit' => 100,
-        'order_direction' => 'desc',
-        'query_advance' => [
-            ['type' => 'doc_date_from', 'value' => $dateFrom]
-        ]
+        'order_direction' => 'desc'
     ];
     
     $ch = curl_init($mkSearchUrl);
