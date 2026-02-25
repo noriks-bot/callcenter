@@ -5070,9 +5070,9 @@
                 return;
             }
             
-            // Build the links
-            const checkoutLink = `https://noriks.com/${country}/cart/`;
-            const checkoutLinkCoupon = `https://noriks.com/${country}/cart/?apply_coupon=SMS20`;
+            // Build the links - always checkout, not cart
+            const checkoutLink = `https://noriks.com/${country}/checkout/`;
+            const checkoutLinkCoupon = `https://noriks.com/${country}/checkout/?coupon=SMS20`;
             const shopLink = `https://noriks.com/${country}/`;
             
             // Replace variables

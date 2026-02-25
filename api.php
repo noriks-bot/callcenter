@@ -1876,8 +1876,8 @@ function runSmsAutomations() {
                     $firstItem = reset($cart['cartContents']);
                     $productName = $firstItem['name'] ?? 'proizvod';
                 }
-                $checkoutLink = "https://noriks.com/{$store}/cart/";
-                $checkoutLinkWithCoupon = "https://noriks.com/{$store}/cart/?apply_coupon=SMS20";
+                $checkoutLink = "https://noriks.com/{$store}/checkout/";
+                $checkoutLinkWithCoupon = "https://noriks.com/{$store}/checkout/?coupon=SMS20";
                 $shopLink = "https://noriks.com/{$store}/";
                 
                 $message = str_replace(
