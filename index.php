@@ -1264,6 +1264,7 @@
             </div>
         </div>
         
+        <div class="content">
         <!-- Manual SMS Send Section -->
         <div class="table-card" style="margin-bottom:20px;border:2px solid var(--accent-green);">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);background:rgba(34,197,94,0.1);">
@@ -1355,6 +1356,7 @@
                 <div class="empty"><i class="fas fa-comment-sms"></i><p>Ni poslanih SMS sporočil</p></div>
             </div>
         </div>
+        </div><!-- .content -->
     </div>
     
     <!-- SMS Settings (shown when tab selected) -->
@@ -1369,7 +1371,7 @@
             </div>
         </div>
         
-        <div style="max-width:1000px;">
+        <div class="content" style="max-width:1000px;">
             <!-- SMS Provider Settings -->
             <div class="table-card" style="padding:12px 16px;margin-bottom:12px;">
                 <h3 style="margin-bottom:4px;font-size:14px;">📱 MetaKocka SMS Provider Settings</h3>
@@ -1522,7 +1524,7 @@
             </div>
         </div>
         
-        <div style="max-width:1000px;">
+        <div class="content" style="max-width:1000px;">
             <div class="table-card" style="padding:12px 16px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                     <div>
