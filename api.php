@@ -2135,50 +2135,32 @@ function buildPaketomatiCacheFull() {
     
     error_log("[Paketomati-Full] Found " . count($allOrders) . " orders, " . count($shippedOrders) . " shipped");
     
-    // Step 2: Fetch delivery events in parallel batches of 20
+    // Step 2: Fetch delivery events sequentially (simpler, more compatible)
     $mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
     $deliveryEventsMap = [];
-    $batchSize = 20;
     
-    for ($i = 0; $i < count($shippedOrders); $i += $batchSize) {
-        $batch = array_slice($shippedOrders, $i, $batchSize);
-        $multiHandle = curl_multi_init();
-        $curlHandles = [];
+    foreach ($shippedOrders as $i => $order) {
+        $mkId = $order['mk_id'] ?? null;
+        if (!$mkId) continue;
         
-        foreach ($batch as $j => $order) {
-            $mkId = $order['mk_id'] ?? null;
-            if (!$mkId) continue;
-            
-            $ch = curl_init($mkGetDocUrl);
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST => true,
-                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                CURLOPT_POSTFIELDS => json_encode([
-                    'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
-                    'company_id' => '6371',
-                    'doc_type' => 'sales_order',
-                    'doc_id' => $mkId,
-                    'return_delivery_service_events' => 'true'
-                ]),
-                CURLOPT_TIMEOUT => 15
-            ]);
-            curl_multi_add_handle($multiHandle, $ch);
-            $curlHandles[$i + $j] = $ch;
-        }
+        $ch = curl_init($mkGetDocUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode([
+                'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+                'company_id' => '6371',
+                'doc_type' => 'sales_order',
+                'doc_id' => $mkId,
+                'return_delivery_service_events' => 'true'
+            ]),
+            CURLOPT_TIMEOUT => 10
+        ]);
+        $response = curl_exec($ch);
+        curl_close($ch);
         
-        $running = null;
-        do {
-            curl_multi_exec($multiHandle, $running);
-            curl_multi_select($multiHandle);
-        } while ($running > 0);
-        
-        foreach ($curlHandles as $idx => $ch) {
-            $deliveryEventsMap[$idx] = json_decode(curl_multi_getcontent($ch), true);
-            curl_multi_remove_handle($multiHandle, $ch);
-            curl_close($ch);
-        }
-        curl_multi_close($multiHandle);
+        $deliveryEventsMap[$i] = json_decode($response, true);
     }
     
     // Step 3: Process and filter for paketomat orders
