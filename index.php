@@ -3007,7 +3007,8 @@
         async function loadPaketomatiBulletproof() {
             const result = await apiFetch('api.php?action=paketomati', {
                 component: 'Paketomati',
-                silent: true
+                silent: true,
+                timeout: 120000  // 2 minutes - API makes many MetaKocka calls
             });
 
             if (result.success && Array.isArray(result.data)) {
@@ -3015,7 +3016,7 @@
                 console.log('[Paketomati] ✓ Loaded:', paketomatiData.length);
             } else {
                 paketomatiData = [];
-                console.warn('[Paketomati] ✗ Failed, using empty array');
+                console.warn('[Paketomati] ✗ Failed, using empty array:', result.error);
             }
         }
 
