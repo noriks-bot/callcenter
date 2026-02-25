@@ -2789,6 +2789,21 @@ try {
             echo json_encode(['success' => true, 'count' => count($buyers), 'time' => date('c')]);
             break;
         
+        case 'cron-sms-automation':
+            // CRON: Run SMS automation checks
+            // Recommended: */30 * * * * curl -s https://callcenter.noriks.com/api.php?action=cron-sms-automation
+            // This adds SMS to queue for carts that match conditions. Never sends directly!
+            ignore_user_abort(true);
+            set_time_limit(120);
+            $result = runSmsAutomations();
+            echo json_encode([
+                'success' => $result['success'] ?? false,
+                'totalQueued' => $result['totalQueued'] ?? 0,
+                'time' => date('c'),
+                'results' => $result['results'] ?? []
+            ]);
+            break;
+        
         case 'cache-status':
             // Check cache status for debugging
             global $cacheDir;
