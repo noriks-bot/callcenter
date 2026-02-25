@@ -3003,55 +3003,21 @@
             await loadSmsTemplates();
         }
 
-        // Bulletproof Paketomati loading - instant cache + background refresh
+        // Bulletproof Paketomati loading
         async function loadPaketomatiBulletproof() {
-            // Step 1: Load from cache instantly (< 1 second)
-            const cachedResult = await apiFetch('api.php?action=paketomati-cached', {
-                component: 'Paketomati-Cache',
-                silent: true,
-                timeout: 5000
-            });
-            
-            if (cachedResult.success && cachedResult.data?.orders) {
-                paketomatiData = cachedResult.data.orders;
-                console.log('[Paketomati] ✓ Cache loaded:', paketomatiData.length, 'orders');
-                updatePaketomatiCount();
-                
-                // If we have cached data, render it immediately
-                if (paketomatiData.length > 0 && currentContentTab === 'paketomati') {
-                    renderPaketomatiInline();
-                }
-            }
-            
-            // Step 2: Refresh in background (don't wait)
-            refreshPaketomatiInBackground();
-        }
-        
-        async function refreshPaketomatiInBackground() {
-            console.log('[Paketomati] Starting background refresh...');
             const result = await apiFetch('api.php?action=paketomati', {
-                component: 'Paketomati-Refresh',
+                component: 'Paketomati',
                 silent: true,
-                timeout: 180000  // 3 minutes for background
+                timeout: 120000  // 2 minutes - API makes many MetaKocka calls
             });
 
             if (result.success && Array.isArray(result.data)) {
                 paketomatiData = result.data;
-                console.log('[Paketomati] ✓ Background refresh done:', paketomatiData.length);
-                updatePaketomatiCount();
-                
-                // Re-render if user is on paketomati tab
-                if (currentContentTab === 'paketomati') {
-                    renderPaketomatiInline();
-                }
+                console.log('[Paketomati] ✓ Loaded:', paketomatiData.length);
             } else {
-                console.warn('[Paketomati] ✗ Background refresh failed:', result.error);
+                paketomatiData = [];
+                console.warn('[Paketomati] ✗ Failed, using empty array:', result.error);
             }
-        }
-        
-        function updatePaketomatiCount() {
-            const paketCount = paketomatiData ? paketomatiData.filter(p => p.status === 'not_called').length : 0;
-            document.getElementById('contentCount-paketomati').textContent = paketCount;
         }
 
         // Legacy loadAllData for backwards compatibility
