@@ -108,24 +108,10 @@ function formatPhoneForSms($phone, $storeCode) {
         $phone = $countryCode . $phone;
     }
     
-    // MetaKocka format: NO + prefix, with spaces for readability
-    // Format: "385 98 216 102" (country code, then groups of digits)
-    $countryCodeLen = strlen($countryCode);
-    $nationalPart = substr($phone, $countryCodeLen); // Part after country code
-    
-    // Format: XXX XX XXX XXX (country code + space + first 2 digits + rest in groups of 3)
-    if (strlen($nationalPart) >= 2) {
-        $formatted = $countryCode . ' ' . substr($nationalPart, 0, 2);
-        $rest = substr($nationalPart, 2);
-        // Split rest into chunks of 3
-        $chunks = str_split($rest, 3);
-        if (!empty($chunks)) {
-            $formatted .= ' ' . implode(' ', $chunks);
-        }
-        return $formatted;
-    }
-    
-    return $phone;
+    // MetaKocka format: with + prefix, no spaces
+    // Format: "+385XXXXXXXXX" (plus sign, country code, national number)
+    // Changed from spaced format because MK seems to reject some international numbers with spaces
+    return '+' . $phone;
 }
 
 /**
@@ -621,6 +607,26 @@ function sendQueuedSms($smsId, $overridePhone = null) {
             'success' => false, 
             'error' => $errorMsg,
             'debug' => 'http_error',
+            'metakockaResponse' => $data,
+            'httpCode' => $httpCode
+        ];
+    }
+    
+    // Check message_list for individual message errors (MK returns opr_code=0 but message status=error)
+    if (isset($data['message_list'][0]['status']) && $data['message_list'][0]['status'] === 'error') {
+        $errorMsg = $data['message_list'][0]['error_desc'] ?? 'Message delivery failed';
+        $logMsg("[SMS-SEND] MESSAGE ERROR: $errorMsg");
+        
+        $queue[$smsIndex]['status'] = 'failed';
+        $queue[$smsIndex]['error'] = $errorMsg;
+        $queue[$smsIndex]['sentAt'] = date('c');
+        $queue[$smsIndex]['metakockaResponse'] = $data;
+        saveSmsQueue($queue);
+        
+        return [
+            'success' => false, 
+            'error' => $errorMsg,
+            'debug' => 'message_status_error',
             'metakockaResponse' => $data,
             'httpCode' => $httpCode
         ];
