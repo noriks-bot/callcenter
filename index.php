@@ -2693,6 +2693,17 @@
                     }
                 }
 
+                // Auto-refresh data every 5 minutes (300000ms)
+                setInterval(async () => {
+                    console.log('[AutoRefresh] Refreshing data...');
+                    try {
+                        await loadAllDataBulletproof();
+                        console.log('[AutoRefresh] ✓ Data refreshed');
+                    } catch (e) {
+                        console.error('[AutoRefresh] Failed:', e);
+                    }
+                }, 5 * 60 * 1000);
+
             } catch (error) {
                 console.error('[Init] Critical error:', error);
                 showToast(`❌ Napaka pri zagonu: ${error.message}`, 'error');
