@@ -2075,13 +2075,25 @@ function saveLastSeen($data) {
 function fetchPaketomatOrders($filter = 'all') {
     global $stores;
     
-    // 15 min cache - API calls are slow, use stale cache if available
-    $cached = getCache('paketomat_orders_' . $filter, 900);
-    if ($cached !== null && $filter !== 'debug') return $cached;
+    // JSON file cache - persists across requests
+    $cacheFile = __DIR__ . '/data/paketomati-cache.json';
+    $cacheMaxAge = 900; // 15 min fresh, but use stale if needed
     
-    // Also check for stale cache (up to 1 hour old) - better than nothing
-    $staleCache = getCache('paketomat_orders_' . $filter, 3600);
-    $useStaleWhileFetching = ($staleCache !== null);
+    if (file_exists($cacheFile) && $filter !== 'debug') {
+        $cacheData = json_decode(file_get_contents($cacheFile), true);
+        $cacheAge = time() - ($cacheData['timestamp'] ?? 0);
+        
+        // Return cached data if fresh enough
+        if ($cacheAge < $cacheMaxAge) {
+            return $cacheData['orders'] ?? [];
+        }
+        
+        // Return stale cache if less than 1 hour old (better than slow fetch)
+        if ($cacheAge < 3600 && !isset($_GET['force'])) {
+            // Trigger background refresh
+            return $cacheData['orders'] ?? [];
+        }
+    }
     
     $statusData = loadPaketomatStatus();
     $allOrders = [];
@@ -2393,8 +2405,18 @@ function fetchPaketomatOrders($filter = 'all') {
         return strtotime($dateB) - strtotime($dateA);
     });
     
-    // Don't cache while debugging
-    // setCache('paketomat_orders_' . $filter, $allOrders);
+    // Save to JSON file cache
+    $cacheFile = __DIR__ . '/data/paketomati-cache.json';
+    $cacheDir = dirname($cacheFile);
+    if (!is_dir($cacheDir)) mkdir($cacheDir, 0755, true);
+    
+    file_put_contents($cacheFile, json_encode([
+        'timestamp' => time(),
+        'count' => count($allOrders),
+        'orders' => $allOrders
+    ], JSON_PRETTY_PRINT));
+    
+    error_log("[Paketomati] Saved " . count($allOrders) . " orders to cache file");
     
     // Add debug info to response if filter is 'debug'
     if ($filter === 'debug') {
@@ -3630,14 +3652,24 @@ try {
             break;
             
         case 'paketomati-cached':
-            // Return cached data instantly (or empty if no cache)
-            $filter = $_GET['filter'] ?? 'all';
-            $cached = getCache('paketomat_orders_' . $filter, 3600); // Accept up to 1 hour old
-            echo json_encode([
-                'orders' => $cached ?? [],
-                'fromCache' => $cached !== null,
-                'count' => $cached ? count($cached) : 0
-            ]);
+            // Return cached data instantly from JSON file
+            $cacheFile = __DIR__ . '/data/paketomati-cache.json';
+            if (file_exists($cacheFile)) {
+                $cacheData = json_decode(file_get_contents($cacheFile), true);
+                $cacheAge = time() - ($cacheData['timestamp'] ?? 0);
+                echo json_encode([
+                    'orders' => $cacheData['orders'] ?? [],
+                    'fromCache' => true,
+                    'cacheAge' => $cacheAge,
+                    'count' => $cacheData['count'] ?? 0
+                ]);
+            } else {
+                echo json_encode([
+                    'orders' => [],
+                    'fromCache' => false,
+                    'count' => 0
+                ]);
+            }
             break;
         
         case 'paketomati-debug':
