@@ -7455,14 +7455,16 @@
                     body: JSON.stringify({ settings: buyersSettings })
                 });
                 const data = await res.json();
+                console.log('[BuyersSettings] Save response:', data);
                 if (data.success) {
-                    showToast('Nastavitve shranjene! Osvežujem podatke...');
+                    showToast('Nastavitve shranjene! (' + minDays + ' dni) Osvežujem podatke...');
                     // Clear cache and reload buyers data with new settings
                     await fetch('api.php?action=clear-cache');
                     await fetch('api.php?action=refresh-buyers-cache');
                     loadBuyers();
                 } else {
-                    showToast(data.error || 'Napaka pri shranjevanju', true);
+                    showToast(data.error || 'Napaka pri shranjevanju', 'error');
+                    console.error('[BuyersSettings] Save failed:', data);
                 }
             } catch (e) {
                 showToast('Napaka: ' + e.message, true);

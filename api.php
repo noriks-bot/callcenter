@@ -2452,9 +2452,21 @@ try {
             }
             $input = json_decode(file_get_contents('php://input'), true);
             $buyersSettingsFile = __DIR__ . '/data/buyers-settings.json';
+            
+            // Ensure data directory exists
+            $dataDir = __DIR__ . '/data';
+            if (!is_dir($dataDir)) {
+                mkdir($dataDir, 0755, true);
+            }
+            
             $settings = $input['settings'] ?? ['minDaysFromPurchase' => 10];
-            file_put_contents($buyersSettingsFile, json_encode($settings, JSON_PRETTY_PRINT));
-            echo json_encode(['success' => true]);
+            $result = file_put_contents($buyersSettingsFile, json_encode($settings, JSON_PRETTY_PRINT));
+            
+            if ($result === false) {
+                echo json_encode(['success' => false, 'error' => 'Failed to write settings file']);
+            } else {
+                echo json_encode(['success' => true, 'saved' => $settings]);
+            }
             break;
             
         case 'sms-test-connection':
