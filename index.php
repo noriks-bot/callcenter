@@ -20,8 +20,7 @@
         #agentsContent,
         #followupsContent,
         #analyticsContent,
-        #paketomatiContent,
-        #urgentContent {
+        #paketomatiContent {
             margin-left: 260px;
             padding-top: 64px;
             min-height: 100vh;
@@ -122,8 +121,7 @@
         .sidebar.collapsed ~ #agentsContent,
         .sidebar.collapsed ~ #followupsContent,
         .sidebar.collapsed ~ #analyticsContent,
-        .sidebar.collapsed ~ #paketomatiContent,
-        .sidebar.collapsed ~ #urgentContent {
+        .sidebar.collapsed ~ #paketomatiContent {
             margin-left: 70px;
         }
 
@@ -137,8 +135,7 @@
             #agentsContent,
             #followupsContent,
             #analyticsContent,
-            #paketomatiContent,
-            #urgentContent {
+            #paketomatiContent {
                 margin-left: 0;
             }
         }
@@ -1965,36 +1962,6 @@
         </div>
     </div>
 
-    <!-- Urgent Leads Content -->
-    <div id="urgentContent" style="display:none;">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title-large"><i class="fas fa-exclamation-triangle"></i> Nujno</h1>
-            <div class="page-header-actions">
-                <button class="action-btn-header" onclick="showAddUrgentModal()">
-                    <i class="fas fa-plus"></i> Dodaj
-                </button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="urgent-content-inner" style="max-width:1200px;padding:20px;">
-            <!-- Table container (rendered by JS) -->
-            <div id="urgentTableContainer">
-                <div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p></div>
-            </div>
-
-            <!-- Bulk actions bar -->
-            <div id="urgentBulkActions" class="bulk-bar" style="display:none;">
-                <span><span id="urgentSelectedCount">0</span> izbranih</span>
-                <button class="btn" onclick="markSelectedUrgentCalled()"><i class="fas fa-check"></i> Označi poklicano</button>
-                <button class="btn btn-danger" onclick="deleteSelectedUrgent()"><i class="fas fa-trash"></i> Izbriši</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Add Urgent Lead Modal -->
     <div id="addUrgentModal" class="modal" style="display:none;">
         <div class="modal-content" style="max-width:500px;">
@@ -2453,7 +2420,7 @@
             const specialAreas = [
                 'dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent',
                 'buyersSettingsContent', 'agentsContent', 'followupsContent',
-                'analyticsContent', 'paketomatiContent', 'urgentContent'
+                'analyticsContent', 'paketomatiContent'
             ];
             specialAreas.forEach(id => {
                 const el = document.getElementById(id);
@@ -2566,7 +2533,6 @@
 
                     // First hide all special content tabs
                     document.getElementById('paketomatiContent').style.display = 'none';
-                    document.getElementById('urgentContent').style.display = 'none';
                     
                     if (currentContentTab === 'paketomati') {
                         document.querySelector('.content').style.display = 'none';
@@ -2657,7 +2623,6 @@
                     
                     // Hide special content tabs first
                     document.getElementById('paketomatiContent').style.display = 'none';
-                    document.getElementById('urgentContent').style.display = 'none';
 
                     // Show appropriate content
                     if (newTab === 'paketomati') {
@@ -2765,7 +2730,7 @@
                 // Hide ALL special content areas first (ensures clean state)
                 ['dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
                  'buyersSettingsContent', 'agentsContent', 'followupsContent',
-                 'analyticsContent', 'paketomatiContent', 'urgentContent'].forEach(id => {
+                 'analyticsContent', 'paketomatiContent'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'none';
                 });
