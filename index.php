@@ -3340,14 +3340,17 @@
                     <tbody>
                         ${data.map(c => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[c.currency] || '€';
-                            return `<tr>
-                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${c.id}" onchange="toggleRowSelection(this)"></td>
-                                <td><div class="customer-cell" onclick="openCustomer360(carts.find(x=>x.id==='${c.id}'))" style="cursor:pointer;"><div class="avatar">${initials(c.customerName)}</div><div><div class="customer-name">${esc(c.customerName)}</div><div class="customer-email">${esc(c.email)}</div></div></div></td>
+                            const isConverted = c.converted === true;
+                            const rowStyle = isConverted ? 'background: linear-gradient(90deg, #d4edda 0%, #f8f9fa 100%); opacity: 0.85;' : '';
+                            const convertedBadge = isConverted ? '<span style="background:#28a745;color:white;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:6px;">KUPIL ✓</span>' : '';
+                            return `<tr style="${rowStyle}">
+                                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${c.id}" onchange="toggleRowSelection(this)" ${isConverted ? 'disabled' : ''}></td>
+                                <td><div class="customer-cell" onclick="openCustomer360(carts.find(x=>x.id==='${c.id}'))" style="cursor:pointer;"><div class="avatar" style="${isConverted ? 'background:#28a745;' : ''}">${initials(c.customerName)}</div><div><div class="customer-name">${esc(c.customerName)}${convertedBadge}</div><div class="customer-email">${esc(c.email)}</div></div></div></td>
                                 <td>${c.storeFlag} ${c.storeName}</td>
                                 <td><strong>${sym}${(c.cartValue||0).toFixed(2)}</strong></td>
                                 <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '-'}</td>
                                 <td>
-                                    <select class="inline-status-select" data-id="${c.id}" data-type="cart" onchange="inlineStatusChange(this)">
+                                    ${isConverted ? '<span style="color:#28a745;font-weight:600;">✅ Converted</span>' : `<select class="inline-status-select" data-id="${c.id}" data-type="cart" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${c.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
                                         <option value="called_no_answer" ${c.callStatus==='called_no_answer'?'selected':''}>📵 No Answer</option>
                                         <option value="called_callback" ${c.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
@@ -3355,24 +3358,27 @@
                                         <option value="called_not_interested" ${c.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
                                         <option value="converted" ${c.callStatus==='converted'?'selected':''}>✅ Converted</option>
                                         <option value="invalid_number" ${c.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
-                                    </select>
+                                    </select>`}
                                 </td>
                                 <td>
                                     <div class="inline-notes-wrapper">
                                         <input type="text" class="inline-notes-input ${c.notes ? 'has-notes' : ''}"
                                                data-id="${c.id}" data-type="cart"
                                                value="${escAttr(c.notes || '')}"
-                                               placeholder="Add notes..."
+                                               placeholder="${isConverted ? 'Converted' : 'Add notes...'}"
+                                               ${isConverted ? 'disabled' : ''}
                                                onchange="markNotesChanged(this)"
                                                onkeypress="if(event.key==='Enter'){saveInlineNotes(this)}">
-                                        <button class="inline-notes-save" onclick="saveInlineNotes(this.previousElementSibling)" title="Save">💾</button>
+                                        ${isConverted ? '' : '<button class="inline-notes-save" onclick="saveInlineNotes(this.previousElementSibling)" title="Save">💾</button>'}
                                     </div>
                                 </td>
                                 <td style="font-size:12px;">${timeAgo(c.abandonedAt)}</td>
                                 <td style="white-space:nowrap;text-align:right;">
+                                    ${isConverted ? '<span style="color:#28a745;font-size:11px;">No action needed</span>' : `
                                     ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
                                     ${c.phone ? `<button class="action-btn sms" onclick="openSmsModal('${c.id}','cart')" title="Send SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
                                     <button class="action-btn-order-large" onclick="openOrderModal('${c.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i> CREATE ORDER</button>
+                                    `}
                                 </td>
                             </tr>`;
                         }).join('')}

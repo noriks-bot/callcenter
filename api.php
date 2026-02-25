@@ -943,6 +943,42 @@ function getCompletedOrderEmails($storeCode) {
     return $emails;
 }
 
+// Get recent orders data (emails AND phones) for conversion tracking
+function getRecentOrderContacts($storeCode) {
+    $cacheKey = "recent_order_contacts_{$storeCode}";
+    $cached = getCache($cacheKey, 300); // 5 min cache
+    if ($cached !== null) return $cached;
+    
+    $contacts = ['emails' => [], 'phones' => []];
+    $orders = wcApiRequest($storeCode, 'orders', [
+        'status' => 'processing,completed',
+        'per_page' => 100,
+        'after' => date('Y-m-d\TH:i:s', strtotime('-7 days'))
+    ]);
+    
+    if (is_array($orders)) {
+        foreach ($orders as $order) {
+            if (!empty($order['billing']['email'])) {
+                $contacts['emails'][] = strtolower($order['billing']['email']);
+            }
+            if (!empty($order['billing']['phone'])) {
+                // Normalize phone - remove all non-digits
+                $phone = preg_replace('/[^0-9]/', '', $order['billing']['phone']);
+                if (strlen($phone) >= 7) {
+                    $contacts['phones'][] = $phone;
+                    // Also add last 9 digits for matching
+                    if (strlen($phone) > 9) {
+                        $contacts['phones'][] = substr($phone, -9);
+                    }
+                }
+            }
+        }
+    }
+    
+    setCache($cacheKey, $contacts);
+    return $contacts;
+}
+
 function fetchAbandonedCarts() {
     global $stores, $storeCurrencies;
     
@@ -958,9 +994,10 @@ function fetchAbandonedCarts() {
     $allCarts = [];
     $responses = curlMultiGet($endpoints);
     
-    $completedEmails = [];
+    // Get recent order contacts (emails + phones) for conversion tracking
+    $orderContacts = [];
     foreach ($stores as $code => $config) {
-        $completedEmails[$code] = getCompletedOrderEmails($code);
+        $orderContacts[$code] = getRecentOrderContacts($code);
     }
     
     foreach ($responses as $storeCode => $response) {
@@ -970,14 +1007,25 @@ function fetchAbandonedCarts() {
         $carts = json_decode($response, true);
         if (!is_array($carts)) continue;
         
-        $storeCompletedEmails = $completedEmails[$storeCode] ?? [];
+        $storeContacts = $orderContacts[$storeCode] ?? ['emails' => [], 'phones' => []];
         
         foreach ($carts as $cart) {
             if (!is_array($cart)) continue;
             
+            // Check if this cart is converted (customer made an order)
             $cartEmail = strtolower($cart['email'] ?? '');
-            if ($cartEmail && in_array($cartEmail, $storeCompletedEmails)) {
-                continue;
+            $cartPhone = preg_replace('/[^0-9]/', '', $cart['other_fields']['wcf_phone_number'] ?? '');
+            $cartPhoneLast9 = strlen($cartPhone) > 9 ? substr($cartPhone, -9) : $cartPhone;
+            
+            $isConverted = false;
+            if ($cartEmail && in_array($cartEmail, $storeContacts['emails'])) {
+                $isConverted = true;
+            }
+            if (!$isConverted && $cartPhone && (
+                in_array($cartPhone, $storeContacts['phones']) || 
+                in_array($cartPhoneLast9, $storeContacts['phones'])
+            )) {
+                $isConverted = true;
             }
             
             $cartId = $storeCode . '_' . ($cart['id'] ?? 'unknown');
@@ -1030,7 +1078,8 @@ function fetchAbandonedCarts() {
                 'callStatus' => $savedData['callStatus'] ?? 'not_called',
                 'notes' => $savedData['notes'] ?? '',
                 'lastUpdated' => $savedData['lastUpdated'] ?? null,
-                'orderId' => $savedData['orderId'] ?? null
+                'orderId' => $savedData['orderId'] ?? null,
+                'converted' => $isConverted
             ];
         }
     }
