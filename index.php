@@ -1978,11 +1978,7 @@
         </div>
 
         <div style="max-width:1200px;">
-            <div style="margin-bottom:24px;">
-                <p style="color:var(--text-muted);margin:0;">📞 Posebni leadi za klicanje z navodili. Ročno dodajanje — ni povezano s sistemom.</p>
-            </div>
-
-            <div class="table-card">
+            <div class="table-card" style="margin-top:20px;">
                 <table class="data-table" id="urgentTable">
                     <thead>
                         <tr>
