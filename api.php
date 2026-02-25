@@ -2161,32 +2161,30 @@ function fetchPaketomatOrders($filter = 'all') {
     
     $orders = $data['result'] ?? [];
     
-    error_log("[Paketomati] Found " . count($orders) . " orders, fetching delivery events...");
+    // Filter to only shipped orders first (reduces API calls significantly)
+    $shippedOrders = array_values(array_filter($orders, function($o) {
+        return ($o['status_desc'] ?? '') === 'shipped';
+    }));
+    
+    // Limit to 60 shipped orders max
+    $shippedOrders = array_slice($shippedOrders, 0, 60);
+    
+    error_log("[Paketomati] Found " . count($orders) . " orders, " . count($shippedOrders) . " shipped, fetching delivery events in parallel...");
     
     // DEBUG: Track processing
-    $debugInfo = ['total_orders' => count($orders), 'processed' => 0, 'with_events' => 0, 'matched' => 0];
+    $debugInfo = ['total_orders' => count($orders), 'shipped_orders' => count($shippedOrders), 'processed' => 0, 'with_events' => 0, 'matched' => 0];
     
-    // STEP 2: For each order, fetch delivery events using get_document
-    // Only check SHIPPED orders - those are the only ones that can be at pickup points
+    // STEP 2: Fetch delivery events using curl_multi (PARALLEL - much faster!)
     $mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
-    $processedCount = 0;
     
-    // Filter to only shipped orders first (reduces API calls significantly)
-    $shippedOrders = array_filter($orders, function($o) {
-        return ($o['status_desc'] ?? '') === 'shipped';
-    });
-    $debugInfo['shipped_orders'] = count($shippedOrders);
+    // Prepare all curl handles
+    $multiHandle = curl_multi_init();
+    $curlHandles = [];
     
-    foreach ($shippedOrders as $order) {
+    foreach ($shippedOrders as $i => $order) {
         $mkId = $order['mk_id'] ?? null;
         if (!$mkId) continue;
         
-        // Limit API calls - max 60 shipped orders to check
-        $processedCount++;
-        $debugInfo['processed'] = $processedCount;
-        if ($processedCount > 60) break;
-        
-        // Fetch delivery events for this order
         $getDocPayload = [
             'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
             'company_id' => '6371',
@@ -2201,13 +2199,39 @@ function fetchPaketomatOrders($filter = 'all') {
             CURLOPT_POST => true,
             CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
             CURLOPT_POSTFIELDS => json_encode($getDocPayload),
-            CURLOPT_TIMEOUT => 10
+            CURLOPT_TIMEOUT => 15
         ]);
         
-        $docResponse = curl_exec($ch);
+        curl_multi_add_handle($multiHandle, $ch);
+        $curlHandles[$i] = $ch;
+    }
+    
+    // Execute all requests in parallel
+    $running = null;
+    do {
+        curl_multi_exec($multiHandle, $running);
+        curl_multi_select($multiHandle);
+    } while ($running > 0);
+    
+    // Collect results
+    $deliveryEventsMap = [];
+    foreach ($curlHandles as $i => $ch) {
+        $response = curl_multi_getcontent($ch);
+        $docData = json_decode($response, true);
+        $deliveryEventsMap[$i] = $docData;
+        curl_multi_remove_handle($multiHandle, $ch);
         curl_close($ch);
+    }
+    curl_multi_close($multiHandle);
+    
+    $debugInfo['processed'] = count($deliveryEventsMap);
+    error_log("[Paketomati] Parallel fetch complete: " . count($deliveryEventsMap) . " orders");
+    
+    // Process results
+    foreach ($shippedOrders as $i => $order) {
+        $docData = $deliveryEventsMap[$i] ?? null;
+        if (!$docData) continue;
         
-        $docData = json_decode($docResponse, true);
         $events = $docData['delivery_service_events'] ?? [];
         
         // MetaKocka returns dict for single event, array for multiple
