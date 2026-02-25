@@ -22,7 +22,7 @@ $stores = [
     'cz' => ['name' => 'Czech', 'flag' => '🇨🇿', 'url' => 'https://noriks.com/cz', 'ck' => 'ck_396d624acec5f7a46dfcfa7d2a74b95c82b38962', 'cs' => 'cs_2a69c7ad4a4d118a2b8abdf44abdd058c9be9115'],
     'pl' => ['name' => 'Poland', 'flag' => '🇵🇱', 'url' => 'https://noriks.com/pl', 'ck' => 'ck_8fd83582ada887d0e586a04bf870d43634ca8f2c', 'cs' => 'cs_f1bf98e46a3ae0623c5f2f9fcf7c2478240c5115'],
     'gr' => ['name' => 'Greece', 'flag' => '🇬🇷', 'url' => 'https://noriks.com/gr', 'ck' => 'ck_2595568b83966151e08031e42388dd1c34307107', 'cs' => 'cs_dbd091b4fc11091638f8ec4c838483be32cfb15b'],
-    'sk' => ['name' => 'Slovakia', 'flag' => '🇸🇰', 'url' => 'https://noriks.com/sk', 'ck' => 'ck_1abaeb006bb9039da0ad40f00ab674067ff1d978', 'cs' => 'cs_32b33bc2716b07a738fb18eb377a767ef60edfe7'],
+    'sk' => ['name' => 'Slovakia', 'flag' => '🇸🇰', 'url' => 'https://noriks.com/sk', 'ck' => 'ck_1abaeb006bb9039da0ad40f00ab674067ff1d978', 'cs' => 'cs_32b33bc2716b07a738ff18eb377a767ef60edfe7'],
     'it' => ['name' => 'Italy', 'flag' => '🇮🇹', 'url' => 'https://noriks.com/it', 'ck' => 'ck_84a1e1425710ff9eeed69b100ed9ac445efc39e2', 'cs' => 'cs_81d25dcb0371773387da4d30482afc7ce83d1b3e'],
     'hu' => ['name' => 'Hungary', 'flag' => '🇭🇺', 'url' => 'https://noriks.com/hu', 'ck' => 'ck_e591c2a0bf8c7a59ec5893e03adde3c760fbdaae', 'cs' => 'cs_d84113ee7a446322d191be0725c0c92883c984c3']
 ];
