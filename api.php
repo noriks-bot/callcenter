@@ -279,14 +279,19 @@ function getFollowUps($agentId = null, $includeAll = false) {
         // Must have callback scheduled
         if (empty($log['callbackAt'])) return false;
         
-        // Must be callback status
-        if ($log['status'] !== 'callback') return false;
+        // Must be callback or completed status
+        if ($log['status'] !== 'callback' && $log['status'] !== 'completed') return false;
         
         // Filter by agent if specified
         if ($agentId && !$includeAll && $log['agentId'] !== $agentId) return false;
         
-        // Only future or today callbacks (not past)
+        // Only future or today callbacks (not past), unless completed
         $callbackDate = date('Y-m-d', strtotime($log['callbackAt']));
+        if ($log['status'] === 'completed') {
+            // Show completed from last 7 days
+            $completedDate = date('Y-m-d', strtotime($log['completedAt'] ?? $log['callbackAt']));
+            return $completedDate >= date('Y-m-d', strtotime('-7 days'));
+        }
         return $callbackDate >= $today;
     });
     
@@ -3394,6 +3399,50 @@ try {
             $agentId = $_GET['agentId'] ?? null;
             $includeAll = ($_GET['all'] ?? '') === 'true';
             echo json_encode(getFollowUps($agentId, $includeAll));
+            break;
+        
+        case 'complete-followup':
+            $data = json_decode(file_get_contents('php://input'), true);
+            $followupId = $data['id'] ?? '';
+            if (empty($followupId)) {
+                echo json_encode(['success' => false, 'error' => 'ID required']);
+                break;
+            }
+            $logs = loadCallLogs();
+            $found = false;
+            foreach ($logs as &$log) {
+                if ($log['id'] === $followupId) {
+                    $log['status'] = 'completed';
+                    $log['completed'] = true;
+                    $log['completedAt'] = date('c');
+                    $found = true;
+                    break;
+                }
+            }
+            if ($found) {
+                saveCallLogs($logs);
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Follow-up not found']);
+            }
+            break;
+        
+        case 'delete-followup':
+            $data = json_decode(file_get_contents('php://input'), true);
+            $followupId = $data['id'] ?? '';
+            if (empty($followupId)) {
+                echo json_encode(['success' => false, 'error' => 'ID required']);
+                break;
+            }
+            $logs = loadCallLogs();
+            $originalCount = count($logs);
+            $logs = array_values(array_filter($logs, fn($log) => $log['id'] !== $followupId));
+            if (count($logs) < $originalCount) {
+                saveCallLogs($logs);
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Follow-up not found']);
+            }
             break;
             
         case 'call-stats':

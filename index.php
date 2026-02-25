@@ -1878,26 +1878,24 @@
             </div>
         </div>
 
-        <div style="max-width:900px;">
-            <div class="table-card" style="padding:24px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                    <div>
-                        <h3 style="margin-bottom:8px;">📞 My Follow-ups</h3>
-                        <p style="color:var(--text-muted);">Dogovorjeni callbacki za danes in prihodnje dni.</p>
-                    </div>
-                    <div style="display:flex;gap:8px;">
-                        <button class="btn" style="background:var(--card-border);" onclick="renderFollowups(true)">
-                            <i class="fas fa-users"></i> Vsi agenti
-                        </button>
-                        <button class="btn btn-save" onclick="renderFollowups()">
-                            <i class="fas fa-sync"></i> Osveži
-                        </button>
-                    </div>
+        <div class="table-card" style="padding:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <div>
+                    <h3 style="margin-bottom:8px;">📞 My Follow-ups</h3>
+                    <p style="color:var(--text-muted);">Dogovorjeni callbacki za danes in prihodnje dni.</p>
                 </div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn" style="background:var(--card-border);" onclick="renderFollowups(true)">
+                        <i class="fas fa-users"></i> Vsi agenti
+                    </button>
+                    <button class="btn btn-save" onclick="renderFollowups()">
+                        <i class="fas fa-sync"></i> Osveži
+                    </button>
+                </div>
+            </div>
 
-                <div id="followupsContainer">
-                    <div class="loading"><div class="spinner"></div>Loading...</div>
-                </div>
+            <div id="followupsContainer">
+                <div class="loading"><div class="spinner"></div>Loading...</div>
             </div>
         </div>
     </div>
@@ -7097,43 +7095,59 @@
                     else groups.later.items.push(f);
                 });
 
-                let html = '';
+                let html = `
+                    <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead><tr>
+                            <th>Status</th>
+                            <th>Stranka</th>
+                            <th>Telefon</th>
+                            <th>Vrednost</th>
+                            <th>Callback</th>
+                            <th>Agent</th>
+                            <th>Opombe</th>
+                            <th style="text-align:right;">Akcije</th>
+                        </tr></thead>
+                        <tbody>
+                `;
+
                 for (const [key, group] of Object.entries(groups)) {
                     if (group.items.length === 0) continue;
 
-                    html += `<h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:13px;">${group.label} (${group.items.length})</h4>`;
-
                     group.items.forEach(f => {
                         const timeClass = f.isDue ? 'due' : (f.isToday ? 'today' : (f.isTomorrow ? 'tomorrow' : 'future'));
-                        const timeLabel = f.isDue ? 'DUE!' : formatDateTime(f.callbackAt);
+                        const timeLabel = f.isDue ? '⚠️ DUE!' : formatDateTime(f.callbackAt);
+                        const statusBadge = {
+                            due: '<span style="background:#dc3545;color:white;padding:3px 8px;border-radius:4px;font-size:11px;">DUE</span>',
+                            today: '<span style="background:#fd7e14;color:white;padding:3px 8px;border-radius:4px;font-size:11px;">DANES</span>',
+                            tomorrow: '<span style="background:#28a745;color:white;padding:3px 8px;border-radius:4px;font-size:11px;">JUTRI</span>',
+                            future: '<span style="background:#6c757d;color:white;padding:3px 8px;border-radius:4px;font-size:11px;">KASNEJE</span>'
+                        }[timeClass];
+                        const isCompleted = f.completed === true;
+                        const rowStyle = isCompleted ? 'background:linear-gradient(90deg, #d4edda 0%, #f8f9fa 100%);opacity:0.7;' : '';
 
                         html += `
-                            <div class="followup-card ${timeClass}">
-                                <div class="followup-header">
-                                    <div>
-                                        <div class="followup-customer">${f.customer?.storeFlag || ''} ${esc(f.customer?.name || 'Unknown')}</div>
-                                        <div style="font-size:12px;color:var(--text-muted);">Agent: ${esc(f.agentId)}</div>
-                                    </div>
-                                    <span class="followup-time ${timeClass}">${timeLabel}</span>
-                                </div>
-                                <div class="followup-details">
-                                    📞 ${esc(f.customer?.phone || 'N/A')} &nbsp;|&nbsp;
-                                    💰 ${f.customer?.currency || '€'}${(f.customer?.cartValue || 0).toFixed(2)}
-                                </div>
-                                ${f.notes ? `<div class="followup-notes">${esc(f.notes)}</div>` : ''}
-                                <div class="followup-actions">
-                                    <button class="btn btn-save" onclick="callFollowupCustomer('${f.customerId}')">
-                                        <i class="fas fa-phone"></i> Pokliči
-                                    </button>
-                                    <button class="btn" style="background:var(--card-border);" onclick="viewFollowupCustomer('${f.customerId}')">
-                                        <i class="fas fa-eye"></i> Poglej
-                                    </button>
-                                </div>
-                            </div>
+                            <tr style="${rowStyle}">
+                                <td>${isCompleted ? '<span style="background:#28a745;color:white;padding:3px 8px;border-radius:4px;font-size:11px;">✓ DONE</span>' : statusBadge}</td>
+                                <td><strong>${f.customer?.storeFlag || ''} ${esc(f.customer?.name || 'Unknown')}</strong></td>
+                                <td>${f.customer?.phone ? `<a href="tel:${f.customer.phone}" class="phone-link"><i class="fas fa-phone"></i> ${esc(f.customer.phone)}</a>` : '-'}</td>
+                                <td><strong>${f.customer?.currency || '€'}${(f.customer?.cartValue || 0).toFixed(2)}</strong></td>
+                                <td style="font-size:12px;">${timeLabel}</td>
+                                <td style="font-size:12px;">${esc(f.agentId)}</td>
+                                <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escAttr(f.notes || '')}">${esc(f.notes || '-')}</td>
+                                <td style="white-space:nowrap;text-align:right;">
+                                    ${isCompleted ? '<span style="color:#28a745;font-size:11px;">Zaključeno</span>' : `
+                                        <button class="action-btn call" onclick="callFollowupCustomer('${f.customerId}')" title="Pokliči"><i class="fas fa-phone"></i></button>
+                                        <button class="action-btn" style="background:#28a745;color:white;" onclick="completeFollowup('${f.id}')" title="Zaključi"><i class="fas fa-check"></i></button>
+                                        <button class="action-btn" style="background:#dc3545;color:white;" onclick="deleteFollowup('${f.id}')" title="Briši"><i class="fas fa-trash"></i></button>
+                                    `}
+                                </td>
+                            </tr>
                         `;
                     });
                 }
 
+                html += `</tbody></table></div>`;
                 container.innerHTML = html;
             } catch (e) {
                 container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
@@ -7151,6 +7165,46 @@
             const customer = carts.find(c => c.id === customerId);
             if (customer) {
                 openCustomer360(customer);
+            }
+        }
+
+        async function completeFollowup(followupId) {
+            if (!confirm('Označiti follow-up kot zaključen?')) return;
+            try {
+                const res = await fetch('api.php?action=complete-followup', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id: followupId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Follow-up zaključen!', 'success');
+                    renderFollowups();
+                } else {
+                    showToast(data.error || 'Napaka', 'error');
+                }
+            } catch (e) {
+                showToast('Napaka: ' + e.message, 'error');
+            }
+        }
+
+        async function deleteFollowup(followupId) {
+            if (!confirm('Res želiš izbrisati ta follow-up?')) return;
+            try {
+                const res = await fetch('api.php?action=delete-followup', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id: followupId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Follow-up izbrisan!', 'success');
+                    renderFollowups();
+                } else {
+                    showToast(data.error || 'Napaka', 'error');
+                }
+            } catch (e) {
+                showToast('Napaka: ' + e.message, 'error');
             }
         }
 
