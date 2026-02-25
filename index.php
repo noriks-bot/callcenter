@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         /* Minimal overrides for compatibility - main styles in styles.css */
-        
+
         /* Special view content areas - copy .main styles from styles.css */
         #dashboardContent,
         #smsDashboardContent,
@@ -20,13 +20,14 @@
         #agentsContent,
         #followupsContent,
         #analyticsContent,
-        #paketomatiContent {
+        #paketomatiContent,
+        #urgentContent {
             margin-left: 260px;
             padding-top: 64px;
             min-height: 100vh;
             background: var(--content-bg);
         }
-        
+
         /* Toggle Switch */
         .toggle-switch {
             position: relative;
@@ -71,7 +72,7 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         /* Template Preview */
         .template-preview {
             margin-top: 12px;
@@ -91,19 +92,19 @@
             text-transform: uppercase;
             margin-bottom: 6px;
         }
-        
+
         /* Page header in special views */
         .page-header {
             padding: 8px 16px;
         }
-        
+
         /* Page title */
         .page-title-large {
             font-size: 16px;
             font-weight: 600;
             margin: 0;
         }
-        
+
         /* Table cards in special views - same as Leads */
         #buyersSettingsContent .table-card,
         #smsSettingsContent .table-card,
@@ -111,7 +112,7 @@
         #agentsContent .table-card {
             margin: 0 16px;
         }
-        
+
         /* Collapsed sidebar */
         .sidebar.collapsed ~ #dashboardContent,
         .sidebar.collapsed ~ #smsDashboardContent,
@@ -121,10 +122,11 @@
         .sidebar.collapsed ~ #agentsContent,
         .sidebar.collapsed ~ #followupsContent,
         .sidebar.collapsed ~ #analyticsContent,
-        .sidebar.collapsed ~ #paketomatiContent {
+        .sidebar.collapsed ~ #paketomatiContent,
+        .sidebar.collapsed ~ #urgentContent {
             margin-left: 70px;
         }
-        
+
         /* Mobile */
         @media (max-width: 1024px) {
             #dashboardContent,
@@ -135,11 +137,12 @@
             #agentsContent,
             #followupsContent,
             #analyticsContent,
-            #paketomatiContent {
+            #paketomatiContent,
+            #urgentContent {
                 margin-left: 0;
             }
         }
-        
+
         /* Inline Status Select */
         .inline-status-select {
             padding: 4px 8px;
@@ -155,7 +158,7 @@
             outline: none;
             border-color: var(--accent-blue);
         }
-        
+
         /* Inline Notes Input with Save Button */
         .inline-notes-wrapper {
             display: flex;
@@ -212,7 +215,7 @@
             background: var(--text-muted);
             cursor: not-allowed;
         }
-        
+
         /* Large CREATE ORDER Button */
         .action-btn-order-large {
             display: inline-flex;
@@ -237,11 +240,11 @@
         .action-btn-order-large i {
             font-size: 14px;
         }
-        
+
         /* Hide show classes for mobile compatibility */
         .hide-mobile { }
         @media (max-width: 640px) { .hide-mobile { display: none !important; } }
-        
+
         /* Content Type Tabs - Clean underlined style */
         .content-tabs {
             display: flex;
@@ -293,7 +296,7 @@
             .content-tab span:not(.count) { display: none; }
             .content-tab i { font-size: 12px; }
         }
-        
+
         /* Bulk Actions Bar */
         .bulk-bar {
             display: none;
@@ -334,7 +337,7 @@
             gap: 6px;
         }
         .bulk-btn:hover { background: rgba(255,255,255,0.3); }
-        
+
         /* Table Checkbox */
         .row-checkbox {
             width: 18px;
@@ -343,7 +346,7 @@
             accent-color: var(--accent-blue);
         }
         .checkbox-cell { width: 40px; text-align: center; }
-        
+
         /* Follow-ups styles */
         .followup-card {
             background: var(--card-bg);
@@ -383,7 +386,7 @@
             margin-bottom: 12px;
         }
         .followup-actions { display: flex; gap: 8px; }
-        
+
         /* Call Status Selector */
         .call-status-grid {
             display: grid;
@@ -407,7 +410,7 @@
         .call-status-option.converted.selected { border-color: var(--accent-green); background: var(--accent-green-light); color: var(--accent-green); }
         .call-status-option.not_interested.selected { border-color: var(--accent-red); background: var(--accent-red-light); color: var(--accent-red); }
         .call-status-option.callback.selected { border-color: var(--accent-orange); background: var(--accent-orange-light); color: var(--accent-orange); }
-        
+
         /* Analytics styles */
         .analytics-grid {
             display: grid;
@@ -448,7 +451,7 @@
         .leaderboard-name { font-weight: 600; }
         .leaderboard-stats { font-size: 12px; color: var(--text-muted); }
         .leaderboard-rate { font-weight: 700; color: var(--accent-green); }
-        
+
         /* Call log styles */
         .call-log-item {
             position: relative;
@@ -491,7 +494,7 @@
             font-size: 12px;
             color: var(--accent-orange);
         }
-        
+
         /* Skeleton loading */
         .skeleton {
             background: linear-gradient(90deg, var(--content-bg) 25%, var(--card-bg) 50%, var(--content-bg) 75%);
@@ -512,7 +515,7 @@
         .skeleton-avatar { width: 42px; height: 42px; border-radius: var(--radius-md); }
         .skeleton-text { height: 14px; flex: 1; }
         .skeleton-text.short { max-width: 100px; }
-        
+
         /* Notes Button */
         .notes-btn {
             padding: 4px 8px;
@@ -541,7 +544,7 @@
             background: var(--accent-blue);
             border-radius: 50%;
         }
-        
+
         /* Notes Modal */
         .notes-modal-content {
             max-width: 500px;
@@ -562,7 +565,7 @@
             outline: none;
             border-color: var(--accent-blue);
         }
-        
+
         /* Toast container */
         .toast-container {
             position: fixed;
@@ -609,7 +612,7 @@
         @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } }
         @keyframes toastOut { to { transform: translateX(100%); opacity: 0; } }
         .toast-item.removing { animation: toastOut 0.3s ease forwards; }
-        
+
         /* Filter Pills */
         .filter-pill {
             display: inline-flex;
@@ -640,11 +643,21 @@
             background: var(--accent-blue);
             color: white;
         }
+        
+        /* Urgent leads called row */
+        .called-row {
+            opacity: 0.6;
+            background: var(--bg-secondary);
+        }
+        .called-row td { text-decoration: line-through; }
+        .called-row td:first-child,
+        .called-row td:last-child,
+        .called-row td:nth-child(5) { text-decoration: none; }
     </style>
 </head>
 <body>
     <?php include 'sidebar.php'; ?>
-    
+
     <!-- Header / Top Bar (outside main so it's always visible) -->
     <div class="top-bar" id="topBar">
         <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
@@ -658,11 +671,11 @@
             </button>
         </div>
     </div>
-    
+
     <!-- Main -->
     <main class="main" id="main">
         <div class="country-tabs" id="countryTabs"></div>
-        
+
         <!-- Content Type Tabs (below country tabs) -->
         <div class="content-tabs" id="contentTabs">
             <button class="content-tab active" data-content="carts">
@@ -685,8 +698,13 @@
                 <span>Paketomati</span>
                 <span class="count" id="contentCount-paketomati">0</span>
             </button>
+            <button class="content-tab" data-content="urgent">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Nujno</span>
+                <span class="count" id="contentCount-urgent">0</span>
+            </button>
         </div>
-        
+
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
@@ -705,7 +723,7 @@
                 <div><div class="stat-value" id="statSms">0</div><div class="stat-label">SMS Sent Today</div></div>
             </div>
         </div>
-        
+
         <div class="content">
             <div class="filters-bar">
                 <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone...">
@@ -722,7 +740,7 @@
                     <option value="voicemail">Voicemail</option>
                 </select>
             </div>
-            
+
             <!-- Bulk Actions Bar -->
             <div class="bulk-bar" id="bulkBar">
                 <button class="bulk-close" onclick="clearSelection()"><i class="fas fa-times"></i></button>
@@ -732,7 +750,7 @@
                     <button class="bulk-btn" onclick="openBulkStatusModal()"><i class="fas fa-edit"></i> Change Status</button>
                 </div>
             </div>
-            
+
             <div class="table-card">
                 <div id="tableContainer">
                     <div class="loading"><div class="spinner"></div>Loading...</div>
@@ -740,7 +758,7 @@
             </div>
         </div>
     </main>
-    
+
     <!-- Status Modal -->
     <div class="modal-bg" id="statusModal">
         <div class="modal">
@@ -771,9 +789,9 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Notes Modal REMOVED - Now inline in table -->
-    
+
     <!-- Create Order Modal (Enhanced) -->
     <div class="modal-bg" id="orderModal">
         <div class="modal wide">
@@ -822,22 +840,22 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Products -->
                 <h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Izdelki</h4>
-                
+
                 <!-- Product Search -->
                 <div class="product-search-container">
                     <i class="fas fa-search product-search-icon"></i>
-                    <input type="text" class="product-search-input" id="productSearchInput" 
-                           placeholder="Išči produkte po imenu ali SKU..." 
+                    <input type="text" class="product-search-input" id="productSearchInput"
+                           placeholder="Išči produkte po imenu ali SKU..."
                            autocomplete="off">
                     <i class="fas fa-spinner fa-spin product-search-spinner" id="productSearchSpinner"></i>
                     <div class="product-search-results" id="productSearchResults">
                         <!-- Results will be rendered here -->
                     </div>
                 </div>
-                
+
                 <!-- Variation Selector (shown when selecting a variable product) -->
                 <div class="variation-selector" id="variationSelector" style="display:none;">
                     <div class="variation-selector-header">
@@ -862,17 +880,17 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="order-items" id="orderItems">
                     <!-- Items will be rendered here -->
                 </div>
-                
+
                 <!-- Options -->
                 <div class="toggle-row">
                     <span class="toggle-label">🚚 Brezplačna dostava</span>
                     <div class="toggle" id="freeShippingToggle" onclick="toggleFreeShipping()"></div>
                 </div>
-                
+
                 <!-- Summary -->
                 <div class="order-summary">
                     <div class="order-summary-row">
@@ -888,7 +906,7 @@
                         <span id="orderTotal">€0.00</span>
                     </div>
                 </div>
-                
+
                 <p style="font-size:12px;color:var(--text-muted);margin-top:16px;">
                     <i class="fas fa-info-circle"></i> Naročilo bo ustvarjeno s statusom "Processing" in meta oznako "_call_center".
                 </p>
@@ -901,7 +919,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- SMS Modal -->
     <div class="modal-bg" id="smsModal">
         <div class="modal">
@@ -919,7 +937,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Predloga (avtomatski prevod za državo)</label>
                     <select class="form-select" id="smsTemplate" onchange="applySmsTemplate()">
@@ -930,13 +948,13 @@
                         <option value="custom">✏️ Prilagojeno sporočilo</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Sporočilo</label>
                     <textarea class="form-textarea" id="smsMessage" placeholder="Vnesite sporočilo..." oninput="updateCharCount()"></textarea>
                     <div class="char-count" id="smsCharCount">0 / 160 znakov</div>
                 </div>
-                
+
                 <div class="message-preview" id="smsPreview" style="display:none;">
                     <strong style="font-size:11px;color:var(--text-muted);">PREDOGLED:</strong><br>
                     <span id="smsPreviewText"></span>
@@ -950,7 +968,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- SMS Edit Modal (for editing phone before sending) -->
     <div class="modal-bg" id="smsEditModal">
         <div class="modal">
@@ -968,7 +986,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Telefonska številka</label>
                     <input type="tel" class="form-input" id="smsEditPhone" placeholder="+38598xxxxxxx ali 098xxxxxxx">
@@ -976,12 +994,12 @@
                         <i class="fas fa-info-circle"></i> Podprti formati: +38598xxx, 38598xxx, 098xxx (sistem avtomatsko formatira)
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Sporočilo (samo za branje)</label>
                     <textarea class="form-textarea" id="smsEditMessage" readonly style="background:var(--content-bg);cursor:not-allowed;"></textarea>
                 </div>
-                
+
                 <input type="hidden" id="smsEditId">
             </div>
             <div class="modal-footer">
@@ -992,7 +1010,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Dashboard Home Content -->
     <div id="dashboardContent" style="display:none;">
         <!-- Page Header -->
@@ -1007,7 +1025,7 @@
                 </button>
             </div>
         </div>
-        
+
         <!-- KPI Cards -->
         <div class="kpi-grid">
             <div class="kpi-card">
@@ -1043,7 +1061,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Charts Row -->
         <div class="dashboard-row">
             <div class="chart-card">
@@ -1063,7 +1081,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Recent Activity -->
         <div class="activity-card">
             <div class="activity-header">
@@ -1082,7 +1100,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Customer 360° Modal -->
     <div class="modal-bg" id="customerModal">
         <div class="modal wide" style="max-width:800px;">
@@ -1113,7 +1131,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Tabs -->
                 <div class="customer-360-tabs">
                     <button class="c360-tab active" data-c360tab="timeline">📋 Timeline</button>
@@ -1122,7 +1140,7 @@
                     <button class="c360-tab" data-c360tab="sms">📱 SMS History</button>
                     <button class="c360-tab" data-c360tab="notes">📝 Notes</button>
                 </div>
-                
+
                 <!-- Tab Content -->
                 <div class="customer-360-content" id="c360Content">
                     <!-- Content loaded dynamically -->
@@ -1130,7 +1148,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- SMS Automation Content -->
     <div id="smsAutomationContent" style="display:none;">
         <!-- Page Header -->
@@ -1148,13 +1166,13 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="content">
             <!-- Info Banner -->
             <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
                 <i class="fas fa-info-circle" style="color: var(--accent-blue); font-size: 20px;"></i>
                 <div style="font-size: 13px; color: var(--text-secondary);">
-                    <strong style="color: var(--text-primary);">Kako deluje:</strong> 
+                    <strong style="color: var(--text-primary);">Kako deluje:</strong>
                     Avtomatizacija preveri pogoje vsakih 30 min in dodaja SMS-e v čakalno vrsto.
                     <span style="color: var(--text-muted);">•</span>
                     Pošiljanje vedno sproži uporabnik <strong>ročno</strong> iz SMS Dashboard strani.
@@ -1183,7 +1201,7 @@
                     <option value="paused">⏸️ Zaustavljene</option>
                 </select>
             </div>
-            
+
             <!-- Automations List -->
             <div class="table-card">
                 <div id="automationsTableContainer">
@@ -1208,7 +1226,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Add/Edit Automation Modal -->
     <div id="automationModalBg" class="modal-bg" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;" onclick="if(event.target===this)closeAutomationModal()">
         <div class="modal" style="max-width:500px;background:var(--card-bg);border-radius:var(--radius-xl);box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;">
@@ -1218,16 +1236,16 @@
                 </h3>
                 <button class="modal-close" onclick="closeAutomationModal()">&times;</button>
             </div>
-            
+
             <div class="modal-body">
                 <form id="automationForm">
                     <input type="hidden" id="automationId" value="">
-                    
+
                     <div class="form-group">
                         <label class="form-label">Ime avtomatizacije</label>
                         <input type="text" id="automationName" class="form-input" placeholder="npr. HR Zapuščena košarica 2h" required>
                     </div>
-                    
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div class="form-group">
                             <label class="form-label">Trgovina</label>
@@ -1242,7 +1260,7 @@
                                 <option value="it">🇮🇹 Italija</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label">Tip</label>
                             <select id="automationType" class="form-select" required>
@@ -1250,7 +1268,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">SMS predloga</label>
                         <select id="automationTemplate" class="form-select" required onchange="showTemplatePreviewInModal()">
@@ -1265,7 +1283,7 @@
                             <div id="modalTemplateText"></div>
                         </div>
                     </div>
-                    
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div class="form-group">
                             <label class="form-label">Zamik pošiljanja</label>
@@ -1274,7 +1292,7 @@
                                 <span style="color: var(--text-secondary); font-size: 13px;">ur</span>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label">Max starost košarice</label>
                             <div style="display: flex; align-items: center; gap: 8px;">
@@ -1286,7 +1304,7 @@
                             </small>
                         </div>
                     </div>
-                    
+
                     <div class="form-group" style="margin-bottom: 0; padding: 16px; background: var(--content-bg); border-radius: var(--radius-md);">
                         <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin: 0;">
                             <input type="checkbox" id="automationEnabled" checked style="width: 18px; height: 18px; accent-color: var(--primary);">
@@ -1298,7 +1316,7 @@
                     </div>
                 </form>
             </div>
-            
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeAutomationModal()">Prekliči</button>
                 <button type="button" class="btn btn-primary" onclick="saveAutomation()">
@@ -1317,18 +1335,18 @@
                 </h3>
                 <button class="modal-close" onclick="closeTemplateModal()">&times;</button>
             </div>
-            
+
             <div class="modal-body">
                 <form id="templateForm">
                     <input type="hidden" id="templateId" value="">
-                    
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                         <div class="form-group" style="margin-bottom:0;">
                             <label class="form-label">ID predloge</label>
                             <input type="text" id="templateKey" class="form-input" placeholder="npr. abandoned_cart" required>
                             <small style="color: var(--text-muted); font-size: 11px;">Unikatni ID (brez presledkov)</small>
                         </div>
-                        
+
                         <div class="form-group" style="margin-bottom:0;">
                             <label class="form-label">Kategorija</label>
                             <select id="templateCategory" class="form-select" required>
@@ -1338,19 +1356,19 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">Ime predloge</label>
                         <input type="text" id="templateName" class="form-input" placeholder="npr. Opuščena košarica" required>
                     </div>
-                    
+
                     <!-- Translations for all countries -->
                     <div class="form-group">
                         <label class="form-label">Prevodi sporočil</label>
                         <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">
                             Variabele: <code>{ime}</code>, <code>{produkt}</code>, <code>{cena}</code>, <code>{link}</code>
                         </p>
-                        
+
                         <div id="templateTranslations" style="display:flex;flex-direction:column;gap:12px;">
                             <!-- HR -->
                             <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
@@ -1412,7 +1430,7 @@
                     </div>
                 </form>
             </div>
-            
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeTemplateModal()">Prekliči</button>
                 <button type="button" class="btn btn-primary" onclick="saveTemplate()">
@@ -1436,13 +1454,13 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="content">
         <!-- Test SMS from Template Section -->
         <div class="table-card" style="margin-bottom:20px;border:2px solid var(--accent-purple);border-color:#a855f7;">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);background:rgba(168,85,247,0.1);">
                 <h3 style="margin:0 0 4px 0;">🧪 Test SMS iz predloge</h3>
-                <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji testni SMS na svoj telefon — vidiš točno kar bo stranka prejela</p>
+                <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji testni SMS na svoj telefon - vidiš točno kar bo stranka prejela</p>
             </div>
             <div style="padding:20px;">
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -1485,7 +1503,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <!-- Test Data Input -->
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;padding:16px;background:var(--bg-secondary);border-radius:8px;">
                     <div class="form-group" style="margin:0;">
@@ -1497,7 +1515,7 @@
                         <input type="text" class="form-input" id="testSmsProduct" placeholder="npr. Noriks čarape" value="Noriks čarape" oninput="loadTestTemplatePreview()">
                     </div>
                 </div>
-                
+
                 <!-- Preview -->
                 <div class="form-group" style="margin-bottom:16px;">
                     <label class="form-label">📋 Predogled SMS</label>
@@ -1508,7 +1526,7 @@
                         <span class="char-count" id="testSmsCharCount">0 / 160 znakov</span>
                     </div>
                 </div>
-                
+
                 <div style="display:flex;gap:12px;align-items:center;">
                     <button class="btn" onclick="sendTestSms()" style="background:#a855f7;color:white;">
                         <i class="fas fa-paper-plane"></i> Pošlji testni SMS
@@ -1517,7 +1535,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Manual SMS Send Section -->
         <div class="table-card" style="margin-bottom:20px;border:2px solid var(--accent-green);">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);background:rgba(34,197,94,0.1);">
@@ -1563,7 +1581,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- SMS Queue Section (from API) -->
         <div class="table-card" style="margin-bottom:20px;">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);">
@@ -1581,14 +1599,14 @@
                 <div class="loading"><div class="spinner"></div>Loading...</div>
             </div>
         </div>
-        
+
         <!-- SMS History Section (from localStorage) -->
         <div class="table-card">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);">
                 <h3 style="margin:0 0 4px 0;">📋 Zgodovina pošiljanja</h3>
                 <p style="margin:0;color:var(--text-muted);font-size:13px;">Poslani SMS-i (lokalna zgodovina)</p>
             </div>
-            
+
             <!-- Modern Filter Bar -->
             <div style="padding:16px 20px;border-bottom:1px solid var(--card-border);background:var(--bg-secondary);">
                 <!-- Date Range Pills -->
@@ -1604,7 +1622,7 @@
                     <span style="color:var(--text-muted);padding:6px 4px;">→</span>
                     <input type="date" class="form-input" id="smsDateTo" style="width:130px;padding:6px 10px;font-size:12px;" onchange="setHistoryDateRange('custom', null)">
                 </div>
-                
+
                 <!-- Country + Status Pills -->
                 <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                     <span style="font-size:12px;color:var(--text-muted);padding:6px 0;margin-right:4px;">🌍 Država:</span>
@@ -1616,15 +1634,15 @@
                     <button class="filter-pill" data-country="hu" onclick="setHistoryCountry('hu', this)">🇭🇺 HU</button>
                     <button class="filter-pill" data-country="gr" onclick="setHistoryCountry('gr', this)">🇬🇷 GR</button>
                     <button class="filter-pill" data-country="it" onclick="setHistoryCountry('it', this)">🇮🇹 IT</button>
-                    
+
                     <div style="border-left:1px solid var(--card-border);margin:0 12px;height:24px;"></div>
-                    
+
                     <span style="font-size:12px;color:var(--text-muted);margin-right:4px;">📊 Status:</span>
                     <button class="filter-pill active" data-status="" onclick="setHistoryStatus('', this)">Vsi</button>
                     <button class="filter-pill" data-status="sent" onclick="setHistoryStatus('sent', this)">✅ Poslano</button>
                     <button class="filter-pill" data-status="queued" onclick="setHistoryStatus('queued', this)">⏳ Čaka</button>
                     <button class="filter-pill" data-status="failed" onclick="setHistoryStatus('failed', this)">❌ Neuspešno</button>
-                    
+
                     <div style="margin-left:auto;">
                         <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="exportSmsCsv()">
                             <i class="fas fa-download"></i> CSV
@@ -1632,14 +1650,14 @@
                     </div>
                 </div>
             </div>
-            
+
             <div id="smsTableContainer" style="padding:20px;">
                 <div class="empty"><i class="fas fa-comment-sms"></i><p>Ni poslanih SMS sporočil</p></div>
             </div>
         </div>
         </div><!-- .content -->
     </div>
-    
+
     <!-- SMS Settings (shown when tab selected) -->
     <div id="smsSettingsContent" style="display:none;">
         <!-- Page Header -->
@@ -1651,7 +1669,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="content" style="max-width:1000px;">
             <!-- SMS Provider Settings -->
             <div class="table-card" style="padding:12px 16px;margin-bottom:12px;">
@@ -1659,7 +1677,7 @@
                 <p style="color:var(--text-muted);margin-bottom:12px;font-size:12px;">
                     <i class="fas fa-info-circle"></i> SMS ID-ji so konfigurirani v kodi in niso nastavljivi preko vmesnika.
                 </p>
-                
+
                 <div class="table-wrapper">
                     <table class="data-table" id="smsProviderTable">
                         <thead>
@@ -1676,7 +1694,7 @@
                     </table>
                 </div>
             </div>
-            
+
             <!-- SMS Templates Management -->
             <div class="table-card" style="padding:16px;margin-bottom:12px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -1690,7 +1708,7 @@
                         <i class="fas fa-plus"></i> Nova predloga
                     </button>
                 </div>
-                
+
                 <!-- Category Filter -->
                 <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
                     <button class="content-tab active" data-category="all" onclick="filterTemplatesByCategory('all', this)">
@@ -1706,7 +1724,7 @@
                         ✏️ Custom
                     </button>
                 </div>
-                
+
                 <!-- Templates List -->
                 <div id="templatesListContainer">
                     <div style="text-align:center;padding:40px;color:var(--text-muted);">
@@ -1714,7 +1732,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Sample Variables for Preview -->
             <div class="table-card" style="padding:12px 16px;">
                 <h3 style="margin-bottom:8px;font-size:14px;">🔍 Testni podatki za predogled</h3>
@@ -1733,10 +1751,10 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
-    
+
     <!-- Options -->
     <div id="buyersSettingsContent" style="display:none;">
         <!-- Page Header -->
@@ -1748,7 +1766,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="content" style="max-width:800px;">
             <!-- Filter Settings Card -->
             <div class="table-card" style="padding:16px 20px;margin-bottom:16px;">
@@ -1762,7 +1780,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="form-group" style="margin-bottom:16px;">
                     <label class="form-label" style="font-size:13px;">Prikaži naročila po X dneh od prvega nakupa</label>
                     <div style="display:flex;align-items:center;gap:12px;">
@@ -1773,7 +1791,7 @@
                         Privzeto: 10 dni. Kupci z enim samim nakupom se prikažejo šele po tem obdobju.
                     </small>
                 </div>
-                
+
                 <div style="display:flex;gap:12px;align-items:center;padding-top:12px;border-top:1px solid var(--card-border);">
                     <button class="btn btn-save" onclick="saveBuyersSettings()" style="padding:10px 20px;">
                         <i class="fas fa-save"></i> Shrani nastavitve
@@ -1781,7 +1799,7 @@
                     <span id="buyersSettingsStatus" style="font-size:12px;color:var(--text-muted);"></span>
                 </div>
             </div>
-            
+
             <!-- Info Box -->
             <div style="background:rgba(59,130,246,0.1);border:1px solid var(--accent-blue);border-radius:8px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;">
                 <i class="fas fa-info-circle" style="color:var(--accent-blue);font-size:18px;margin-top:2px;"></i>
@@ -1793,7 +1811,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Agents Management Content (Admin Only) -->
     <div id="agentsContent" style="display:none;">
         <!-- Page Header -->
@@ -1808,7 +1826,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="content" style="max-width:1000px;">
             <div class="table-card" style="padding:12px 16px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -1820,7 +1838,7 @@
                         <i class="fas fa-plus"></i> Add Agent
                     </button>
                 </div>
-                
+
                 <div class="table-wrapper">
                     <table class="data-table" id="agentsTable">
                         <thead>
@@ -1841,7 +1859,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Follow-ups Content -->
     <div id="followupsContent" style="display:none;">
         <!-- Page Header -->
@@ -1856,7 +1874,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div style="max-width:900px;">
             <div class="table-card" style="padding:24px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
@@ -1873,14 +1891,14 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div id="followupsContainer">
                     <div class="loading"><div class="spinner"></div>Loading...</div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <!-- Paketomati Content -->
     <div id="paketomatiContent" style="display:none;">
         <!-- Page Header -->
@@ -1895,7 +1913,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div style="max-width:1400px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
                 <div>
@@ -1918,7 +1936,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="table-card">
                 <table class="data-table" id="paketomatiTable">
                     <thead>
@@ -1941,7 +1959,91 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Urgent Leads Content -->
+    <div id="urgentContent" style="display:none;">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title-large"><i class="fas fa-exclamation-triangle"></i> Nujno</h1>
+            <div class="page-header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+
+        <div style="max-width:1200px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <div>
+                    <h3 style="margin-bottom:8px;">📞 Nujni klici</h3>
+                    <p style="color:var(--text-muted);">Posebni leadi za klicanje z navodili. Ročno dodajanje - ni povezano s sistemom.</p>
+                </div>
+                <button class="btn btn-save" onclick="showAddUrgentModal()">
+                    <i class="fas fa-plus"></i> Dodaj lead
+                </button>
+            </div>
+
+            <div class="table-card">
+                <table class="data-table" id="urgentTable">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;"><input type="checkbox" id="urgentSelectAll" onchange="toggleAllUrgent(this)"></th>
+                            <th>Telefon</th>
+                            <th>Navodilo / Razlog</th>
+                            <th>Dodano</th>
+                            <th>Poklicano</th>
+                            <th style="width:100px;">Akcije</th>
+                        </tr>
+                    </thead>
+                    <tbody id="urgentTableBody">
+                        <tr id="urgentEmptyRow"><td colspan="6" class="empty" style="padding:40px;text-align:center;">
+                            <i class="fas fa-phone-slash" style="font-size:32px;color:var(--text-muted);margin-bottom:12px;display:block;"></i>
+                            <p style="margin:0;color:var(--text-muted);">Ni nujnih leadov</p>
+                            <small style="color:var(--text-muted);">Klikni "Dodaj lead" za vnos</small>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quick actions for selected -->
+            <div id="urgentBulkActions" style="display:none;margin-top:16px;padding:12px 16px;background:var(--bg-secondary);border-radius:8px;display:flex;gap:12px;align-items:center;">
+                <span style="color:var(--text-muted);font-size:13px;"><span id="urgentSelectedCount">0</span> izbranih</span>
+                <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="markSelectedUrgentCalled()">
+                    <i class="fas fa-check"></i> Označi poklicano
+                </button>
+                <button class="btn" style="padding:6px 12px;font-size:12px;background:var(--accent-red);" onclick="deleteSelectedUrgent()">
+                    <i class="fas fa-trash"></i> Izbriši
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Urgent Lead Modal -->
+    <div id="addUrgentModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus"></i> Dodaj nujni lead</h3>
+                <button class="modal-close" onclick="closeAddUrgentModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Telefonska številka *</label>
+                    <input type="tel" class="form-input" id="urgentPhone" placeholder="+386 40 xxx xxx">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Navodilo / Razlog za klic *</label>
+                    <textarea class="form-textarea" id="urgentNote" placeholder="Kaj je treba poklicati, posebna navodila..." style="min-height:100px;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeAddUrgentModal()">Prekliči</button>
+                <button class="btn btn-save" onclick="saveUrgentLead()">
+                    <i class="fas fa-plus"></i> Dodaj
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Settings Modal -->
     <div id="notificationSettingsModal" class="modal" style="display:none;">
         <div class="modal-content" style="max-width:500px;">
@@ -1975,7 +2077,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Analytics Content -->
     <div id="analyticsContent" style="display:none;">
         <!-- Page Header -->
@@ -1990,7 +2092,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div style="max-width:1200px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
                 <div>
@@ -2008,13 +2110,13 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="analytics-grid" id="analyticsContainer">
                 <div class="loading"><div class="spinner"></div>Loading...</div>
             </div>
         </div>
     </div>
-    
+
     <!-- Call Log Modal -->
     <div class="modal-bg" id="callLogModal">
         <div class="modal">
@@ -2025,19 +2127,19 @@
             <div class="modal-body">
                 <input type="hidden" id="callLogCustomerId">
                 <input type="hidden" id="callLogStoreCode">
-                
+
                 <div class="form-group">
                     <label class="form-label">Call Status *</label>
                     <div class="call-status-grid" id="callStatusGrid">
                         <!-- Status options rendered by JS -->
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Notes</label>
                     <textarea class="form-textarea" id="callLogNotes" placeholder="Kaj ste se dogovorili, zakaj ni odgovoril, itd..." rows="3"></textarea>
                 </div>
-                
+
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                     <div class="form-group">
                         <label class="form-label">Call Duration (min)</label>
@@ -2057,7 +2159,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Agent Modal -->
     <div class="modal-bg" id="agentModal">
         <div class="modal">
@@ -2067,18 +2169,18 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="agentEditId">
-                
+
                 <div class="form-group">
                     <label class="form-label">Username *</label>
                     <input type="text" class="form-input" id="agentUsername" placeholder="npr. marko">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Password *</label>
                     <input type="password" class="form-input" id="agentPassword" placeholder="Geslo za prijavo">
                     <small style="color:var(--text-muted);font-size:12px;" id="passwordHint">Pusti prazno za ohranitev obstoječega (pri urejanju)</small>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Role</label>
                     <select class="form-select" id="agentRole">
@@ -2086,14 +2188,14 @@
                         <option value="admin">Admin - vidi vse, upravlja nastavitve</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Assigned Countries</label>
                     <div class="country-checkboxes" id="agentCountries">
                         <!-- Checkboxes rendered by JS -->
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Status</label>
                     <div class="toggle-row">
@@ -2110,31 +2212,31 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Toast Container (Enhanced) -->
     <div class="toast-container" id="toastContainer"></div>
-    
+
     <!-- Legacy Toast (fallback) -->
     <div class="toast" id="toast"></div>
-    
+
     <script>
         // Auth
         const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
         if (!user) window.location.href = 'login.php';
-        
+
         const isAdmin = user.role === 'admin';
         const userCountries = user.countries || [];
         const hasAllCountries = userCountries.includes('all');
-        
+
         document.getElementById('userName').textContent = user.username;
         document.getElementById('userRole').textContent = isAdmin ? 'Administrator' : 'Agent';
         document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
-        
+
         // Show admin sections
         if (isAdmin) {
             document.body.classList.add('is-admin');
         }
-        
+
         // ========== BULLETPROOF API UTILITIES ==========
         const API_CONFIG = {
             timeout: 15000,      // 15 second timeout
@@ -2142,7 +2244,7 @@
             retryDelay: 1000,    // 1 second between retries
             backoffMultiplier: 2 // Exponential backoff
         };
-        
+
         // Loading state management
         const loadingState = {
             active: new Set(),
@@ -2161,57 +2263,57 @@
                 }
             }
         };
-        
+
         // Bulletproof fetch with retry, timeout, and error handling
         async function apiFetch(url, options = {}) {
-            const { 
+            const {
                 retries = API_CONFIG.retries,
                 timeout = API_CONFIG.timeout,
                 silent = false,
                 component = 'api'
             } = options;
-            
+
             let lastError;
             let delay = API_CONFIG.retryDelay;
-            
+
             for (let attempt = 1; attempt <= retries; attempt++) {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeout);
-                
+
                 try {
                     console.log(`[API] ${component} - Attempt ${attempt}/${retries}: ${url}`);
-                    
+
                     const response = await fetch(url, {
                         ...options,
                         signal: controller.signal
                     });
-                    
+
                     clearTimeout(timeoutId);
-                    
+
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
-                    
+
                     const data = await response.json();
-                    
+
                     // Check for API-level errors
                     if (data && data.error) {
                         console.warn(`[API] ${component} - API error:`, data.error);
                         return { success: false, error: data.error, data: null };
                     }
-                    
+
                     console.log(`[API] ${component} - Success:`, Array.isArray(data) ? `${data.length} items` : 'object');
                     return { success: true, data, error: null };
-                    
+
                 } catch (error) {
                     clearTimeout(timeoutId);
                     lastError = error;
-                    
+
                     const isTimeout = error.name === 'AbortError';
                     const errorMsg = isTimeout ? 'Timeout' : error.message;
-                    
+
                     console.warn(`[API] ${component} - Attempt ${attempt} failed: ${errorMsg}`);
-                    
+
                     if (attempt < retries) {
                         console.log(`[API] ${component} - Retrying in ${delay}ms...`);
                         await new Promise(r => setTimeout(r, delay));
@@ -2219,26 +2321,26 @@
                     }
                 }
             }
-            
+
             // All retries failed
-            const errorMsg = lastError?.name === 'AbortError' 
-                ? 'Request timed out' 
+            const errorMsg = lastError?.name === 'AbortError'
+                ? 'Request timed out'
                 : lastError?.message || 'Unknown error';
-            
+
             console.error(`[API] ${component} - All ${retries} attempts failed:`, errorMsg);
-            
+
             if (!silent) {
                 showToast(`⚠️ ${component}: ${errorMsg}`, 'error');
             }
-            
+
             return { success: false, error: errorMsg, data: null };
         }
-        
+
         // Show loading skeleton in a container
         function showLoadingSkeleton(containerId, rows = 5) {
             const container = document.getElementById(containerId);
             if (!container) return;
-            
+
             container.innerHTML = `
                 <tr>
                     <td colspan="10" style="padding:40px;text-align:center;">
@@ -2248,12 +2350,12 @@
                 </tr>
             `;
         }
-        
+
         // Show error state in a container
         function showErrorState(containerId, message, retryFn = null) {
             const container = document.getElementById(containerId);
             if (!container) return;
-            
+
             container.innerHTML = `
                 <tr>
                     <td colspan="10" style="padding:40px;text-align:center;">
@@ -2266,12 +2368,12 @@
                 </tr>
             `;
         }
-        
+
         // Show empty state in a container
         function showEmptyState(containerId, message, icon = 'fa-inbox') {
             const container = document.getElementById(containerId);
             if (!container) return;
-            
+
             container.innerHTML = `
                 <tr>
                     <td colspan="10" style="padding:40px;text-align:center;color:var(--text-muted);">
@@ -2281,39 +2383,39 @@
                 </tr>
             `;
         }
-        
+
         // ========== END BULLETPROOF UTILITIES ==========
-        
+
         // Theme Toggle (Dark/Light Mode)
         function initTheme() {
             const savedTheme = localStorage.getItem('callcenter_theme') || 'light';
             document.body.classList.toggle('dark', savedTheme === 'dark');
             updateThemeIcon(savedTheme);
         }
-        
+
         function toggleTheme() {
             const isDark = document.body.classList.toggle('dark');
             const newTheme = isDark ? 'dark' : 'light';
             localStorage.setItem('callcenter_theme', newTheme);
             updateThemeIcon(newTheme);
         }
-        
+
         function updateThemeIcon(theme) {
             const btn = document.getElementById('themeToggle');
             if (btn) {
-                btn.innerHTML = theme === 'dark' 
-                    ? '<i class="fas fa-sun"></i>' 
+                btn.innerHTML = theme === 'dark'
+                    ? '<i class="fas fa-sun"></i>'
                     : '<i class="fas fa-moon"></i>';
             }
         }
-        
+
         // Initialize theme on load
         initTheme();
-        
+
         console.log('[Auth] User:', user);
         console.log('[Auth] isAdmin:', isAdmin);
         console.log('[Auth] userCountries:', userCountries);
-        
+
         // Hide SMS Settings for non-admins
         if (!isAdmin) {
             console.log('[Auth] Hiding SMS Settings nav for non-admin');
@@ -2322,7 +2424,7 @@
         } else {
             console.log('[Auth] Admin user - showing all settings');
         }
-        
+
         // State
         let stores = [];
         let carts = [];
@@ -2338,7 +2440,7 @@
         let orderItems = [];
         let freeShipping = false;
         let smsTarget = null;
-        
+
         // Global loading status for progressive loading (buyers takes longest)
         const globalLoadingStatus = {
             carts: true,
@@ -2346,15 +2448,15 @@
             buyers: true,
             buyersError: null  // Will store error message if buyers fail
         };
-        
+
         // Pagination & Sorting State
         let currentPage = 1;
         let itemsPerPage = 25;
         let sortColumn = 'abandonedAt';
         let sortDirection = 'desc';
-        
+
         const SHIPPING_COST = 5.00;
-        
+
         // SMS Templates
         const smsTemplates = {
             reminder: {
@@ -2367,83 +2469,83 @@
                 text: '{ime}, zadnja priložnost! {produkt} bo kmalu razprodan. Ne zamudite: {link}'
             }
         };
-        
+
         // ========== UNIFIED CONTENT VISIBILITY CONTROL ==========
         function hideAllContent() {
             // Hide all special content areas
             const specialAreas = [
                 'dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent',
                 'buyersSettingsContent', 'agentsContent', 'followupsContent',
-                'analyticsContent', 'paketomatiContent'
+                'analyticsContent', 'paketomatiContent', 'urgentContent'
             ];
             specialAreas.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
-            
+
             // Also ensure main content area is in correct state
             const mainContent = document.querySelector('.content');
             if (mainContent) mainContent.style.display = 'none';
         }
-        
+
         function showMainView() {
             const main = document.getElementById('main');
             if (main) main.style.display = 'block';
-            
+
             const statsGrid = document.querySelector('.stats-grid');
             if (statsGrid) statsGrid.style.display = 'grid';
-            
+
             const countryTabs = document.querySelector('.country-tabs');
             if (countryTabs) countryTabs.style.display = 'flex';
-            
+
             const contentTabs = document.getElementById('contentTabs');
             if (contentTabs) contentTabs.style.display = 'flex';
-            
+
             const content = document.querySelector('.content');
             if (content) content.style.display = 'block';
         }
-        
+
         function showSpecialView(contentId) {
             // Hide main completely
             const main = document.getElementById('main');
             if (main) main.style.display = 'none';
-            
+
             // Show specific content
             const el = document.getElementById(contentId);
             if (el) el.style.display = 'block';
         }
-        
+
         // Sidebar toggle
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
-        
+
         menuBtn.addEventListener('click', () => {
             sidebar.classList.toggle('open');
             sidebarOverlay.classList.toggle('show');
         });
-        
+
         sidebarOverlay.addEventListener('click', () => {
             sidebar.classList.remove('open');
             sidebarOverlay.classList.remove('show');
         });
-        
+
         // Nav items
         document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
             item.addEventListener('click', () => {
                 currentTab = item.dataset.tab;
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
-                
+
                 // Close sidebar on mobile
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('show');
-                
+
                 // Data tabs that use content tabs
                 const dataTabs = ['carts', 'pending', 'buyers', 'paketomati'];
                 const isDataTab = dataTabs.includes(currentTab);
                 const isLeadsTab = currentTab === 'leads';
-                
+
                 // Update page title
                 const titles = {
                     dashboard: 'Dashboard',
@@ -2461,17 +2563,17 @@
                     'analytics': 'Analytics'
                 };
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
-                
+
                 // FIRST: Hide ALL content areas to prevent overlap
                 hideAllContent();
-                
+
                 // Content tabs element
                 const contentTabs = document.getElementById('contentTabs');
-                
+
                 if (isDataTab || isLeadsTab) {
                     // Show main view with stats, country tabs, content tabs
                     showMainView();
-                    
+
                     // For "leads" tab, default to carts view
                     if (isLeadsTab) {
                         currentContentTab = 'carts';
@@ -2479,22 +2581,26 @@
                     } else {
                         currentContentTab = currentTab;
                     }
-                    
+
                     // Sync content tab state
                     contentTabs.querySelectorAll('.content-tab').forEach(t => {
                         t.classList.toggle('active', t.dataset.content === currentContentTab);
                     });
-                    
+
                     if (currentContentTab === 'paketomati') {
                         document.querySelector('.content').style.display = 'none';
                         document.getElementById('paketomatiContent').style.display = 'block';
                         loadPaketomati();
+                    } else if (currentContentTab === 'urgent') {
+                        document.querySelector('.content').style.display = 'none';
+                        document.getElementById('urgentContent').style.display = 'block';
+                        renderUrgentTable();
                     } else {
                         currentPage = 1;
                         renderTable();
                         setTimeout(addCustomerClickHandlers, 100);
                     }
-                    
+
                     // Update country tab counts to reflect current content type
                     updateCounts();
                 } else {
@@ -2529,27 +2635,27 @@
                 }
             });
         });
-        
+
         // Content tab state
         let currentContentTab = 'carts';
-        
+
         // Setup content tabs
         function setupContentTabs() {
             const contentTabs = document.getElementById('contentTabs');
             if (!contentTabs) return;
-            
+
             contentTabs.querySelectorAll('.content-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const newTab = tab.dataset.content;
-                    
+
                     // Update active state
                     contentTabs.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
-                    
+
                     // Update current content tab
                     currentContentTab = newTab;
                     currentTab = newTab; // Sync with main tab state
-                    
+
                     // Update page title
                     const titles = {
                         carts: 'Abandoned Carts',
@@ -2558,18 +2664,18 @@
                         paketomati: 'Paketomati'
                     };
                     document.getElementById('pageTitle').textContent = titles[newTab] || newTab;
-                    
+
                     // Update sidebar active state - keep "Leads" highlighted for content tabs
                     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                     const leadsItem = document.querySelector('.nav-item[data-tab="leads"]');
                     if (leadsItem) leadsItem.classList.add('active');
-                    
+
                     // Hide ALL content areas first (prevents overlap)
                     hideAllContent();
-                    
+
                     // Show main view elements
                     showMainView();
-                    
+
                     // Show appropriate content
                     if (newTab === 'paketomati') {
                         document.querySelector('.content').style.display = 'none';
@@ -2579,13 +2685,13 @@
                         currentPage = 1;
                         renderTable();
                     }
-                    
+
                     // Update country tab counts to reflect current content type
                     updateCounts();
                 });
             });
         }
-        
+
         // Update content tab counts
         function updateContentTabCounts() {
             // Filter by user's allowed countries
@@ -2593,17 +2699,17 @@
             let filteredCarts = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
             let filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
             let filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
-            
+
             // Apply country filter if not "all"
             if (currentStore !== 'all') {
                 filteredCarts = filteredCarts.filter(c => c.storeCode === currentStore);
                 filteredPending = filteredPending.filter(p => p.storeCode === currentStore);
                 filteredBuyers = filteredBuyers.filter(b => b.storeCode === currentStore);
             }
-            
+
             document.getElementById('contentCount-carts').textContent = filteredCarts.length;
             document.getElementById('contentCount-pending').textContent = filteredPending.length;
-            
+
             // Buyers: Show spinner if still loading, error icon if failed
             const buyersCountEl = document.getElementById('contentCount-buyers');
             if (globalLoadingStatus.buyers) {
@@ -2613,38 +2719,38 @@
             } else {
                 buyersCountEl.textContent = filteredBuyers.length;
             }
-            
+
             // Paketomati count (not filtered by country as they come from MetaKocka)
             const paketCount = paketomatiData ? paketomatiData.filter(p => p.status === 'not_called').length : 0;
             document.getElementById('contentCount-paketomati').textContent = paketCount;
         }
-        
+
         // Init - Bulletproof version
         async function init() {
             console.log('[Init] Starting application...');
             const startTime = Date.now();
-            
+
             // Show global loading state
             loadingState.show('init');
-            
+
             try {
                 // 1. Load stores (critical - app won't work without it)
                 console.log('[Init] Loading stores...');
-                const storesResult = await apiFetch('api.php?action=stores', { 
+                const storesResult = await apiFetch('api.php?action=stores', {
                     component: 'Stores',
-                    retries: 3 
+                    retries: 3
                 });
-                
+
                 if (!storesResult.success || !storesResult.data) {
                     throw new Error('Napaka pri nalaganju trgovin');
                 }
                 stores = storesResult.data;
                 console.log('[Init] Stores loaded:', stores.length);
-                
+
                 // 2. Render UI components
                 renderCountryTabs();
                 setupContentTabs();
-                
+
                 // 3. Load all data in parallel with graceful degradation
                 console.log('[Init] Loading all data in parallel...');
                 const results = await Promise.allSettled([
@@ -2653,7 +2759,7 @@
                     loadSmsTemplatesBulletproof(),
                     loadPaketomatiBulletproof()
                 ]);
-                
+
                 // Log results
                 const labels = ['MainData', 'SmsData', 'SmsTemplates', 'Paketomati'];
                 results.forEach((result, i) => {
@@ -2663,39 +2769,39 @@
                         console.error(`[Init] ✗ ${labels[i]} failed:`, result.reason);
                     }
                 });
-                
+
                 // Update counts after all data loaded
                 updateContentTabCounts();
-                
+
                 // 4. Set default view - LEADS (shows carts/pending/buyers tabs)
                 currentTab = 'leads';
                 currentContentTab = 'carts';
                 document.getElementById('pageTitle').textContent = 'Leads';
-                
+
                 // Hide ALL special content areas first (ensures clean state)
                 ['dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
-                 'buyersSettingsContent', 'agentsContent', 'followupsContent', 
-                 'analyticsContent', 'paketomatiContent'].forEach(id => {
+                 'buyersSettingsContent', 'agentsContent', 'followupsContent',
+                 'analyticsContent', 'paketomatiContent', 'urgentContent'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'none';
                 });
-                
+
                 // Show the main content area
                 document.getElementById('main').style.display = 'block';
                 document.querySelector('.stats-grid').style.display = 'grid';
                 document.querySelector('.country-tabs').style.display = 'flex';
                 document.getElementById('contentTabs').style.display = 'flex';
                 document.querySelector('.content').style.display = 'block';
-                
+
                 // Update sidebar - Leads is active by default
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 document.querySelector('.nav-item[data-tab="leads"]')?.classList.add('active');
-                
+
                 renderTable();
-                
+
                 const loadTime = Date.now() - startTime;
                 console.log(`[Init] ✓ Application ready in ${loadTime}ms`);
-                
+
                 // Handle hash navigation (from sidebar links)
                 if (window.location.hash) {
                     const hash = window.location.hash.substring(1); // Remove #
@@ -2704,11 +2810,11 @@
                         navItem.click();
                     }
                 }
-                
+
             } catch (error) {
                 console.error('[Init] Critical error:', error);
                 showToast(`❌ Napaka pri zagonu: ${error.message}`, 'error');
-                
+
                 // Show error state in main content
                 document.querySelector('.content').innerHTML = `
                     <div style="padding:60px;text-align:center;">
@@ -2724,25 +2830,25 @@
                 loadingState.hide('init');
             }
         }
-        
+
         function renderCountryTabs() {
             const container = document.getElementById('countryTabs');
-            
+
             // Filter stores based on user's assigned countries
-            const allowedStores = hasAllCountries 
-                ? stores 
+            const allowedStores = hasAllCountries
+                ? stores
                 : stores.filter(s => userCountries.includes(s.code));
-            
+
             // If agent has only one country, hide tabs and set that country
             if (!hasAllCountries && allowedStores.length === 1) {
                 container.style.display = 'none';
                 currentStore = allowedStores[0].code;
                 return;
             }
-            
+
             // Show "All" tab only for admins or users with multiple countries
             const showAllTab = hasAllCountries || allowedStores.length > 1;
-            
+
             container.innerHTML = (showAllTab ? `
                 <button class="country-tab active" data-store="all">
                     <span class="flag">🌍</span> All
@@ -2752,12 +2858,12 @@
                     <span class="flag">${s.flag}</span> ${s.name}
                 </button>
             `).join('');
-            
+
             // Set initial store for non-admins
             if (!showAllTab && allowedStores.length > 0) {
                 currentStore = allowedStores[0].code;
             }
-            
+
             container.querySelectorAll('.country-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     currentStore = tab.dataset.store;
@@ -2765,7 +2871,7 @@
                     tab.classList.add('active');
                     updateStats();
                     updateContentTabCounts();
-                    
+
                     // Re-render based on current content tab
                     if (currentContentTab === 'paketomati') {
                         renderPaketomatiTable();
@@ -2774,20 +2880,20 @@
                     }
                 });
             });
-            
+
             // SMS country filter is now using pills, no need to populate select
         }
-        
+
         // Bulletproof data loading with PROGRESSIVE loading for better UX
         async function loadAllDataBulletproof() {
             console.log('[Data] Loading main data with progressive loading...');
-            
+
             // Reset global loading status
             globalLoadingStatus.carts = true;
             globalLoadingStatus.pending = true;
             globalLoadingStatus.buyers = true;
             globalLoadingStatus.buyersError = null;
-            
+
             // Helper to update tab loading indicators
             const updateTabLoading = (tab, loading) => {
                 const tabEl = document.querySelector(`.content-tab[data-content="${tab}"]`);
@@ -2798,21 +2904,21 @@
                     }
                 }
             };
-            
+
             // Show loading on all tabs
             updateTabLoading('carts', true);
             updateTabLoading('pending', true);
             updateTabLoading('buyers', true);
-            
+
             // PROGRESSIVE LOADING: Load carts & pending first (fastest), show them immediately
             // Then load buyers in background (slowest)
-            
+
             // Phase 1: Load fast data (carts + pending) in parallel
             const [cartsResult, pendingResult] = await Promise.allSettled([
                 apiFetch('api.php?action=abandoned-carts', { component: 'Carts', silent: true }),
                 apiFetch('api.php?action=pending-orders', { component: 'Pending', silent: true })
             ]);
-            
+
             // Process carts immediately
             if (cartsResult.status === 'fulfilled' && cartsResult.value.success) {
                 carts = Array.isArray(cartsResult.value.data) ? cartsResult.value.data : [];
@@ -2822,7 +2928,7 @@
                 carts = [];
             }
             globalLoadingStatus.carts = false;
-            
+
             // Process pending immediately
             if (pendingResult.status === 'fulfilled' && pendingResult.value.success) {
                 pending = Array.isArray(pendingResult.value.data) ? pendingResult.value.data : [];
@@ -2832,38 +2938,38 @@
                 pending = [];
             }
             globalLoadingStatus.pending = false;
-            
+
             // Render immediately with carts + pending (buyers will show spinner)
             updateCounts();
             updateStats();
             renderTable();
             console.log('[Data] Phase 1 complete - showing carts & pending');
-            
+
             // Phase 2: Load buyers - SIMPLE AND DIRECT
             console.log('[Data] Phase 2: Loading buyers...');
-            
+
             try {
                 // Try cache first (instant if available)
-                const cacheResult = await apiFetch('api.php?action=buyers-cache', { 
-                    component: 'BuyersCache', 
+                const cacheResult = await apiFetch('api.php?action=buyers-cache', {
+                    component: 'BuyersCache',
                     silent: true,
                     timeout: 30000
                 });
-                
+
                 console.log('[Data] Cache result:', cacheResult.success, cacheResult.data?.buyers?.length || 0);
-                
+
                 if (cacheResult.success && cacheResult.data?.buyers?.length > 0) {
                     buyers = cacheResult.data.buyers;
                     console.log('[Data] ✓ Buyers from cache:', buyers.length);
                 } else {
                     // No cache - load directly (slower but works)
                     console.log('[Data] No cache, loading directly...');
-                    const directResult = await apiFetch('api.php?action=one-time-buyers', { 
-                        component: 'Buyers', 
+                    const directResult = await apiFetch('api.php?action=one-time-buyers', {
+                        component: 'Buyers',
                         silent: true,
                         timeout: 120000  // 2 minutes for full fetch
                     });
-                    
+
                     if (directResult.success && Array.isArray(directResult.data)) {
                         buyers = directResult.data;
                         console.log('[Data] ✓ Buyers direct:', buyers.length);
@@ -2878,35 +2984,35 @@
                 buyers = [];
                 globalLoadingStatus.buyersError = err.message || 'Napaka';
             }
-            
+
             // Always mark as loaded
             globalLoadingStatus.buyers = false;
             globalLoadingStatus.buyersError = buyers.length === 0 ? (globalLoadingStatus.buyersError || null) : null;
-            
+
             // Update UI
             updateCounts();
             renderTable();
-            
+
             // Final render with all data
             console.log('[Data] Phase 2 complete - all data loaded');
             console.log('[Data] Totals:', { carts: carts.length, pending: pending.length, buyers: buyers.length });
-            
+
             updateCounts();
             updateStats();
             renderTable();
-            
+
             // Show warning if any failed
             const failures = [
                 cartsResult.status !== 'fulfilled' || !cartsResult.value?.success ? 'Carts' : null,
                 pendingResult.status !== 'fulfilled' || !pendingResult.value?.success ? 'Pending' : null,
                 globalLoadingStatus.buyersError ? 'Buyers' : null
             ].filter(Boolean);
-            
+
             if (failures.length > 0) {
                 showToast(`⚠️ Nekateri podatki niso bili naloženi: ${failures.join(', ')}`, 'warning');
             }
         }
-        
+
         // Background refresh for buyers cache
         async function refreshBuyersInBackground() {
             try {
@@ -2926,13 +3032,13 @@
                 console.error('[Data] Background buyers refresh failed:', err);
             }
         }
-        
+
         // Function to retry loading buyers only
         async function retryLoadBuyers() {
             console.log('[Data] Retrying buyers load...');
             globalLoadingStatus.buyers = true;
             globalLoadingStatus.buyersError = null;
-            
+
             // Update UI immediately
             const tabEl = document.querySelector('.content-tab[data-content="buyers"]');
             if (tabEl) {
@@ -2940,7 +3046,7 @@
                 if (countEl) countEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:8px"></i>';
             }
             renderTable();  // Show loading spinner
-            
+
             // Force refresh the cache first
             showToast('🔄 Osveževanje podatkov...', 'info');
             try {
@@ -2948,14 +3054,14 @@
             } catch (e) {
                 console.error('[Data] Cache refresh failed:', e);
             }
-            
+
             // Then load from cache
-            const cacheResult = await apiFetch('api.php?action=buyers-cache', { 
-                component: 'Buyers', 
+            const cacheResult = await apiFetch('api.php?action=buyers-cache', {
+                component: 'Buyers',
                 silent: false,
                 timeout: 5000
             });
-            
+
             if (cacheResult.success && cacheResult.data?.buyers) {
                 buyers = cacheResult.data.buyers;
                 console.log('[Data] ✓ Buyers retry success:', buyers.length);
@@ -2963,12 +3069,12 @@
                 showToast(`✓ Enkratni kupci naloženi: ${buyers.length}`);
             } else {
                 // Fallback to direct API
-                const buyersResult = await apiFetch('api.php?action=one-time-buyers', { 
-                    component: 'Buyers', 
+                const buyersResult = await apiFetch('api.php?action=one-time-buyers', {
+                    component: 'Buyers',
                     silent: false,
                     timeout: 45000
                 });
-                
+
                 if (buyersResult.success) {
                     buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
                     console.log('[Data] ✓ Buyers retry success:', buyers.length);
@@ -2981,18 +3087,18 @@
                 }
             }
             globalLoadingStatus.buyers = false;
-            
+
             updateCounts();
             renderTable();
         }
-        
+
         // Bulletproof SMS data loading
         async function loadSmsDataBulletproof() {
-            const result = await apiFetch('api.php?action=sms-queue', { 
-                component: 'SMS Queue', 
-                silent: true 
+            const result = await apiFetch('api.php?action=sms-queue', {
+                component: 'SMS Queue',
+                silent: true
             });
-            
+
             if (result.success && Array.isArray(result.data)) {
                 smsLog = result.data;
                 console.log('[SMS] ✓ Queue loaded:', smsLog.length);
@@ -3001,20 +3107,20 @@
                 console.warn('[SMS] ✗ Queue failed, using empty array');
             }
         }
-        
+
         // Bulletproof SMS templates loading - uses direct JSON fetch
         async function loadSmsTemplatesBulletproof() {
             // Reuse the main loadSmsTemplates function
             await loadSmsTemplates();
         }
-        
+
         // Bulletproof Paketomati loading
         async function loadPaketomatiBulletproof() {
-            const result = await apiFetch('api.php?action=paketomati', { 
-                component: 'Paketomati', 
-                silent: true 
+            const result = await apiFetch('api.php?action=paketomati', {
+                component: 'Paketomati',
+                silent: true
             });
-            
+
             if (result.success && Array.isArray(result.data)) {
                 paketomatiData = result.data;
                 console.log('[Paketomati] ✓ Loaded:', paketomatiData.length);
@@ -3023,24 +3129,24 @@
                 console.warn('[Paketomati] ✗ Failed, using empty array');
             }
         }
-        
+
         // Legacy loadAllData for backwards compatibility
         async function loadAllData() {
             return loadAllDataBulletproof();
         }
-        
+
         async function refreshData() {
             console.log('[Refresh] Starting data refresh...');
             document.getElementById('tableContainer').innerHTML = renderSkeletonTable(8);
-            
+
             try {
                 // Clear cache first
-                await apiFetch('api.php?action=clear-cache', { 
-                    component: 'ClearCache', 
+                await apiFetch('api.php?action=clear-cache', {
+                    component: 'ClearCache',
                     silent: true,
-                    retries: 1 
+                    retries: 1
                 });
-                
+
                 // Reload all data
                 await loadAllDataBulletproof();
                 showToast('✓ Podatki osveženi!');
@@ -3049,13 +3155,13 @@
                 showToast('⚠️ Napaka pri osvežitvi podatkov', 'error');
             }
         }
-        
+
         async function loadSmsData() {
             return loadSmsDataBulletproof();
-            
+
             // Automation rules still in localStorage (not critical)
             smsAutomation = JSON.parse(localStorage.getItem('sms_automation') || '[]');
-            
+
             // Default automation rules if empty
             if (smsAutomation.length === 0) {
                 smsAutomation = [
@@ -3065,26 +3171,26 @@
                 ];
                 saveSmsAutomation();
             }
-            
+
             document.getElementById('navSms').textContent = smsLog.filter(s => s.status === 'queued').length;
         }
-        
+
         function saveSmsLog() {
             localStorage.setItem('sms_log', JSON.stringify(smsLog));
             document.getElementById('navSms').textContent = smsLog.filter(s => s.status === 'queued').length;
         }
-        
+
         function saveSmsAutomation() {
             localStorage.setItem('sms_automation', JSON.stringify(smsAutomation));
         }
-        
+
         function updateCounts() {
             // Filter by user's allowed countries (admins see everything)
             const shouldFilter = !hasAllCountries && !isAdmin;
             const filteredCarts = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
             const filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
             const filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
-            
+
             // Update nav sidebar counts (guard against missing elements)
             const navCarts = document.getElementById('navCarts');
             const navPending = document.getElementById('navPending');
@@ -3092,11 +3198,11 @@
             if (navCarts) navCarts.textContent = filteredCarts.length;
             if (navPending) navPending.textContent = filteredPending.length;
             if (navBuyers) navBuyers.textContent = filteredBuyers.length;
-            
+
             // Update content tab counts
             updateContentTabCounts();
         }
-        
+
         // Currency conversion rates to EUR (approximate, Feb 2026)
         // Update periodically for accuracy
         const currencyToEur = {
@@ -3105,46 +3211,46 @@
             PLN: 0.23,   // 1 PLN ≈ 0.23 EUR (4.35 PLN = 1 EUR)
             HUF: 0.0025  // 1 HUF ≈ 0.0025 EUR (400 HUF = 1 EUR)
         };
-        
+
         function convertToEur(value, currency) {
             const rate = currencyToEur[currency] || 1;
             return value * rate;
         }
-        
+
         function updateStats() {
             // Filter by user's allowed countries first (same as updateContentTabCounts)
             const shouldFilter = !hasAllCountries && !isAdmin;
             let fc = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
             let fp = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
-            
+
             // Then filter by currentStore if not 'all'
             if (currentStore !== 'all') {
                 fc = fc.filter(c => c.storeCode === currentStore);
                 fp = fp.filter(p => p.storeCode === currentStore);
             }
-            
+
             // Convert all values to EUR before summing
             const totalValue = fc.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
             const sym = '€'; // Always show in EUR since we're converting
-            
+
             const today = new Date().toDateString();
             const smsToday = smsLog.filter(s => new Date(s.date).toDateString() === today).length;
-            
+
             document.getElementById('statCarts').textContent = fc.length;
             document.getElementById('statValue').textContent = sym + Math.round(totalValue).toLocaleString();
             document.getElementById('statPending').textContent = fp.length;
             document.getElementById('statSms').textContent = smsToday;
         }
-        
+
         // Filters
         document.getElementById('searchInput').addEventListener('input', renderTable);
         document.getElementById('statusFilter').addEventListener('change', renderTable);
-        
+
         function renderTable() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const status = document.getElementById('statusFilter').value;
             const container = document.getElementById('tableContainer');
-            
+
             // BUYERS: Check loading/error state first
             if (currentTab === 'buyers') {
                 // Still loading buyers
@@ -3158,7 +3264,7 @@
                     `;
                     return;
                 }
-                
+
                 // Buyers failed to load - show error with retry
                 if (globalLoadingStatus.buyersError) {
                     container.innerHTML = `
@@ -3174,27 +3280,27 @@
                     return;
                 }
             }
-            
+
             let data = currentTab === 'carts' ? [...carts] : currentTab === 'pending' ? [...pending] : [...buyers];
-            
+
             // Filter by user's allowed countries first (admins see everything)
             if (!hasAllCountries && !isAdmin) {
                 data = data.filter(d => userCountries.includes(d.storeCode));
             }
-            
+
             if (currentStore !== 'all') data = data.filter(d => d.storeCode === currentStore);
             if (status) data = data.filter(d => d.callStatus === status);
-            if (search) data = data.filter(d => 
+            if (search) data = data.filter(d =>
                 (d.customerName || '').toLowerCase().includes(search) ||
                 (d.email || '').toLowerCase().includes(search) ||
                 (d.phone || '').includes(search)
             );
-            
+
             // Sort data
             data.sort((a, b) => {
                 let valA = a[sortColumn] || '';
                 let valB = b[sortColumn] || '';
-                
+
                 if (sortColumn === 'cartValue' || sortColumn === 'orderTotal' || sortColumn === 'totalSpent') {
                     valA = parseFloat(valA) || 0;
                     valB = parseFloat(valB) || 0;
@@ -3205,16 +3311,16 @@
                     valA = String(valA).toLowerCase();
                     valB = String(valB).toLowerCase();
                 }
-                
+
                 if (sortDirection === 'asc') {
                     return valA > valB ? 1 : valA < valB ? -1 : 0;
                 } else {
                     return valA < valB ? 1 : valA > valB ? -1 : 0;
                 }
             });
-            
+
             const totalItems = data.length;
-            
+
             if (!totalItems) {
                 const emptyMessages = {
                     'carts': '<div class="empty"><i class="fas fa-shopping-cart"></i><p>Ni zapuščenih košaric</p><small style="color:var(--text-muted);">Vse košarice so bile pretvorjene ali filtrirane</small></div>',
@@ -3224,18 +3330,18 @@
                 container.innerHTML = emptyMessages[currentTab] || '<div class="empty"><i class="fas fa-inbox"></i><p>Ni podatkov za prikaz</p></div>';
                 return;
             }
-            
+
             // Pagination
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             if (currentPage > totalPages) currentPage = 1;
             const startIdx = (currentPage - 1) * itemsPerPage;
             const paginatedData = data.slice(startIdx, startIdx + itemsPerPage);
-            
+
             if (currentTab === 'carts') renderCartsTable(paginatedData, totalItems, totalPages);
             else if (currentTab === 'pending') renderPendingTable(paginatedData, totalItems, totalPages);
             else renderBuyersTable(paginatedData, totalItems, totalPages);
         }
-        
+
         function sortTable(column) {
             if (sortColumn === column) {
                 sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
@@ -3246,32 +3352,32 @@
             currentPage = 1;
             renderTable();
         }
-        
+
         function goToPage(page) {
             currentPage = page;
             renderTable();
         }
-        
+
         function changeItemsPerPage(val) {
             itemsPerPage = parseInt(val) || 25;
             currentPage = 1;
             renderTable();
         }
-        
+
         function renderPagination(totalItems, totalPages) {
             const start = (currentPage - 1) * itemsPerPage + 1;
             const end = Math.min(currentPage * itemsPerPage, totalItems);
-            
+
             let pageButtons = '';
             const maxButtons = 5;
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, startPage + maxButtons - 1);
             if (endPage - startPage < maxButtons - 1) startPage = Math.max(1, endPage - maxButtons + 1);
-            
+
             for (let i = startPage; i <= endPage; i++) {
                 pageButtons += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
             }
-            
+
             return `
                 <div class="pagination">
                     <div class="pagination-info">
@@ -3301,13 +3407,13 @@
                 </div>
             `;
         }
-        
+
         function renderCartsTable(data, totalItems, totalPages) {
             const getSortClass = (col) => sortColumn === col ? sortDirection : '';
             // Clear selection when table changes
             selectedItems.clear();
             updateBulkBar();
-            
+
             document.getElementById('tableContainer').innerHTML = `
                 <div class="table-wrapper">
                 <table class="data-table">
@@ -3330,7 +3436,7 @@
                                 <td><div class="customer-cell" onclick="openCustomer360(carts.find(x=>x.id==='${c.id}'))" style="cursor:pointer;"><div class="avatar">${initials(c.customerName)}</div><div><div class="customer-name">${esc(c.customerName)}</div><div class="customer-email">${esc(c.email)}</div></div></div></td>
                                 <td>${c.storeFlag} ${c.storeName}</td>
                                 <td><strong>${sym}${(c.cartValue||0).toFixed(2)}</strong></td>
-                                <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '—'}</td>
+                                <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '-'}</td>
                                 <td>
                                     <select class="inline-status-select" data-id="${c.id}" data-type="cart" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${c.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
@@ -3344,9 +3450,9 @@
                                 </td>
                                 <td>
                                     <div class="inline-notes-wrapper">
-                                        <input type="text" class="inline-notes-input ${c.notes ? 'has-notes' : ''}" 
+                                        <input type="text" class="inline-notes-input ${c.notes ? 'has-notes' : ''}"
                                                data-id="${c.id}" data-type="cart"
-                                               value="${escAttr(c.notes || '')}" 
+                                               value="${escAttr(c.notes || '')}"
                                                placeholder="Add notes..."
                                                onchange="markNotesChanged(this)"
                                                onkeypress="if(event.key==='Enter'){saveInlineNotes(this)}">
@@ -3366,7 +3472,7 @@
                 </div>
                 ${renderPagination(totalItems, totalPages)}`;
         }
-        
+
         function renderPendingTable(data, totalItems, totalPages) {
             const getSortClass = (col) => sortColumn === col ? sortDirection : '';
             document.getElementById('tableContainer').innerHTML = `
@@ -3390,7 +3496,7 @@
                                 <td>${o.storeFlag} ${o.storeName}</td>
                                 <td><strong>#${o.orderId}</strong></td>
                                 <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
-                                <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '—'}</td>
+                                <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '-'}</td>
                                 <td>
                                     <select class="inline-status-select" data-id="${o.id}" data-type="pending" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${o.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
@@ -3404,9 +3510,9 @@
                                 </td>
                                 <td>
                                     <div class="inline-notes-wrapper">
-                                        <input type="text" class="inline-notes-input ${o.notes ? 'has-notes' : ''}" 
+                                        <input type="text" class="inline-notes-input ${o.notes ? 'has-notes' : ''}"
                                                data-id="${o.id}" data-type="pending"
-                                               value="${escAttr(o.notes || '')}" 
+                                               value="${escAttr(o.notes || '')}"
                                                placeholder="Add notes..."
                                                onchange="markNotesChanged(this)"
                                                onkeypress="if(event.key==='Enter'){saveInlineNotes(this)}">
@@ -3424,7 +3530,7 @@
                 </div>
                 ${renderPagination(totalItems, totalPages)}`;
         }
-        
+
         function renderBuyersTable(data, totalItems, totalPages) {
             const getSortClass = (col) => sortColumn === col ? sortDirection : '';
             document.getElementById('tableContainer').innerHTML = `
@@ -3447,7 +3553,7 @@
                                 <td><div class="customer-cell"><div class="avatar">${initials(b.customerName)}</div><div><div class="customer-name">${esc(b.customerName)}</div><div class="customer-email">${esc(b.email)}</div></div></div></td>
                                 <td>${b.storeFlag} ${b.storeName}</td>
                                 <td><strong>${sym}${(b.totalSpent||0).toFixed(2)}</strong></td>
-                                <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '—'}</td>
+                                <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '-'}</td>
                                 <td style="font-size:12px;">${formatDate(b.registeredAt)}</td>
                                 <td>
                                     <select class="inline-status-select" data-id="${b.id}" data-type="buyer" onchange="inlineStatusChange(this)">
@@ -3462,9 +3568,9 @@
                                 </td>
                                 <td>
                                     <div class="inline-notes-wrapper">
-                                        <input type="text" class="inline-notes-input ${b.notes ? 'has-notes' : ''}" 
+                                        <input type="text" class="inline-notes-input ${b.notes ? 'has-notes' : ''}"
                                                data-id="${b.id}" data-type="buyer"
-                                               value="${escAttr(b.notes || '')}" 
+                                               value="${escAttr(b.notes || '')}"
                                                placeholder="Add notes..."
                                                onchange="markNotesChanged(this)"
                                                onkeypress="if(event.key==='Enter'){saveInlineNotes(this)}">
@@ -3482,7 +3588,7 @@
                 </div>
                 ${renderPagination(totalItems, totalPages)}`;
         }
-        
+
         // Status Modal
         function openStatusModal(id, status, notes) {
             editId = id;
@@ -3490,7 +3596,7 @@
             document.getElementById('modalNotes').value = notes || '';
             document.getElementById('statusModal').classList.add('open');
         }
-        
+
         async function saveStatus() {
             const status = document.getElementById('modalStatus').value;
             const notes = document.getElementById('modalNotes').value;
@@ -3507,21 +3613,21 @@
             renderTable();
             showToast('Status updated!');
         }
-        
+
         // Inline Status Change
         async function inlineStatusChange(select) {
             const id = select.dataset.id;
             const type = select.dataset.type;
             const newStatus = select.value;
-            
+
             // Find the item and get current notes
             let item = null;
             if (type === 'cart') item = carts.find(c => c.id === id);
             else if (type === 'pending') item = pending.find(p => p.id === id);
             else if (type === 'buyer') item = buyers.find(b => b.id === id);
-            
+
             const currentNotes = item?.notes || '';
-            
+
             try {
                 await fetch('api.php?action=update-status', {
                     method: 'POST',
@@ -3534,52 +3640,52 @@
                 showToast('Error updating status', false, 'error');
             }
         }
-        
+
         // Inline Notes Functions
         function markNotesChanged(input) {
             const saveBtn = input.nextElementSibling;
             if (saveBtn) saveBtn.classList.add('show');
         }
-        
+
         async function saveInlineNotes(input) {
             const id = input.dataset.id;
             const type = input.dataset.type;
             const newNotes = input.value.trim();
             const saveBtn = input.nextElementSibling;
-            
+
             // Find the item and get current status
             let item = null;
             if (type === 'cart') item = carts.find(c => c.id === id);
             else if (type === 'pending') item = pending.find(p => p.id === id);
             else if (type === 'buyer') item = buyers.find(b => b.id === id);
-            
+
             const currentStatus = item?.callStatus || 'not_called';
-            
+
             // Show saving state
             if (saveBtn) {
                 saveBtn.classList.add('saving');
                 saveBtn.textContent = '⏳';
             }
-            
+
             try {
                 await fetch('api.php?action=update-status', {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({id, callStatus: currentStatus, notes: newNotes})
                 });
-                
+
                 // Update local data
                 if (item) item.notes = newNotes;
-                
+
                 // Update input styling
                 input.classList.toggle('has-notes', newNotes.length > 0);
-                
+
                 // Reset save button
                 if (saveBtn) {
                     saveBtn.classList.remove('saving', 'show');
                     saveBtn.textContent = '💾';
                 }
-                
+
                 showToast('✅ Notes saved!');
             } catch (err) {
                 if (saveBtn) {
@@ -3589,13 +3695,13 @@
                 showToast('❌ Error saving notes', false, 'error');
             }
         }
-        
+
         // Order Modal (Enhanced)
         function openOrderModal(cartId) {
             orderCartId = cartId;
             orderCart = carts.find(c => c.id === cartId);
             if (!orderCart) return;
-            
+
             // Populate customer info
             const nameParts = orderCart.customerName.split(' ');
             document.getElementById('orderFirstName').value = orderCart.firstName || nameParts[0] || '';
@@ -3605,7 +3711,7 @@
             document.getElementById('orderAddress').value = orderCart.address || '';
             document.getElementById('orderCity').value = orderCart.city || '';
             document.getElementById('orderPostcode').value = orderCart.postcode || '';
-            
+
             // Copy cart items for editing
             orderItems = (orderCart.cartContents || []).map((item, idx) => ({
                 ...item,
@@ -3613,10 +3719,10 @@
                 editPrice: item.price,
                 editQty: item.quantity
             }));
-            
+
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
-            
+
             // Reset product search
             document.getElementById('productSearchInput').value = '';
             document.getElementById('productSearchResults').classList.remove('open');
@@ -3624,21 +3730,21 @@
             document.getElementById('variationSelector').style.display = 'none';
             selectedProduct = null;
             selectedVariation = null;
-            
+
             renderOrderItems();
             document.getElementById('orderModal').classList.add('open');
         }
-        
+
         function renderOrderItems() {
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart?.currency] || '€';
             const container = document.getElementById('orderItems');
-            
+
             if (orderItems.length === 0) {
                 container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-box-open"></i><p>Ni izdelkov - uporabi iskanje zgoraj</p></div>';
                 updateOrderTotals();
                 return;
             }
-            
+
             container.innerHTML = orderItems.map((item, i) => `
                 <div class="order-item">
                     ${item.image ? `<img src="${item.image}" alt="" style="width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
@@ -3660,59 +3766,59 @@
                     <button class="btn-remove-item" onclick="removeOrderItem(${i})" title="Odstrani"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
-            
+
             updateOrderTotals();
         }
-        
+
         function updateItemQty(idx, val) {
             orderItems[idx].editQty = Math.max(1, parseInt(val) || 1);
             renderOrderItems();
         }
-        
+
         function updateItemPrice(idx, val) {
             orderItems[idx].editPrice = Math.max(0, parseFloat(val) || 0);
             renderOrderItems();
         }
-        
+
         function removeOrderItem(idx) {
             orderItems.splice(idx, 1);
             renderOrderItems();
         }
-        
+
         function toggleFreeShipping() {
             freeShipping = !freeShipping;
             document.getElementById('freeShippingToggle').classList.toggle('active', freeShipping);
             updateOrderTotals();
         }
-        
+
         // Product Search
         let searchTimeout = null;
         let selectedProduct = null;
         let selectedVariation = null;
-        
+
         document.getElementById('productSearchInput').addEventListener('input', function(e) {
             const query = e.target.value.trim();
             clearTimeout(searchTimeout);
-            
+
             if (query.length < 2) {
                 document.getElementById('productSearchResults').classList.remove('open');
                 return;
             }
-            
+
             document.getElementById('productSearchSpinner').classList.add('active');
-            
+
             searchTimeout = setTimeout(() => {
                 searchProducts(query);
             }, 300);
         });
-        
+
         document.getElementById('productSearchInput').addEventListener('focus', function() {
             const results = document.getElementById('productSearchResults');
             if (results.children.length > 0 && this.value.length >= 2) {
                 results.classList.add('open');
             }
         });
-        
+
         // Close search results when clicking outside
         document.addEventListener('click', function(e) {
             const container = document.querySelector('.product-search-container');
@@ -3720,34 +3826,34 @@
                 document.getElementById('productSearchResults').classList.remove('open');
             }
         });
-        
+
         async function searchProducts(query) {
             if (!orderCart) return;
-            
+
             const storeCode = orderCart.storeCode;
             const spinner = document.getElementById('productSearchSpinner');
             const resultsContainer = document.getElementById('productSearchResults');
-            
+
             try {
                 const res = await fetch(`api.php?action=search-products&store=${storeCode}&q=${encodeURIComponent(query)}`);
                 const products = await res.json();
-                
+
                 spinner.classList.remove('active');
-                
+
                 if (products.error) {
                     resultsContainer.innerHTML = `<div class="product-search-empty"><i class="fas fa-exclamation-circle"></i> ${products.error}</div>`;
                     resultsContainer.classList.add('open');
                     return;
                 }
-                
+
                 if (products.length === 0) {
                     resultsContainer.innerHTML = '<div class="product-search-empty"><i class="fas fa-search"></i> Ni rezultatov</div>';
                     resultsContainer.classList.add('open');
                     return;
                 }
-                
+
                 const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
-                
+
                 resultsContainer.innerHTML = products.map(p => `
                     <div class="product-search-item" onclick='selectProduct(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
                         <img src="${p.image || 'https://via.placeholder.com/48'}" alt="" class="product-search-img" onerror="this.src='https://via.placeholder.com/48'">
@@ -3761,43 +3867,43 @@
                         <div class="product-search-price">${sym}${p.price.toFixed(2)}</div>
                     </div>
                 `).join('');
-                
+
                 resultsContainer.classList.add('open');
-                
+
             } catch (e) {
                 spinner.classList.remove('active');
                 resultsContainer.innerHTML = '<div class="product-search-empty"><i class="fas fa-exclamation-triangle"></i> Napaka pri iskanju</div>';
                 resultsContainer.classList.add('open');
             }
         }
-        
+
         function selectProduct(product) {
             document.getElementById('productSearchResults').classList.remove('open');
             document.getElementById('productSearchInput').value = '';
-            
+
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
-            
+
             if (product.type === 'variable' && product.variations.length > 0) {
                 // Show variation selector
                 selectedProduct = product;
                 selectedVariation = null;
-                
+
                 document.getElementById('variationProductImg').src = product.image || 'https://via.placeholder.com/60';
                 document.getElementById('variationProductName').textContent = product.name;
                 document.getElementById('variationProductPrice').textContent = sym + product.price.toFixed(2);
                 document.getElementById('variationQty').value = 1;
-                
+
                 const optionsContainer = document.getElementById('variationOptions');
                 optionsContainer.innerHTML = product.variations.map(v => `
-                    <div class="variation-option ${v.inStock ? '' : 'out-of-stock'}" 
+                    <div class="variation-option ${v.inStock ? '' : 'out-of-stock'}"
                          onclick="selectVariation(${v.id}, ${v.price}, '${escAttr(v.name)}', ${v.inStock})"
                          data-var-id="${v.id}">
                         ${esc(v.name)} - ${sym}${v.price.toFixed(2)}
                     </div>
                 `).join('');
-                
+
                 document.getElementById('variationSelector').style.display = 'block';
-                
+
             } else {
                 // Simple product - add directly
                 addProductToOrder({
@@ -3810,31 +3916,31 @@
                 });
             }
         }
-        
+
         function selectVariation(varId, price, name, inStock) {
             if (!inStock) return;
-            
+
             document.querySelectorAll('.variation-option').forEach(el => el.classList.remove('selected'));
             document.querySelector(`.variation-option[data-var-id="${varId}"]`).classList.add('selected');
-            
+
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
             document.getElementById('variationProductPrice').textContent = sym + price.toFixed(2);
-            
+
             selectedVariation = {
                 id: varId,
                 price: price,
                 name: name
             };
         }
-        
+
         function addSelectedVariation() {
             if (!selectedProduct || !selectedVariation) {
                 showToast('Izberi variacijo', true);
                 return;
             }
-            
+
             const qty = parseInt(document.getElementById('variationQty').value) || 1;
-            
+
             addProductToOrder({
                 productId: selectedProduct.id,
                 variationId: selectedVariation.id,
@@ -3843,23 +3949,23 @@
                 quantity: qty,
                 image: selectedProduct.image
             });
-            
+
             cancelVariationSelection();
         }
-        
+
         function cancelVariationSelection() {
             document.getElementById('variationSelector').style.display = 'none';
             selectedProduct = null;
             selectedVariation = null;
         }
-        
+
         function addProductToOrder(product) {
             // Check if product already exists in order
-            const existingIndex = orderItems.findIndex(item => 
-                item.productId === product.productId && 
+            const existingIndex = orderItems.findIndex(item =>
+                item.productId === product.productId &&
                 item.variationId === product.variationId
             );
-            
+
             if (existingIndex >= 0) {
                 // Increase quantity
                 orderItems[existingIndex].editQty += product.quantity;
@@ -3876,33 +3982,33 @@
                     image: product.image
                 });
             }
-            
+
             renderOrderItems();
             showToast(`✓ ${product.name} dodano`, false, 'info');
         }
-        
+
         function updateOrderTotals() {
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart?.currency] || '€';
             const subtotal = orderItems.reduce((sum, item) => sum + (item.editPrice * item.editQty), 0);
             const shipping = freeShipping ? 0 : SHIPPING_COST;
             const total = subtotal + shipping;
-            
+
             document.getElementById('orderSubtotal').textContent = sym + subtotal.toFixed(2);
             document.getElementById('orderShipping').textContent = freeShipping ? 'BREZPLAČNO' : sym + shipping.toFixed(2);
             document.getElementById('shippingRow').classList.toggle('free-shipping', freeShipping);
             document.getElementById('orderTotal').textContent = sym + total.toFixed(2);
         }
-        
+
         async function confirmCreateOrder() {
             if (!orderCartId || orderItems.length === 0) {
                 showToast('Dodajte vsaj en izdelek', true);
                 return;
             }
-            
+
             const btn = document.getElementById('createOrderBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ustvarjam...';
-            
+
             // Gather edited data
             const orderData = {
                 cartId: orderCartId,
@@ -3924,7 +4030,7 @@
                 })),
                 freeShipping: freeShipping
             };
-            
+
             try {
                 const res = await fetch('api.php?action=create-order', {
                     method: 'POST',
@@ -3932,7 +4038,7 @@
                     body: JSON.stringify(orderData)
                 });
                 const result = await res.json();
-                
+
                 if (result.success) {
                     closeModal('orderModal');
                     showToast(`✅ Naročilo #${result.orderNumber} ustvarjeno!`);
@@ -3946,19 +4052,19 @@
             } catch (e) {
                 showToast('Napaka pri povezavi', true);
             }
-            
+
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check"></i> Ustvari naročilo';
         }
-        
+
         // SMS Modal
         function openSmsModal(id, type) {
             const data = type === 'cart' ? carts : type === 'pending' ? pending : buyers;
             const item = data.find(d => d.id === id);
             if (!item || !item.phone) return;
-            
+
             smsTarget = { ...item, type };
-            
+
             document.getElementById('smsAvatar').textContent = initials(item.customerName);
             document.getElementById('smsCustomerName').textContent = item.customerName;
             document.getElementById('smsCustomerPhone').textContent = item.phone;
@@ -3966,10 +4072,10 @@
             document.getElementById('smsMessage').value = '';
             document.getElementById('smsPreview').style.display = 'none';
             updateCharCount();
-            
+
             document.getElementById('smsModal').classList.add('open');
         }
-        
+
         function applySmsTemplate() {
             const tpl = document.getElementById('smsTemplate').value;
             if (!tpl || tpl === 'custom') {
@@ -3977,11 +4083,11 @@
                 updateCharCount();
                 return;
             }
-            
+
             // Get template from loaded data (per country)
             const storeCode = smsTarget?.storeCode || 'hr';
             let text = '';
-            
+
             if (smsTemplatesData?.templates?.[tpl]?.[storeCode]) {
                 text = smsTemplatesData.templates[tpl][storeCode].message;
             } else if (smsTemplates[tpl]) {
@@ -3990,30 +4096,30 @@
             } else {
                 return;
             }
-            
+
             // Replace variables
             const firstName = smsTarget?.firstName || smsTarget?.customerName?.split(' ')[0] || 'Stranka';
             const product = smsTarget?.cartContents?.[0]?.name || 'vaš izdelek';
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[smsTarget?.currency] || '€';
             const price = sym + (smsTarget?.cartValue?.toFixed(2) || '0.00');
             const storeUrl = `noriks.com/${storeCode}/checkout`;
-            
+
             text = text.replace(/{ime}/g, firstName)
                        .replace(/{produkt}/g, product)
                        .replace(/{cena}/g, price)
                        .replace(/{link}/g, storeUrl);
-            
+
             document.getElementById('smsMessage').value = text;
             updateCharCount();
         }
-        
+
         function updateCharCount() {
             const msg = document.getElementById('smsMessage').value;
             const len = msg.length;
             const counter = document.getElementById('smsCharCount');
             counter.textContent = `${len} / 160 znakov`;
             counter.className = 'char-count' + (len > 160 ? ' error' : len > 140 ? ' warning' : '');
-            
+
             // Show preview
             const preview = document.getElementById('smsPreview');
             if (msg.trim()) {
@@ -4022,15 +4128,15 @@
             } else {
                 preview.style.display = 'none';
             }
-            
+
             // Enable/disable button
             document.getElementById('sendSmsBtn').disabled = !msg.trim();
         }
-        
+
         async function queueSms() {
             const msg = document.getElementById('smsMessage').value.trim();
             if (!msg || !smsTarget) return;
-            
+
             try {
                 // Add to API queue (NOT send!)
                 const res = await fetch('api.php?action=sms-add', {
@@ -4045,7 +4151,7 @@
                         addedBy: user?.username || 'unknown'
                     })
                 });
-                
+
                 const result = await res.json();
                 if (result.success) {
                     closeModal('smsModal');
@@ -4062,11 +4168,11 @@
                 showToast('Napaka pri dodajanju SMS', true);
             }
         }
-        
+
         // =============================================
         // SMS AUTOMATION FUNCTIONS
         // =============================================
-        
+
         // Helper function to escape HTML
         function escapeHtml(text) {
             if (!text) return '';
@@ -4074,20 +4180,20 @@
             div.textContent = text;
             return div.innerHTML;
         }
-        
+
         let smsAutomations = [];
         let smsAutomationsFiltered = [];
         let smsTemplatesCache = {};
         let automationCheckInterval = null;
         const AUTOMATION_CHECK_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
-        
+
         // Auto-run automations check if needed
         async function checkAndRunAutomations(forceRun = false) {
             const lastRunKey = 'smsAutomationLastRun';
             const lastRun = parseInt(localStorage.getItem(lastRunKey) || '0');
             const now = Date.now();
             const timeSinceLastRun = now - lastRun;
-            
+
             // Update last run display
             const lastRunSpan = document.getElementById('lastAutomationRun');
             if (lastRunSpan && lastRun > 0) {
@@ -4100,23 +4206,23 @@
                     lastRunSpan.textContent = '| Zadnje preverjanje: ' + new Date(lastRun).toLocaleTimeString('sl-SI');
                 }
             }
-            
+
             // Check if we should auto-run
             const hasEnabledAutomations = smsAutomations.some(a => a.enabled);
             const shouldAutoRun = hasEnabledAutomations && (forceRun || timeSinceLastRun > AUTOMATION_CHECK_INTERVAL_MS);
-            
+
             if (shouldAutoRun) {
                 console.log('Auto-running SMS automation check...');
                 try {
                     const res = await fetch('api.php?action=run-sms-automations');
                     const result = await res.json();
                     localStorage.setItem(lastRunKey, now.toString());
-                    
+
                     if (result.success && result.totalQueued > 0) {
                         showToast(`🤖 Auto-check: ${result.totalQueued} SMS dodano v vrsto`);
                         loadSmsAutomations(); // Refresh to show updated counts
                     }
-                    
+
                     // Update last run display
                     if (lastRunSpan) {
                         lastRunSpan.textContent = '| Zadnje preverjanje: ravnokar';
@@ -4126,7 +4232,7 @@
                 }
             }
         }
-        
+
         // Start/stop periodic automation checking
         function startAutomationChecking() {
             if (automationCheckInterval) return;
@@ -4136,24 +4242,24 @@
                 }
             }, AUTOMATION_CHECK_INTERVAL_MS);
         }
-        
+
         function stopAutomationChecking() {
             if (automationCheckInterval) {
                 clearInterval(automationCheckInterval);
                 automationCheckInterval = null;
             }
         }
-        
+
         // ========== SMS TEMPLATE MANAGEMENT ==========
         let allTemplates = {};
         let currentTemplateFilter = 'all';
-        
+
         async function loadAllTemplates() {
             const container = document.getElementById('templatesListContainer');
             if (!container) return;
-            
+
             container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Nalagam predloge...</div>';
-            
+
             try {
                 const res = await fetch('api.php?action=all-sms-templates');
                 allTemplates = await res.json();
@@ -4163,24 +4269,24 @@
                 container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Napaka pri nalaganju predlog</div>';
             }
         }
-        
+
         function renderTemplatesList() {
             const container = document.getElementById('templatesListContainer');
             if (!container) return;
-            
+
             const templates = allTemplates.templates || [];
-            const filtered = currentTemplateFilter === 'all' 
-                ? templates 
+            const filtered = currentTemplateFilter === 'all'
+                ? templates
                 : templates.filter(t => t.category === currentTemplateFilter);
-            
+
             if (filtered.length === 0) {
                 container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-inbox" style="font-size:32px;margin-bottom:10px;display:block;opacity:0.3;"></i>Ni predlog v tej kategoriji</div>';
                 return;
             }
-            
+
             const categoryIcons = { abandoned: '🛒', winback: '💙', custom: '✏️' };
             const countryFlags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', hu: '🇭🇺', gr: '🇬🇷', it: '🇮🇹' };
-            
+
             container.innerHTML = filtered.map(t => {
                 const translations = Object.keys(t.messages || {}).map(c => countryFlags[c] || c).join(' ');
                 return `
@@ -4207,14 +4313,14 @@
                 `;
             }).join('');
         }
-        
+
         function filterTemplatesByCategory(category, btn) {
             currentTemplateFilter = category;
             document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             renderTemplatesList();
         }
-        
+
         function showAddTemplateModal() {
             document.getElementById('templateModalTitle').innerHTML = '<i class="fas fa-plus" style="margin-right: 8px; color: var(--primary);"></i>Nova SMS predloga';
             document.getElementById('templateId').value = '';
@@ -4227,52 +4333,52 @@
             });
             document.getElementById('templateModalBg').style.display = 'flex';
         }
-        
+
         function editTemplate(id) {
             const templates = allTemplates.templates || [];
             const template = templates.find(t => t.id === id);
             if (!template) return;
-            
+
             document.getElementById('templateModalTitle').innerHTML = '<i class="fas fa-edit" style="margin-right: 8px; color: var(--primary);"></i>Uredi predlogo';
             document.getElementById('templateId').value = template.id;
             document.getElementById('templateKey').value = template.id;
             document.getElementById('templateKey').disabled = true;
             document.getElementById('templateName').value = template.name || '';
             document.getElementById('templateCategory').value = template.category || 'custom';
-            
+
             ['hr', 'cz', 'pl', 'sk', 'hu', 'gr', 'it'].forEach(c => {
                 const msg = template.messages?.[c] || '';
                 document.getElementById('templateMsg_' + c).value = msg;
             });
-            
+
             document.getElementById('templateModalBg').style.display = 'flex';
         }
-        
+
         function closeTemplateModal() {
             document.getElementById('templateModalBg').style.display = 'none';
         }
-        
+
         async function saveTemplate() {
             const id = document.getElementById('templateKey').value.trim();
             const name = document.getElementById('templateName').value.trim();
             const category = document.getElementById('templateCategory').value;
-            
+
             if (!id || !name) {
                 showToast('Izpolni ID in ime predloge', true);
                 return;
             }
-            
+
             const messages = {};
             ['hr', 'cz', 'pl', 'sk', 'hu', 'gr', 'it'].forEach(c => {
                 const msg = document.getElementById('templateMsg_' + c).value.trim();
                 if (msg) messages[c] = msg;
             });
-            
+
             if (Object.keys(messages).length === 0) {
                 showToast('Dodaj vsaj en prevod', true);
                 return;
             }
-            
+
             try {
                 const res = await fetch('api.php?action=save-sms-template', {
                     method: 'POST',
@@ -4280,7 +4386,7 @@
                     body: JSON.stringify({ id, name, category, messages })
                 });
                 const result = await res.json();
-                
+
                 if (result.success) {
                     showToast('Predloga shranjena!');
                     closeTemplateModal();
@@ -4292,10 +4398,10 @@
                 showToast('Napaka pri shranjevanju', true);
             }
         }
-        
+
         async function deleteTemplate(id) {
             if (!confirm('Si prepričan, da želiš izbrisati to predlogo?')) return;
-            
+
             try {
                 const res = await fetch('api.php?action=delete-sms-template', {
                     method: 'POST',
@@ -4303,7 +4409,7 @@
                     body: JSON.stringify({ id })
                 });
                 const result = await res.json();
-                
+
                 if (result.success) {
                     showToast('Predloga izbrisana');
                     loadAllTemplates();
@@ -4314,17 +4420,17 @@
                 showToast('Napaka pri brisanju', true);
             }
         }
-        
+
         async function loadSmsAutomations() {
             const tbody = document.getElementById('automationsTableBody');
             if (!tbody) return;
-            
+
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px;"><div class="spinner"></div></td></tr>';
-            
+
             try {
                 const res = await fetch('api.php?action=sms-automations');
                 smsAutomations = await res.json();
-                
+
                 if (!Array.isArray(smsAutomations) || smsAutomations.length === 0) {
                     tbody.innerHTML = `
                         <tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-muted);">
@@ -4337,26 +4443,26 @@
                     `;
                     return;
                 }
-                
+
                 renderAutomationsTable();
-                
+
                 // Auto-run check if enabled automations exist and enough time passed
                 checkAndRunAutomations();
-                
+
                 // Start periodic checking
                 startAutomationChecking();
-                
+
             } catch (err) {
                 console.error('Error loading automations:', err);
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--danger);">Napaka pri nalaganju</td></tr>';
             }
         }
-        
+
         function filterAutomations() {
             const countryFilter = document.getElementById('automationCountryFilter')?.value || '';
             const typeFilter = document.getElementById('automationTypeFilter')?.value || '';
             const statusFilter = document.getElementById('automationStatusFilter')?.value || '';
-            
+
             smsAutomationsFiltered = smsAutomations.filter(a => {
                 if (countryFilter && a.store !== countryFilter) return false;
                 if (typeFilter && a.type !== typeFilter) return false;
@@ -4364,22 +4470,22 @@
                 if (statusFilter === 'paused' && a.enabled) return false;
                 return true;
             });
-            
+
             renderAutomationsTable();
         }
-        
+
         function renderAutomationsTable() {
             const tbody = document.getElementById('automationsTableBody');
             if (!tbody) return;
-            
+
             const data = smsAutomationsFiltered.length > 0 ? smsAutomationsFiltered : smsAutomations;
-            
+
             // Check if filtered resulted in empty when filters are applied
             const countryFilter = document.getElementById('automationCountryFilter')?.value || '';
             const typeFilter = document.getElementById('automationTypeFilter')?.value || '';
             const statusFilter = document.getElementById('automationStatusFilter')?.value || '';
             const hasFilters = countryFilter || typeFilter || statusFilter;
-            
+
             if (hasFilters && smsAutomationsFiltered.length === 0) {
                 tbody.innerHTML = `
                     <tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-muted);">
@@ -4389,16 +4495,16 @@
                 `;
                 return;
             }
-            
+
             const storeNames = {
-                hr: '🇭🇷 HR', cz: '🇨🇿 CZ', pl: '🇵🇱 PL', 
+                hr: '🇭🇷 HR', cz: '🇨🇿 CZ', pl: '🇵🇱 PL',
                 sk: '🇸🇰 SK', hu: '🇭🇺 HU', gr: '🇬🇷 GR', it: '🇮🇹 IT'
             };
-            
+
             const typeNames = {
                 abandoned_cart: '🛒 Zapuščena košarica'
             };
-            
+
             tbody.innerHTML = data.map(a => `
                 <tr data-automation-id="${a.id}">
                     <td>
@@ -4431,7 +4537,7 @@
                 </tr>
             `).join('');
         }
-        
+
         async function previewTemplate(store, templateId) {
             // Load templates if not cached
             if (!smsTemplatesCache[store]) {
@@ -4443,10 +4549,10 @@
                     return;
                 }
             }
-            
+
             const templates = smsTemplatesCache[store] || [];
             const template = templates.find(t => (t.id || t.name) === templateId);
-            
+
             if (template && template.message) {
                 // Show in a simple alert for now, or create a preview modal
                 const previewHtml = `
@@ -4467,7 +4573,7 @@
                 showToast('Predloga ni najdena', true);
             }
         }
-        
+
         function showTemplatePreviewModal(content) {
             // Create modal if it doesn't exist
             let modal = document.getElementById('templatePreviewModal');
@@ -4493,11 +4599,11 @@
                 `;
                 document.body.appendChild(modal);
             }
-            
+
             document.getElementById('templatePreviewContent').innerHTML = content;
             modal.style.display = 'flex';
         }
-        
+
         function showAddAutomationModal() {
             document.getElementById('automationModalTitle').textContent = 'Nova SMS avtomatizacija';
             document.getElementById('automationForm').reset();
@@ -4509,53 +4615,53 @@
             if (previewDiv) previewDiv.style.display = 'none';
             document.getElementById('automationModalBg').style.display = 'flex';
         }
-        
+
         function closeAutomationModal() {
             document.getElementById('automationModalBg').style.display = 'none';
             // Hide template preview on close
             const previewDiv = document.getElementById('modalTemplatePreview');
             if (previewDiv) previewDiv.style.display = 'none';
         }
-        
+
         async function loadTemplatesForStore(store) {
             const templateSelect = document.getElementById('automationTemplate');
             const previewDiv = document.getElementById('modalTemplatePreview');
             templateSelect.innerHTML = '<option value="">Nalagam predloge...</option>';
             if (previewDiv) previewDiv.style.display = 'none';
-            
+
             try {
                 const res = await fetch(`api.php?action=sms-templates&store=${store}`);
                 const templates = await res.json();
                 smsTemplatesCache[store] = templates;
-                
+
                 if (!templates || templates.length === 0) {
                     templateSelect.innerHTML = '<option value="">-- Ni predlog za to trgovino --</option>';
                     return;
                 }
-                
-                templateSelect.innerHTML = '<option value="">-- Izberi predlogo --</option>' + 
+
+                templateSelect.innerHTML = '<option value="">-- Izberi predlogo --</option>' +
                     templates.map(t => `<option value="${escapeHtml(t.id || t.name)}">${escapeHtml(t.name)}</option>`).join('');
-                    
+
             } catch (err) {
                 console.error('Error loading templates:', err);
                 templateSelect.innerHTML = '<option value="">-- Napaka pri nalaganju --</option>';
             }
         }
-        
+
         function showTemplatePreviewInModal() {
             const store = document.getElementById('automationStore').value;
             const templateId = document.getElementById('automationTemplate').value;
             const previewDiv = document.getElementById('modalTemplatePreview');
             const previewText = document.getElementById('modalTemplateText');
-            
+
             if (!templateId || !store || !previewDiv) {
                 if (previewDiv) previewDiv.style.display = 'none';
                 return;
             }
-            
+
             const templates = smsTemplatesCache[store] || [];
             const template = templates.find(t => (t.id || t.name) === templateId);
-            
+
             if (template && template.message) {
                 previewText.textContent = template.message;
                 previewDiv.style.display = 'block';
@@ -4563,7 +4669,7 @@
                 previewDiv.style.display = 'none';
             }
         }
-        
+
         // Listen for store change
         document.addEventListener('DOMContentLoaded', () => {
             const storeSelect = document.getElementById('automationStore');
@@ -4578,7 +4684,7 @@
                 });
             }
         });
-        
+
         async function saveAutomation() {
             const id = document.getElementById('automationId').value;
             const data = {
@@ -4591,12 +4697,12 @@
                 max_days: parseInt(document.getElementById('automationMaxDays').value) || 7,
                 enabled: document.getElementById('automationEnabled').checked
             };
-            
+
             if (!data.name || !data.store || !data.template) {
                 showToast('Prosim izpolni vsa polja', true);
                 return;
             }
-            
+
             try {
                 const res = await fetch('api.php?action=save-sms-automation', {
                     method: 'POST',
@@ -4604,7 +4710,7 @@
                     body: JSON.stringify(data)
                 });
                 const result = await res.json();
-                
+
                 if (result.success) {
                     showToast(id ? 'Avtomatizacija posodobljena!' : 'Avtomatizacija dodana!');
                     closeAutomationModal();
@@ -4617,11 +4723,11 @@
                 showToast('Napaka pri shranjevanju', true);
             }
         }
-        
+
         function editAutomation(id) {
             const automation = smsAutomations.find(a => a.id === id);
             if (!automation) return;
-            
+
             document.getElementById('automationModalTitle').textContent = 'Uredi avtomatizacijo';
             document.getElementById('automationId').value = automation.id;
             document.getElementById('automationName').value = automation.name;
@@ -4630,25 +4736,25 @@
             document.getElementById('automationDelay').value = automation.delay_hours;
             document.getElementById('automationMaxDays').value = automation.max_days || 7;
             document.getElementById('automationEnabled').checked = automation.enabled;
-            
+
             // Load templates then select the right one and show preview
             loadTemplatesForStore(automation.store).then(() => {
                 document.getElementById('automationTemplate').value = automation.template;
                 showTemplatePreviewInModal(); // Show preview after selecting template
             });
-            
+
             document.getElementById('automationModalBg').style.display = 'flex';
         }
-        
+
         async function toggleAutomation(id, checkbox) {
             const automation = smsAutomations.find(a => a.id === id);
             if (!automation) return;
-            
+
             const newState = checkbox ? checkbox.checked : !automation.enabled;
-            
+
             // Disable checkbox while saving
             if (checkbox) checkbox.disabled = true;
-            
+
             try {
                 automation.enabled = newState;
                 await fetch('api.php?action=save-sms-automation', {
@@ -4669,10 +4775,10 @@
                 automation.enabled = !newState;
             }
         }
-        
+
         async function deleteAutomation(id) {
             if (!confirm('Si prepričan, da želiš izbrisati to avtomatizacijo?')) return;
-            
+
             try {
                 const res = await fetch('api.php?action=delete-sms-automation', {
                     method: 'POST',
@@ -4680,7 +4786,7 @@
                     body: JSON.stringify({ id })
                 });
                 const result = await res.json();
-                
+
                 if (result.success) {
                     showToast('Avtomatizacija izbrisana');
                     loadSmsAutomations();
@@ -4691,10 +4797,10 @@
                 showToast('Napaka pri brisanju', true);
             }
         }
-        
+
         async function resetAutomationQueue(id) {
             if (!confirm('Reset evidenco? To bo omogočilo ponovno pošiljanje SMS za vse košarice te avtomatizacije.')) return;
-            
+
             try {
                 const res = await fetch('api.php?action=reset-automation-queue', {
                     method: 'POST',
@@ -4702,7 +4808,7 @@
                     body: JSON.stringify({ automation_id: id })
                 });
                 const result = await res.json();
-                
+
                 if (result.success) {
                     showToast(`Evidenca resetirana (${result.reset_count || 0} košaric)`);
                     loadSmsAutomations();
@@ -4713,19 +4819,19 @@
                 showToast('Napaka pri resetiranju', true);
             }
         }
-        
+
         // Run SMS automations - check conditions and add to queue
         async function runSmsAutomations() {
             const btn = document.getElementById('runAutomationsBtn');
             const originalHtml = btn.innerHTML;
-            
+
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preverjam...';
             btn.disabled = true;
-            
+
             try {
                 const res = await fetch('api.php?action=run-sms-automations');
                 const result = await res.json();
-                
+
                 if (result.success) {
                     const totalQueued = result.totalQueued || 0;
                     if (totalQueued > 0) {
@@ -4733,16 +4839,16 @@
                     } else {
                         showToast('ℹ️ Ni novih SMS za dodati v vrsto');
                     }
-                    
+
                     // Save last run time
                     localStorage.setItem('smsAutomationLastRun', Date.now().toString());
-                    
+
                     // Update last run time display
                     const lastRunSpan = document.getElementById('lastAutomationRun');
                     if (lastRunSpan) {
                         lastRunSpan.textContent = '| Zadnje preverjanje: ravnokar';
                     }
-                    
+
                     // Reload automations to show updated queued counts (without triggering auto-run again)
                     const tbody = document.getElementById('automationsTableBody');
                     if (tbody) {
@@ -4763,22 +4869,22 @@
                 btn.disabled = false;
             }
         }
-        
+
         // =============================================
-        // SMS DASHBOARD FUNCTIONS  
+        // SMS DASHBOARD FUNCTIONS
         // =============================================
-        
+
         // SMS Dashboard - Load Queue from API
         async function loadSmsDashboardQueue() {
             const container = document.getElementById('smsDashboardQueue');
             if (!container) return;
-            
+
             container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
-            
+
             try {
                 const res = await fetch('api.php?action=sms-queue&status=queued');
                 const queue = await res.json();
-                
+
                 if (!Array.isArray(queue) || queue.length === 0) {
                     container.innerHTML = `
                         <div class="empty" style="padding:20px;">
@@ -4789,7 +4895,7 @@
                     `;
                     return;
                 }
-                
+
                 container.innerHTML = `
                     <div class="table-wrapper">
                         <table class="data-table">
@@ -4839,7 +4945,7 @@
                 container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka: ${e.message}</p><button class="btn btn-save" style="margin-top:12px;" onclick="loadSmsDashboardQueue()"><i class="fas fa-redo"></i> Poskusi znova</button></div>`;
             }
         }
-        
+
         // Open SMS Edit Modal before sending
         function openSmsEditModal(smsId, phone, message, customerName) {
             document.getElementById('smsEditId').value = smsId;
@@ -4849,17 +4955,17 @@
             document.getElementById('smsEditAvatar').textContent = (customerName || '?')[0].toUpperCase();
             document.getElementById('smsEditModal').classList.add('open');
         }
-        
+
         // Confirm and send SMS with (potentially edited) phone number
         async function confirmSendSms() {
             const smsId = document.getElementById('smsEditId').value;
             const editedPhone = document.getElementById('smsEditPhone').value.trim();
-            
+
             if (!editedPhone) {
                 showToast('❌ Vnesi telefonsko številko!', true);
                 return;
             }
-            
+
             // Basic validation - at least 7 digits
             const digitsOnly = editedPhone.replace(/[^0-9]/g, '');
             if (digitsOnly.length < 7) {
@@ -4870,20 +4976,20 @@
                 showToast('❌ Telefonska številka je predolga (max. 15 številk)', true);
                 return;
             }
-            
+
             closeModal('smsEditModal');
             await sendSmsFromDashboard(smsId, editedPhone);
         }
-        
+
         // Send SMS from Dashboard Queue
         async function sendSmsFromDashboard(smsId, overridePhone = null) {
             if (!confirm('Ali si prepričan, da želiš poslati ta SMS?\\n\\n⚠️ SMS bo poslan preko MetaKocka API!')) {
                 return;
             }
-            
+
             // Show loading state
             showToast('📤 Pošiljam SMS preko MetaKocka...', false, 'info');
-            
+
             try {
                 const payload = { id: smsId };
                 if (overridePhone) {
@@ -4895,10 +5001,10 @@
                     body: JSON.stringify(payload)
                 });
                 const result = await res.json();
-                
+
                 // Log full response for debugging
                 console.log('[SMS] MetaKocka response:', result);
-                
+
                 if (result.success) {
                     let msg = `✅ SMS uspešno poslan na ${result.recipient || 'prejemnika'}!`;
                     if (result.metakockaResponse) {
@@ -4927,7 +5033,7 @@
                 alert('🚨 SMS NAPAKA!\n\n' + e.message);
             }
         }
-        
+
         async function removeFromQueueApi(smsId) {
             try {
                 await fetch('api.php?action=sms-remove', {
@@ -4942,7 +5048,7 @@
                 showToast('Napaka pri odstranjevanju', true);
             }
         }
-        
+
         // ========== MANUAL SMS SEND ==========
         function updateManualSmsCharCount() {
             const msg = document.getElementById('manualSmsMessage').value;
@@ -4952,37 +5058,37 @@
             counter.textContent = `${len} / 160 znakov (${smsCount} SMS)`;
             counter.className = 'char-count' + (len > 160 ? ' warning' : '');
         }
-        
+
         async function sendManualSms() {
             const phone = document.getElementById('manualSmsPhone').value.trim();
             const country = document.getElementById('manualSmsCountry').value;
             const message = document.getElementById('manualSmsMessage').value.trim();
             const statusEl = document.getElementById('manualSmsStatus');
-            
+
             // Basic validation
             if (!phone) {
                 showToast('❌ Vnesi telefonsko številko!', true);
                 return;
             }
-            
+
             const digitsOnly = phone.replace(/[^0-9]/g, '');
             if (digitsOnly.length < 7) {
                 showToast('❌ Telefonska številka je prekratka (min. 7 številk)', true);
                 return;
             }
-            
+
             if (!message) {
                 showToast('❌ Vnesi sporočilo!', true);
                 return;
             }
-            
+
             if (!confirm(`📱 Pošlji SMS?\n\nŠtevilka: ${phone}\nDržava: ${country.toUpperCase()}\nSporočilo: ${message.substring(0, 50)}...`)) {
                 return;
             }
-            
+
             statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pošiljam...';
             statusEl.style.color = 'var(--text-muted)';
-            
+
             try {
                 const res = await fetch('api.php?action=sms-send-direct', {
                     method: 'POST',
@@ -4993,20 +5099,20 @@
                         message: message
                     })
                 });
-                
+
                 const result = await res.json();
                 console.log('[Manual SMS] Response:', result);
-                
+
                 if (result.success) {
                     statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Poslano na ${result.recipient || phone}`;
                     statusEl.style.color = 'var(--accent-green)';
                     showToast(`✅ SMS uspešno poslan na ${result.recipient || phone}!`);
-                    
+
                     // Clear form
                     document.getElementById('manualSmsPhone').value = '';
                     document.getElementById('manualSmsMessage').value = '';
                     updateManualSmsCharCount();
-                    
+
                     // Refresh history
                     await loadSmsData();
                     renderSmsTable();
@@ -5014,7 +5120,7 @@
                     statusEl.innerHTML = `<i class="fas fa-times-circle"></i> ${result.error || 'Napaka'}`;
                     statusEl.style.color = 'var(--accent-red)';
                     showToast('❌ ' + (result.error || 'Napaka pri pošiljanju'), true);
-                    
+
                     if (result.metakockaResponse) {
                         console.error('[Manual SMS] MK Response:', result.metakockaResponse);
                     }
@@ -5026,10 +5132,10 @@
                 showToast('❌ Napaka: ' + e.message, true);
             }
         }
-        
+
         // ========== TEST SMS FROM TEMPLATE ==========
         // Note: smsTemplatesCache already defined above
-        
+
         async function loadTestSmsTemplates() {
             try {
                 const res = await fetch('api.php?action=all-sms-templates');
@@ -5039,7 +5145,7 @@
                 return { templates: {} };
             }
         }
-        
+
         async function loadTestTemplatePreview() {
             const templateKey = document.getElementById('testSmsTemplate').value;
             const country = document.getElementById('testSmsCountry').value;
@@ -5047,13 +5153,13 @@
             const product = document.getElementById('testSmsProduct').value || 'proizvod';
             const preview = document.getElementById('testSmsPreview');
             const charCount = document.getElementById('testSmsCharCount');
-            
+
             if (!templateKey) {
                 preview.innerHTML = '<span style="color:var(--text-muted);font-style:italic;">Izberi predlogo za predogled...</span>';
                 charCount.textContent = '0 / 160 znakov';
                 return;
             }
-            
+
             const data = await loadTestSmsTemplates();
             console.log('[TestSMS] API data:', data);
             // API returns array: templates: [{id, name, messages: {hr: "...", cz: "..."}}]
@@ -5064,17 +5170,17 @@
             console.log('[TestSMS] Found template:', template);
             const message = template?.messages?.[country];
             console.log('[TestSMS] Message:', message);
-            
+
             if (!message) {
                 preview.innerHTML = `<span style="color:var(--accent-red);">Predloga ni najdena (key=${templateKey}, country=${country}, templates=${templateList.length})</span>`;
                 return;
             }
-            
+
             // Build the links - always checkout, not cart
             const checkoutLink = `https://noriks.com/${country}/checkout/`;
             const checkoutLinkCoupon = `https://noriks.com/${country}/checkout/?coupon=SMS20`;
             const shopLink = `https://noriks.com/${country}/`;
-            
+
             // Replace variables
             let finalMessage = message
                 .replace(/{ime}/g, name)
@@ -5083,15 +5189,15 @@
                 .replace(/{link}/g, checkoutLink)
                 .replace(/{shop_link}/g, shopLink)
                 .replace(/{cena}/g, '29.99');
-            
+
             preview.textContent = finalMessage;
-            
+
             const len = finalMessage.length;
             const smsCount = Math.ceil(len / 160) || 1;
             charCount.textContent = `${len} / 160 znakov (${smsCount} SMS)`;
             charCount.className = 'char-count' + (len > 160 ? ' warning' : '');
         }
-        
+
         async function sendTestSms() {
             const phone = document.getElementById('testSmsPhone').value.trim();
             const phoneCountry = document.getElementById('testSmsPhoneCountry').value; // Za formatiranje telefona
@@ -5100,32 +5206,32 @@
             const name = document.getElementById('testSmsName').value || 'Kupac';
             const product = document.getElementById('testSmsProduct').value || 'proizvod';
             const statusEl = document.getElementById('testSmsStatus');
-            
+
             if (!phone) {
                 showToast('❌ Vnesi svojo telefonsko številko!', true);
                 return;
             }
-            
+
             if (!templateKey) {
                 showToast('❌ Izberi predlogo!', true);
                 return;
             }
-            
+
             // Get the message from preview
             const message = document.getElementById('testSmsPreview').textContent;
-            
+
             if (!message || message.includes('Izberi predlogo')) {
                 showToast('❌ Ni veljavnega sporočila za pošiljanje', true);
                 return;
             }
-            
+
             if (!confirm(`🧪 Pošlji TESTNI SMS?\n\nŠtevilka: ${phone} (${phoneCountry.toUpperCase()})\nPredloga: ${templateKey}\nJezik: ${templateCountry.toUpperCase()}\n\n${message.substring(0, 100)}...`)) {
                 return;
             }
-            
+
             statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pošiljam...';
             statusEl.style.color = 'var(--text-muted)';
-            
+
             try {
                 const res = await fetch('api.php?action=sms-send-direct', {
                     method: 'POST',
@@ -5136,15 +5242,15 @@
                         message: message
                     })
                 });
-                
+
                 const result = await res.json();
                 console.log('[Test SMS] Response:', result);
-                
+
                 if (result.success) {
                     statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Testni SMS poslan!`;
                     statusEl.style.color = '#a855f7';
                     showToast(`🧪 Testni SMS poslan na ${result.recipient || phone}!`);
-                    
+
                     // Refresh history
                     await loadSmsData();
                     renderSmsTable();
@@ -5160,33 +5266,33 @@
                 showToast('❌ Napaka: ' + e.message, true);
             }
         }
-        
+
         // SMS Dashboard - Load History
         async function renderSmsTable() {
             // Refresh from API first
             await loadSmsData();
-            
+
             const dateFrom = document.getElementById('smsDateFrom')?.value;
             const dateTo = document.getElementById('smsDateTo')?.value;
             const country = smsHistoryFilters?.country || '';
             const status = smsHistoryFilters?.status || '';
-            
+
             let filtered = [...smsLog];
-            
+
             if (dateFrom) filtered = filtered.filter(s => s.date >= dateFrom);
             if (dateTo) filtered = filtered.filter(s => s.date <= dateTo + 'T23:59:59');
             if (country) filtered = filtered.filter(s => s.storeCode === country);
             if (status) filtered = filtered.filter(s => s.status === status);
-            
+
             filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
+
             const container = document.getElementById('smsTableContainer');
-            
+
             if (!filtered.length) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-comment-sms"></i><p>Ni SMS sporočil za prikaz</p></div>';
                 return;
             }
-            
+
             container.innerHTML = `
                 <div class="table-wrapper">
                 <table class="data-table">
@@ -5221,7 +5327,7 @@
                 </div>
             `;
         }
-        
+
         async function removeSmsFromQueue(id) {
             try {
                 const res = await fetch('api.php?action=sms-remove', {
@@ -5241,13 +5347,13 @@
                 showToast('Napaka pri odstranjevanju', true);
             }
         }
-        
+
         function exportSmsCsv() {
             if (!smsLog.length) {
                 showToast('Ni podatkov za izvoz', true);
                 return;
             }
-            
+
             const headers = ['Datum', 'Prejemnik', 'Telefon', 'Sporočilo', 'Država', 'Status'];
             const rows = smsLog.map(s => [
                 new Date(s.date).toLocaleString('sl-SI'),
@@ -5257,7 +5363,7 @@
                 s.storeCode,
                 s.status
             ]);
-            
+
             const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -5266,20 +5372,20 @@
             a.download = `sms-log-${new Date().toISOString().slice(0,10)}.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            
+
             showToast('CSV izvožen!');
         }
-        
+
         // SMS Templates (loaded directly from JSON file)
         let smsTemplatesData = null;
-        
+
         async function loadSmsTemplates() {
             try {
                 const res = await fetch('sms-templates.json');
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 smsTemplatesData = await res.json();
                 console.log('[SMS] ✓ Templates loaded from JSON:', Object.keys(smsTemplatesData.templates || {}).length, 'templates');
-                
+
                 // Populate preview country dropdown
                 const previewCountry = document.getElementById('previewCountry');
                 if (previewCountry && stores) {
@@ -5292,58 +5398,58 @@
                 smsTemplatesData = { templates: {} };
             }
         }
-        
+
         // Load templates immediately on script load
         loadSmsTemplates();
-        
+
         function updateTemplatePreview() {
             const templateKey = document.getElementById('previewTemplate').value;
             const countryCode = document.getElementById('previewCountry').value;
             const previewBox = document.getElementById('templatePreviewBox');
-            
+
             if (!templateKey || !countryCode || !smsTemplatesData) {
                 previewBox.style.display = 'none';
                 return;
             }
-            
+
             const template = smsTemplatesData.templates?.[templateKey]?.[countryCode];
             if (!template) {
                 previewBox.style.display = 'none';
                 return;
             }
-            
+
             // Get sample values
             const sampleName = document.getElementById('sampleName').value || 'Kupec';
             const sampleProduct = document.getElementById('sampleProduct').value || 'Izdelek';
             const samplePrice = document.getElementById('samplePrice').value || '€0.00';
             const sampleLink = `noriks.com/${countryCode}/checkout`;
-            
+
             // Replace variables
             let message = template.message
                 .replace(/{ime}/g, sampleName)
                 .replace(/{produkt}/g, sampleProduct)
                 .replace(/{cena}/g, samplePrice)
                 .replace(/{link}/g, sampleLink);
-            
+
             document.getElementById('previewTemplateName').textContent = template.name;
             document.getElementById('previewMessage').textContent = message;
-            
+
             // Character count
             const len = message.length;
             const charCount = document.getElementById('previewCharCount');
             charCount.textContent = `${len} / 160 znakov`;
             charCount.className = 'char-count' + (len > 160 ? ' error' : len > 140 ? ' warning' : '');
-            
+
             previewBox.style.display = 'block';
         }
-        
+
         function copyTemplateToClipboard() {
             const message = document.getElementById('previewMessage').textContent;
             navigator.clipboard.writeText(message).then(() => {
                 showToast('📋 Sporočilo kopirano!', false, 'info');
             });
         }
-        
+
         function getTemplateOptions() {
             if (!smsTemplatesData?.templates) {
                 return `
@@ -5352,44 +5458,44 @@
                     <option value="last_chance">⏰ Zadnja prilika</option>
                 `;
             }
-            
+
             const templateNames = {
                 'abandoned_cart': '🛒 Opuščena košarica',
                 'winback': '💙 Povratek kupca',
                 'last_chance': '⏰ Zadnja prilika'
             };
-            
-            return Object.keys(smsTemplatesData.templates).map(key => 
+
+            return Object.keys(smsTemplatesData.templates).map(key =>
                 `<option value="${key}">${templateNames[key] || key}</option>`
             ).join('');
         }
-        
+
         // SMS Automation Settings
         function renderAutomationRules() {
             const container = document.getElementById('automationRules');
-            
-            const countryOptions = stores.map(s => 
+
+            const countryOptions = stores.map(s =>
                 `<option value="${s.code}">${s.flag} ${s.name}</option>`
             ).join('');
-            
+
             container.innerHTML = smsAutomation.map((rule, i) => `
                 <div class="order-item" style="margin-bottom:16px;flex-wrap:wrap;">
                     <div class="order-item-info" style="min-width:200px;flex:2;">
-                        <input type="text" class="form-input" value="${esc(rule.name)}" 
-                               onchange="updateRule(${i}, 'name', this.value)" 
+                        <input type="text" class="form-input" value="${esc(rule.name)}"
+                               onchange="updateRule(${i}, 'name', this.value)"
                                placeholder="Ime pravila" style="margin-bottom:8px;">
                         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <select class="form-select" style="flex:1;min-width:140px;" 
+                            <select class="form-select" style="flex:1;min-width:140px;"
                                     onchange="updateRule(${i}, 'template', this.value)">
                                 ${getTemplateOptions().replace(`value="${rule.template}"`, `value="${rule.template}" selected`)}
                             </select>
-                            <select class="form-select" style="flex:1;min-width:100px;" 
+                            <select class="form-select" style="flex:1;min-width:100px;"
                                     onchange="updateRule(${i}, 'country', this.value)">
                                 <option value="all" ${rule.country === 'all' ? 'selected' : ''}>🌍 Vse države</option>
                                 ${countryOptions.replace(`value="${rule.country}"`, `value="${rule.country}" selected`)}
                             </select>
                             <div style="display:flex;align-items:center;gap:4px;">
-                                <input type="number" min="1" max="72" value="${rule.delay}" 
+                                <input type="number" min="1" max="72" value="${rule.delay}"
                                        style="width:60px;padding:8px;background:var(--content-bg);border:1px solid var(--card-border);border-radius:6px;color:var(--text-primary);text-align:center;"
                                        onchange="updateRule(${i}, 'delay', parseInt(this.value))">
                                 <span style="font-size:12px;color:var(--text-muted);">ur</span>
@@ -5406,45 +5512,45 @@
                     </div>
                 </div>
             `).join('');
-            
+
             if (smsAutomation.length === 0) {
                 container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-cog"></i><p>Ni nastavljenih pravil</p></div>';
             }
         }
-        
+
         function previewRuleTemplate(idx) {
             const rule = smsAutomation[idx];
             if (!rule) return;
-            
+
             document.getElementById('previewTemplate').value = rule.template || 'abandoned_cart';
             document.getElementById('previewCountry').value = rule.country === 'all' ? 'hr' : rule.country;
             updateTemplatePreview();
-            
+
             // Scroll to preview
             document.querySelector('.table-card:last-child').scrollIntoView({ behavior: 'smooth' });
         }
-        
+
         function updateRule(idx, field, value) {
             smsAutomation[idx][field] = value;
             saveSmsAutomation();
         }
-        
+
         function toggleRule(idx) {
             smsAutomation[idx].active = !smsAutomation[idx].active;
             saveSmsAutomation();
             renderAutomationRules();
-            
+
             if (smsAutomation[idx].active) {
                 showToast('⚠️ Pravilo aktivirano. SMS sporočila se NE pošiljajo avtomatsko - dodajajo se v čakalno vrsto.', false, 'info');
             }
         }
-        
+
         function removeRule(idx) {
             smsAutomation.splice(idx, 1);
             saveSmsAutomation();
             renderAutomationRules();
         }
-        
+
         function addAutomationRule() {
             smsAutomation.push({
                 id: Date.now(),
@@ -5457,27 +5563,27 @@
             saveSmsAutomation();
             renderAutomationRules();
         }
-        
+
         // Add filter listeners for SMS dashboard (with null checks)
         const smsDateFromEl = document.getElementById('smsDateFrom');
         const smsDateToEl = document.getElementById('smsDateTo');
         if (smsDateFromEl) smsDateFromEl.addEventListener('change', renderSmsTable);
         if (smsDateToEl) smsDateToEl.addEventListener('change', renderSmsTable);
-        
+
         // SMS History filter state
         let smsHistoryFilters = { country: '', status: '' };
-        
+
         function setHistoryDateRange(range, btn) {
             const today = new Date();
             const dateFrom = document.getElementById('smsDateFrom');
             const dateTo = document.getElementById('smsDateTo');
-            
+
             // Clear active state from all range pills
             document.querySelectorAll('.filter-pill[data-range]').forEach(p => p.classList.remove('active'));
             if (btn) btn.classList.add('active');
-            
+
             const formatDate = (d) => d.toISOString().split('T')[0];
-            
+
             switch(range) {
                 case 'today':
                     dateFrom.value = formatDate(today);
@@ -5511,24 +5617,24 @@
             }
             renderSmsTable();
         }
-        
+
         function setHistoryCountry(country, btn) {
             document.querySelectorAll('.filter-pill[data-country]').forEach(p => p.classList.remove('active'));
             if (btn) btn.classList.add('active');
             smsHistoryFilters.country = country;
             renderSmsTable();
         }
-        
+
         function setHistoryStatus(status, btn) {
             document.querySelectorAll('.filter-pill[data-status]').forEach(p => p.classList.remove('active'));
             if (btn) btn.classList.add('active');
             smsHistoryFilters.status = status;
             renderSmsTable();
         }
-        
+
         // ========== SMS PROVIDER SETTINGS ==========
         let smsProviderSettings = null;
-        
+
         async function loadSmsSettingsUI() {
             console.log('[SMS Settings] Loading UI...');
             try {
@@ -5543,11 +5649,11 @@
                 showToast('Napaka pri nalaganju SMS nastavitev', true);
             }
         }
-        
+
         function renderSmsProviderTable() {
             const tbody = document.getElementById('smsProviderRows');
             if (!tbody) return;
-            
+
             // Hardcoded SMS eshop_sync_id values (configured in code)
             const countries = [
                 { code: 'hr', flag: '🇭🇷', name: 'Croatia', eshop_sync_id: '637100000075', store: 'noriks.com/hr' },
@@ -5559,7 +5665,7 @@
                 { code: 'hu', flag: '🇭🇺', name: 'Hungary', eshop_sync_id: '637100000075', store: 'noriks.com/hu' },
                 { code: 'si', flag: '🇸🇮', name: 'Slovenia', eshop_sync_id: '637100367725', store: 'noriks.com/si' }
             ];
-            
+
             tbody.innerHTML = countries.map(c => {
                 return `
                     <tr>
@@ -5573,8 +5679,8 @@
                             </a>
                         </td>
                         <td>
-                            <button class="action-btn order" 
-                                    onclick="testSmsConnection('${c.code}')" 
+                            <button class="action-btn order"
+                                    onclick="testSmsConnection('${c.code}')"
                                     title="Test Connection">
                                 <i class="fas fa-plug"></i>
                             </button>
@@ -5583,7 +5689,7 @@
                 `;
             }).join('');
         }
-        
+
         // SMS eshop_sync_id values are hardcoded - no save function needed
         const SMS_ESHOP_IDS = {
             'hr': '637100000075',
@@ -5595,13 +5701,13 @@
             'hu': '637100000075',
             'si': '637100367725'
         };
-        
+
         async function testSmsConnection(storeCode) {
             const btn = event.target.closest('button');
             const originalIcon = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             btn.disabled = true;
-            
+
             try {
                 const res = await fetch('api.php?action=sms-test-connection', {
                     method: 'POST',
@@ -5609,7 +5715,7 @@
                     body: JSON.stringify({ storeCode })
                 });
                 const result = await res.json();
-                
+
                 if (result.success) {
                     showToast(`✅ ${storeCode.toUpperCase()}: Connection OK!`);
                     if (smsProviderSettings?.providers?.[storeCode]) {
@@ -5627,20 +5733,20 @@
             } catch (e) {
                 showToast('Napaka pri testiranju', true);
             }
-            
+
             btn.innerHTML = originalIcon;
             btn.disabled = false;
         }
-        
+
         // ========== SMS QUEUE MANAGEMENT ==========
         async function renderSmsQueueManagement() {
             const container = document.getElementById('smsQueueManagement');
             if (!container) return;
-            
+
             try {
                 const res = await fetch('api.php?action=sms-queue&status=queued');
                 const queue = await res.json();
-                
+
                 if (!queue.length) {
                     container.innerHTML = `
                         <div class="empty" style="padding:40px;">
@@ -5650,7 +5756,7 @@
                     `;
                     return;
                 }
-                
+
                 container.innerHTML = `
                     <div class="table-wrapper">
                         <table class="data-table">
@@ -5679,8 +5785,8 @@
                                             </td>
                                             <td>${store?.flag || '🌍'} ${sms.storeCode?.toUpperCase() || ''}</td>
                                             <td style="white-space:nowrap;">
-                                                <button class="action-btn" 
-                                                        onclick="openSmsEditModal('${sms.id}', '${escAttr(sms.recipient || '')}', '${escAttr(sms.message || '')}', '${escAttr(sms.customerName || 'Unknown')}')" 
+                                                <button class="action-btn"
+                                                        onclick="openSmsEditModal('${sms.id}', '${escAttr(sms.recipient || '')}', '${escAttr(sms.message || '')}', '${escAttr(sms.customerName || 'Unknown')}')"
                                                         title="${hasProvider ? 'Pošlji SMS' : 'Provider ni nastavljen'}"
                                                         style="${hasProvider ? 'background:var(--accent-green);color:white;' : 'opacity:0.5;'}"
                                                         ${!hasProvider ? 'disabled' : ''}>
@@ -5705,15 +5811,15 @@
                 container.innerHTML = '<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Napaka pri nalaganju</p><button class="btn btn-save" style="margin-top:12px;" onclick="renderSmsQueueManagement()"><i class="fas fa-redo"></i> Poskusi znova</button></div>';
             }
         }
-        
+
         async function sendSingleSms(smsId) {
             if (!confirm('Ali si prepričan, da želiš poslati ta SMS?\\n\\n⚠️ SMS bo poslan preko MetaKocka API!')) {
                 return;
             }
-            
+
             // Show loading
             showToast('📤 Pošiljam SMS preko MetaKocka...', false, 'info');
-            
+
             try {
                 const res = await fetch('api.php?action=sms-send', {
                     method: 'POST',
@@ -5721,10 +5827,10 @@
                     body: JSON.stringify({ id: smsId })
                 });
                 const result = await res.json();
-                
+
                 // Log for debugging
                 console.log('[SMS] MetaKocka response:', result);
-                
+
                 if (result.success) {
                     let msg = `✅ SMS uspešno poslan na ${result.recipient || 'prejemnika'}!`;
                     if (result.metakockaResponse) {
@@ -5753,7 +5859,7 @@
                 alert('🚨 SMS NAPAKA!\n\n' + e.message);
             }
         }
-        
+
         async function removeFromQueue(smsId) {
             try {
                 await fetch('api.php?action=sms-remove', {
@@ -5769,21 +5875,21 @@
                 showToast('Napaka pri odstranjevanju', true);
             }
         }
-        
+
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
         function call(phone) { window.open('tel:'+phone, '_self'); }
         function logout() { localStorage.removeItem('callcenter_user'); window.location.href = 'login.php'; }
-        
+
         function showToast(msg, isError = false, type = null) {
             const container = document.getElementById('toastContainer');
             const id = 'toast_' + Date.now();
-            
+
             let icon = 'fa-check-circle';
             let toastType = 'success';
             if (isError) { icon = 'fa-times-circle'; toastType = 'error'; }
             else if (type === 'info') { icon = 'fa-info-circle'; toastType = 'info'; }
             else if (type === 'warning') { icon = 'fa-exclamation-triangle'; toastType = 'warning'; }
-            
+
             const toast = document.createElement('div');
             toast.className = `toast-item ${toastType}`;
             toast.id = id;
@@ -5792,13 +5898,13 @@
                 <span>${msg}</span>
                 <button class="toast-close" onclick="removeToast('${id}')"><i class="fas fa-times"></i></button>
             `;
-            
+
             container.appendChild(toast);
-            
+
             // Auto remove after 3s
             setTimeout(() => removeToast(id), 3000);
         }
-        
+
         function removeToast(id) {
             const toast = document.getElementById(id);
             if (toast) {
@@ -5806,7 +5912,7 @@
                 setTimeout(() => toast.remove(), 300);
             }
         }
-        
+
         // ========== SKELETON LOADING ==========
         function renderSkeletonTable(rows = 8) {
             return `
@@ -5852,10 +5958,10 @@
                 </div>
             `;
         }
-        
+
         // ========== BULK SELECTION ==========
         let selectedItems = new Set();
-        
+
         function toggleSelectAll(checkbox) {
             const checkboxes = document.querySelectorAll('.row-checkbox');
             checkboxes.forEach(cb => {
@@ -5869,7 +5975,7 @@
             });
             updateBulkBar();
         }
-        
+
         function toggleRowSelection(checkbox) {
             const id = checkbox.dataset.id;
             if (checkbox.checked) {
@@ -5878,27 +5984,27 @@
                 selectedItems.delete(id);
             }
             updateBulkBar();
-            
+
             // Update select all checkbox
             const selectAll = document.getElementById('selectAllCheckbox');
             const checkboxes = document.querySelectorAll('.row-checkbox');
             const allChecked = Array.from(checkboxes).every(cb => cb.checked);
             if (selectAll) selectAll.checked = allChecked;
         }
-        
+
         function updateBulkBar() {
             const bulkBar = document.getElementById('bulkBar');
             const count = selectedItems.size;
-            
+
             document.getElementById('selectedCount').textContent = count;
-            
+
             if (count > 0) {
                 bulkBar.classList.add('show');
             } else {
                 bulkBar.classList.remove('show');
             }
         }
-        
+
         function clearSelection() {
             selectedItems.clear();
             document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
@@ -5906,27 +6012,27 @@
             if (selectAll) selectAll.checked = false;
             updateBulkBar();
         }
-        
+
         async function bulkAddToSms() {
             const selectedCarts = carts.filter(c => selectedItems.has(c.id) && c.phone);
-            
+
             if (selectedCarts.length === 0) {
                 showToast('Ni izbranih strank s telefonsko številko', true);
                 return;
             }
-            
+
             let added = 0;
             for (const cart of selectedCarts) {
                 try {
                     // Get template for this store
                     const template = smsTemplates.find(t => t.storeCode === cart.storeCode && t.type === 'abandoned_cart');
                     if (!template) continue;
-                    
+
                     const message = template.template
                         .replace('{ime}', cart.firstName || cart.customerName.split(' ')[0])
                         .replace('{produkt}', cart.cartContents?.[0]?.name || 'vaš izdelek')
                         .replace('{link}', 'https://noriks.com/' + cart.storeCode);
-                    
+
                     await fetch('api.php?action=sms-add', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -5944,15 +6050,15 @@
                     console.error('Failed to add SMS:', e);
                 }
             }
-            
+
             showToast(`${added} SMS dodanih v čakalno vrsto`, false, 'info');
             clearSelection();
             await loadSmsData();
         }
-        
+
         function openBulkStatusModal() {
             if (selectedItems.size === 0) return;
-            
+
             // Create simple status selection modal
             const statuses = [
                 { value: 'not_called', label: 'Not Called' },
@@ -5961,7 +6067,7 @@
                 { value: 'converted', label: 'Converted' },
                 { value: 'not_interested', label: 'Not Interested' }
             ];
-            
+
             const modal = document.createElement('div');
             modal.className = 'modal-bg open';
             modal.id = 'bulkStatusModal';
@@ -5987,15 +6093,15 @@
             `;
             document.body.appendChild(modal);
         }
-        
+
         function closeBulkStatusModal() {
             const modal = document.getElementById('bulkStatusModal');
             if (modal) modal.remove();
         }
-        
+
         async function applyBulkStatus() {
             const newStatus = document.getElementById('bulkNewStatus').value;
-            
+
             let updated = 0;
             for (const id of selectedItems) {
                 try {
@@ -6008,30 +6114,30 @@
                             notes: ''
                         })
                     });
-                    
+
                     // Update local data
                     [carts, pending, buyers].forEach(arr => {
                         const item = arr.find(i => i.id === id);
                         if (item) item.callStatus = newStatus;
                     });
-                    
+
                     updated++;
                 } catch (e) {
                     console.error('Failed to update status:', e);
                 }
             }
-            
+
             showToast(`${updated} items updated to "${statusLabel(newStatus)}"`);
             closeBulkStatusModal();
             clearSelection();
             renderTable();
         }
-        
+
         // Helpers
         function initials(n) { return (n||'?').split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase(); }
         function esc(t) { const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
         function escAttr(t) { return (t||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
-        function statusLabel(s) { 
+        function statusLabel(s) {
             const labels = {
                 not_called:'Not Called',
                 no_answer_1:'No Answer (1)',
@@ -6052,80 +6158,80 @@
         }
         function formatDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
         function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
-        
+
         // ========== DASHBOARD FUNCTIONS ==========
         let recoveryChart = null;
         let countryChart = null;
-        
+
         function renderDashboard() {
             updateKPIs();
             renderCharts();
             renderActivityFeed();
         }
-        
+
         function updateKPIs() {
             // Filter by user's allowed countries first (same as updateStats)
             const shouldFilter = !hasAllCountries && !isAdmin;
             let fc = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
-            
+
             // Then filter by currentStore if not 'all'
             if (currentStore !== 'all') {
                 fc = fc.filter(c => c.storeCode === currentStore);
             }
-            
+
             // Convert all values to EUR before summing
             const totalValue = fc.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
             const converted = fc.filter(c => c.callStatus === 'converted').length;
             const recoveryRate = fc.length > 0 ? Math.round((converted / fc.length) * 100) : 0;
-            
+
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
             const smsSentWeek = smsLog.filter(s => new Date(s.date) > weekAgo && s.status === 'sent').length;
-            
+
             // Estimate recovered revenue (converted carts value) - convert to EUR
             const recoveredValue = fc.filter(c => c.callStatus === 'converted')
                 .reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
-            
+
             document.getElementById('kpiTotalValue').textContent = '€' + Math.round(totalValue).toLocaleString();
             document.getElementById('kpiRecoveryRate').textContent = recoveryRate + '%';
             document.getElementById('kpiSmsSent').textContent = smsSentWeek;
             document.getElementById('kpiRecovered').textContent = '€' + Math.round(recoveredValue).toLocaleString();
         }
-        
+
         function renderCharts() {
             // Recovery Chart (Line chart - last 7 days)
             const recoveryCtx = document.getElementById('recoveryChart');
             if (!recoveryCtx) return;
-            
+
             if (recoveryChart) recoveryChart.destroy();
-            
+
             const labels = [];
             const cartsData = [];
             const convertedData = [];
-            
+
             for (let i = 6; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
                 const dateStr = date.toLocaleDateString('en-US', { weekday: 'short' });
                 labels.push(dateStr);
-                
+
                 const dayStart = new Date(date.setHours(0,0,0,0));
                 const dayEnd = new Date(date.setHours(23,59,59,999));
-                
+
                 const dayCarts = carts.filter(c => {
                     const t = new Date(c.abandonedAt);
                     return t >= dayStart && t <= dayEnd;
                 }).length;
-                
+
                 const dayConverted = carts.filter(c => {
                     const t = new Date(c.lastUpdated);
                     return c.callStatus === 'converted' && t >= dayStart && t <= dayEnd;
                 }).length;
-                
+
                 cartsData.push(dayCarts);
                 convertedData.push(dayConverted);
             }
-            
+
             recoveryChart = new Chart(recoveryCtx, {
                 type: 'line',
                 data: {
@@ -6156,17 +6262,17 @@
                     }
                 }
             });
-            
+
             // Country Chart (Doughnut)
             const countryCtx = document.getElementById('countryChart');
             if (!countryCtx) return;
-            
+
             if (countryChart) countryChart.destroy();
-            
+
             const countryLabels = [];
             const countryData = [];
             const countryColors = ['#3b82f6', '#22c55e', '#f97316', '#a855f7', '#ef4444', '#06b6d4', '#eab308'];
-            
+
             stores.forEach((s, i) => {
                 const count = carts.filter(c => c.storeCode === s.code).length;
                 if (count > 0) {
@@ -6174,7 +6280,7 @@
                     countryData.push(count);
                 }
             });
-            
+
             countryChart = new Chart(countryCtx, {
                 type: 'doughnut',
                 data: {
@@ -6195,14 +6301,14 @@
                 }
             });
         }
-        
+
         function renderActivityFeed() {
             const activityList = document.getElementById('activityList');
             if (!activityList) return;
-            
+
             // Combine recent activities
             const activities = [];
-            
+
             // Recent carts
             carts.slice(0, 5).forEach(c => {
                 activities.push({
@@ -6214,7 +6320,7 @@
                     data: c
                 });
             });
-            
+
             // Recent SMS
             smsLog.slice(0, 5).forEach(s => {
                 activities.push({
@@ -6226,15 +6332,15 @@
                     data: s
                 });
             });
-            
+
             // Sort by time
             activities.sort((a, b) => new Date(b.time) - new Date(a.time));
-            
+
             if (activities.length === 0) {
                 activityList.innerHTML = '<div class="empty" style="padding:40px;"><i class="fas fa-inbox"></i><p>No recent activity</p></div>';
                 return;
             }
-            
+
             activityList.innerHTML = activities.slice(0, 10).map(a => `
                 <div class="activity-item" onclick="handleActivityClick('${a.type}', '${a.data?.id || ''}')">
                     <div class="activity-icon ${a.type}"><i class="fas ${a.icon}"></i></div>
@@ -6246,54 +6352,54 @@
                 </div>
             `).join('');
         }
-        
+
         function handleActivityClick(type, id) {
             if (type === 'cart' && id) {
                 const cart = carts.find(c => c.id === id);
                 if (cart) openCustomer360(cart);
             }
         }
-        
+
         function refreshActivity() {
             renderActivityFeed();
             showToast('Activity refreshed!', false, 'info');
         }
-        
+
         // ========== CUSTOMER 360° FUNCTIONS ==========
         let currentCustomer = null;
         let currentC360Tab = 'timeline';
-        
+
         function openCustomer360(customer) {
             currentCustomer = customer;
-            
+
             // Populate header
             document.getElementById('c360Avatar').textContent = initials(customer.customerName);
             document.getElementById('c360Name').textContent = customer.customerName;
             document.getElementById('c360Email').textContent = customer.email || 'N/A';
             document.getElementById('c360Phone').textContent = customer.phone || 'N/A';
             document.getElementById('c360Location').textContent = customer.location || customer.city || 'N/A';
-            
+
             // Calculate stats
             const customerCarts = carts.filter(c => c.email === customer.email);
             const totalSpent = customerCarts.filter(c => c.callStatus === 'converted')
                 .reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
             const orderCount = customerCarts.filter(c => c.callStatus === 'converted').length;
-            
+
             document.getElementById('c360TotalSpent').textContent = '€' + totalSpent.toFixed(2);
             document.getElementById('c360Orders').textContent = orderCount;
-            
+
             // Setup tabs
             document.querySelectorAll('.c360-tab').forEach(tab => {
                 tab.classList.remove('active');
                 if (tab.dataset.c360tab === 'timeline') tab.classList.add('active');
             });
-            
+
             currentC360Tab = 'timeline';
             renderC360Content();
-            
+
             document.getElementById('customerModal').classList.add('open');
         }
-        
+
         // Tab click handlers
         document.querySelectorAll('.c360-tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -6303,15 +6409,15 @@
                 renderC360Content();
             });
         });
-        
+
         function renderC360Content() {
             const container = document.getElementById('c360Content');
             if (!currentCustomer) return;
-            
+
             const email = currentCustomer.email;
             const customerCarts = carts.filter(c => c.email === email);
             const customerSms = smsLog.filter(s => s.recipient === currentCustomer.phone);
-            
+
             switch (currentC360Tab) {
                 case 'timeline':
                     renderC360Timeline(customerCarts, customerSms);
@@ -6330,10 +6436,10 @@
                     break;
             }
         }
-        
+
         function renderC360Timeline(customerCarts, customerSms) {
             const container = document.getElementById('c360Content');
-            
+
             const events = [];
             customerCarts.forEach(c => {
                 events.push({
@@ -6362,14 +6468,14 @@
                     time: s.date
                 });
             });
-            
+
             events.sort((a, b) => new Date(b.time) - new Date(a.time));
-            
+
             if (events.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><p>No activity history</p></div>';
                 return;
             }
-            
+
             container.innerHTML = events.map(e => `
                 <div class="timeline-item">
                     <div class="timeline-dot ${e.type}"><i class="fas ${e.icon}"></i></div>
@@ -6381,16 +6487,16 @@
                 </div>
             `).join('');
         }
-        
+
         function renderC360Orders(customerCarts) {
             const container = document.getElementById('c360Content');
             const orders = customerCarts.filter(c => c.callStatus === 'converted');
-            
+
             if (orders.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-box-open"></i><p>No orders yet</p></div>';
                 return;
             }
-            
+
             container.innerHTML = orders.map(o => `
                 <div class="order-item" style="margin-bottom:12px;">
                     <div class="order-item-info">
@@ -6401,15 +6507,15 @@
                 </div>
             `).join('');
         }
-        
+
         function renderC360Carts(customerCarts) {
             const container = document.getElementById('c360Content');
-            
+
             if (customerCarts.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-shopping-cart"></i><p>No carts</p></div>';
                 return;
             }
-            
+
             container.innerHTML = customerCarts.map(c => `
                 <div class="order-item" style="margin-bottom:12px;">
                     <div class="order-item-info">
@@ -6421,15 +6527,15 @@
                 </div>
             `).join('');
         }
-        
+
         function renderC360Sms(customerSms) {
             const container = document.getElementById('c360Content');
-            
+
             if (customerSms.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-comment-sms"></i><p>No SMS history</p></div>';
                 return;
             }
-            
+
             container.innerHTML = customerSms.map(s => `
                 <div class="order-item" style="margin-bottom:12px;">
                     <div class="order-item-info">
@@ -6440,11 +6546,11 @@
                 </div>
             `).join('');
         }
-        
+
         function renderC360Notes() {
             const container = document.getElementById('c360Content');
             const notes = currentCustomer?.notes || '';
-            
+
             container.innerHTML = `
                 <div class="form-group">
                     <label class="form-label">Customer Notes</label>
@@ -6455,11 +6561,11 @@
                 </button>
             `;
         }
-        
+
         async function saveCustomerNotes() {
             const notes = document.getElementById('c360NotesInput').value;
             if (!currentCustomer) return;
-            
+
             await fetch('api.php?action=update-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -6469,14 +6575,14 @@
                     notes
                 })
             });
-            
+
             currentCustomer.notes = notes;
             const cart = carts.find(c => c.id === currentCustomer.id);
             if (cart) cart.notes = notes;
-            
+
             showToast('Notes saved!');
         }
-        
+
         // Click on customer name to open 360° view
         function addCustomerClickHandlers() {
             document.querySelectorAll('.customer-cell').forEach(cell => {
@@ -6496,15 +6602,15 @@
         // NOTE: Theme toggle functions are defined earlier in the file (initTheme, toggleTheme, updateThemeIcon)
         // They use body.dark class and localStorage.callcenter_theme
         // DO NOT add duplicate theme code here!
-        
+
         // ========== AGENT MANAGEMENT FUNCTIONS ==========
         let agentsList = [];
         let editingAgentId = null;
         let agentActiveState = true;
-        
+
         async function loadAgents() {
             if (!isAdmin) return;
-            
+
             try {
                 const res = await fetch('api.php?action=agents-list');
                 const data = await res.json();
@@ -6514,23 +6620,23 @@
                 console.error('Failed to load agents:', e);
             }
         }
-        
+
         function renderAgentsTable() {
             const tbody = document.getElementById('agentsTableBody');
             if (!tbody) return;
-            
+
             if (agentsList.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="empty"><i class="fas fa-users"></i><p>Ni agentov</p></td></tr>';
                 return;
             }
-            
+
             const countryFlags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', gr: '🇬🇷', sk: '🇸🇰', it: '🇮🇹', hu: '🇭🇺', all: '🌍' };
-            
+
             tbody.innerHTML = agentsList.map(agent => {
-                const countries = (agent.countries || []).map(c => 
+                const countries = (agent.countries || []).map(c =>
                     c === 'all' ? '🌍 All' : `${countryFlags[c] || ''} ${c.toUpperCase()}`
                 ).join(', ');
-                
+
                 return `
                     <tr>
                         <td>
@@ -6563,7 +6669,7 @@
                             </span>
                         </td>
                         <td style="font-size:12px;color:var(--text-muted);">
-                            ${agent.createdAt ? formatDate(agent.createdAt) : '—'}
+                            ${agent.createdAt ? formatDate(agent.createdAt) : '-'}
                         </td>
                         <td style="white-space:nowrap;">
                             <button class="action-btn" onclick="openAgentModal('${agent.id}')" title="Edit">
@@ -6579,30 +6685,30 @@
                 `;
             }).join('');
         }
-        
+
         function openAgentModal(agentId = null) {
             editingAgentId = agentId;
             const agent = agentId ? agentsList.find(a => a.id === agentId) : null;
-            
+
             // Update modal title
             document.getElementById('agentModalTitle').textContent = agent ? '✏️ Edit Agent' : '➕ Add Agent';
             document.getElementById('passwordHint').style.display = agent ? 'block' : 'none';
-            
+
             // Populate fields
             document.getElementById('agentEditId').value = agentId || '';
             document.getElementById('agentUsername').value = agent?.username || '';
             document.getElementById('agentPassword').value = '';
             document.getElementById('agentRole').value = agent?.role || 'agent';
-            
+
             agentActiveState = agent?.active !== false;
             document.getElementById('agentActiveToggle').classList.toggle('active', agentActiveState);
-            
+
             // Render country checkboxes
             renderAgentCountryCheckboxes(agent?.countries || []);
-            
+
             document.getElementById('agentModal').classList.add('open');
         }
-        
+
         function renderAgentCountryCheckboxes(selectedCountries = []) {
             const container = document.getElementById('agentCountries');
             const countries = [
@@ -6614,9 +6720,9 @@
                 { code: 'it', flag: '🇮🇹', name: 'Italy' },
                 { code: 'hu', flag: '🇭🇺', name: 'Hungary' }
             ];
-            
+
             const hasAll = selectedCountries.includes('all');
-            
+
             container.innerHTML = `
                 <label class="country-checkbox ${hasAll ? 'selected' : ''}" onclick="toggleAgentCountry(this, 'all')">
                     <input type="checkbox" name="agent_country" value="all" ${hasAll ? 'checked' : ''}>
@@ -6632,13 +6738,13 @@
                 `).join('')}
             `;
         }
-        
+
         function toggleAgentCountry(label, code) {
             const checkbox = label.querySelector('input');
             const isChecked = !checkbox.checked;
             checkbox.checked = isChecked;
             label.classList.toggle('selected', isChecked);
-            
+
             // If "all" is selected, uncheck others
             if (code === 'all' && isChecked) {
                 document.querySelectorAll('#agentCountries input[name="agent_country"]').forEach(cb => {
@@ -6657,50 +6763,50 @@
                 }
             }
         }
-        
+
         function toggleAgentActive() {
             agentActiveState = !agentActiveState;
             document.getElementById('agentActiveToggle').classList.toggle('active', agentActiveState);
         }
-        
+
         async function saveAgent() {
             const username = document.getElementById('agentUsername').value.trim();
             const password = document.getElementById('agentPassword').value;
             const role = document.getElementById('agentRole').value;
-            
+
             // Get selected countries
             const countries = [];
             document.querySelectorAll('#agentCountries input[name="agent_country"]:checked').forEach(cb => {
                 countries.push(cb.value);
             });
-            
+
             // Validation
             if (!username) {
                 showToast('Username is required', true);
                 return;
             }
-            
+
             if (!editingAgentId && !password) {
                 showToast('Password is required for new agents', true);
                 return;
             }
-            
+
             if (countries.length === 0) {
                 showToast('Select at least one country', true);
                 return;
             }
-            
+
             const payload = {
                 username,
                 role,
                 countries,
                 active: agentActiveState
             };
-            
+
             if (password) {
                 payload.password = password;
             }
-            
+
             try {
                 let res;
                 if (editingAgentId) {
@@ -6717,9 +6823,9 @@
                         body: JSON.stringify(payload)
                     });
                 }
-                
+
                 const result = await res.json();
-                
+
                 if (result.success || result.id) {
                     closeModal('agentModal');
                     showToast(editingAgentId ? '✅ Agent updated!' : '✅ Agent added!');
@@ -6731,24 +6837,24 @@
                 showToast('Connection error', true);
             }
         }
-        
+
         async function deleteAgent(agentId) {
             const agent = agentsList.find(a => a.id === agentId);
             if (!agent) return;
-            
+
             if (!confirm(`Are you sure you want to delete agent "${agent.username}"?`)) {
                 return;
             }
-            
+
             try {
                 const res = await fetch('api.php?action=agents-delete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: agentId })
                 });
-                
+
                 const result = await res.json();
-                
+
                 if (result.success) {
                     showToast('✅ Agent deleted!');
                     await loadAgents();
@@ -6759,11 +6865,11 @@
                 showToast('Connection error', true);
             }
         }
-        
+
         // ========== COUNTRY FILTERING FOR AGENTS ==========
         function filterCountryTabs() {
             if (hasAllCountries || isAdmin) return; // Admin sees everything
-            
+
             // Hide country tabs that user doesn't have access to
             document.querySelectorAll('.country-tab[data-store]').forEach(tab => {
                 const storeCode = tab.dataset.store;
@@ -6775,7 +6881,7 @@
                     tab.style.display = 'none';
                 }
             });
-            
+
             // If user has only one country, auto-select it
             if (userCountries.length === 1) {
                 currentStore = userCountries[0];
@@ -6784,41 +6890,41 @@
                 if (targetTab) targetTab.classList.add('active');
             }
         }
-        
+
         function filterDataByUserCountries(dataArray) {
             if (hasAllCountries || isAdmin) return dataArray;
             return dataArray.filter(item => userCountries.includes(item.storeCode));
         }
-        
+
         // Override loadAllData to filter by user countries
         const originalLoadAllData = loadAllData;
         loadAllData = async function() {
             await originalLoadAllData();
-            
+
             // Filter data by user countries
             if (!hasAllCountries && !isAdmin) {
                 carts = filterDataByUserCountries(carts);
                 pending = filterDataByUserCountries(pending);
                 buyers = filterDataByUserCountries(buyers);
             }
-            
+
             // Apply country tab filtering
             filterCountryTabs();
-            
+
             // Update counts after filtering
             updateCounts();
             updateStats();
             renderTable();
-            
+
             // Load agents if admin
             if (isAdmin) {
                 loadAgents();
             }
-            
+
             // Load follow-ups count
             loadFollowupsCount();
         };
-        
+
         // ========== CALL LOGGING FUNCTIONS ==========
         const CALL_STATUSES = [
             { value: 'not_called', label: 'Not Called', icon: '📵', class: '' },
@@ -6833,49 +6939,49 @@
             { value: 'wrong_number', label: 'Wrong Number', icon: '❓', class: 'not_interested' },
             { value: 'voicemail', label: 'Voicemail', icon: '📬', class: 'no_answer' }
         ];
-        
+
         let currentCallLogCustomer = null;
         let selectedCallStatus = 'not_called';
         let followupsData = [];
         let analyticsCharts = {};
-        
+
         function openCallLogModal(customer) {
             currentCallLogCustomer = customer;
             selectedCallStatus = customer.callStatus || 'not_called';
-            
+
             document.getElementById('callLogCustomerId').value = customer.id;
             document.getElementById('callLogStoreCode').value = customer.storeCode;
             document.getElementById('callLogNotes').value = '';
             document.getElementById('callLogDuration').value = '';
             document.getElementById('callLogCallback').value = '';
-            
+
             renderCallStatusGrid();
             toggleCallbackSection();
-            
+
             document.getElementById('callLogModal').classList.add('open');
         }
-        
+
         function renderCallStatusGrid() {
             const grid = document.getElementById('callStatusGrid');
             grid.innerHTML = CALL_STATUSES.filter(s => s.value !== 'not_called').map(status => `
-                <div class="call-status-option ${status.class} ${selectedCallStatus === status.value ? 'selected' : ''}" 
+                <div class="call-status-option ${status.class} ${selectedCallStatus === status.value ? 'selected' : ''}"
                      onclick="selectCallStatus('${status.value}')">
                     <span style="font-size:18px;display:block;margin-bottom:4px;">${status.icon}</span>
                     ${status.label}
                 </div>
             `).join('');
         }
-        
+
         function selectCallStatus(status) {
             selectedCallStatus = status;
             renderCallStatusGrid();
             toggleCallbackSection();
         }
-        
+
         function toggleCallbackSection() {
             const section = document.getElementById('callbackSection');
             section.style.display = selectedCallStatus === 'callback' ? 'block' : 'none';
-            
+
             if (selectedCallStatus === 'callback' && !document.getElementById('callLogCallback').value) {
                 // Default to tomorrow 10:00
                 const tomorrow = new Date();
@@ -6884,19 +6990,19 @@
                 document.getElementById('callLogCallback').value = tomorrow.toISOString().slice(0, 16);
             }
         }
-        
+
         async function saveCallLog() {
             const customerId = document.getElementById('callLogCustomerId').value;
             const storeCode = document.getElementById('callLogStoreCode').value;
             const notes = document.getElementById('callLogNotes').value;
             const duration = document.getElementById('callLogDuration').value;
             const callbackAt = document.getElementById('callLogCallback').value;
-            
+
             if (selectedCallStatus === 'callback' && !callbackAt) {
                 showToast('Prosim izberi datum in čas za callback!', true);
                 return;
             }
-            
+
             try {
                 const res = await fetch('api.php?action=call-logs-add', {
                     method: 'POST',
@@ -6911,23 +7017,23 @@
                         agentId: user.username
                     })
                 });
-                
+
                 const result = await res.json();
-                
+
                 if (result.success) {
                     showToast('Call logged successfully!');
                     closeModal('callLogModal');
-                    
+
                     // Update local data
                     const cart = carts.find(c => c.id === customerId);
                     if (cart) {
                         cart.callStatus = selectedCallStatus;
                         cart.notes = notes;
                     }
-                    
+
                     renderTable();
                     loadFollowupsCount();
-                    
+
                     // Refresh customer 360 if open
                     if (currentCustomer && currentCustomer.id === customerId) {
                         renderC360Content();
@@ -6939,19 +7045,19 @@
                 showToast('Error: ' + e.message, true);
             }
         }
-        
+
         async function loadFollowupsCount() {
             try {
                 const res = await fetch(`api.php?action=my-followups&agentId=${encodeURIComponent(user.username)}`);
                 followupsData = await res.json();
-                
+
                 const dueCount = followupsData.filter(f => f.isDue).length;
                 const todayCount = followupsData.filter(f => f.isToday).length;
                 const totalCount = followupsData.length;
-                
+
                 const badge = document.getElementById('navFollowups');
                 badge.textContent = totalCount;
-                
+
                 if (dueCount > 0) {
                     badge.classList.add('due');
                     badge.title = `${dueCount} due now!`;
@@ -6962,18 +7068,18 @@
                 console.error('Failed to load followups count:', e);
             }
         }
-        
+
         async function renderFollowups(showAll = false) {
             const container = document.getElementById('followupsContainer');
             container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
-            
+
             try {
-                const url = showAll 
-                    ? 'api.php?action=my-followups&all=true' 
+                const url = showAll
+                    ? 'api.php?action=my-followups&all=true'
                     : `api.php?action=my-followups&agentId=${encodeURIComponent(user.username)}`;
                 const res = await fetch(url);
                 const data = await res.json();
-                
+
                 if (data.length === 0) {
                     container.innerHTML = `
                         <div class="empty" style="padding:60px;">
@@ -6983,35 +7089,35 @@
                     `;
                     return;
                 }
-                
+
                 // Group by date
                 const today = new Date().toDateString();
                 const tomorrow = new Date(Date.now() + 86400000).toDateString();
-                
+
                 const groups = {
                     due: { label: '⚠️ Due Now', items: [] },
                     today: { label: '📅 Danes', items: [] },
                     tomorrow: { label: '📆 Jutri', items: [] },
                     later: { label: '🗓️ Kasneje', items: [] }
                 };
-                
+
                 data.forEach(f => {
                     if (f.isDue) groups.due.items.push(f);
                     else if (f.isToday) groups.today.items.push(f);
                     else if (f.isTomorrow) groups.tomorrow.items.push(f);
                     else groups.later.items.push(f);
                 });
-                
+
                 let html = '';
                 for (const [key, group] of Object.entries(groups)) {
                     if (group.items.length === 0) continue;
-                    
+
                     html += `<h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:13px;">${group.label} (${group.items.length})</h4>`;
-                    
+
                     group.items.forEach(f => {
                         const timeClass = f.isDue ? 'due' : (f.isToday ? 'today' : (f.isTomorrow ? 'tomorrow' : 'future'));
                         const timeLabel = f.isDue ? 'DUE!' : formatDateTime(f.callbackAt);
-                        
+
                         html += `
                             <div class="followup-card ${timeClass}">
                                 <div class="followup-header">
@@ -7022,7 +7128,7 @@
                                     <span class="followup-time ${timeClass}">${timeLabel}</span>
                                 </div>
                                 <div class="followup-details">
-                                    📞 ${esc(f.customer?.phone || 'N/A')} &nbsp;|&nbsp; 
+                                    📞 ${esc(f.customer?.phone || 'N/A')} &nbsp;|&nbsp;
                                     💰 ${f.customer?.currency || '€'}${(f.customer?.cartValue || 0).toFixed(2)}
                                 </div>
                                 ${f.notes ? `<div class="followup-notes">${esc(f.notes)}</div>` : ''}
@@ -7038,50 +7144,50 @@
                         `;
                     });
                 }
-                
+
                 container.innerHTML = html;
             } catch (e) {
                 container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
             }
         }
-        
+
         function callFollowupCustomer(customerId) {
             const customer = carts.find(c => c.id === customerId);
             if (customer) {
                 openCallLogModal(customer);
             }
         }
-        
+
         function viewFollowupCustomer(customerId) {
             const customer = carts.find(c => c.id === customerId);
             if (customer) {
                 openCustomer360(customer);
             }
         }
-        
+
         function formatDateTime(dateStr) {
             if (!dateStr) return '';
             const d = new Date(dateStr);
             return d.toLocaleDateString('sl-SI') + ' ' + d.toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' });
         }
-        
+
         // ========== ANALYTICS FUNCTIONS ==========
         async function renderAnalytics() {
             const container = document.getElementById('analyticsContainer');
             container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
-            
+
             const days = parseInt(document.getElementById('analyticsDateRange').value) || 30;
             const dateFrom = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
-            
+
             try {
                 const [statsRes, smsRes] = await Promise.all([
                     fetch(`api.php?action=call-stats&dateFrom=${dateFrom}`),
                     fetch('api.php?action=sms-queue')
                 ]);
-                
+
                 const stats = await statsRes.json();
                 const smsData = await smsRes.json();
-                
+
                 // Calculate SMS stats
                 const smsStats = {
                     total: smsData.length,
@@ -7089,7 +7195,7 @@
                     queued: smsData.filter(s => s.status === 'queued').length,
                     failed: smsData.filter(s => s.status === 'failed').length
                 };
-                
+
                 container.innerHTML = `
                     <!-- Summary Cards -->
                     <div class="analytics-card" style="grid-column: span 2;">
@@ -7117,7 +7223,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Calls by Status -->
                     <div class="analytics-card">
                         <h3><i class="fas fa-chart-pie"></i> Calls by Status</h3>
@@ -7125,7 +7231,7 @@
                             <canvas id="statusChart"></canvas>
                         </div>
                     </div>
-                    
+
                     <!-- Agent Leaderboard -->
                     <div class="analytics-card">
                         <h3><i class="fas fa-trophy"></i> Agent Leaderboard</h3>
@@ -7133,7 +7239,7 @@
                             ${renderLeaderboard(stats.agentStats)}
                         </div>
                     </div>
-                    
+
                     <!-- Calls Over Time -->
                     <div class="analytics-card" style="grid-column: span 2;">
                         <h3><i class="fas fa-chart-line"></i> Calls Over Time</h3>
@@ -7141,7 +7247,7 @@
                             <canvas id="timelineChart"></canvas>
                         </div>
                     </div>
-                    
+
                     <!-- Best Hours -->
                     <div class="analytics-card">
                         <h3><i class="fas fa-clock"></i> Calls by Hour</h3>
@@ -7149,7 +7255,7 @@
                             <canvas id="hourlyChart"></canvas>
                         </div>
                     </div>
-                    
+
                     <!-- SMS Stats -->
                     <div class="analytics-card">
                         <h3><i class="fas fa-sms"></i> SMS Performance</h3>
@@ -7173,20 +7279,20 @@
                         </div>
                     </div>
                 `;
-                
+
                 // Render charts
                 renderAnalyticsCharts(stats);
-                
+
             } catch (e) {
                 container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
             }
         }
-        
+
         function renderLeaderboard(agentStats) {
             if (!agentStats || Object.keys(agentStats).length === 0) {
                 return '<p style="color:var(--text-muted);text-align:center;padding:20px;">No agent data yet</p>';
             }
-            
+
             const agents = Object.entries(agentStats)
                 .map(([id, data]) => ({
                     id,
@@ -7195,7 +7301,7 @@
                     rate: data.calls > 0 ? Math.round((data.converted / data.calls) * 100) : 0
                 }))
                 .sort((a, b) => b.converted - a.converted || b.calls - a.calls);
-            
+
             return agents.slice(0, 5).map((agent, i) => {
                 const rankClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : ''));
                 return `
@@ -7210,11 +7316,11 @@
                 `;
             }).join('');
         }
-        
+
         function renderAnalyticsCharts(stats) {
             // Destroy existing charts
             Object.values(analyticsCharts).forEach(chart => chart?.destroy());
-            
+
             // Status Pie Chart
             const statusCtx = document.getElementById('statusChart')?.getContext('2d');
             if (statusCtx && stats.statusCounts) {
@@ -7230,11 +7336,11 @@
                     voicemail: '#8b5cf6',
                     wrong_number: '#ec4899'
                 };
-                
+
                 const labels = Object.keys(stats.statusCounts);
                 const data = Object.values(stats.statusCounts);
                 const colors = labels.map(l => statusColors[l] || '#64748b');
-                
+
                 analyticsCharts.status = new Chart(statusCtx, {
                     type: 'doughnut',
                     data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
@@ -7246,7 +7352,7 @@
                     }
                 });
             }
-            
+
             // Timeline Chart
             const timelineCtx = document.getElementById('timelineChart')?.getContext('2d');
             if (timelineCtx && stats.dailyStats) {
@@ -7254,7 +7360,7 @@
                     const date = new Date(d);
                     return date.toLocaleDateString('sl-SI', { day: 'numeric', month: 'short' });
                 });
-                
+
                 analyticsCharts.timeline = new Chart(timelineCtx, {
                     type: 'line',
                     data: {
@@ -7279,12 +7385,12 @@
                     }
                 });
             }
-            
+
             // Hourly Chart
             const hourlyCtx = document.getElementById('hourlyChart')?.getContext('2d');
             if (hourlyCtx && stats.hourlyStats) {
                 const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-                
+
                 analyticsCharts.hourly = new Chart(hourlyCtx, {
                     type: 'bar',
                     data: {
@@ -7307,7 +7413,7 @@
                 });
             }
         }
-        
+
         // ========== CUSTOMER 360° CALL HISTORY ==========
         async function loadCustomerCallHistory(customerId) {
             try {
@@ -7318,17 +7424,17 @@
                 return [];
             }
         }
-        
+
         // Override renderC360Timeline to include call history
         const originalRenderC360Timeline = renderC360Timeline;
         renderC360Timeline = async function(customerCarts, customerSms) {
             const container = document.getElementById('c360Content');
-            
+
             // Load call history
             const callLogs = currentCustomer ? await loadCustomerCallHistory(currentCustomer.id) : [];
-            
+
             const events = [];
-            
+
             // Add call logs
             callLogs.forEach(log => {
                 const statusInfo = CALL_STATUSES.find(s => s.value === log.status) || { label: log.status, icon: '📞' };
@@ -7344,7 +7450,7 @@
                     statusClass: log.status.includes('no_answer') ? 'no_answer' : log.status
                 });
             });
-            
+
             // Add cart events
             customerCarts.forEach(c => {
                 events.push({
@@ -7364,7 +7470,7 @@
                     });
                 }
             });
-            
+
             // Add SMS events
             customerSms.forEach(s => {
                 events.push({
@@ -7375,14 +7481,14 @@
                     time: s.date
                 });
             });
-            
+
             events.sort((a, b) => new Date(b.time) - new Date(a.time));
-            
+
             if (events.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-history"></i><p>No activity history</p></div>';
                 return;
             }
-            
+
             container.innerHTML = `
                 <div class="call-timeline">
                     ${events.map(e => `
@@ -7400,12 +7506,12 @@
                 </div>
             `;
         };
-        
+
         // Add "Log Call" button to Customer 360°
         const originalOpenCustomer360 = openCustomer360;
         openCustomer360 = function(customer) {
             originalOpenCustomer360(customer);
-            
+
             // Add log call button if not exists
             setTimeout(() => {
                 const header = document.querySelector('.c360-header');
@@ -7420,10 +7526,10 @@
                 }
             }, 100);
         };
-        
+
         // ========== ENKRATNI KUPCI SETTINGS ==========
         let buyersSettings = { minDaysFromPurchase: 10 };
-        
+
         async function loadBuyersSettings() {
             try {
                 const res = await fetch('api.php?action=buyers-settings');
@@ -7436,11 +7542,11 @@
                 console.error('Failed to load buyers settings:', e);
             }
         }
-        
+
         async function saveBuyersSettings() {
             const minDays = parseInt(document.getElementById('buyersMinDays').value) || 10;
             buyersSettings.minDaysFromPurchase = minDays;
-            
+
             try {
                 const res = await fetch('api.php?action=buyers-settings-save', {
                     method: 'POST',
@@ -7459,14 +7565,14 @@
                 showToast('Napaka: ' + e.message, true);
             }
         }
-        
+
         // ========== PAKETOMATI FUNCTIONS ==========
         let paketomatiData = [];
-        
+
         async function loadPaketomati() {
             const filter = document.getElementById('paketomatFilter')?.value || 'all';
             console.log('[Paketomati] Loading with filter:', filter);
-            
+
             // Show loading state
             document.getElementById('paketomatiTableBody').innerHTML = `
                 <tr><td colspan="9" style="padding:40px;text-align:center;">
@@ -7474,13 +7580,13 @@
                     <div style="color:var(--text-muted);">Nalagam podatke iz MetaKocka...</div>
                 </td></tr>
             `;
-            
+
             const result = await apiFetch(`api.php?action=paketomati&filter=${filter}`, {
                 component: 'Paketomati',
                 timeout: 30000, // 30s timeout for MetaKocka
                 retries: 2
             });
-            
+
             if (result.success && Array.isArray(result.data)) {
                 paketomatiData = result.data;
                 console.log('[Paketomati] ✓ Loaded', paketomatiData.length, 'orders');
@@ -7500,15 +7606,15 @@
                 `;
             }
         }
-        
+
         function renderPaketomatiTable() {
             const statusFilter = document.getElementById('paketomatStatusFilter')?.value || 'all';
             let filtered = paketomatiData;
-            
+
             if (statusFilter !== 'all') {
                 filtered = paketomatiData.filter(o => o.status === statusFilter);
             }
-            
+
             if (filtered.length === 0) {
                 console.log('[Paketomati] No orders found. Total data:', paketomatiData.length, 'Filter:', statusFilter);
                 const typeFilter = document.getElementById('paketomatFilter')?.value || 'all';
@@ -7525,7 +7631,7 @@
                 document.getElementById('paketomatiTableBody').innerHTML = msg;
                 return;
             }
-            
+
             const html = filtered.map(order => {
                 const statusColors = {
                     not_called: 'var(--text-muted)',
@@ -7537,11 +7643,11 @@
                     called: 'Poklicano',
                     notified: 'Obveščeno'
                 };
-                
+
                 // Format last event date
                 const eventDate = order.lastEventDate ? new Date(order.lastEventDate).toLocaleDateString('sl-SI') : '';
                 const eventTitle = order.lastDeliveryEvent + (eventDate ? ` (${eventDate})` : '');
-                
+
                 return `
                     <tr>
                         <td>
@@ -7593,10 +7699,10 @@
                     </tr>
                 `;
             }).join('');
-            
+
             document.getElementById('paketomatiTableBody').innerHTML = html;
         }
-        
+
         async function updatePaketomatStatus(orderId, status) {
             try {
                 const order = paketomatiData.find(o => o.id === orderId);
@@ -7605,7 +7711,7 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({id: orderId, status: status, notes: order?.notes || ''})
                 });
-                
+
                 // Update local data
                 if (order) order.status = status;
                 renderPaketomatiTable();
@@ -7614,7 +7720,7 @@
                 showToast('Napaka pri posodabljanju statusa', 'error');
             }
         }
-        
+
         function showPaketomatNotes(orderId, currentNotes) {
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -7636,18 +7742,18 @@
             `;
             document.body.appendChild(modal);
         }
-        
+
         async function savePaketomatNotes(orderId) {
             const notes = document.getElementById('paketomatNotesText').value;
             const order = paketomatiData.find(o => o.id === orderId);
-            
+
             try {
                 await fetch('api.php?action=paketomati-update', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({id: orderId, status: order?.status || 'not_called', notes: notes})
                 });
-                
+
                 if (order) order.notes = notes;
                 document.getElementById('paketomatNotesModal').remove();
                 showToast('Opombe shranjene');
@@ -7655,19 +7761,202 @@
                 showToast('Napaka pri shranjevanju', 'error');
             }
         }
-        
+
         async function refreshPaketomati() {
             console.log('[Paketomati] Refreshing...');
             await apiFetch('api.php?action=clear-cache', { component: 'ClearCache', silent: true, retries: 1 });
             await loadPaketomati();
             showToast('✓ Paketomati osveženi!');
         }
-        
+
         function updatePaketomatiCount() {
             const notCalled = paketomatiData.filter(o => o.status === 'not_called').length;
             document.getElementById('navPaketomati').textContent = notCalled;
         }
+
+        // ========== URGENT LEADS FUNCTIONS ==========
+        let urgentLeads = [];
         
+        function loadUrgentLeads() {
+            // Load from localStorage (per store)
+            const key = `urgentLeads_${currentStore}`;
+            const stored = localStorage.getItem(key);
+            urgentLeads = stored ? JSON.parse(stored) : [];
+            updateUrgentCount();
+        }
+        
+        function saveUrgentLeads() {
+            const key = `urgentLeads_${currentStore}`;
+            localStorage.setItem(key, JSON.stringify(urgentLeads));
+            updateUrgentCount();
+        }
+        
+        function updateUrgentCount() {
+            const uncalled = urgentLeads.filter(l => !l.called).length;
+            const countEl = document.getElementById('contentCount-urgent');
+            if (countEl) countEl.textContent = uncalled;
+        }
+        
+        function renderUrgentTable() {
+            loadUrgentLeads();
+            const tbody = document.getElementById('urgentTableBody');
+            const emptyRow = document.getElementById('urgentEmptyRow');
+            
+            if (!urgentLeads.length) {
+                tbody.innerHTML = `<tr id="urgentEmptyRow"><td colspan="6" class="empty" style="padding:40px;text-align:center;">
+                    <i class="fas fa-phone-slash" style="font-size:32px;color:var(--text-muted);margin-bottom:12px;display:block;"></i>
+                    <p style="margin:0;color:var(--text-muted);">Ni nujnih leadov</p>
+                    <small style="color:var(--text-muted);">Klikni "Dodaj lead" za vnos</small>
+                </td></tr>`;
+                document.getElementById('urgentBulkActions').style.display = 'none';
+                return;
+            }
+            
+            tbody.innerHTML = urgentLeads.map((lead, idx) => `
+                <tr data-idx="${idx}" class="${lead.called ? 'called-row' : ''}">
+                    <td><input type="checkbox" class="urgent-checkbox" data-idx="${idx}" onchange="updateUrgentSelection()"></td>
+                    <td>
+                        <a href="tel:${lead.phone}" style="color:var(--accent-blue);text-decoration:none;font-weight:500;">
+                            ${esc(lead.phone)}
+                        </a>
+                    </td>
+                    <td style="max-width:400px;">
+                        <div style="white-space:pre-wrap;">${esc(lead.note)}</div>
+                    </td>
+                    <td style="font-size:12px;color:var(--text-muted);">
+                        ${new Date(lead.addedAt).toLocaleString('sl-SI')}
+                    </td>
+                    <td>
+                        <label style="cursor:pointer;display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" ${lead.called ? 'checked' : ''} onchange="toggleUrgentCalled(${idx}, this.checked)">
+                            <span class="badge ${lead.called ? 'converted' : 'not_called'}">${lead.called ? 'Poklicano' : 'Čaka'}</span>
+                        </label>
+                    </td>
+                    <td>
+                        <button class="action-btn" onclick="editUrgentLead(${idx})" title="Uredi">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" onclick="deleteUrgentLead(${idx})" title="Izbriši" style="color:var(--accent-red);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function showAddUrgentModal(editIdx = null) {
+            document.getElementById('urgentPhone').value = '';
+            document.getElementById('urgentNote').value = '';
+            document.getElementById('addUrgentModal').dataset.editIdx = editIdx !== null ? editIdx : '';
+            
+            if (editIdx !== null && urgentLeads[editIdx]) {
+                document.getElementById('urgentPhone').value = urgentLeads[editIdx].phone;
+                document.getElementById('urgentNote').value = urgentLeads[editIdx].note;
+            }
+            
+            document.getElementById('addUrgentModal').style.display = 'flex';
+            document.getElementById('urgentPhone').focus();
+        }
+        
+        function closeAddUrgentModal() {
+            document.getElementById('addUrgentModal').style.display = 'none';
+        }
+        
+        function saveUrgentLead() {
+            const phone = document.getElementById('urgentPhone').value.trim();
+            const note = document.getElementById('urgentNote').value.trim();
+            const editIdx = document.getElementById('addUrgentModal').dataset.editIdx;
+            
+            if (!phone) {
+                showToast('❌ Vnesi telefonsko številko!', true);
+                return;
+            }
+            if (!note) {
+                showToast('❌ Vnesi navodilo/razlog!', true);
+                return;
+            }
+            
+            if (editIdx !== '') {
+                // Edit existing
+                urgentLeads[parseInt(editIdx)].phone = phone;
+                urgentLeads[parseInt(editIdx)].note = note;
+                showToast('✅ Lead posodobljen');
+            } else {
+                // Add new
+                urgentLeads.unshift({
+                    id: Date.now(),
+                    phone: phone,
+                    note: note,
+                    addedAt: new Date().toISOString(),
+                    called: false
+                });
+                showToast('✅ Lead dodan');
+            }
+            
+            saveUrgentLeads();
+            closeAddUrgentModal();
+            renderUrgentTable();
+        }
+        
+        function editUrgentLead(idx) {
+            showAddUrgentModal(idx);
+        }
+        
+        function deleteUrgentLead(idx) {
+            if (!confirm('Ali res želiš izbrisati ta lead?')) return;
+            urgentLeads.splice(idx, 1);
+            saveUrgentLeads();
+            renderUrgentTable();
+            showToast('Lead izbrisan');
+        }
+        
+        function toggleUrgentCalled(idx, called) {
+            urgentLeads[idx].called = called;
+            if (called) urgentLeads[idx].calledAt = new Date().toISOString();
+            saveUrgentLeads();
+            renderUrgentTable();
+        }
+        
+        function updateUrgentSelection() {
+            const checked = document.querySelectorAll('.urgent-checkbox:checked').length;
+            const bulkActions = document.getElementById('urgentBulkActions');
+            document.getElementById('urgentSelectedCount').textContent = checked;
+            bulkActions.style.display = checked > 0 ? 'flex' : 'none';
+        }
+        
+        function toggleAllUrgent(el) {
+            document.querySelectorAll('.urgent-checkbox').forEach(cb => cb.checked = el.checked);
+            updateUrgentSelection();
+        }
+        
+        function markSelectedUrgentCalled() {
+            document.querySelectorAll('.urgent-checkbox:checked').forEach(cb => {
+                const idx = parseInt(cb.dataset.idx);
+                urgentLeads[idx].called = true;
+                urgentLeads[idx].calledAt = new Date().toISOString();
+            });
+            saveUrgentLeads();
+            renderUrgentTable();
+            showToast('Označeno kot poklicano');
+        }
+        
+        function deleteSelectedUrgent() {
+            const selected = [...document.querySelectorAll('.urgent-checkbox:checked')].map(cb => parseInt(cb.dataset.idx));
+            if (!selected.length) return;
+            if (!confirm(`Ali res želiš izbrisati ${selected.length} leadov?`)) return;
+            
+            // Delete from highest index to lowest to preserve indices
+            selected.sort((a, b) => b - a).forEach(idx => urgentLeads.splice(idx, 1));
+            saveUrgentLeads();
+            renderUrgentTable();
+            showToast(`${selected.length} leadov izbrisanih`);
+        }
+        
+        // Load urgent leads on init and store change
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(loadUrgentLeads, 100);
+        });
+
         // ========== REAL-TIME NOTIFICATION SYSTEM ==========
         let notificationSettings = {
             desktopEnabled: true,
@@ -7676,7 +7965,7 @@
         };
         let pollInterval = null;
         let notificationSound = null;
-        
+
         async function initNotificationSystem() {
             // Load settings
             try {
@@ -7685,27 +7974,27 @@
             } catch (e) {
                 console.log('Using default notification settings');
             }
-            
+
             // Update UI
             document.getElementById('notifDesktopToggle').checked = notificationSettings.desktopEnabled;
             document.getElementById('notifSoundToggle').checked = notificationSettings.soundEnabled;
             document.getElementById('notifPollingInterval').value = notificationSettings.pollingInterval;
-            
+
             // Request notification permission
             if (notificationSettings.desktopEnabled && Notification.permission === 'default') {
                 Notification.requestPermission();
             }
-            
+
             // Create notification sound
             createNotificationSound();
-            
+
             // Start polling
             startPolling();
-            
+
             // Mark current items as seen
             await markCurrentItemsSeen();
         }
-        
+
         function createNotificationSound() {
             // Create a simple beep using Web Audio API
             try {
@@ -7727,22 +8016,22 @@
                 console.log('Audio not supported');
             }
         }
-        
+
         function startPolling() {
             if (pollInterval) clearInterval(pollInterval);
             pollInterval = setInterval(pollForNewItems, notificationSettings.pollingInterval);
         }
-        
+
         async function pollForNewItems() {
             try {
                 const userId = currentUser?.id || 'default';
                 const res = await fetch(`api.php?action=poll-new&userId=${userId}`);
                 const data = await res.json();
-                
+
                 // Update badge counts
                 document.getElementById('navCarts').textContent = data.totalCarts;
                 document.getElementById('navPaketomati').textContent = data.totalPaketomati;
-                
+
                 // Show notifications for new items
                 if (data.newCarts.length > 0 || data.newPaketomati.length > 0) {
                     // Update badge with "new" indicator
@@ -7756,10 +8045,10 @@
                         paketBadge.style.background = 'var(--accent-red)';
                         paketBadge.style.color = 'white';
                     }
-                    
+
                     // Play sound
                     if (notificationSound) notificationSound();
-                    
+
                     // Show desktop notifications
                     if (notificationSettings.desktopEnabled && Notification.permission === 'granted') {
                         if (data.newCarts.length > 0) {
@@ -7775,7 +8064,7 @@
                                 notif.close();
                             };
                         }
-                        
+
                         if (data.newPaketomati.length > 0) {
                             const order = data.newPaketomati[0];
                             const notif = new Notification('📦 Novo paketomat naročilo!', {
@@ -7790,7 +8079,7 @@
                             };
                         }
                     }
-                    
+
                     // Mark items as seen
                     await markItemsSeen(
                         data.newCarts.map(c => c.id),
@@ -7801,7 +8090,7 @@
                 console.log('Poll error:', e);
             }
         }
-        
+
         async function markCurrentItemsSeen() {
             try {
                 const userId = currentUser?.id || 'default';
@@ -7811,7 +8100,7 @@
                 ]);
                 const currentCarts = await cartsRes.json();
                 const currentPaketomati = await paketRes.json();
-                
+
                 await markItemsSeen(
                     currentCarts.map(c => c.id),
                     currentPaketomati.map(p => p.id)
@@ -7820,7 +8109,7 @@
                 console.log('Mark seen error:', e);
             }
         }
-        
+
         async function markItemsSeen(cartIds, paketomatIds) {
             try {
                 const userId = currentUser?.id || 'default';
@@ -7833,19 +8122,19 @@
                 console.log('Mark seen error:', e);
             }
         }
-        
+
         async function saveNotificationSettings() {
             notificationSettings = {
                 desktopEnabled: document.getElementById('notifDesktopToggle').checked,
                 soundEnabled: document.getElementById('notifSoundToggle').checked,
                 pollingInterval: parseInt(document.getElementById('notifPollingInterval').value)
             };
-            
+
             // Request permission if enabling desktop notifications
             if (notificationSettings.desktopEnabled && Notification.permission === 'default') {
                 await Notification.requestPermission();
             }
-            
+
             // Save to server
             try {
                 await fetch('api.php?action=notification-settings', {
@@ -7854,23 +8143,23 @@
                     body: JSON.stringify(notificationSettings)
                 });
             } catch (e) {}
-            
+
             // Restart polling with new interval
             startPolling();
             showToast('Notification settings saved');
         }
-        
+
         function openNotificationSettings() {
             document.getElementById('notificationSettingsModal').style.display = 'flex';
         }
-        
+
         function closeNotificationSettings() {
             document.getElementById('notificationSettingsModal').style.display = 'none';
         }
-        
+
         function testNotification() {
             if (notificationSound) notificationSound();
-            
+
             if (Notification.permission === 'granted') {
                 new Notification('🔔 Test Notification', {
                     body: 'Obvestila delujejo pravilno!',
@@ -7889,7 +8178,7 @@
                 showToast('Desktop notifications so blokirane v brskalniku', 'error');
             }
         }
-        
+
         // Add notification bell to top bar
         function addNotificationBell() {
             const topBarActions = document.querySelector('.top-bar-actions');
@@ -7903,7 +8192,7 @@
                 topBarActions.insertBefore(bellBtn, topBarActions.firstChild);
             }
         }
-        
+
         // Reset badge color when tab is visited
         document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
             item.addEventListener('click', () => {
@@ -7920,7 +8209,7 @@
                 }
             });
         });
-        
+
         // Initialize notification system after main init
         const originalInit = init;
         init = async function() {
@@ -7928,7 +8217,7 @@
             addNotificationBell();
             await initNotificationSystem();
         };
-        
+
         init();
     </script>
 </body>
