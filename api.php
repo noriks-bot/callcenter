@@ -2730,6 +2730,49 @@ try {
             file_put_contents($automationsFile, json_encode(array_values($automations), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             echo json_encode(['success' => true]);
             break;
+        
+        case 'reset-automation-queue':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $queuedCartsFile = __DIR__ . '/data/automation-queued-carts.json';
+            
+            if (empty($input['automation_id'])) {
+                echo json_encode(['error' => 'automation_id required']);
+                break;
+            }
+            
+            $queuedCarts = [];
+            if (file_exists($queuedCartsFile)) {
+                $queuedCarts = json_decode(file_get_contents($queuedCartsFile), true) ?: [];
+            }
+            
+            // Reset the queued carts for this automation
+            $autoId = $input['automation_id'];
+            $previousCount = count($queuedCarts[$autoId] ?? []);
+            $queuedCarts[$autoId] = [];
+            
+            file_put_contents($queuedCartsFile, json_encode($queuedCarts, JSON_PRETTY_PRINT));
+            
+            // Also reset queued_count in automations file
+            $automationsFile = __DIR__ . '/data/sms-automations.json';
+            if (file_exists($automationsFile)) {
+                $automations = json_decode(file_get_contents($automationsFile), true) ?: [];
+                foreach ($automations as &$a) {
+                    if ($a['id'] === $autoId) {
+                        $a['queued_count'] = 0;
+                        break;
+                    }
+                }
+                unset($a);
+                file_put_contents($automationsFile, json_encode($automations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            }
+            
+            echo json_encode(['success' => true, 'reset_count' => $previousCount]);
+            break;
             
         case 'run-sms-automations':
             // Run automation check - adds to queue, never sends directly
