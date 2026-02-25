@@ -2569,10 +2569,6 @@
                         document.querySelector('.content').style.display = 'none';
                         document.getElementById('paketomatiContent').style.display = 'block';
                         loadPaketomati();
-                    } else if (currentContentTab === 'urgent') {
-                        document.querySelector('.content').style.display = 'none';
-                        document.getElementById('urgentContent').style.display = 'block';
-                        renderUrgentTable();
                     } else {
                         document.querySelector('.content').style.display = 'block';
                         currentPage = 1;
@@ -2665,10 +2661,6 @@
                         document.querySelector('.content').style.display = 'none';
                         document.getElementById('paketomatiContent').style.display = 'block';
                         loadPaketomati();
-                    } else if (newTab === 'urgent') {
-                        document.querySelector('.content').style.display = 'none';
-                        document.getElementById('urgentContent').style.display = 'block';
-                        renderUrgentTable();
                     } else {
                         document.querySelector('.content').style.display = 'block';
                         currentPage = 1;
@@ -3270,6 +3262,12 @@
                 }
             }
 
+            // Handle urgent tab separately (uses localStorage, not server data)
+            if (currentTab === 'urgent') {
+                renderUrgentTableInline();
+                return;
+            }
+            
             let data = currentTab === 'carts' ? [...carts] : currentTab === 'pending' ? [...pending] : [...buyers];
 
             // Filter by user's allowed countries first (admins see everything)
@@ -3314,7 +3312,8 @@
                 const emptyMessages = {
                     'carts': '<div class="empty"><i class="fas fa-shopping-cart"></i><p>Ni zapuščenih košaric</p><small style="color:var(--text-muted);">Vse košarice so bile pretvorjene ali filtrirane</small></div>',
                     'pending': '<div class="empty"><i class="fas fa-clock"></i><p>Ni čakajočih naročil</p><small style="color:var(--text-muted);">Vsa naročila so bila obdelana</small></div>',
-                    'buyers': '<div class="empty"><i class="fas fa-user"></i><p>Ni enkratnih kupcev</p><small style="color:var(--text-muted);">Trenutno ni kupcev z natanko 1 naročilom ki ustrezajo filtru</small></div>'
+                    'buyers': '<div class="empty"><i class="fas fa-user"></i><p>Ni enkratnih kupcev</p><small style="color:var(--text-muted);">Trenutno ni kupcev z natanko 1 naročilom ki ustrezajo filtru</small></div>',
+                    'urgent': '<div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p><small style="color:var(--text-muted);">Klikni + Dodaj za vnos novega leada</small></div>'
                 };
                 container.innerHTML = emptyMessages[currentTab] || '<div class="empty"><i class="fas fa-inbox"></i><p>Ni podatkov za prikaz</p></div>';
                 return;
@@ -3328,6 +3327,7 @@
 
             if (currentTab === 'carts') renderCartsTable(paginatedData, totalItems, totalPages);
             else if (currentTab === 'pending') renderPendingTable(paginatedData, totalItems, totalPages);
+            else if (currentTab === 'urgent') renderUrgentTableInline();
             else renderBuyersTable(paginatedData, totalItems, totalPages);
         }
 
@@ -7786,13 +7786,12 @@
             if (countEl) countEl.textContent = uncalled;
         }
         
-        function renderUrgentTable() {
+        function renderUrgentTableInline() {
             loadUrgentLeads();
-            const container = document.getElementById('urgentTableContainer');
+            const container = document.getElementById('tableContainer');
             
             if (!urgentLeads.length) {
-                container.innerHTML = `<div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p><small style="color:var(--text-muted);">Klikni "+ Dodaj" za vnos</small></div>`;
-                document.getElementById('urgentBulkActions').style.display = 'none';
+                container.innerHTML = `<div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p><small style="color:var(--text-muted);">Klikni + Dodaj za vnos novega leada</small></div>`;
                 return;
             }
             
@@ -7836,6 +7835,8 @@
                 </table>
                 </div>
             `;
+            
+            updateUrgentCount();
         }
         
         function showAddUrgentModal(editIdx = null) {
