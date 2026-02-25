@@ -19,8 +19,7 @@
         #buyersSettingsContent,
         #agentsContent,
         #followupsContent,
-        #analyticsContent,
-        #paketomatiContent {
+        #analyticsContent {
             margin-left: 260px;
             padding-top: 64px;
             min-height: 100vh;
@@ -121,7 +120,7 @@
         .sidebar.collapsed ~ #agentsContent,
         .sidebar.collapsed ~ #followupsContent,
         .sidebar.collapsed ~ #analyticsContent,
-        .sidebar.collapsed ~ #paketomatiContent {
+        .sidebar.collapsed ~ .dummy-selector-removed {
             margin-left: 70px;
         }
 
@@ -135,7 +134,7 @@
             #agentsContent,
             #followupsContent,
             #analyticsContent,
-            #paketomatiContent {
+            .dummy-selector-mobile-removed {
                 margin-left: 0;
             }
         }
@@ -1901,67 +1900,6 @@
         </div>
     </div>
 
-    <!-- Paketomati Content -->
-    <div id="paketomatiContent" style="display:none;">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title-large"><i class="fas fa-box"></i> Paketomati</h1>
-            <div class="page-header-actions">
-                <button class="action-btn-header" onclick="refreshPaketomati()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
-        </div>
-
-        <div style="max-width:1400px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                <div>
-                    <h3 style="margin-bottom:8px;">📦 Paketi v Paketomatih</h3>
-                    <p style="color:var(--text-muted);">Naročila kjer paket TRENUTNO čaka na prevzem v paketomatu ali pošti (iz MetaKocka delivery events).</p>
-                </div>
-                <div style="display:flex;gap:8px;">
-                    <select class="filter-select" id="paketomatFilter" onchange="loadPaketomati()">
-                        <option value="all">V paketomatu / čaka</option>
-                        <option value="all_orders">🔧 Vsi z delivery events</option>
-                    </select>
-                    <select class="filter-select" id="paketomatStatusFilter" onchange="renderPaketomatiTable()">
-                        <option value="all">Vsi statusi</option>
-                        <option value="not_called">Ni poklicano</option>
-                        <option value="called">Poklicano</option>
-                        <option value="notified">Obveščeno</option>
-                    </select>
-                    <button class="btn btn-save" onclick="refreshPaketomati()">
-                        <i class="fas fa-sync"></i> Osveži
-                    </button>
-                </div>
-            </div>
-
-            <div class="table-card">
-                <table class="data-table" id="paketomatiTable">
-                    <thead>
-                        <tr>
-                            <th>Št. naročila</th>
-                            <th>Stranka</th>
-                            <th>Telefon</th>
-                            <th>Email</th>
-                            <th>Dostava</th>
-                            <th>Zadnji event</th>
-                            <th>Znesek</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="paketomatiTableBody">
-                        <tr><td colspan="9" class="loading"><div class="spinner"></div>Nalagam iz MetaKocka...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <!-- Add Urgent Lead Modal -->
     <div id="addUrgentModal" class="modal" style="display:none;">
         <div class="modal-content" style="max-width:500px;">
@@ -2420,7 +2358,7 @@
             const specialAreas = [
                 'dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent',
                 'buyersSettingsContent', 'agentsContent', 'followupsContent',
-                'analyticsContent', 'paketomatiContent'
+                'analyticsContent'
             ];
             specialAreas.forEach(id => {
                 const el = document.getElementById(id);
@@ -2531,19 +2469,11 @@
                         t.classList.toggle('active', t.dataset.content === currentContentTab);
                     });
 
-                    // First hide all special content tabs
-                    document.getElementById('paketomatiContent').style.display = 'none';
-                    
-                    if (currentContentTab === 'paketomati') {
-                        document.querySelector('.content').style.display = 'none';
-                        document.getElementById('paketomatiContent').style.display = 'block';
-                        loadPaketomati();
-                    } else {
-                        document.querySelector('.content').style.display = 'block';
-                        currentPage = 1;
-                        renderTable();
-                        setTimeout(addCustomerClickHandlers, 100);
-                    }
+                    // All tabs now render in main content area
+                    document.querySelector('.content').style.display = 'block';
+                    currentPage = 1;
+                    renderTable();
+                    setTimeout(addCustomerClickHandlers, 100);
 
                     // Update country tab counts to reflect current content type
                     updateCounts();
@@ -2621,19 +2551,10 @@
                     // Show main view elements
                     showMainView();
                     
-                    // Hide special content tabs first
-                    document.getElementById('paketomatiContent').style.display = 'none';
-
-                    // Show appropriate content
-                    if (newTab === 'paketomati') {
-                        document.querySelector('.content').style.display = 'none';
-                        document.getElementById('paketomatiContent').style.display = 'block';
-                        loadPaketomati();
-                    } else {
-                        document.querySelector('.content').style.display = 'block';
-                        currentPage = 1;
-                        renderTable();
-                    }
+                    // All tabs render in main content area
+                    document.querySelector('.content').style.display = 'block';
+                    currentPage = 1;
+                    renderTable();
 
                     // Update country tab counts to reflect current content type
                     updateCounts();
@@ -2730,7 +2651,7 @@
                 // Hide ALL special content areas first (ensures clean state)
                 ['dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
                  'buyersSettingsContent', 'agentsContent', 'followupsContent',
-                 'analyticsContent', 'paketomatiContent'].forEach(id => {
+                 'analyticsContent'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'none';
                 });
@@ -3237,6 +3158,12 @@
             // Handle urgent tab separately (uses localStorage, not server data)
             if (currentTab === 'urgent') {
                 renderUrgentTableInline();
+                return;
+            }
+            
+            // Handle paketomati tab separately
+            if (currentTab === 'paketomati') {
+                renderPaketomatiInline();
                 return;
             }
             
@@ -7758,6 +7685,73 @@
             if (countEl) countEl.textContent = uncalled;
         }
         
+        async function renderPaketomatiInline() {
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Nalagam paketomati...</div>';
+            
+            // Load data if not loaded
+            if (!paketomatiData || paketomatiData.length === 0) {
+                await loadPaketomati();
+            }
+            
+            if (!paketomatiData || paketomatiData.length === 0) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-box"></i><p>Ni paketov v paketomatih</p><small style="color:var(--text-muted);">Noben paket trenutno ne čaka na prevzem</small></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr>
+                        <th>Št. naročila</th>
+                        <th>Stranka</th>
+                        <th>Telefon</th>
+                        <th>Dostava</th>
+                        <th>Zadnji event</th>
+                        <th>Znesek</th>
+                        <th>Status</th>
+                        <th>Akcije</th>
+                    </tr></thead>
+                    <tbody>
+                        ${paketomatiData.map(order => `
+                            <tr>
+                                <td>
+                                    <strong>${esc(order.orderNumber)}</strong>
+                                    ${order.trackingCode ? `<br><small style="color:var(--text-muted);">${esc(order.trackingCode)}</small>` : ''}
+                                </td>
+                                <td>${esc(order.customerName)}</td>
+                                <td>${order.phone ? `<a href="tel:${order.phone}">${esc(order.phone)}</a>` : '-'}</td>
+                                <td><span class="badge">${esc(order.deliveryService || '-')}</span></td>
+                                <td>${esc(order.lastDeliveryEvent || '-')}</td>
+                                <td><strong>${order.orderTotal?.toFixed(2) || '0.00'} ${order.currency || 'EUR'}</strong></td>
+                                <td>
+                                    <span class="badge ${order.status === 'notified' ? 'converted' : order.status === 'called' ? 'called' : 'not_called'}" 
+                                          style="cursor:pointer;" onclick="cyclePaketomatStatus('${order.id}')">
+                                        ${order.status === 'notified' ? '✓ Obveščeno' : order.status === 'called' ? 'Poklicano' : 'Čaka'}
+                                    </span>
+                                </td>
+                                <td>
+                                    ${order.phone ? `<button class="action-btn" onclick="window.location='tel:${order.phone}'" title="Pokliči"><i class="fas fa-phone"></i></button>` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                </div>
+            `;
+            
+            updatePaketomatiCount();
+        }
+        
+        function cyclePaketomatStatus(orderId) {
+            const order = paketomatiData.find(o => o.id === orderId);
+            if (!order) return;
+            const states = ['not_called', 'called', 'notified'];
+            const currentIdx = states.indexOf(order.status);
+            const nextStatus = states[(currentIdx + 1) % states.length];
+            updatePaketomatStatus(orderId, nextStatus);
+        }
+
         function renderUrgentTableInline() {
             loadUrgentLeads();
             const container = document.getElementById('tableContainer');
