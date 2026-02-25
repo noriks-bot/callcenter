@@ -5019,14 +5019,12 @@
         }
         
         // ========== TEST SMS FROM TEMPLATE ==========
-        let smsTemplatesCache = null;
+        // Note: smsTemplatesCache already defined above
         
-        async function loadSmsTemplates() {
-            if (smsTemplatesCache) return smsTemplatesCache;
+        async function loadTestSmsTemplates() {
             try {
                 const res = await fetch('api.php?action=all-sms-templates');
-                smsTemplatesCache = await res.json();
-                return smsTemplatesCache;
+                return await res.json();
             } catch (e) {
                 console.error('[Test SMS] Failed to load templates:', e);
                 return { templates: {} };
@@ -5047,7 +5045,7 @@
                 return;
             }
             
-            const templates = await loadSmsTemplates();
+            const templates = await loadTestSmsTemplates();
             const template = templates.templates?.[templateKey]?.[country];
             
             if (!template) {
