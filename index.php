@@ -2400,7 +2400,7 @@
                 document.getElementById('pageTitle').textContent = 'Leads';
                 
                 // Hide ALL special content areas first (ensures clean state)
-                ['dashboardContent', 'smsDashboardContent', 'smsSettingsContent', 
+                ['dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
                  'buyersSettingsContent', 'agentsContent', 'followupsContent', 
                  'analyticsContent', 'paketomatiContent'].forEach(id => {
                     const el = document.getElementById(id);
