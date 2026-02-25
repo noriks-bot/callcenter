@@ -2666,7 +2666,8 @@
                         carts: 'Abandoned Carts',
                         pending: 'Pending Orders',
                         buyers: 'Enkratni kupci',
-                        paketomati: 'Paketomati'
+                        paketomati: 'Paketomati',
+                        urgent: 'Nujno'
                     };
                     document.getElementById('pageTitle').textContent = titles[newTab] || newTab;
 
@@ -2680,13 +2681,22 @@
 
                     // Show main view elements
                     showMainView();
+                    
+                    // Hide special content tabs first
+                    document.getElementById('paketomatiContent').style.display = 'none';
+                    document.getElementById('urgentContent').style.display = 'none';
 
                     // Show appropriate content
                     if (newTab === 'paketomati') {
                         document.querySelector('.content').style.display = 'none';
                         document.getElementById('paketomatiContent').style.display = 'block';
                         loadPaketomati();
+                    } else if (newTab === 'urgent') {
+                        document.querySelector('.content').style.display = 'none';
+                        document.getElementById('urgentContent').style.display = 'block';
+                        renderUrgentTable();
                     } else {
+                        document.querySelector('.content').style.display = 'block';
                         currentPage = 1;
                         renderTable();
                     }
