@@ -15,6 +15,7 @@
         #dashboardContent,
         #smsDashboardContent,
         #smsSettingsContent,
+        #smsAutomationContent,
         #buyersSettingsContent,
         #agentsContent,
         #followupsContent,
@@ -24,6 +25,71 @@
             padding-top: 64px;
             min-height: 100vh;
             background: var(--content-bg);
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            display: inline-block;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--card-border);
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--accent-green);
+        }
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        .toggle-switch input:disabled + .toggle-slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Template Preview */
+        .template-preview {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--content-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        .template-preview-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
         }
         
         /* Page header in special views */
@@ -49,6 +115,7 @@
         .sidebar.collapsed ~ #dashboardContent,
         .sidebar.collapsed ~ #smsDashboardContent,
         .sidebar.collapsed ~ #smsSettingsContent,
+        .sidebar.collapsed ~ #smsAutomationContent,
         .sidebar.collapsed ~ #buyersSettingsContent,
         .sidebar.collapsed ~ #agentsContent,
         .sidebar.collapsed ~ #followupsContent,
@@ -62,6 +129,7 @@
             #dashboardContent,
             #smsDashboardContent,
             #smsSettingsContent,
+            #smsAutomationContent,
             #buyersSettingsContent,
             #agentsContent,
             #followupsContent,
@@ -1047,19 +1115,42 @@
         </div>
         
         <div class="content">
+            <!-- Filters Bar -->
+            <div class="filters-bar" style="margin-bottom: 12px;">
+                <select class="filter-select" id="automationCountryFilter" onchange="filterAutomations()">
+                    <option value="">🌍 Vse države</option>
+                    <option value="hr">🇭🇷 Hrvaška</option>
+                    <option value="cz">🇨🇿 Češka</option>
+                    <option value="pl">🇵🇱 Poljska</option>
+                    <option value="sk">🇸🇰 Slovaška</option>
+                    <option value="hu">🇭🇺 Madžarska</option>
+                    <option value="gr">🇬🇷 Grčija</option>
+                    <option value="it">🇮🇹 Italija</option>
+                </select>
+                <select class="filter-select" id="automationTypeFilter" onchange="filterAutomations()">
+                    <option value="">📋 Vsi tipi</option>
+                    <option value="abandoned_cart">🛒 Zapuščena košarica</option>
+                </select>
+                <select class="filter-select" id="automationStatusFilter" onchange="filterAutomations()">
+                    <option value="">⚡ Vsi statusi</option>
+                    <option value="active">✅ Aktivne</option>
+                    <option value="paused">⏸️ Zaustavljene</option>
+                </select>
+            </div>
+            
             <!-- Automations List -->
             <div class="table-card">
                 <div id="automationsTableContainer">
                     <table class="data-table" id="automationsTable">
                         <thead>
                             <tr>
-                                <th>Status</th>
+                                <th style="width: 80px;">ON/OFF</th>
                                 <th>Ime</th>
                                 <th>Trgovina</th>
                                 <th>Tip</th>
                                 <th>Predloga</th>
                                 <th>Zamik</th>
-                                <th>Poslanih</th>
+                                <th>V vrsti</th>
                                 <th>Akcije</th>
                             </tr>
                         </thead>
@@ -1116,12 +1207,17 @@
                     
                     <div class="form-group">
                         <label class="form-label">SMS predloga</label>
-                        <select id="automationTemplate" class="form-select" required>
+                        <select id="automationTemplate" class="form-select" required onchange="showTemplatePreviewInModal()">
                             <option value="">Najprej izberi trgovino</option>
                         </select>
                         <small style="color: var(--text-muted); font-size: 12px; margin-top: 6px; display: block;">
                             <i class="fas fa-info-circle"></i> Predloge se naložijo glede na izbrano trgovino
                         </small>
+                        <!-- Template Preview in Modal -->
+                        <div id="modalTemplatePreview" class="template-preview" style="display: none;">
+                            <div class="template-preview-label">📄 Predogled besedila:</div>
+                            <div id="modalTemplateText"></div>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -3687,6 +3783,7 @@
         }
         
         let smsAutomations = [];
+        let smsAutomationsFiltered = [];
         let smsTemplatesCache = {};
         
         async function loadSmsAutomations() {
@@ -3712,44 +3809,155 @@
                     return;
                 }
                 
-                const storeNames = {
-                    hr: '🇭🇷 HR', cz: '🇨🇿 CZ', pl: '🇵🇱 PL', 
-                    sk: '🇸🇰 SK', hu: '🇭🇺 HU', gr: '🇬🇷 GR', it: '🇮🇹 IT'
-                };
-                
-                const typeNames = {
-                    abandoned_cart: '🛒 Zapuščena košarica'
-                };
-                
-                tbody.innerHTML = smsAutomations.map(a => `
-                    <tr>
-                        <td>
-                            <span class="status-badge ${a.enabled ? 'status-success' : 'status-muted'}" style="cursor: pointer;" onclick="toggleAutomation('${a.id}')">
-                                <i class="fas fa-${a.enabled ? 'check-circle' : 'pause-circle'}"></i>
-                                ${a.enabled ? 'Aktivno' : 'Zaustavljeno'}
-                            </span>
-                        </td>
-                        <td><strong>${escapeHtml(a.name)}</strong></td>
-                        <td>${storeNames[a.store] || a.store}</td>
-                        <td>${typeNames[a.type] || a.type}</td>
-                        <td><code>${escapeHtml(a.template)}</code></td>
-                        <td>${a.delay_hours}h</td>
-                        <td>${a.sent_count || 0}</td>
-                        <td>
-                            <button class="btn btn-sm btn-secondary" onclick="editAutomation('${a.id}')" title="Uredi">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteAutomation('${a.id}')" title="Izbriši">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
+                renderAutomationsTable();
                 
             } catch (err) {
                 console.error('Error loading automations:', err);
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--danger);">Napaka pri nalaganju</td></tr>';
             }
+        }
+        
+        function filterAutomations() {
+            const countryFilter = document.getElementById('automationCountryFilter')?.value || '';
+            const typeFilter = document.getElementById('automationTypeFilter')?.value || '';
+            const statusFilter = document.getElementById('automationStatusFilter')?.value || '';
+            
+            smsAutomationsFiltered = smsAutomations.filter(a => {
+                if (countryFilter && a.store !== countryFilter) return false;
+                if (typeFilter && a.type !== typeFilter) return false;
+                if (statusFilter === 'active' && !a.enabled) return false;
+                if (statusFilter === 'paused' && a.enabled) return false;
+                return true;
+            });
+            
+            renderAutomationsTable();
+        }
+        
+        function renderAutomationsTable() {
+            const tbody = document.getElementById('automationsTableBody');
+            if (!tbody) return;
+            
+            const data = smsAutomationsFiltered.length > 0 ? smsAutomationsFiltered : smsAutomations;
+            
+            // Check if filtered resulted in empty when filters are applied
+            const countryFilter = document.getElementById('automationCountryFilter')?.value || '';
+            const typeFilter = document.getElementById('automationTypeFilter')?.value || '';
+            const statusFilter = document.getElementById('automationStatusFilter')?.value || '';
+            const hasFilters = countryFilter || typeFilter || statusFilter;
+            
+            if (hasFilters && smsAutomationsFiltered.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-filter" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.3;"></i>
+                        Nobena avtomatizacija ne ustreza filtrom
+                    </td></tr>
+                `;
+                return;
+            }
+            
+            const storeNames = {
+                hr: '🇭🇷 HR', cz: '🇨🇿 CZ', pl: '🇵🇱 PL', 
+                sk: '🇸🇰 SK', hu: '🇭🇺 HU', gr: '🇬🇷 GR', it: '🇮🇹 IT'
+            };
+            
+            const typeNames = {
+                abandoned_cart: '🛒 Zapuščena košarica'
+            };
+            
+            tbody.innerHTML = data.map(a => `
+                <tr data-automation-id="${a.id}">
+                    <td>
+                        <label class="toggle-switch" title="${a.enabled ? 'Klikni za izklop' : 'Klikni za vklop'}">
+                            <input type="checkbox" ${a.enabled ? 'checked' : ''} onchange="toggleAutomation('${a.id}', this)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </td>
+                    <td><strong>${escapeHtml(a.name)}</strong></td>
+                    <td>${storeNames[a.store] || a.store}</td>
+                    <td>${typeNames[a.type] || a.type}</td>
+                    <td>
+                        <code style="cursor: pointer;" onclick="previewTemplate('${a.store}', '${escapeHtml(a.template)}')" title="Klikni za predogled">
+                            ${escapeHtml(a.template)}
+                        </code>
+                    </td>
+                    <td>${a.delay_hours}h</td>
+                    <td>${a.queued_count || 0}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editAutomation('${a.id}')" title="Uredi">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAutomation('${a.id}')" title="Izbriši">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function previewTemplate(store, templateId) {
+            // Load templates if not cached
+            if (!smsTemplatesCache[store]) {
+                try {
+                    const res = await fetch(`api.php?action=sms-templates&store=${store}`);
+                    smsTemplatesCache[store] = await res.json();
+                } catch (err) {
+                    showToast('Napaka pri nalaganju predloge', true);
+                    return;
+                }
+            }
+            
+            const templates = smsTemplatesCache[store] || [];
+            const template = templates.find(t => (t.id || t.name) === templateId);
+            
+            if (template && template.text) {
+                // Show in a simple alert for now, or create a preview modal
+                const previewHtml = `
+                    <div style="padding: 20px;">
+                        <h4 style="margin: 0 0 12px; font-size: 14px; color: var(--text-muted);">
+                            <i class="fas fa-envelope"></i> Predloga: ${escapeHtml(template.name)}
+                        </h4>
+                        <div style="padding: 16px; background: var(--content-bg); border-radius: 8px; border: 1px solid var(--card-border); font-size: 13px; line-height: 1.6; white-space: pre-wrap;">
+                            ${escapeHtml(template.text)}
+                        </div>
+                        <div style="margin-top: 12px; font-size: 11px; color: var(--text-muted);">
+                            <i class="fas fa-info-circle"></i> Spremenljivke: {ime}, {link}, {znesek} bodo zamenjane ob pošiljanju
+                        </div>
+                    </div>
+                `;
+                showTemplatePreviewModal(previewHtml);
+            } else {
+                showToast('Predloga ni najdena', true);
+            }
+        }
+        
+        function showTemplatePreviewModal(content) {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('templatePreviewModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'templatePreviewModal';
+                modal.className = 'modal-bg';
+                modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:300;padding:20px;';
+                modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+                modal.innerHTML = `
+                    <div class="modal" style="max-width:500px;background:var(--card-bg);border-radius:var(--radius-xl);box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;">
+                        <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--card-border);">
+                            <h3 class="modal-title" style="font-size: 15px; margin: 0;">
+                                <i class="fas fa-eye" style="margin-right: 8px; color: var(--primary);"></i>Predogled predloge
+                            </h3>
+                            <button class="modal-close" onclick="document.getElementById('templatePreviewModal').style.display='none'">&times;</button>
+                        </div>
+                        <div id="templatePreviewContent"></div>
+                        <div class="modal-footer" style="padding: 12px 20px; border-top: 1px solid var(--card-border);">
+                            <button class="btn btn-secondary" onclick="document.getElementById('templatePreviewModal').style.display='none'">Zapri</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            
+            document.getElementById('templatePreviewContent').innerHTML = content;
+            modal.style.display = 'flex';
         }
         
         function showAddAutomationModal() {
@@ -3758,16 +3966,24 @@
             document.getElementById('automationId').value = '';
             document.getElementById('automationEnabled').checked = true;
             document.getElementById('automationTemplate').innerHTML = '<option value="">-- Najprej izberi trgovino --</option>';
+            // Hide template preview
+            const previewDiv = document.getElementById('modalTemplatePreview');
+            if (previewDiv) previewDiv.style.display = 'none';
             document.getElementById('automationModalBg').style.display = 'flex';
         }
         
         function closeAutomationModal() {
             document.getElementById('automationModalBg').style.display = 'none';
+            // Hide template preview on close
+            const previewDiv = document.getElementById('modalTemplatePreview');
+            if (previewDiv) previewDiv.style.display = 'none';
         }
         
         async function loadTemplatesForStore(store) {
             const templateSelect = document.getElementById('automationTemplate');
+            const previewDiv = document.getElementById('modalTemplatePreview');
             templateSelect.innerHTML = '<option value="">Nalagam predloge...</option>';
+            if (previewDiv) previewDiv.style.display = 'none';
             
             try {
                 const res = await fetch(`api.php?action=sms-templates&store=${store}`);
@@ -3788,6 +4004,28 @@
             }
         }
         
+        function showTemplatePreviewInModal() {
+            const store = document.getElementById('automationStore').value;
+            const templateId = document.getElementById('automationTemplate').value;
+            const previewDiv = document.getElementById('modalTemplatePreview');
+            const previewText = document.getElementById('modalTemplateText');
+            
+            if (!templateId || !store || !previewDiv) {
+                if (previewDiv) previewDiv.style.display = 'none';
+                return;
+            }
+            
+            const templates = smsTemplatesCache[store] || [];
+            const template = templates.find(t => (t.id || t.name) === templateId);
+            
+            if (template && template.text) {
+                previewText.textContent = template.text;
+                previewDiv.style.display = 'block';
+            } else {
+                previewDiv.style.display = 'none';
+            }
+        }
+        
         // Listen for store change
         document.addEventListener('DOMContentLoaded', () => {
             const storeSelect = document.getElementById('automationStore');
@@ -3796,6 +4034,9 @@
                     if (e.target.value) {
                         loadTemplatesForStore(e.target.value);
                     }
+                    // Hide preview when store changes
+                    const previewDiv = document.getElementById('modalTemplatePreview');
+                    if (previewDiv) previewDiv.style.display = 'none';
                 });
             }
         });
@@ -3850,30 +4091,42 @@
             document.getElementById('automationDelay').value = automation.delay_hours;
             document.getElementById('automationEnabled').checked = automation.enabled;
             
-            // Load templates then select the right one
+            // Load templates then select the right one and show preview
             loadTemplatesForStore(automation.store).then(() => {
                 document.getElementById('automationTemplate').value = automation.template;
+                showTemplatePreviewInModal(); // Show preview after selecting template
             });
             
             document.getElementById('automationModalBg').style.display = 'flex';
         }
         
-        async function toggleAutomation(id) {
+        async function toggleAutomation(id, checkbox) {
             const automation = smsAutomations.find(a => a.id === id);
             if (!automation) return;
             
-            automation.enabled = !automation.enabled;
+            const newState = checkbox ? checkbox.checked : !automation.enabled;
+            
+            // Disable checkbox while saving
+            if (checkbox) checkbox.disabled = true;
             
             try {
+                automation.enabled = newState;
                 await fetch('api.php?action=save-sms-automation', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(automation)
                 });
-                showToast(automation.enabled ? 'Avtomatizacija aktivirana' : 'Avtomatizacija zaustavljena');
-                loadSmsAutomations();
+                showToast(automation.enabled ? '✅ Avtomatizacija VKLOPLJENA' : '⏸️ Avtomatizacija IZKLOPLJENA');
+                // Don't reload the whole table, just update the local state
+                if (checkbox) checkbox.disabled = false;
             } catch (err) {
                 showToast('Napaka pri posodabljanju', true);
+                // Revert checkbox state on error
+                if (checkbox) {
+                    checkbox.checked = !newState;
+                    checkbox.disabled = false;
+                }
+                automation.enabled = !newState;
             }
         }
         
