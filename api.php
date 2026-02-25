@@ -108,23 +108,9 @@ function formatPhoneForSms($phone, $storeCode) {
         $phone = $countryCode . $phone;
     }
     
-    // MetaKocka format: spaces, NO + prefix (same as Slovenia which works)
-    // Format: "386 40 688 722" or "30 69 082 381 96"
-    $countryCodeLen = strlen($countryCode);
-    $nationalPart = substr($phone, $countryCodeLen);
-    
-    // Format: country_code + space + 2 digits + space + rest in chunks of 3
-    if (strlen($nationalPart) >= 2) {
-        $formatted = $countryCode . ' ' . substr($nationalPart, 0, 2);
-        $rest = substr($nationalPart, 2);
-        if (!empty($rest)) {
-            $chunks = str_split($rest, 3);
-            $formatted .= ' ' . implode(' ', $chunks);
-        }
-        return $formatted;
-    }
-    
-    return $countryCode . ' ' . $nationalPart;
+    // MetaKocka format: just digits, no spaces, no +
+    // Format: "306908238196" for Greece, "38640688722" for Slovenia
+    return $phone;
 }
 
 /**
