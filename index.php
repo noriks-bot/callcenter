@@ -1978,37 +1978,16 @@
         </div>
 
         <div class="content" style="max-width:1200px;">
-            <div class="table-card">
-                <table class="data-table" id="urgentTable">
-                    <thead>
-                        <tr>
-                            <th style="width:40px;"><input type="checkbox" id="urgentSelectAll" onchange="toggleAllUrgent(this)"></th>
-                            <th>Telefon</th>
-                            <th>Navodilo / Razlog</th>
-                            <th>Dodano</th>
-                            <th>Poklicano</th>
-                            <th style="width:100px;">Akcije</th>
-                        </tr>
-                    </thead>
-                    <tbody id="urgentTableBody">
-                        <tr id="urgentEmptyRow"><td colspan="6" class="empty" style="padding:40px;text-align:center;">
-                            <i class="fas fa-phone-slash" style="font-size:32px;color:var(--text-muted);margin-bottom:12px;display:block;"></i>
-                            <p style="margin:0;color:var(--text-muted);">Ni nujnih leadov</p>
-                            <small style="color:var(--text-muted);">Klikni "Dodaj lead" za vnos</small>
-                        </td></tr>
-                    </tbody>
-                </table>
+            <!-- Table container (rendered by JS) -->
+            <div id="urgentTableContainer">
+                <div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p></div>
             </div>
 
-            <!-- Quick actions for selected -->
-            <div id="urgentBulkActions" style="display:none;margin-top:16px;padding:12px 16px;background:var(--bg-secondary);border-radius:8px;display:flex;gap:12px;align-items:center;">
-                <span style="color:var(--text-muted);font-size:13px;"><span id="urgentSelectedCount">0</span> izbranih</span>
-                <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="markSelectedUrgentCalled()">
-                    <i class="fas fa-check"></i> Označi poklicano
-                </button>
-                <button class="btn" style="padding:6px 12px;font-size:12px;background:var(--accent-red);" onclick="deleteSelectedUrgent()">
-                    <i class="fas fa-trash"></i> Izbriši
-                </button>
+            <!-- Bulk actions bar -->
+            <div id="urgentBulkActions" class="bulk-bar" style="display:none;">
+                <span><span id="urgentSelectedCount">0</span> izbranih</span>
+                <button class="btn" onclick="markSelectedUrgentCalled()"><i class="fas fa-check"></i> Označi poklicano</button>
+                <button class="btn btn-danger" onclick="deleteSelectedUrgent()"><i class="fas fa-trash"></i> Izbriši</button>
             </div>
         </div>
     </div>
@@ -7809,49 +7788,54 @@
         
         function renderUrgentTable() {
             loadUrgentLeads();
-            const tbody = document.getElementById('urgentTableBody');
-            const emptyRow = document.getElementById('urgentEmptyRow');
+            const container = document.getElementById('urgentTableContainer');
             
             if (!urgentLeads.length) {
-                tbody.innerHTML = `<tr id="urgentEmptyRow"><td colspan="6" class="empty" style="padding:40px;text-align:center;">
-                    <i class="fas fa-phone-slash" style="font-size:32px;color:var(--text-muted);margin-bottom:12px;display:block;"></i>
-                    <p style="margin:0;color:var(--text-muted);">Ni nujnih leadov</p>
-                    <small style="color:var(--text-muted);">Klikni "Dodaj lead" za vnos</small>
-                </td></tr>`;
+                container.innerHTML = `<div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p><small style="color:var(--text-muted);">Klikni "+ Dodaj" za vnos</small></div>`;
                 document.getElementById('urgentBulkActions').style.display = 'none';
                 return;
             }
             
-            tbody.innerHTML = urgentLeads.map((lead, idx) => `
-                <tr data-idx="${idx}" class="${lead.called ? 'called-row' : ''}">
-                    <td><input type="checkbox" class="urgent-checkbox" data-idx="${idx}" onchange="updateUrgentSelection()"></td>
-                    <td>
-                        <a href="tel:${lead.phone}" style="color:var(--accent-blue);text-decoration:none;font-weight:500;">
-                            ${esc(lead.phone)}
-                        </a>
-                    </td>
-                    <td style="max-width:400px;">
-                        <div style="white-space:pre-wrap;">${esc(lead.note)}</div>
-                    </td>
-                    <td style="font-size:12px;color:var(--text-muted);">
-                        ${new Date(lead.addedAt).toLocaleString('sl-SI')}
-                    </td>
-                    <td>
-                        <label style="cursor:pointer;display:flex;align-items:center;gap:8px;">
-                            <input type="checkbox" ${lead.called ? 'checked' : ''} onchange="toggleUrgentCalled(${idx}, this.checked)">
-                            <span class="badge ${lead.called ? 'converted' : 'not_called'}">${lead.called ? 'Poklicano' : 'Čaka'}</span>
-                        </label>
-                    </td>
-                    <td>
-                        <button class="action-btn" onclick="editUrgentLead(${idx})" title="Uredi">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn" onclick="deleteUrgentLead(${idx})" title="Izbriši" style="color:var(--accent-red);">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            container.innerHTML = `
+                <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr>
+                        <th class="checkbox-cell"><input type="checkbox" id="urgentSelectAll" onchange="toggleAllUrgent(this)"></th>
+                        <th>Telefon</th>
+                        <th>Navodilo / Razlog</th>
+                        <th>Dodano</th>
+                        <th>Status</th>
+                        <th>Akcije</th>
+                    </tr></thead>
+                    <tbody>
+                        ${urgentLeads.map((lead, idx) => `
+                            <tr data-idx="${idx}" class="${lead.called ? 'called-row' : ''}">
+                                <td class="checkbox-cell"><input type="checkbox" class="urgent-checkbox row-checkbox" data-idx="${idx}" onchange="updateUrgentSelection()"></td>
+                                <td>
+                                    <div style="font-weight:500;">${esc(lead.phone)}</div>
+                                    <a href="tel:${lead.phone}" class="action-btn" title="Pokliči"><i class="fas fa-phone"></i></a>
+                                </td>
+                                <td style="max-width:300px;">
+                                    <div class="note-text">${esc(lead.note)}</div>
+                                </td>
+                                <td style="font-size:12px;color:var(--text-muted);">
+                                    ${new Date(lead.addedAt).toLocaleString('sl-SI', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})}
+                                </td>
+                                <td>
+                                    <span class="badge ${lead.called ? 'converted' : 'not_called'}" style="cursor:pointer;" onclick="toggleUrgentCalled(${idx}, ${!lead.called})">
+                                        ${lead.called ? '✓ Poklicano' : 'Čaka'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="action-btn" onclick="editUrgentLead(${idx})" title="Uredi"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn" onclick="deleteUrgentLead(${idx})" title="Izbriši"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                </div>
+            `;
         }
         
         function showAddUrgentModal(editIdx = null) {
