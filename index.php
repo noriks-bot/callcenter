@@ -1046,12 +1046,9 @@
             </div>
         </div>
         
-        <!-- Automations List -->
-        <div class="card" style="margin: 20px;">
-            <div class="card-header">
-                <h3><i class="fas fa-list"></i> Aktivne avtomatizacije</h3>
-            </div>
-            <div class="card-body">
+        <div class="content">
+            <!-- Automations List -->
+            <div class="table-card">
                 <div id="automationsTableContainer">
                     <table class="data-table" id="automationsTable">
                         <thead>
