@@ -3470,6 +3470,13 @@ try {
             ]);
             break;
             
+        case 'refresh-paketomati-cache':
+            // CRON: */15 * * * * curl -s "https://domain/api.php?action=refresh-paketomati-cache"
+            set_time_limit(300);
+            $result = fetchPaketomatOrders('all_orders'); // Forces full fetch
+            echo json_encode(['success' => true, 'count' => count($result)]);
+            break;
+            
         case 'paketomati-update':
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 http_response_code(405);
