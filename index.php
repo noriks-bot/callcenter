@@ -1445,10 +1445,23 @@
                 <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji testni SMS na svoj telefon — vidiš točno kar bo stranka prejela</p>
             </div>
             <div style="padding:20px;">
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
                     <div class="form-group" style="margin:0;">
                         <label class="form-label">Tvoja telefonska št.</label>
                         <input type="tel" class="form-input" id="testSmsPhone" placeholder="+386 40 xxx xxx" value="">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label class="form-label">Država telefona</label>
+                        <select class="form-select" id="testSmsPhoneCountry">
+                            <option value="si">🇸🇮 SI (+386)</option>
+                            <option value="hr">🇭🇷 HR (+385)</option>
+                            <option value="cz">🇨🇿 CZ (+420)</option>
+                            <option value="pl">🇵🇱 PL (+48)</option>
+                            <option value="sk">🇸🇰 SK (+421)</option>
+                            <option value="hu">🇭🇺 HU (+36)</option>
+                            <option value="gr">🇬🇷 GR (+30)</option>
+                            <option value="it">🇮🇹 IT (+39)</option>
+                        </select>
                     </div>
                     <div class="form-group" style="margin:0;">
                         <label class="form-label">Predloga</label>
@@ -1460,7 +1473,7 @@
                         </select>
                     </div>
                     <div class="form-group" style="margin:0;">
-                        <label class="form-label">Država (za sporočilo)</label>
+                        <label class="form-label">Jezik sporočila</label>
                         <select class="form-select" id="testSmsCountry" onchange="loadTestTemplatePreview()">
                             <option value="hr">🇭🇷 HR - Hrvaška</option>
                             <option value="cz">🇨🇿 CZ - Češka</option>
@@ -5073,8 +5086,9 @@
         
         async function sendTestSms() {
             const phone = document.getElementById('testSmsPhone').value.trim();
+            const phoneCountry = document.getElementById('testSmsPhoneCountry').value; // Za formatiranje telefona
             const templateKey = document.getElementById('testSmsTemplate').value;
-            const country = document.getElementById('testSmsCountry').value;
+            const templateCountry = document.getElementById('testSmsCountry').value; // Za jezik sporočila
             const name = document.getElementById('testSmsName').value || 'Kupac';
             const product = document.getElementById('testSmsProduct').value || 'proizvod';
             const statusEl = document.getElementById('testSmsStatus');
@@ -5097,7 +5111,7 @@
                 return;
             }
             
-            if (!confirm(`🧪 Pošlji TESTNI SMS?\n\nŠtevilka: ${phone}\nPredloga: ${templateKey}\nDržava: ${country.toUpperCase()}\n\n${message.substring(0, 100)}...`)) {
+            if (!confirm(`🧪 Pošlji TESTNI SMS?\n\nŠtevilka: ${phone} (${phoneCountry.toUpperCase()})\nPredloga: ${templateKey}\nJezik: ${templateCountry.toUpperCase()}\n\n${message.substring(0, 100)}...`)) {
                 return;
             }
             
@@ -5110,7 +5124,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         phone: phone,
-                        storeCode: country,
+                        storeCode: phoneCountry, // Uporabi državo telefona za formatiranje
                         message: message
                     })
                 });
