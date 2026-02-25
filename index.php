@@ -3924,7 +3924,7 @@
             const templates = smsTemplatesCache[store] || [];
             const template = templates.find(t => (t.id || t.name) === templateId);
             
-            if (template && template.text) {
+            if (template && template.message) {
                 // Show in a simple alert for now, or create a preview modal
                 const previewHtml = `
                     <div style="padding: 20px;">
@@ -3932,7 +3932,7 @@
                             <i class="fas fa-envelope"></i> Predloga: ${escapeHtml(template.name)}
                         </h4>
                         <div style="padding: 16px; background: var(--content-bg); border-radius: 8px; border: 1px solid var(--card-border); font-size: 13px; line-height: 1.6; white-space: pre-wrap;">
-                            ${escapeHtml(template.text)}
+                            ${escapeHtml(template.message)}
                         </div>
                         <div style="margin-top: 12px; font-size: 11px; color: var(--text-muted);">
                             <i class="fas fa-info-circle"></i> Spremenljivke: {ime}, {link}, {znesek} bodo zamenjane ob pošiljanju
@@ -4033,8 +4033,8 @@
             const templates = smsTemplatesCache[store] || [];
             const template = templates.find(t => (t.id || t.name) === templateId);
             
-            if (template && template.text) {
-                previewText.textContent = template.text;
+            if (template && template.message) {
+                previewText.textContent = template.message;
                 previewDiv.style.display = 'block';
             } else {
                 previewDiv.style.display = 'none';
