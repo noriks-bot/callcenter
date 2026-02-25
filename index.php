@@ -5440,9 +5440,11 @@
             renderAutomationRules();
         }
         
-        // Add filter listeners for SMS dashboard
-        document.getElementById('smsDateFrom').addEventListener('change', renderSmsTable);
-        document.getElementById('smsDateTo').addEventListener('change', renderSmsTable);
+        // Add filter listeners for SMS dashboard (with null checks)
+        const smsDateFromEl = document.getElementById('smsDateFrom');
+        const smsDateToEl = document.getElementById('smsDateTo');
+        if (smsDateFromEl) smsDateFromEl.addEventListener('change', renderSmsTable);
+        if (smsDateToEl) smsDateToEl.addEventListener('change', renderSmsTable);
         
         // SMS History filter state
         let smsHistoryFilters = { country: '', status: '' };
