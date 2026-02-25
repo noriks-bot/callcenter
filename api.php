@@ -2340,6 +2340,74 @@ try {
             if ($store) $carts = array_values(array_filter($carts, fn($c) => $c['storeCode'] === $store));
             echo json_encode($carts);
             break;
+        
+        case 'customer-360':
+            // Fetch all data for a specific customer by email
+            $email = $_GET['email'] ?? '';
+            if (empty($email)) {
+                echo json_encode(['error' => 'Email required']);
+                break;
+            }
+            
+            $email = strtolower(trim($email));
+            $allOrders = [];
+            $totalSpent = 0;
+            $orderCount = 0;
+            
+            // Fetch orders from all stores for this email
+            foreach ($stores as $storeCode => $config) {
+                $orders = wcApiRequest($storeCode, 'orders', [
+                    'search' => $email,
+                    'per_page' => 50,
+                    'status' => 'processing,completed,on-hold'
+                ]);
+                
+                if (is_array($orders) && !isset($orders['error'])) {
+                    foreach ($orders as $order) {
+                        $orderEmail = strtolower($order['billing']['email'] ?? '');
+                        if ($orderEmail !== $email) continue;
+                        
+                        $allOrders[] = [
+                            'id' => $order['id'],
+                            'storeCode' => $storeCode,
+                            'storeFlag' => $config['flag'],
+                            'storeName' => $config['name'],
+                            'status' => $order['status'],
+                            'total' => floatval($order['total']),
+                            'currency' => $order['currency'] ?? 'EUR',
+                            'date' => $order['date_created'],
+                            'items' => array_map(fn($i) => [
+                                'name' => $i['name'],
+                                'quantity' => $i['quantity'],
+                                'total' => $i['total']
+                            ], $order['line_items'] ?? [])
+                        ];
+                        $totalSpent += floatval($order['total']);
+                        $orderCount++;
+                    }
+                }
+            }
+            
+            // Sort orders by date descending
+            usort($allOrders, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
+            
+            // Fetch SMS history for this customer
+            $smsQueue = loadSmsQueue();
+            $smsHistory = array_filter($smsQueue, function($sms) use ($email) {
+                return strtolower($sms['customerEmail'] ?? '') === $email;
+            });
+            $smsHistory = array_values($smsHistory);
+            usort($smsHistory, fn($a, $b) => strtotime($b['createdAt'] ?? 0) - strtotime($a['createdAt'] ?? 0));
+            
+            echo json_encode([
+                'success' => true,
+                'email' => $email,
+                'orders' => $allOrders,
+                'orderCount' => $orderCount,
+                'totalSpent' => $totalSpent,
+                'smsHistory' => $smsHistory
+            ]);
+            break;
             
         case 'one-time-buyers':
             echo json_encode(fetchOneTimeBuyers($store));

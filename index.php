@@ -6314,8 +6314,10 @@
         let currentCustomer = null;
         let currentC360Tab = 'timeline';
 
-        function openCustomer360(customer) {
+        async function openCustomer360(customer) {
             currentCustomer = customer;
+            currentCustomer.realOrders = [];
+            currentCustomer.realSmsHistory = [];
 
             // Populate header
             document.getElementById('c360Avatar').textContent = initials(customer.customerName);
@@ -6324,14 +6326,9 @@
             document.getElementById('c360Phone').textContent = customer.phone || 'N/A';
             document.getElementById('c360Location').textContent = customer.location || customer.city || 'N/A';
 
-            // Calculate stats
-            const customerCarts = carts.filter(c => c.email === customer.email);
-            const totalSpent = customerCarts.filter(c => c.callStatus === 'converted')
-                .reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
-            const orderCount = customerCarts.filter(c => c.callStatus === 'converted').length;
-
-            document.getElementById('c360TotalSpent').textContent = '€' + totalSpent.toFixed(2);
-            document.getElementById('c360Orders').textContent = orderCount;
+            // Show loading state
+            document.getElementById('c360TotalSpent').textContent = '...';
+            document.getElementById('c360Orders').textContent = '...';
 
             // Setup tabs
             document.querySelectorAll('.c360-tab').forEach(tab => {
@@ -6340,9 +6337,26 @@
             });
 
             currentC360Tab = 'timeline';
-            renderC360Content();
-
+            document.getElementById('c360Content').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
             document.getElementById('customerModal').classList.add('open');
+
+            // Fetch real customer data from API
+            if (customer.email) {
+                try {
+                    const resp = await fetch(`api.php?action=customer-360&email=${encodeURIComponent(customer.email)}`);
+                    const data = await resp.json();
+                    if (data.success) {
+                        currentCustomer.realOrders = data.orders || [];
+                        currentCustomer.realSmsHistory = data.smsHistory || [];
+                        document.getElementById('c360TotalSpent').textContent = '€' + (data.totalSpent || 0).toFixed(2);
+                        document.getElementById('c360Orders').textContent = data.orderCount || 0;
+                    }
+                } catch (e) {
+                    console.error('Customer 360 fetch error:', e);
+                }
+            }
+
+            renderC360Content();
         }
 
         // Tab click handlers
@@ -6361,20 +6375,21 @@
 
             const email = currentCustomer.email;
             const customerCarts = carts.filter(c => c.email === email);
-            const customerSms = smsLog.filter(s => s.recipient === currentCustomer.phone);
+            const realOrders = currentCustomer.realOrders || [];
+            const realSmsHistory = currentCustomer.realSmsHistory || [];
 
             switch (currentC360Tab) {
                 case 'timeline':
-                    renderC360Timeline(customerCarts, customerSms);
+                    renderC360Timeline(customerCarts, realOrders, realSmsHistory);
                     break;
                 case 'orders':
-                    renderC360Orders(customerCarts);
+                    renderC360Orders(realOrders);
                     break;
                 case 'carts':
                     renderC360Carts(customerCarts);
                     break;
                 case 'sms':
-                    renderC360Sms(customerSms);
+                    renderC360Sms(realSmsHistory);
                     break;
                 case 'notes':
                     renderC360Notes();
@@ -6382,35 +6397,43 @@
             }
         }
 
-        function renderC360Timeline(customerCarts, customerSms) {
+        function renderC360Timeline(customerCarts, realOrders, realSmsHistory) {
             const container = document.getElementById('c360Content');
 
             const events = [];
+            
+            // Add abandoned carts
             customerCarts.forEach(c => {
                 events.push({
                     type: 'cart',
                     icon: 'fa-shopping-cart',
-                    title: 'Cart abandoned',
+                    title: '🛒 Cart abandoned',
                     desc: `€${c.cartValue?.toFixed(2)} - ${c.storeFlag} ${c.storeName}`,
                     time: c.abandonedAt
                 });
-                if (c.callStatus === 'converted') {
-                    events.push({
-                        type: 'order',
-                        icon: 'fa-check-circle',
-                        title: 'Cart converted to order',
-                        desc: `Order #${c.orderId || 'N/A'}`,
-                        time: c.lastUpdated
-                    });
-                }
             });
-            customerSms.forEach(s => {
+            
+            // Add real orders from WooCommerce
+            realOrders.forEach(o => {
+                const statusEmoji = {completed: '✅', processing: '📦', 'on-hold': '⏸️'}[o.status] || '📋';
+                events.push({
+                    type: 'order',
+                    icon: 'fa-check-circle',
+                    title: `${statusEmoji} Order #${o.id}`,
+                    desc: `€${o.total?.toFixed(2)} - ${o.storeFlag} ${o.storeName}`,
+                    time: o.date
+                });
+            });
+            
+            // Add SMS history
+            realSmsHistory.forEach(s => {
+                const statusIcon = s.status === 'sent' ? '✅' : (s.status === 'failed' ? '❌' : '⏳');
                 events.push({
                     type: 'sms',
                     icon: 'fa-comment-sms',
-                    title: s.status === 'sent' ? 'SMS sent' : 'SMS queued',
-                    desc: s.message?.substring(0, 50) + '...',
-                    time: s.date
+                    title: `${statusIcon} SMS ${s.status}`,
+                    desc: (s.message || '').substring(0, 50) + '...',
+                    time: s.sentAt || s.createdAt
                 });
             });
 
@@ -6433,24 +6456,38 @@
             `).join('');
         }
 
-        function renderC360Orders(customerCarts) {
+        function renderC360Orders(realOrders) {
             const container = document.getElementById('c360Content');
-            const orders = customerCarts.filter(c => c.callStatus === 'converted');
 
-            if (orders.length === 0) {
+            if (!realOrders || realOrders.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-box-open"></i><p>No orders yet</p></div>';
                 return;
             }
 
-            container.innerHTML = orders.map(o => `
-                <div class="order-item" style="margin-bottom:12px;">
-                    <div class="order-item-info">
-                        <div class="order-item-name">Order #${o.orderId || 'N/A'}</div>
-                        <div class="order-item-id">${o.storeFlag} ${o.storeName} • ${formatDate(o.lastUpdated)}</div>
+            container.innerHTML = realOrders.map(o => {
+                const statusBadge = {
+                    completed: '<span style="background:#28a745;color:white;padding:2px 6px;border-radius:4px;font-size:10px;">COMPLETED</span>',
+                    processing: '<span style="background:#007bff;color:white;padding:2px 6px;border-radius:4px;font-size:10px;">PROCESSING</span>',
+                    'on-hold': '<span style="background:#ffc107;color:black;padding:2px 6px;border-radius:4px;font-size:10px;">ON HOLD</span>'
+                }[o.status] || `<span style="background:#6c757d;color:white;padding:2px 6px;border-radius:4px;font-size:10px;">${o.status?.toUpperCase()}</span>`;
+                
+                const itemsList = (o.items || []).map(i => `${i.quantity}x ${i.name}`).join(', ');
+                
+                return `
+                <div class="order-item" style="margin-bottom:16px;padding:12px;background:#f8f9fa;border-radius:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <div>
+                            <div class="order-item-name" style="font-weight:600;">Order #${o.id}</div>
+                            <div class="order-item-id" style="color:#666;font-size:12px;">${o.storeFlag} ${o.storeName} • ${formatDate(o.date)}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-weight:700;font-size:16px;">€${o.total?.toFixed(2) || '0.00'}</div>
+                            ${statusBadge}
+                        </div>
                     </div>
-                    <div class="order-item-total">€${o.cartValue?.toFixed(2) || '0.00'}</div>
+                    ${itemsList ? `<div style="font-size:12px;color:#555;border-top:1px solid #ddd;padding-top:8px;margin-top:8px;">${esc(itemsList)}</div>` : ''}
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderC360Carts(customerCarts) {
@@ -6473,23 +6510,30 @@
             `).join('');
         }
 
-        function renderC360Sms(customerSms) {
+        function renderC360Sms(realSmsHistory) {
             const container = document.getElementById('c360Content');
 
-            if (customerSms.length === 0) {
+            if (!realSmsHistory || realSmsHistory.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-comment-sms"></i><p>No SMS history</p></div>';
                 return;
             }
 
-            container.innerHTML = customerSms.map(s => `
-                <div class="order-item" style="margin-bottom:12px;">
-                    <div class="order-item-info">
-                        <div class="order-item-name" style="white-space:normal;">${esc(s.message?.substring(0, 80))}...</div>
-                        <div class="order-item-id">${formatDate(s.date)}</div>
+            container.innerHTML = realSmsHistory.map(s => {
+                const statusBadge = {
+                    sent: '<span style="background:#28a745;color:white;padding:2px 6px;border-radius:4px;font-size:10px;">SENT ✓</span>',
+                    queued: '<span style="background:#ffc107;color:black;padding:2px 6px;border-radius:4px;font-size:10px;">QUEUED</span>',
+                    failed: '<span style="background:#dc3545;color:white;padding:2px 6px;border-radius:4px;font-size:10px;">FAILED</span>'
+                }[s.status] || `<span style="background:#6c757d;color:white;padding:2px 6px;border-radius:4px;font-size:10px;">${s.status?.toUpperCase()}</span>`;
+                
+                return `
+                <div class="order-item" style="margin-bottom:12px;padding:10px;background:#f8f9fa;border-radius:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                        <div style="font-size:12px;color:#666;">${formatDate(s.sentAt || s.createdAt)}</div>
+                        ${statusBadge}
                     </div>
-                    <span class="badge ${s.status === 'sent' ? 'converted' : s.status === 'queued' ? 'called' : 'not_interested'}">${s.status}</span>
+                    <div style="font-size:13px;white-space:normal;word-break:break-word;">${esc(s.message || '')}</div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderC360Notes() {
