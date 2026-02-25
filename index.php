@@ -1383,7 +1383,7 @@
                             <label class="field-label">
                                 <i class="fas fa-store"></i> Trgovina
                             </label>
-                            <select id="automationStore" class="field-input" required>
+                            <select id="automationStore" class="field-input" required onchange="if(this.value) loadTemplatesForStore(this.value)">
                                 <option value="">Izberi...</option>
                                 <option value="hr">🇭🇷 Hrvaška</option>
                                 <option value="cz">🇨🇿 Češka</option>
