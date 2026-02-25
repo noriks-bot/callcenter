@@ -1364,25 +1364,10 @@ function fetchOneTimeBuyers($storeFilter = null) {
             // Skip if already marked as converted
             if (($savedData['callStatus'] ?? '') === 'converted') continue;
             
-            // Check if this buyer made a NEW order recently (became repeat customer)
-            $recentContacts = getRecentOrderContacts($storeCode);
-            $buyerPhone = preg_replace('/[^0-9]/', '', $billing['phone'] ?? '');
-            $buyerPhoneLast9 = strlen($buyerPhone) > 9 ? substr($buyerPhone, -9) : $buyerPhone;
-            
+            // One-time buyers: no automatic conversion detection needed
+            // When they make a 2nd order, they disappear from this list automatically
+            // (because filter checks count($data['orders']) === 1)
             $isConverted = false;
-            // Check if email appears in recent orders more than once (new order)
-            $emailCount = array_count_values($recentContacts['emails'])[$email] ?? 0;
-            if ($emailCount > 0) {
-                // They have a recent order - check if it's newer than their original order
-                $isConverted = true;
-            }
-            // Also check by phone
-            if (!$isConverted && $buyerPhone && (
-                in_array($buyerPhone, $recentContacts['phones']) || 
-                in_array($buyerPhoneLast9, $recentContacts['phones'])
-            )) {
-                $isConverted = true;
-            }
             
             $allBuyers[] = [
                 'id' => $customerId,
