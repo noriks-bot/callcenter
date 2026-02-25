@@ -246,6 +246,7 @@
             display: flex;
             gap: 0;
             padding: 0 16px;
+            margin-bottom: 10px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             background: var(--card-bg);
