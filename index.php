@@ -7456,8 +7456,10 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast('Nastavitve shranjene!');
-                    // Reload buyers data with new settings
+                    showToast('Nastavitve shranjene! Osvežujem podatke...');
+                    // Clear cache and reload buyers data with new settings
+                    await fetch('api.php?action=clear-cache');
+                    await fetch('api.php?action=refresh-buyers-cache');
                     loadBuyers();
                 } else {
                     showToast(data.error || 'Napaka pri shranjevanju', true);
