@@ -107,6 +107,7 @@
         /* Table cards in special views - same as Leads */
         #buyersSettingsContent .table-card,
         #smsSettingsContent .table-card,
+        #smsAutomationContent .table-card,
         #agentsContent .table-card {
             margin: 0 16px;
         }
