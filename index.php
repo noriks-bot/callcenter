@@ -729,6 +729,9 @@
         <div class="content">
             <div class="filters-bar">
                 <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone...">
+                <button class="btn btn-save" id="addUrgentBtn" style="display:none;" onclick="showAddUrgentModal()">
+                    <i class="fas fa-plus"></i> Dodaj
+                </button>
                 <select class="filter-select" id="statusFilter">
                     <option value="">All Status</option>
                     <option value="not_called">Not Called</option>
@@ -3262,6 +3265,10 @@
                 }
             }
 
+            // Hide urgent add button by default
+            const addUrgentBtn = document.getElementById('addUrgentBtn');
+            if (addUrgentBtn) addUrgentBtn.style.display = 'none';
+            
             // Handle urgent tab separately (uses localStorage, not server data)
             if (currentTab === 'urgent') {
                 renderUrgentTableInline();
@@ -7789,6 +7796,10 @@
         function renderUrgentTableInline() {
             loadUrgentLeads();
             const container = document.getElementById('tableContainer');
+            
+            // Show + button in filters bar
+            const addBtn = document.getElementById('addUrgentBtn');
+            if (addBtn) addBtn.style.display = 'inline-flex';
             
             if (!urgentLeads.length) {
                 container.innerHTML = `<div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p><small style="color:var(--text-muted);">Klikni + Dodaj za vnos novega leada</small></div>`;
