@@ -948,10 +948,7 @@
                     <label class="form-label">Predloga (avtomatski prevod za državo)</label>
                     <select class="form-select" id="smsTemplate" onchange="applySmsTemplate()">
                         <option value="">-- Izberi predlogo --</option>
-                        <option value="abandoned_cart">🛒 Opuščena košarica</option>
-                        <option value="winback">💙 Povratek kupca</option>
-                        <option value="last_chance">⏰ Zadnja prilika</option>
-                        <option value="custom">✏️ Prilagojeno sporočilo</option>
+                        <!-- Dynamically populated -->
                     </select>
                 </div>
 
@@ -3971,7 +3968,7 @@
 
         // SMS Modal
         function openSmsModal(id, type) {
-            const data = type === 'cart' ? carts : type === 'pending' ? pending : buyers;
+            const data = type === 'cart' ? carts : type === 'pending' ? pending : type === 'paketomat' ? paketomatiData : buyers;
             const item = data.find(d => d.id === id);
             if (!item || !item.phone) return;
 
@@ -3980,10 +3977,25 @@
             document.getElementById('smsAvatar').textContent = initials(item.customerName);
             document.getElementById('smsCustomerName').textContent = item.customerName;
             document.getElementById('smsCustomerPhone').textContent = item.phone;
-            document.getElementById('smsTemplate').value = '';
             document.getElementById('smsMessage').value = '';
             document.getElementById('smsPreview').style.display = 'none';
             updateCharCount();
+
+            // Populate template dropdown from loaded templates
+            const templateSelect = document.getElementById('smsTemplate');
+            const storeCode = item.storeCode || 'hr';
+            templateSelect.innerHTML = '<option value="">-- Izberi predlogo --</option>';
+            
+            if (smsTemplatesData?.templates) {
+                Object.keys(smsTemplatesData.templates).forEach(key => {
+                    const tpl = smsTemplatesData.templates[key][storeCode];
+                    if (tpl) {
+                        const icon = key.includes('abandoned') ? '🛒' : key.includes('winback') ? '💙' : '📱';
+                        templateSelect.innerHTML += `<option value="${key}">${icon} ${tpl.name}</option>`;
+                    }
+                });
+            }
+            templateSelect.innerHTML += '<option value="custom">✏️ Prilagojeno sporočilo</option>';
 
             document.getElementById('smsModal').classList.add('open');
         }
