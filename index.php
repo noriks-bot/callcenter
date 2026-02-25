@@ -2761,8 +2761,9 @@
             }
 
             container.querySelectorAll('.country-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
+                tab.addEventListener('click', async () => {
                     currentStore = tab.dataset.store;
+                    console.log('[Country Click] Changed to:', currentStore, 'currentContentTab:', currentContentTab);
                     container.querySelectorAll('.country-tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     updateStats();
@@ -2770,9 +2771,10 @@
 
                     // Re-render based on current content tab
                     if (currentContentTab === 'paketomati') {
-                        renderPaketomatiInline();
+                        console.log('[Country Click] Calling renderPaketomatiInline');
+                        await renderPaketomatiInline();
                     } else if (currentContentTab === 'urgent') {
-                        renderUrgentTableInline();
+                        await renderUrgentTableInline();
                     } else {
                         renderTable();
                     }
