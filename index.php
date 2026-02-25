@@ -609,6 +609,37 @@
         @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } }
         @keyframes toastOut { to { transform: translateX(100%); opacity: 0; } }
         .toast-item.removing { animation: toastOut 0.3s ease forwards; }
+        
+        /* Filter Pills */
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            background: var(--bg-primary);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .filter-pill:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        .filter-pill.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+        .filter-pill.active:hover {
+            background: var(--accent-blue);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -1407,11 +1438,78 @@
         </div>
         
         <div class="content">
+        <!-- Test SMS from Template Section -->
+        <div class="table-card" style="margin-bottom:20px;border:2px solid var(--accent-purple);border-color:#a855f7;">
+            <div style="padding:20px;border-bottom:1px solid var(--card-border);background:rgba(168,85,247,0.1);">
+                <h3 style="margin:0 0 4px 0;">🧪 Test SMS iz predloge</h3>
+                <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji testni SMS na svoj telefon — vidiš točno kar bo stranka prejela</p>
+            </div>
+            <div style="padding:20px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+                    <div class="form-group" style="margin:0;">
+                        <label class="form-label">Tvoja telefonska št.</label>
+                        <input type="tel" class="form-input" id="testSmsPhone" placeholder="+386 40 xxx xxx" value="">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label class="form-label">Predloga</label>
+                        <select class="form-select" id="testSmsTemplate" onchange="loadTestTemplatePreview()">
+                            <option value="">-- Izberi predlogo --</option>
+                            <option value="abandoned_cart_1">🛒 Zapuščena košarica 1 (opomnik)</option>
+                            <option value="abandoned_cart_2">🎁 Zapuščena košarica 2 (20% popust)</option>
+                            <option value="winback_1">💙 Povratek kupca 1 (generičen)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label class="form-label">Država (za sporočilo)</label>
+                        <select class="form-select" id="testSmsCountry" onchange="loadTestTemplatePreview()">
+                            <option value="hr">🇭🇷 HR - Hrvaška</option>
+                            <option value="cz">🇨🇿 CZ - Češka</option>
+                            <option value="pl">🇵🇱 PL - Poljska</option>
+                            <option value="sk">🇸🇰 SK - Slovaška</option>
+                            <option value="hu">🇭🇺 HU - Madžarska</option>
+                            <option value="gr">🇬🇷 GR - Grčija</option>
+                            <option value="it">🇮🇹 IT - Italija</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Test Data Input -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;padding:16px;background:var(--bg-secondary);border-radius:8px;">
+                    <div class="form-group" style="margin:0;">
+                        <label class="form-label">Ime stranke (za test)</label>
+                        <input type="text" class="form-input" id="testSmsName" placeholder="npr. Marko" value="Marko" oninput="loadTestTemplatePreview()">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label class="form-label">Ime produkta (za test)</label>
+                        <input type="text" class="form-input" id="testSmsProduct" placeholder="npr. Noriks čarape" value="Noriks čarape" oninput="loadTestTemplatePreview()">
+                    </div>
+                </div>
+                
+                <!-- Preview -->
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label class="form-label">📋 Predogled SMS</label>
+                    <div id="testSmsPreview" style="padding:16px;background:var(--bg-secondary);border-radius:8px;border:1px solid var(--card-border);font-family:monospace;font-size:14px;min-height:60px;color:var(--text-primary);">
+                        <span style="color:var(--text-muted);font-style:italic;">Izberi predlogo za predogled...</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                        <span class="char-count" id="testSmsCharCount">0 / 160 znakov</span>
+                    </div>
+                </div>
+                
+                <div style="display:flex;gap:12px;align-items:center;">
+                    <button class="btn" onclick="sendTestSms()" style="background:#a855f7;color:white;">
+                        <i class="fas fa-paper-plane"></i> Pošlji testni SMS
+                    </button>
+                    <span id="testSmsStatus" style="font-size:13px;"></span>
+                </div>
+            </div>
+        </div>
+        
         <!-- Manual SMS Send Section -->
         <div class="table-card" style="margin-bottom:20px;border:2px solid var(--accent-green);">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);background:rgba(34,197,94,0.1);">
-                <h3 style="margin:0 0 4px 0;">📱 Ročno pošiljanje SMS (Test)</h3>
-                <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji SMS na poljubno številko — za testiranje</p>
+                <h3 style="margin:0 0 4px 0;">📱 Ročno pošiljanje SMS</h3>
+                <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji poljuben SMS na poljubno številko</p>
             </div>
             <div style="padding:20px;">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -1477,23 +1575,51 @@
                 <h3 style="margin:0 0 4px 0;">📋 Zgodovina pošiljanja</h3>
                 <p style="margin:0;color:var(--text-muted);font-size:13px;">Poslani SMS-i (lokalna zgodovina)</p>
             </div>
-            <div class="filters-bar" style="border-bottom:1px solid var(--card-border);">
-                <input type="date" class="form-input" id="smsDateFrom" style="max-width:150px;">
-                <input type="date" class="form-input" id="smsDateTo" style="max-width:150px;">
-                <select class="filter-select" id="smsCountryFilter">
-                    <option value="">Vse države</option>
-                </select>
-                <select class="filter-select" id="smsStatusFilter">
-                    <option value="">Vsi statusi</option>
-                    <option value="queued">V čakanju</option>
-                    <option value="sent">Poslano</option>
-                    <option value="delivered">Dostavljeno</option>
-                    <option value="failed">Neuspešno</option>
-                </select>
-                <button class="action-btn-header" onclick="exportSmsCsv()">
-                    <i class="fas fa-download"></i> CSV Export
-                </button>
+            
+            <!-- Modern Filter Bar -->
+            <div style="padding:16px 20px;border-bottom:1px solid var(--card-border);background:var(--bg-secondary);">
+                <!-- Date Range Pills -->
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                    <span style="font-size:12px;color:var(--text-muted);padding:6px 0;margin-right:4px;">📅 Obdobje:</span>
+                    <button class="filter-pill active" data-range="today" onclick="setHistoryDateRange('today', this)">Danes</button>
+                    <button class="filter-pill" data-range="yesterday" onclick="setHistoryDateRange('yesterday', this)">Včeraj</button>
+                    <button class="filter-pill" data-range="week" onclick="setHistoryDateRange('week', this)">7 dni</button>
+                    <button class="filter-pill" data-range="month" onclick="setHistoryDateRange('month', this)">30 dni</button>
+                    <button class="filter-pill" data-range="all" onclick="setHistoryDateRange('all', this)">Vse</button>
+                    <div style="border-left:1px solid var(--card-border);margin:0 8px;"></div>
+                    <input type="date" class="form-input" id="smsDateFrom" style="width:130px;padding:6px 10px;font-size:12px;" onchange="setHistoryDateRange('custom', null)">
+                    <span style="color:var(--text-muted);padding:6px 4px;">→</span>
+                    <input type="date" class="form-input" id="smsDateTo" style="width:130px;padding:6px 10px;font-size:12px;" onchange="setHistoryDateRange('custom', null)">
+                </div>
+                
+                <!-- Country + Status Pills -->
+                <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+                    <span style="font-size:12px;color:var(--text-muted);padding:6px 0;margin-right:4px;">🌍 Država:</span>
+                    <button class="filter-pill active" data-country="" onclick="setHistoryCountry('', this)">Vse</button>
+                    <button class="filter-pill" data-country="hr" onclick="setHistoryCountry('hr', this)">🇭🇷 HR</button>
+                    <button class="filter-pill" data-country="cz" onclick="setHistoryCountry('cz', this)">🇨🇿 CZ</button>
+                    <button class="filter-pill" data-country="pl" onclick="setHistoryCountry('pl', this)">🇵🇱 PL</button>
+                    <button class="filter-pill" data-country="sk" onclick="setHistoryCountry('sk', this)">🇸🇰 SK</button>
+                    <button class="filter-pill" data-country="hu" onclick="setHistoryCountry('hu', this)">🇭🇺 HU</button>
+                    <button class="filter-pill" data-country="gr" onclick="setHistoryCountry('gr', this)">🇬🇷 GR</button>
+                    <button class="filter-pill" data-country="it" onclick="setHistoryCountry('it', this)">🇮🇹 IT</button>
+                    
+                    <div style="border-left:1px solid var(--card-border);margin:0 12px;height:24px;"></div>
+                    
+                    <span style="font-size:12px;color:var(--text-muted);margin-right:4px;">📊 Status:</span>
+                    <button class="filter-pill active" data-status="" onclick="setHistoryStatus('', this)">Vsi</button>
+                    <button class="filter-pill" data-status="sent" onclick="setHistoryStatus('sent', this)">✅ Poslano</button>
+                    <button class="filter-pill" data-status="queued" onclick="setHistoryStatus('queued', this)">⏳ Čaka</button>
+                    <button class="filter-pill" data-status="failed" onclick="setHistoryStatus('failed', this)">❌ Neuspešno</button>
+                    
+                    <div style="margin-left:auto;">
+                        <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="exportSmsCsv()">
+                            <i class="fas fa-download"></i> CSV
+                        </button>
+                    </div>
+                </div>
             </div>
+            
             <div id="smsTableContainer" style="padding:20px;">
                 <div class="empty"><i class="fas fa-comment-sms"></i><p>Ni poslanih SMS sporočil</p></div>
             </div>
@@ -4892,6 +5018,133 @@
             }
         }
         
+        // ========== TEST SMS FROM TEMPLATE ==========
+        let smsTemplatesCache = null;
+        
+        async function loadSmsTemplates() {
+            if (smsTemplatesCache) return smsTemplatesCache;
+            try {
+                const res = await fetch('api.php?action=all-sms-templates');
+                smsTemplatesCache = await res.json();
+                return smsTemplatesCache;
+            } catch (e) {
+                console.error('[Test SMS] Failed to load templates:', e);
+                return { templates: {} };
+            }
+        }
+        
+        async function loadTestTemplatePreview() {
+            const templateKey = document.getElementById('testSmsTemplate').value;
+            const country = document.getElementById('testSmsCountry').value;
+            const name = document.getElementById('testSmsName').value || 'Kupac';
+            const product = document.getElementById('testSmsProduct').value || 'proizvod';
+            const preview = document.getElementById('testSmsPreview');
+            const charCount = document.getElementById('testSmsCharCount');
+            
+            if (!templateKey) {
+                preview.innerHTML = '<span style="color:var(--text-muted);font-style:italic;">Izberi predlogo za predogled...</span>';
+                charCount.textContent = '0 / 160 znakov';
+                return;
+            }
+            
+            const templates = await loadSmsTemplates();
+            const template = templates.templates?.[templateKey]?.[country];
+            
+            if (!template) {
+                preview.innerHTML = '<span style="color:var(--accent-red);">Predloga ni najdena za izbrano državo</span>';
+                return;
+            }
+            
+            // Build the links
+            const checkoutLink = `https://noriks.com/${country}/cart/`;
+            const checkoutLinkCoupon = `https://noriks.com/${country}/cart/?apply_coupon=SMS20`;
+            const shopLink = `https://noriks.com/${country}/`;
+            
+            // Replace variables
+            let message = template.message
+                .replace(/{ime}/g, name)
+                .replace(/{produkt}/g, product)
+                .replace(/{link_coupon}/g, checkoutLinkCoupon)
+                .replace(/{link}/g, checkoutLink)
+                .replace(/{shop_link}/g, shopLink)
+                .replace(/{cena}/g, '29.99');
+            
+            preview.textContent = message;
+            
+            const len = message.length;
+            const smsCount = Math.ceil(len / 160) || 1;
+            charCount.textContent = `${len} / 160 znakov (${smsCount} SMS)`;
+            charCount.className = 'char-count' + (len > 160 ? ' warning' : '');
+        }
+        
+        async function sendTestSms() {
+            const phone = document.getElementById('testSmsPhone').value.trim();
+            const templateKey = document.getElementById('testSmsTemplate').value;
+            const country = document.getElementById('testSmsCountry').value;
+            const name = document.getElementById('testSmsName').value || 'Kupac';
+            const product = document.getElementById('testSmsProduct').value || 'proizvod';
+            const statusEl = document.getElementById('testSmsStatus');
+            
+            if (!phone) {
+                showToast('❌ Vnesi svojo telefonsko številko!', true);
+                return;
+            }
+            
+            if (!templateKey) {
+                showToast('❌ Izberi predlogo!', true);
+                return;
+            }
+            
+            // Get the message from preview
+            const message = document.getElementById('testSmsPreview').textContent;
+            
+            if (!message || message.includes('Izberi predlogo')) {
+                showToast('❌ Ni veljavnega sporočila za pošiljanje', true);
+                return;
+            }
+            
+            if (!confirm(`🧪 Pošlji TESTNI SMS?\n\nŠtevilka: ${phone}\nPredloga: ${templateKey}\nDržava: ${country.toUpperCase()}\n\n${message.substring(0, 100)}...`)) {
+                return;
+            }
+            
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pošiljam...';
+            statusEl.style.color = 'var(--text-muted)';
+            
+            try {
+                const res = await fetch('api.php?action=sms-send-direct', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phone: phone,
+                        storeCode: country,
+                        message: message
+                    })
+                });
+                
+                const result = await res.json();
+                console.log('[Test SMS] Response:', result);
+                
+                if (result.success) {
+                    statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Testni SMS poslan!`;
+                    statusEl.style.color = '#a855f7';
+                    showToast(`🧪 Testni SMS poslan na ${result.recipient || phone}!`);
+                    
+                    // Refresh history
+                    await loadSmsData();
+                    renderSmsTable();
+                } else {
+                    statusEl.innerHTML = `<i class="fas fa-times-circle"></i> ${result.error || 'Napaka'}`;
+                    statusEl.style.color = 'var(--accent-red)';
+                    showToast('❌ ' + (result.error || 'Napaka pri pošiljanju'), true);
+                }
+            } catch (e) {
+                console.error('[Test SMS] Error:', e);
+                statusEl.innerHTML = `<i class="fas fa-times-circle"></i> ${e.message}`;
+                statusEl.style.color = 'var(--accent-red)';
+                showToast('❌ Napaka: ' + e.message, true);
+            }
+        }
+        
         // SMS Dashboard - Load History
         async function renderSmsTable() {
             // Refresh from API first
@@ -4899,8 +5152,8 @@
             
             const dateFrom = document.getElementById('smsDateFrom')?.value;
             const dateTo = document.getElementById('smsDateTo')?.value;
-            const country = document.getElementById('smsCountryFilter')?.value;
-            const status = document.getElementById('smsStatusFilter')?.value;
+            const country = smsHistoryFilters?.country || '';
+            const status = smsHistoryFilters?.status || '';
             
             let filtered = [...smsLog];
             
@@ -5192,8 +5445,68 @@
         // Add filter listeners for SMS dashboard
         document.getElementById('smsDateFrom').addEventListener('change', renderSmsTable);
         document.getElementById('smsDateTo').addEventListener('change', renderSmsTable);
-        document.getElementById('smsCountryFilter').addEventListener('change', renderSmsTable);
-        document.getElementById('smsStatusFilter').addEventListener('change', renderSmsTable);
+        
+        // SMS History filter state
+        let smsHistoryFilters = { country: '', status: '' };
+        
+        function setHistoryDateRange(range, btn) {
+            const today = new Date();
+            const dateFrom = document.getElementById('smsDateFrom');
+            const dateTo = document.getElementById('smsDateTo');
+            
+            // Clear active state from all range pills
+            document.querySelectorAll('.filter-pill[data-range]').forEach(p => p.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            
+            const formatDate = (d) => d.toISOString().split('T')[0];
+            
+            switch(range) {
+                case 'today':
+                    dateFrom.value = formatDate(today);
+                    dateTo.value = formatDate(today);
+                    break;
+                case 'yesterday':
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    dateFrom.value = formatDate(yesterday);
+                    dateTo.value = formatDate(yesterday);
+                    break;
+                case 'week':
+                    const weekAgo = new Date(today);
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    dateFrom.value = formatDate(weekAgo);
+                    dateTo.value = formatDate(today);
+                    break;
+                case 'month':
+                    const monthAgo = new Date(today);
+                    monthAgo.setDate(monthAgo.getDate() - 30);
+                    dateFrom.value = formatDate(monthAgo);
+                    dateTo.value = formatDate(today);
+                    break;
+                case 'all':
+                    dateFrom.value = '';
+                    dateTo.value = '';
+                    break;
+                case 'custom':
+                    // Don't change dates, just mark as custom
+                    break;
+            }
+            renderSmsTable();
+        }
+        
+        function setHistoryCountry(country, btn) {
+            document.querySelectorAll('.filter-pill[data-country]').forEach(p => p.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            smsHistoryFilters.country = country;
+            renderSmsTable();
+        }
+        
+        function setHistoryStatus(status, btn) {
+            document.querySelectorAll('.filter-pill[data-status]').forEach(p => p.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            smsHistoryFilters.status = status;
+            renderSmsTable();
+        }
         
         // ========== SMS PROVIDER SETTINGS ==========
         let smsProviderSettings = null;
