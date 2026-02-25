@@ -1277,6 +1277,120 @@
         </div>
     </div>
 
+    <!-- Add/Edit Template Modal -->
+    <div id="templateModalBg" class="modal-bg" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;overflow-y:auto;" onclick="if(event.target===this)closeTemplateModal()">
+        <div class="modal" style="max-width:800px;width:100%;background:var(--card-bg);border-radius:var(--radius-xl);box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;max-height:90vh;overflow-y:auto;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="templateModalTitle">
+                    <i class="fas fa-edit" style="margin-right: 8px; color: var(--primary);"></i>Nova SMS predloga
+                </h3>
+                <button class="modal-close" onclick="closeTemplateModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="templateForm">
+                    <input type="hidden" id="templateId" value="">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">ID predloge</label>
+                            <input type="text" id="templateKey" class="form-input" placeholder="npr. abandoned_cart" required>
+                            <small style="color: var(--text-muted); font-size: 11px;">Unikatni ID (brez presledkov)</small>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Kategorija</label>
+                            <select id="templateCategory" class="form-select" required>
+                                <option value="abandoned">🛒 Abandoned</option>
+                                <option value="winback">💙 Winback</option>
+                                <option value="custom">✏️ Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Ime predloge</label>
+                        <input type="text" id="templateName" class="form-input" placeholder="npr. Opuščena košarica" required>
+                    </div>
+                    
+                    <!-- Translations for all countries -->
+                    <div class="form-group">
+                        <label class="form-label">Prevodi sporočil</label>
+                        <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">
+                            Variabele: <code>{ime}</code>, <code>{produkt}</code>, <code>{cena}</code>, <code>{link}</code>
+                        </p>
+                        
+                        <div id="templateTranslations" style="display:flex;flex-direction:column;gap:12px;">
+                            <!-- HR -->
+                            <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                    <span>🇭🇷</span>
+                                    <strong style="font-size:13px;">Hrvaška (HR)</strong>
+                                </div>
+                                <textarea id="templateMsg_hr" class="form-input" rows="2" placeholder="Sporočilo v hrvaščini..." style="resize:vertical;"></textarea>
+                            </div>
+                            <!-- CZ -->
+                            <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                    <span>🇨🇿</span>
+                                    <strong style="font-size:13px;">Češka (CZ)</strong>
+                                </div>
+                                <textarea id="templateMsg_cz" class="form-input" rows="2" placeholder="Sporočilo v češčini..." style="resize:vertical;"></textarea>
+                            </div>
+                            <!-- PL -->
+                            <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                    <span>🇵🇱</span>
+                                    <strong style="font-size:13px;">Poljska (PL)</strong>
+                                </div>
+                                <textarea id="templateMsg_pl" class="form-input" rows="2" placeholder="Sporočilo v poljščini..." style="resize:vertical;"></textarea>
+                            </div>
+                            <!-- SK -->
+                            <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                    <span>🇸🇰</span>
+                                    <strong style="font-size:13px;">Slovaška (SK)</strong>
+                                </div>
+                                <textarea id="templateMsg_sk" class="form-input" rows="2" placeholder="Sporočilo v slovaščini..." style="resize:vertical;"></textarea>
+                            </div>
+                            <!-- HU -->
+                            <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                    <span>🇭🇺</span>
+                                    <strong style="font-size:13px;">Madžarska (HU)</strong>
+                                </div>
+                                <textarea id="templateMsg_hu" class="form-input" rows="2" placeholder="Sporočilo v madžarščini..." style="resize:vertical;"></textarea>
+                            </div>
+                            <!-- GR -->
+                            <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                    <span>🇬🇷</span>
+                                    <strong style="font-size:13px;">Grčija (GR)</strong>
+                                </div>
+                                <textarea id="templateMsg_gr" class="form-input" rows="2" placeholder="Sporočilo v grščini..." style="resize:vertical;"></textarea>
+                            </div>
+                            <!-- IT -->
+                            <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                    <span>🇮🇹</span>
+                                    <strong style="font-size:13px;">Italija (IT)</strong>
+                                </div>
+                                <textarea id="templateMsg_it" class="form-input" rows="2" placeholder="Sporočilo v italijanščini..." style="resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeTemplateModal()">Prekliči</button>
+                <button type="button" class="btn btn-primary" onclick="saveTemplate()">
+                    <i class="fas fa-check"></i> Shrani
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- SMS Dashboard Content (shown when tab selected) -->
     <div id="smsDashboardContent" style="display:none;">
         <!-- Page Header -->
@@ -1424,71 +1538,63 @@
                 </div>
             </div>
             
-            <!-- Template Preview Section -->
-            <div class="table-card" style="padding:12px 16px;margin-bottom:12px;">
-                <h3 style="margin-bottom:8px;font-size:14px;">📝 Predogled predlog</h3>
-                <p style="color:var(--text-muted);margin-bottom:10px;font-size:12px;">
-                    Preveri kako izgledajo SMS sporočila v različnih jezikih. Variabele: <code>{ime}</code>, <code>{produkt}</code>, <code>{cena}</code>, <code>{link}</code>
-                </p>
-                
-                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-                    <select class="form-select" id="previewTemplate" onchange="updateTemplatePreview()" style="flex:1;min-width:150px;">
-                        <option value="">-- Izberi predlogo --</option>
-                        <option value="abandoned_cart">🛒 Opuščena košarica</option>
-                        <option value="winback">💙 Povratek kupca</option>
-                        <option value="last_chance">⏰ Zadnja prilika</option>
-                    </select>
-                    <select class="form-select" id="previewCountry" onchange="updateTemplatePreview()" style="flex:1;min-width:150px;">
-                        <option value="">-- Izberi državo --</option>
-                    </select>
+            <!-- SMS Templates Management -->
+            <div class="table-card" style="padding:16px;margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <div>
+                        <h3 style="margin:0;font-size:14px;">📝 SMS Predloge</h3>
+                        <p style="color:var(--text-muted);margin:4px 0 0 0;font-size:12px;">
+                            Upravljaj SMS predloge za vse države. Variabele: <code>{ime}</code>, <code>{produkt}</code>, <code>{cena}</code>, <code>{link}</code>
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddTemplateModal()" style="padding:8px 16px;">
+                        <i class="fas fa-plus"></i> Nova predloga
+                    </button>
                 </div>
                 
-                <div id="templatePreviewBox" style="display:none;">
-                    <div style="background:var(--content-bg);border-radius:8px;padding:16px;margin-bottom:12px;">
-                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">
-                            <i class="fas fa-tag"></i> <span id="previewTemplateName">Template name</span>
-                        </div>
-                        <div id="previewMessage" style="font-size:14px;line-height:1.6;white-space:pre-wrap;"></div>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span class="char-count" id="previewCharCount">0 / 160 znakov</span>
-                        <button class="btn btn-cancel" style="padding:8px 16px;" onclick="copyTemplateToClipboard()">
-                            <i class="fas fa-copy"></i> Kopiraj
-                        </button>
-                    </div>
+                <!-- Category Filter -->
+                <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                    <button class="content-tab active" data-category="all" onclick="filterTemplatesByCategory('all', this)">
+                        📋 Vse
+                    </button>
+                    <button class="content-tab" data-category="abandoned" onclick="filterTemplatesByCategory('abandoned', this)">
+                        🛒 Abandoned
+                    </button>
+                    <button class="content-tab" data-category="winback" onclick="filterTemplatesByCategory('winback', this)">
+                        💙 Winback
+                    </button>
+                    <button class="content-tab" data-category="custom" onclick="filterTemplatesByCategory('custom', this)">
+                        ✏️ Custom
+                    </button>
                 </div>
                 
-                <!-- Sample Variables -->
-                <div style="margin-top:16px;padding:12px;background:var(--content-bg);border-radius:8px;">
-                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Testni podatki za predogled:</div>
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                        <div style="flex:1;min-width:120px;">
-                            <label style="font-size:11px;color:var(--text-muted);">Ime</label>
-                            <input type="text" class="form-input" id="sampleName" value="Marko" oninput="updateTemplatePreview()" style="padding:8px;">
-                        </div>
-                        <div style="flex:1;min-width:120px;">
-                            <label style="font-size:11px;color:var(--text-muted);">Produkt</label>
-                            <input type="text" class="form-input" id="sampleProduct" value="Noriks majica" oninput="updateTemplatePreview()" style="padding:8px;">
-                        </div>
-                        <div style="flex:1;min-width:80px;">
-                            <label style="font-size:11px;color:var(--text-muted);">Cena</label>
-                            <input type="text" class="form-input" id="samplePrice" value="€29.99" oninput="updateTemplatePreview()" style="padding:8px;">
-                        </div>
+                <!-- Templates List -->
+                <div id="templatesListContainer">
+                    <div style="text-align:center;padding:40px;color:var(--text-muted);">
+                        <i class="fas fa-spinner fa-spin"></i> Nalagam predloge...
                     </div>
                 </div>
             </div>
             
-            <!-- SMS Queue Management -->
-            <div class="table-card" style="padding:24px;">
-                <h3 style="margin-bottom:8px;">📤 Čakalna vrsta za pošiljanje</h3>
-                <p style="color:var(--text-muted);margin-bottom:24px;">
-                    ⚠️ <strong>Samo Dejan</strong> lahko ročno pošlje SMS iz čakalne vrste!
-                </p>
-                
-                <div id="smsQueueManagement">
-                    <!-- Queue items will be rendered here -->
+            <!-- Sample Variables for Preview -->
+            <div class="table-card" style="padding:12px 16px;">
+                <h3 style="margin-bottom:8px;font-size:14px;">🔍 Testni podatki za predogled</h3>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:120px;">
+                        <label style="font-size:11px;color:var(--text-muted);">Ime</label>
+                        <input type="text" class="form-input" id="sampleName" value="Marko" style="padding:8px;">
+                    </div>
+                    <div style="flex:1;min-width:120px;">
+                        <label style="font-size:11px;color:var(--text-muted);">Produkt</label>
+                        <input type="text" class="form-input" id="sampleProduct" value="Noriks majica" style="padding:8px;">
+                    </div>
+                    <div style="flex:1;min-width:80px;">
+                        <label style="font-size:11px;color:var(--text-muted);">Cena</label>
+                        <input type="text" class="form-input" id="samplePrice" value="€29.99" style="padding:8px;">
+                    </div>
                 </div>
             </div>
+            
         </div>
     </div>
     
@@ -2267,6 +2373,7 @@
                     } else if (currentTab === 'sms-settings') {
                         showSpecialView('smsSettingsContent');
                         loadSmsSettingsUI();
+                        loadAllTemplates();
                     } else if (currentTab === 'buyers-settings') {
                         showSpecialView('buyersSettingsContent');
                         loadBuyersSettings();
@@ -3899,6 +4006,177 @@
             if (automationCheckInterval) {
                 clearInterval(automationCheckInterval);
                 automationCheckInterval = null;
+            }
+        }
+        
+        // ========== SMS TEMPLATE MANAGEMENT ==========
+        let allTemplates = {};
+        let currentTemplateFilter = 'all';
+        
+        async function loadAllTemplates() {
+            const container = document.getElementById('templatesListContainer');
+            if (!container) return;
+            
+            container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Nalagam predloge...</div>';
+            
+            try {
+                const res = await fetch('api.php?action=all-sms-templates');
+                allTemplates = await res.json();
+                renderTemplatesList();
+            } catch (err) {
+                console.error('Error loading templates:', err);
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Napaka pri nalaganju predlog</div>';
+            }
+        }
+        
+        function renderTemplatesList() {
+            const container = document.getElementById('templatesListContainer');
+            if (!container) return;
+            
+            const templates = allTemplates.templates || [];
+            const filtered = currentTemplateFilter === 'all' 
+                ? templates 
+                : templates.filter(t => t.category === currentTemplateFilter);
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-inbox" style="font-size:32px;margin-bottom:10px;display:block;opacity:0.3;"></i>Ni predlog v tej kategoriji</div>';
+                return;
+            }
+            
+            const categoryIcons = { abandoned: '🛒', winback: '💙', custom: '✏️' };
+            const countryFlags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', hu: '🇭🇺', gr: '🇬🇷', it: '🇮🇹' };
+            
+            container.innerHTML = filtered.map(t => {
+                const translations = Object.keys(t.messages || {}).map(c => countryFlags[c] || c).join(' ');
+                return `
+                    <div style="background:var(--content-bg);border-radius:8px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <span>${categoryIcons[t.category] || '📝'}</span>
+                                <strong>${escapeHtml(t.name)}</strong>
+                                <code style="font-size:11px;color:var(--text-muted);">${escapeHtml(t.id)}</code>
+                            </div>
+                            <div style="font-size:12px;color:var(--text-muted);">
+                                Prevodi: ${translations || 'Ni prevodov'}
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-sm btn-secondary" onclick="editTemplate('${escapeHtml(t.id)}')" title="Uredi">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteTemplate('${escapeHtml(t.id)}')" title="Izbriši">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function filterTemplatesByCategory(category, btn) {
+            currentTemplateFilter = category;
+            document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderTemplatesList();
+        }
+        
+        function showAddTemplateModal() {
+            document.getElementById('templateModalTitle').innerHTML = '<i class="fas fa-plus" style="margin-right: 8px; color: var(--primary);"></i>Nova SMS predloga';
+            document.getElementById('templateId').value = '';
+            document.getElementById('templateKey').value = '';
+            document.getElementById('templateKey').disabled = false;
+            document.getElementById('templateName').value = '';
+            document.getElementById('templateCategory').value = 'abandoned';
+            ['hr', 'cz', 'pl', 'sk', 'hu', 'gr', 'it'].forEach(c => {
+                document.getElementById('templateMsg_' + c).value = '';
+            });
+            document.getElementById('templateModalBg').style.display = 'flex';
+        }
+        
+        function editTemplate(id) {
+            const templates = allTemplates.templates || [];
+            const template = templates.find(t => t.id === id);
+            if (!template) return;
+            
+            document.getElementById('templateModalTitle').innerHTML = '<i class="fas fa-edit" style="margin-right: 8px; color: var(--primary);"></i>Uredi predlogo';
+            document.getElementById('templateId').value = template.id;
+            document.getElementById('templateKey').value = template.id;
+            document.getElementById('templateKey').disabled = true;
+            document.getElementById('templateName').value = template.name || '';
+            document.getElementById('templateCategory').value = template.category || 'custom';
+            
+            ['hr', 'cz', 'pl', 'sk', 'hu', 'gr', 'it'].forEach(c => {
+                const msg = template.messages?.[c] || '';
+                document.getElementById('templateMsg_' + c).value = msg;
+            });
+            
+            document.getElementById('templateModalBg').style.display = 'flex';
+        }
+        
+        function closeTemplateModal() {
+            document.getElementById('templateModalBg').style.display = 'none';
+        }
+        
+        async function saveTemplate() {
+            const id = document.getElementById('templateKey').value.trim();
+            const name = document.getElementById('templateName').value.trim();
+            const category = document.getElementById('templateCategory').value;
+            
+            if (!id || !name) {
+                showToast('Izpolni ID in ime predloge', true);
+                return;
+            }
+            
+            const messages = {};
+            ['hr', 'cz', 'pl', 'sk', 'hu', 'gr', 'it'].forEach(c => {
+                const msg = document.getElementById('templateMsg_' + c).value.trim();
+                if (msg) messages[c] = msg;
+            });
+            
+            if (Object.keys(messages).length === 0) {
+                showToast('Dodaj vsaj en prevod', true);
+                return;
+            }
+            
+            try {
+                const res = await fetch('api.php?action=save-sms-template', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, category, messages })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast('Predloga shranjena!');
+                    closeTemplateModal();
+                    loadAllTemplates();
+                } else {
+                    showToast(result.error || 'Napaka pri shranjevanju', true);
+                }
+            } catch (err) {
+                showToast('Napaka pri shranjevanju', true);
+            }
+        }
+        
+        async function deleteTemplate(id) {
+            if (!confirm('Si prepričan, da želiš izbrisati to predlogo?')) return;
+            
+            try {
+                const res = await fetch('api.php?action=delete-sms-template', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast('Predloga izbrisana');
+                    loadAllTemplates();
+                } else {
+                    showToast(result.error || 'Napaka pri brisanju', true);
+                }
+            } catch (err) {
+                showToast('Napaka pri brisanju', true);
             }
         }
         

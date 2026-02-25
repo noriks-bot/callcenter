@@ -2676,6 +2676,132 @@ try {
                 echo json_encode(['error' => 'Templates file not found']);
             }
             break;
+        
+        case 'all-sms-templates':
+            // Get all templates with their translations for management UI
+            $templatesFile = __DIR__ . '/sms-templates.json';
+            if (file_exists($templatesFile)) {
+                $data = json_decode(file_get_contents($templatesFile), true);
+                $templates = $data['templates'] ?? $data;
+                
+                $result = [];
+                foreach ($templates as $typeKey => $stores) {
+                    $messages = [];
+                    $name = '';
+                    $category = 'custom';
+                    
+                    // Determine category from key
+                    if (strpos($typeKey, 'abandoned') !== false) $category = 'abandoned';
+                    elseif (strpos($typeKey, 'winback') !== false) $category = 'winback';
+                    
+                    foreach ($stores as $storeCode => $storeData) {
+                        if (is_array($storeData)) {
+                            $messages[$storeCode] = $storeData['message'] ?? '';
+                            if (!$name && !empty($storeData['name'])) $name = $storeData['name'];
+                        }
+                    }
+                    
+                    // Get category from metadata if exists
+                    if (isset($stores['_meta']['category'])) {
+                        $category = $stores['_meta']['category'];
+                    }
+                    if (isset($stores['_meta']['name'])) {
+                        $name = $stores['_meta']['name'];
+                    }
+                    
+                    $result[] = [
+                        'id' => $typeKey,
+                        'name' => $name ?: ucfirst(str_replace('_', ' ', $typeKey)),
+                        'category' => $category,
+                        'messages' => $messages
+                    ];
+                }
+                echo json_encode(['templates' => $result]);
+            } else {
+                echo json_encode(['templates' => []]);
+            }
+            break;
+        
+        case 'save-sms-template':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $templatesFile = __DIR__ . '/sms-templates.json';
+            
+            $id = $input['id'] ?? '';
+            $name = $input['name'] ?? '';
+            $category = $input['category'] ?? 'custom';
+            $messages = $input['messages'] ?? [];
+            
+            if (empty($id) || empty($name)) {
+                echo json_encode(['error' => 'ID and name required']);
+                break;
+            }
+            
+            $data = [];
+            if (file_exists($templatesFile)) {
+                $data = json_decode(file_get_contents($templatesFile), true) ?: [];
+            }
+            
+            // Ensure templates key exists
+            if (!isset($data['templates'])) {
+                $data = ['templates' => $data];
+            }
+            
+            // Build template structure
+            $templateData = [
+                '_meta' => ['name' => $name, 'category' => $category]
+            ];
+            foreach ($messages as $storeCode => $message) {
+                if (!empty($message)) {
+                    $templateData[$storeCode] = [
+                        'name' => $name,
+                        'message' => $message
+                    ];
+                }
+            }
+            
+            $data['templates'][$id] = $templateData;
+            
+            file_put_contents($templatesFile, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            echo json_encode(['success' => true]);
+            break;
+        
+        case 'delete-sms-template':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo json_encode(['error' => 'POST required']);
+                break;
+            }
+            $input = json_decode(file_get_contents('php://input'), true);
+            $templatesFile = __DIR__ . '/sms-templates.json';
+            
+            $id = $input['id'] ?? '';
+            if (empty($id)) {
+                echo json_encode(['error' => 'ID required']);
+                break;
+            }
+            
+            $data = [];
+            if (file_exists($templatesFile)) {
+                $data = json_decode(file_get_contents($templatesFile), true) ?: [];
+            }
+            
+            if (!isset($data['templates'])) {
+                $data = ['templates' => $data];
+            }
+            
+            if (isset($data['templates'][$id])) {
+                unset($data['templates'][$id]);
+                file_put_contents($templatesFile, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['error' => 'Template not found']);
+            }
+            break;
             
         case 'sms-automations':
             $automationsFile = __DIR__ . '/data/sms-automations.json';
