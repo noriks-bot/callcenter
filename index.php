@@ -7819,7 +7819,7 @@
 
         function updatePaketomatiCount() {
             const notCalled = paketomatiData.filter(o => o.status === 'not_called').length;
-            document.getElementById('navPaketomati').textContent = notCalled;
+            document.getElementById('contentCount-paketomati').textContent = notCalled;
         }
 
         // Inline status change for paketomati (from select dropdown)
@@ -8268,7 +8268,7 @@
 
                 // Update badge counts
                 document.getElementById('navCarts').textContent = data.totalCarts;
-                document.getElementById('navPaketomati').textContent = data.totalPaketomati;
+                document.getElementById('contentCount-paketomati').textContent = data.totalPaketomati;
 
                 // Show notifications for new items
                 if (data.newCarts.length > 0 || data.newPaketomati.length > 0) {
@@ -8279,7 +8279,7 @@
                         cartsBadge.style.color = 'white';
                     }
                     if (data.newPaketomati.length > 0) {
-                        const paketBadge = document.getElementById('navPaketomati');
+                        const paketBadge = document.getElementById('contentCount-paketomati');
                         paketBadge.style.background = 'var(--accent-red)';
                         paketBadge.style.color = 'white';
                     }
@@ -8441,7 +8441,7 @@
                     badge.style.color = '';
                 }
                 if (tab === 'paketomati') {
-                    const badge = document.getElementById('navPaketomati');
+                    const badge = document.getElementById('contentCount-paketomati');
                     badge.style.background = '';
                     badge.style.color = '';
                 }
