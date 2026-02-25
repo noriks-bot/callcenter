@@ -1073,8 +1073,8 @@
     </div>
     
     <!-- Add/Edit Automation Modal -->
-    <div id="automationModalBg" class="modal-bg" onclick="if(event.target===this)closeAutomationModal()">
-        <div class="modal" style="max-width: 500px;">
+    <div id="automationModalBg" class="modal-bg" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;" onclick="if(event.target===this)closeAutomationModal()">
+        <div class="modal" style="max-width:500px;background:var(--card-bg);border-radius:var(--radius-xl);box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;">
             <div class="modal-header">
                 <h3 class="modal-title" id="automationModalTitle">
                     <i class="fas fa-robot" style="margin-right: 8px; color: var(--primary);"></i>Nova SMS avtomatizacija
@@ -3758,11 +3758,11 @@
             document.getElementById('automationId').value = '';
             document.getElementById('automationEnabled').checked = true;
             document.getElementById('automationTemplate').innerHTML = '<option value="">-- Najprej izberi trgovino --</option>';
-            document.getElementById('automationModalBg').classList.add('open');
+            document.getElementById('automationModalBg').style.display = 'flex';
         }
         
         function closeAutomationModal() {
-            document.getElementById('automationModalBg').classList.remove('open');
+            document.getElementById('automationModalBg').style.display = 'none';
         }
         
         async function loadTemplatesForStore(store) {
@@ -3855,7 +3855,7 @@
                 document.getElementById('automationTemplate').value = automation.template;
             });
             
-            document.getElementById('automationModalBg').classList.add('open');
+            document.getElementById('automationModalBg').style.display = 'flex';
         }
         
         async function toggleAutomation(id) {
