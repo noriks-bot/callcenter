@@ -3610,6 +3610,17 @@ try {
             ]);
             break;
             
+        case 'refresh-paketomati-cache':
+            // CRON: */15 * * * * curl -s "https://callcenter.noriks.com/api.php?action=refresh-paketomati-cache"
+            set_time_limit(300);
+            // Force cache refresh by calling with no cache
+            $paketomati = fetchPaketomatOrders('all');
+            echo json_encode([
+                'success' => true,
+                'paketomatCount' => count($paketomati)
+            ]);
+            break;
+            
         case 'paketomati-raw':
             // Raw debug - check specific orders
             $rawDebug = [];
