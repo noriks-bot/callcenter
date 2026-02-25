@@ -22,27 +22,20 @@
 <body>
     <?php include 'sidebar.php'; ?>
     
+    <!-- Top Bar -->
+    <div class="top-bar" id="topBar">
+        <button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
+        <div class="page-title">Statistics</div>
+        <div class="top-bar-actions">
+            <button class="action-btn-header" onclick="loadStats()">
+                <i class="fas fa-sync-alt"></i> <span class="hide-mobile">Osveži</span>
+            </button>
+            <div class="header-avatar" id="headerAvatar">N</div>
+        </div>
+    </div>
+    
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <button class="menu-toggle" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="breadcrumb">
-                    <a href="index.php">Call Center</a>
-                    <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
-                    <span class="current">Statistics</span>
-                </div>
-            </div>
-            <div class="header-right">
-                <button class="header-btn" onclick="loadStats()">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-                <div class="header-avatar" id="headerAvatar">N</div>
-            </div>
-        </header>
         
         <!-- Page Content -->
         <div class="page-content">
