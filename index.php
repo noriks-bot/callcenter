@@ -2554,7 +2554,15 @@
                     // All tabs render in main content area
                     document.querySelector('.content').style.display = 'block';
                     currentPage = 1;
-                    renderTable();
+                    
+                    // Direct render for special tabs
+                    if (newTab === 'urgent') {
+                        renderUrgentTableInline();
+                    } else if (newTab === 'paketomati') {
+                        renderPaketomatiInline();
+                    } else {
+                        renderTable();
+                    }
 
                     // Update country tab counts to reflect current content type
                     updateCounts();
