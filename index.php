@@ -723,11 +723,15 @@
         </div>
 
         <div class="content">
-            <div class="filters-bar">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone...">
-                <button class="btn btn-save" id="addUrgentBtn" style="display:none;margin-left:auto;padding:8px 16px;" onclick="showAddUrgentModal()">
+            <!-- Urgent Add Button Bar (shown only for Nujno tab) -->
+            <div id="urgentActionBar" style="display:none;margin-bottom:12px;">
+                <button class="btn btn-save" id="addUrgentBtn" style="padding:10px 20px;font-size:14px;" onclick="showAddUrgentModal()">
                     <i class="fas fa-plus"></i> Dodaj nujni lead
                 </button>
+            </div>
+            
+            <div class="filters-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone...">
                 <select class="filter-select" id="statusFilter">
                     <option value="">All Status</option>
                     <option value="not_called">Not Called</option>
@@ -1901,7 +1905,7 @@
     </div>
 
     <!-- Add Urgent Lead Modal -->
-    <div class="modal-bg" id="addUrgentModal" style="display:none;">
+    <div class="modal-bg" id="addUrgentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:200;padding:20px;">
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title"><i class="fas fa-plus"></i> Dodaj nujni lead</div>
@@ -3159,9 +3163,9 @@
                 }
             }
 
-            // Hide urgent add button by default
-            const addUrgentBtn = document.getElementById('addUrgentBtn');
-            if (addUrgentBtn) addUrgentBtn.style.display = 'none';
+            // Hide urgent action bar by default
+            const urgentActionBar = document.getElementById('urgentActionBar');
+            if (urgentActionBar) urgentActionBar.style.display = 'none';
             
             // Handle urgent tab separately (uses localStorage, not server data)
             if (currentTab === 'urgent') {
@@ -7780,9 +7784,9 @@
                 return;
             }
             
-            // Show + button in filters bar
-            const addBtn = document.getElementById('addUrgentBtn');
-            if (addBtn) addBtn.style.display = 'inline-flex';
+            // Show urgent action bar
+            const actionBar = document.getElementById('urgentActionBar');
+            if (actionBar) actionBar.style.display = 'block';
             
             // Make sure container is visible
             container.style.display = 'block';
