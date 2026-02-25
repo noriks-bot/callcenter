@@ -3117,6 +3117,7 @@
         document.getElementById('statusFilter').addEventListener('change', renderTable);
 
         function renderTable() {
+            console.log('[renderTable] called, currentTab:', currentTab, 'currentContentTab:', currentContentTab);
             const search = document.getElementById('searchInput').value.toLowerCase();
             const status = document.getElementById('statusFilter').value;
             const container = document.getElementById('tableContainer');
@@ -3157,6 +3158,7 @@
             
             // Handle urgent tab separately (uses localStorage, not server data)
             if (currentTab === 'urgent') {
+                console.log('[renderTable] currentTab is urgent, calling renderUrgentTableInline');
                 renderUrgentTableInline();
                 return;
             }
@@ -7753,15 +7755,20 @@
         }
 
         function renderUrgentTableInline() {
+            console.log('[Urgent] renderUrgentTableInline called');
             loadUrgentLeads();
             const container = document.getElementById('tableContainer');
+            console.log('[Urgent] container:', container);
+            console.log('[Urgent] urgentLeads:', urgentLeads.length, 'items');
             
             // Show + button in filters bar
             const addBtn = document.getElementById('addUrgentBtn');
             if (addBtn) addBtn.style.display = 'inline-flex';
             
             if (!urgentLeads.length) {
+                console.log('[Urgent] No leads, showing empty state');
                 container.innerHTML = `<div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p><small style="color:var(--text-muted);">Klikni + Dodaj za vnos novega leada</small></div>`;
+                console.log('[Urgent] Container innerHTML set, length:', container.innerHTML.length);
                 return;
             }
             
