@@ -108,9 +108,9 @@ function formatPhoneForSms($phone, $storeCode) {
         $phone = $countryCode . $phone;
     }
     
-    // MetaKocka format: just digits, no spaces, no +
-    // Format: "306908238196" for Greece, "38640688722" for Slovenia
-    return $phone;
+    // MetaKocka format: +COUNTRYCODE followed by digits, no spaces
+    // Format: "+306908238196" for Greece, "+38640688722" for Slovenia
+    return '+' . $phone;
 }
 
 /**
