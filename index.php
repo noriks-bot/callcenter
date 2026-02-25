@@ -1076,40 +1076,314 @@
     </div>
     
     <!-- Add/Edit Automation Modal -->
+    <style>
+    /* Automation Modal Styles */
+    #automationModal {
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+    }
+    #automationModal .automation-modal-content {
+        max-width: 520px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 25px 60px -12px rgba(0,0,0,0.35);
+        animation: modalSlideIn 0.3s ease;
+        background: var(--card-bg);
+    }
+    @keyframes modalSlideIn {
+        from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    #automationModal .modal-header-automation {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+        padding: 32px;
+        position: relative;
+        overflow: hidden;
+    }
+    #automationModal .modal-header-automation::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        pointer-events: none;
+    }
+    #automationModal .header-icon {
+        width: 56px;
+        height: 56px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+    }
+    #automationModal .header-icon i {
+        font-size: 26px;
+        color: white;
+    }
+    #automationModal .modal-title-text {
+        color: white;
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+    }
+    #automationModal .modal-subtitle {
+        color: rgba(255,255,255,0.75);
+        font-size: 14px;
+        margin: 0;
+    }
+    #automationModal .close-btn-automation {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 36px;
+        height: 36px;
+        background: rgba(255,255,255,0.15);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #automationModal .close-btn-automation:hover {
+        background: rgba(255,255,255,0.25);
+        transform: scale(1.05);
+    }
+    #automationModal .modal-body-automation {
+        padding: 28px 32px;
+    }
+    #automationModal .field-group {
+        margin-bottom: 22px;
+    }
+    #automationModal .field-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        color: var(--text-secondary);
+    }
+    #automationModal .field-label i {
+        width: 16px;
+        color: #6366f1;
+    }
+    #automationModal .field-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid var(--card-border);
+        border-radius: 12px;
+        font-size: 15px;
+        background: var(--content-bg);
+        color: var(--text-primary);
+        transition: all 0.2s;
+    }
+    #automationModal .field-input:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+    #automationModal .field-input::placeholder {
+        color: var(--text-muted);
+    }
+    #automationModal .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    #automationModal .field-hint {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+    #automationModal .delay-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: var(--content-bg);
+        padding: 8px 16px 8px 8px;
+        border-radius: 12px;
+        border: 2px solid var(--card-border);
+    }
+    #automationModal .delay-input {
+        width: 72px;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-size: 20px;
+        font-weight: 700;
+        text-align: center;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+    }
+    #automationModal .delay-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    }
+    #automationModal .delay-text {
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+    #automationModal .status-card {
+        background: linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(34,197,94,0.02) 100%);
+        border: 2px solid rgba(34,197,94,0.15);
+        border-radius: 14px;
+        padding: 20px;
+        margin-top: 8px;
+    }
+    #automationModal .status-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        margin: 0;
+    }
+    #automationModal .status-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    #automationModal .status-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+    }
+    #automationModal .status-text strong {
+        display: block;
+        font-size: 15px;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+    }
+    #automationModal .status-text span {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+    /* Modern Toggle */
+    #automationModal .toggle-modern {
+        position: relative;
+        width: 54px;
+        height: 30px;
+    }
+    #automationModal .toggle-modern input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    #automationModal .toggle-track {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: #d1d5db;
+        border-radius: 30px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #automationModal .toggle-track::before {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    #automationModal .toggle-modern input:checked + .toggle-track {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    }
+    #automationModal .toggle-modern input:checked + .toggle-track::before {
+        transform: translateX(24px);
+    }
+    #automationModal .modal-footer-automation {
+        padding: 20px 32px 28px;
+        background: var(--content-bg);
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+    #automationModal .btn-cancel {
+        padding: 14px 24px;
+        border: 2px solid var(--card-border);
+        border-radius: 12px;
+        background: transparent;
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    #automationModal .btn-cancel:hover {
+        border-color: var(--text-muted);
+        color: var(--text-primary);
+    }
+    #automationModal .btn-save {
+        padding: 14px 28px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    #automationModal .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.4);
+    }
+    </style>
+    
     <div id="automationModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width: 560px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); padding: 28px 32px; border: none;">
-                <div>
-                    <h3 id="automationModalTitle" style="color: white; font-size: 22px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 12px;">
-                        <i class="fas fa-robot" style="font-size: 24px;"></i> 
-                        <span>Nova SMS avtomatizacija</span>
-                    </h3>
-                    <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0 0; font-size: 14px;">Nastavi avtomatsko pošiljanje SMS sporočil</p>
+        <div class="modal-content automation-modal-content">
+            <div class="modal-header-automation">
+                <div class="header-icon">
+                    <i class="fas fa-robot"></i>
                 </div>
-                <button class="modal-close" onclick="closeAutomationModal()" style="background: rgba(255,255,255,0.2); color: white; border: none;">&times;</button>
+                <h3 id="automationModalTitle" class="modal-title-text">Nova SMS avtomatizacija</h3>
+                <p class="modal-subtitle">Nastavi avtomatsko pošiljanje SMS sporočil</p>
+                <button class="close-btn-automation" onclick="closeAutomationModal()">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 32px;">
+            
+            <div class="modal-body-automation">
                 <form id="automationForm">
                     <input type="hidden" id="automationId" value="">
                     
-                    <!-- Name -->
-                    <div class="form-group" style="margin-bottom: 24px;">
-                        <label for="automationName" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
-                            <i class="fas fa-tag" style="color: var(--primary); width: 18px;"></i>
-                            Ime avtomatizacije
+                    <div class="field-group">
+                        <label class="field-label">
+                            <i class="fas fa-tag"></i> Ime avtomatizacije
                         </label>
-                        <input type="text" id="automationName" class="form-control" placeholder="npr. HR Zapuščena košarica 2h" required
-                            style="padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 2px solid var(--card-border); transition: all 0.2s;">
+                        <input type="text" id="automationName" class="field-input" placeholder="npr. HR Zapuščena košarica 2h" required>
                     </div>
                     
-                    <!-- Store & Type Row -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="automationStore" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
-                                <i class="fas fa-store" style="color: var(--primary); width: 18px;"></i>
-                                Trgovina
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label">
+                                <i class="fas fa-store"></i> Trgovina
                             </label>
-                            <select id="automationStore" class="form-control" required style="padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 2px solid var(--card-border);">
+                            <select id="automationStore" class="field-input" required>
                                 <option value="">Izberi...</option>
                                 <option value="hr">🇭🇷 Hrvaška</option>
                                 <option value="cz">🇨🇿 Češka</option>
@@ -1121,120 +1395,66 @@
                             </select>
                         </div>
                         
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="automationType" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
-                                <i class="fas fa-cogs" style="color: var(--primary); width: 18px;"></i>
-                                Tip
+                        <div class="field-group">
+                            <label class="field-label">
+                                <i class="fas fa-cog"></i> Tip
                             </label>
-                            <select id="automationType" class="form-control" required style="padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 2px solid var(--card-border);">
+                            <select id="automationType" class="field-input" required>
                                 <option value="abandoned_cart">🛒 Zapuščena košarica</option>
                             </select>
                         </div>
                     </div>
                     
-                    <!-- Template -->
-                    <div class="form-group" style="margin-bottom: 24px;">
-                        <label for="automationTemplate" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
-                            <i class="fas fa-comment-alt" style="color: var(--primary); width: 18px;"></i>
-                            SMS predloga
+                    <div class="field-group">
+                        <label class="field-label">
+                            <i class="fas fa-comment-dots"></i> SMS predloga
                         </label>
-                        <select id="automationTemplate" class="form-control" required style="padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 2px solid var(--card-border);">
+                        <select id="automationTemplate" class="field-input" required>
                             <option value="">Najprej izberi trgovino</option>
                         </select>
-                        <p style="margin: 8px 0 0 0; font-size: 13px; color: var(--text-muted);">
+                        <div class="field-hint">
                             <i class="fas fa-info-circle"></i> Predloge se naložijo glede na izbrano trgovino
-                        </p>
-                    </div>
-                    
-                    <!-- Delay -->
-                    <div class="form-group" style="margin-bottom: 28px;">
-                        <label for="automationDelay" style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">
-                            <i class="fas fa-clock" style="color: var(--primary); width: 18px;"></i>
-                            Zamik pošiljanja
-                        </label>
-                        <div style="display: flex; align-items: center; gap: 12px; background: var(--content-bg); padding: 14px 18px; border-radius: 10px; border: 2px solid var(--card-border);">
-                            <input type="number" id="automationDelay" class="form-control" min="1" max="72" value="2" required
-                                style="width: 70px; padding: 10px 12px; border-radius: 8px; font-size: 18px; font-weight: 700; text-align: center; border: 2px solid var(--primary); background: var(--card-bg);">
-                            <span style="color: var(--text-secondary); font-size: 15px;">ur po zapustitvi košarice</span>
                         </div>
                     </div>
                     
-                    <!-- Status Toggle -->
-                    <div style="background: linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(34,197,94,0.05) 100%); padding: 18px 20px; border-radius: 12px; border: 2px solid rgba(34,197,94,0.2);">
-                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 0;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <i class="fas fa-power-off" style="color: #22c55e; font-size: 20px;"></i>
-                                <div>
-                                    <div style="font-weight: 600; color: var(--text-primary);">Avtomatizacija aktivna</div>
-                                    <div style="font-size: 13px; color: var(--text-muted);">SMS se bo pošiljal avtomatsko</div>
+                    <div class="field-group">
+                        <label class="field-label">
+                            <i class="fas fa-clock"></i> Zamik pošiljanja
+                        </label>
+                        <div class="delay-wrapper">
+                            <input type="number" id="automationDelay" class="delay-input" min="1" max="72" value="2" required>
+                            <span class="delay-text">ur po zapustitvi košarice</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <label class="status-label">
+                            <div class="status-info">
+                                <div class="status-icon">
+                                    <i class="fas fa-power-off"></i>
+                                </div>
+                                <div class="status-text">
+                                    <strong>Avtomatizacija aktivna</strong>
+                                    <span>SMS se bo pošiljal avtomatsko</span>
                                 </div>
                             </div>
-                            <div class="toggle-switch">
+                            <div class="toggle-modern">
                                 <input type="checkbox" id="automationEnabled" checked>
-                                <span class="toggle-slider"></span>
+                                <span class="toggle-track"></span>
                             </div>
                         </label>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer" style="padding: 20px 32px 28px; border: none; background: var(--content-bg); gap: 12px;">
-                <button type="button" class="btn btn-secondary" onclick="closeAutomationModal()" style="padding: 14px 28px; border-radius: 10px; font-weight: 600;">
-                    Prekliči
-                </button>
-                <button type="button" class="btn btn-primary" onclick="saveAutomation()" style="padding: 14px 32px; border-radius: 10px; font-weight: 600; background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); border: none;">
-                    <i class="fas fa-check"></i> Shrani avtomatizacijo
+            
+            <div class="modal-footer-automation">
+                <button type="button" class="btn-cancel" onclick="closeAutomationModal()">Prekliči</button>
+                <button type="button" class="btn-save" onclick="saveAutomation()">
+                    <i class="fas fa-check"></i> Shrani
                 </button>
             </div>
         </div>
     </div>
-    
-    <style>
-    /* Toggle Switch */
-    .toggle-switch {
-        position: relative;
-        width: 52px;
-        height: 28px;
-    }
-    .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-    .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .3s;
-        border-radius: 28px;
-    }
-    .toggle-slider:before {
-        position: absolute;
-        content: "";
-        height: 22px;
-        width: 22px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: .3s;
-        border-radius: 50%;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .toggle-switch input:checked + .toggle-slider {
-        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-    }
-    .toggle-switch input:checked + .toggle-slider:before {
-        transform: translateX(24px);
-    }
-    #automationModal .form-control:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        outline: none;
-    }
-    </style>
 
     <!-- SMS Dashboard Content (shown when tab selected) -->
     <div id="smsDashboardContent" style="display:none;">
