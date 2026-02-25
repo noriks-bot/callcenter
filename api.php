@@ -2075,9 +2075,9 @@ function saveLastSeen($data) {
 function fetchPaketomatOrders($filter = 'all') {
     global $stores;
     
-    // Disable cache temporarily for debugging
-    // $cached = getCache('paketomat_orders_' . $filter, 120); // 2 min cache
-    // if ($cached !== null) return $cached;
+    // 5 min cache - API calls are slow
+    $cached = getCache('paketomat_orders_' . $filter, 300);
+    if ($cached !== null && $filter !== 'debug') return $cached;
     
     $statusData = loadPaketomatStatus();
     $allOrders = [];
@@ -2119,49 +2119,43 @@ function fetchPaketomatOrders($filter = 'all') {
     ];
     
     // STEP 1: Fetch recent orders from MetaKocka (search endpoint)
-    // Get 200 most recent orders (2 pages of 100 each, newest first)
+    // Get 100 most recent orders (newest first)
     $mkSearchUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
-    $orders = [];
+    $mkPayload = [
+        'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+        'company_id' => '6371',
+        'doc_type' => 'sales_order',
+        'result_type' => 'doc',
+        'limit' => 100,
+        'order_direction' => 'desc'
+    ];
     
-    foreach ([0, 100] as $offset) {
-        $mkPayload = [
-            'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
-            'company_id' => '6371',
-            'doc_type' => 'sales_order',
-            'result_type' => 'doc',
-            'limit' => 100,
-            'offset' => $offset,
-            'order_direction' => 'desc'
-        ];
-        
-        $ch = curl_init($mkSearchUrl);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_POSTFIELDS => json_encode($mkPayload),
-            CURLOPT_TIMEOUT => 30
-        ]);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-        
-        if ($curlError || $httpCode !== 200) {
-            error_log("[Paketomati] MetaKocka search error: HTTP $httpCode, error: $curlError");
-            continue;
-        }
-        
-        $data = json_decode($response, true);
-        if (!$data || !isset($data['opr_code']) || $data['opr_code'] !== '0') {
-            error_log("[Paketomati] MetaKocka search error response: " . json_encode($data));
-            continue;
-        }
-        
-        $pageOrders = $data['result'] ?? [];
-        $orders = array_merge($orders, $pageOrders);
+    $ch = curl_init($mkSearchUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => json_encode($mkPayload),
+        CURLOPT_TIMEOUT => 30
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+    
+    if ($curlError || $httpCode !== 200) {
+        error_log("[Paketomati] MetaKocka search error: HTTP $httpCode, error: $curlError");
+        return [];
     }
+    
+    $data = json_decode($response, true);
+    if (!$data || !isset($data['opr_code']) || $data['opr_code'] !== '0') {
+        error_log("[Paketomati] MetaKocka search error response: " . json_encode($data));
+        return [];
+    }
+    
+    $orders = $data['result'] ?? [];
     
     error_log("[Paketomati] Found " . count($orders) . " orders, fetching delivery events...");
     
@@ -2183,10 +2177,10 @@ function fetchPaketomatOrders($filter = 'all') {
         $mkId = $order['mk_id'] ?? null;
         if (!$mkId) continue;
         
-        // Limit API calls - max 50 shipped orders to check
+        // Limit API calls - max 30 shipped orders to check (balance speed vs coverage)
         $processedCount++;
         $debugInfo['processed'] = $processedCount;
-        if ($processedCount > 50) break;
+        if ($processedCount > 30) break;
         
         // Fetch delivery events for this order
         $getDocPayload = [
