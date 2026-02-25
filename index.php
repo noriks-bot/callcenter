@@ -1968,6 +1968,9 @@
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-exclamation-triangle"></i> Nujno</h1>
             <div class="page-header-actions">
+                <button class="btn btn-save" onclick="showAddUrgentModal()" style="margin-right:12px;">
+                    <i class="fas fa-plus"></i> Dodaj lead
+                </button>
                 <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -1975,14 +1978,8 @@
         </div>
 
         <div style="max-width:1200px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                <div>
-                    <h3 style="margin-bottom:8px;">📞 Nujni klici</h3>
-                    <p style="color:var(--text-muted);">Posebni leadi za klicanje z navodili. Ročno dodajanje - ni povezano s sistemom.</p>
-                </div>
-                <button class="btn btn-save" onclick="showAddUrgentModal()">
-                    <i class="fas fa-plus"></i> Dodaj lead
-                </button>
+            <div style="margin-bottom:24px;">
+                <p style="color:var(--text-muted);margin:0;">📞 Posebni leadi za klicanje z navodili. Ročno dodajanje — ni povezano s sistemom.</p>
             </div>
 
             <div class="table-card">
