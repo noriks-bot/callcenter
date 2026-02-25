@@ -2075,8 +2075,9 @@ function saveLastSeen($data) {
 function fetchPaketomatOrders($filter = 'all') {
     global $stores;
     
-    $cached = getCache('paketomat_orders_' . $filter, 120); // 2 min cache
-    if ($cached !== null) return $cached;
+    // Disable cache temporarily for debugging
+    // $cached = getCache('paketomat_orders_' . $filter, 120); // 2 min cache
+    // if ($cached !== null) return $cached;
     
     $statusData = loadPaketomatStatus();
     $allOrders = [];
@@ -2221,14 +2222,21 @@ function fetchPaketomatOrders($filter = 'all') {
         // Check if last event status is a paketomat status
         $isPaketomat = false;
         foreach ($PAKETOMAT_STATUSES as $paketStatus) {
-            if (stripos($lastEventStatus, $paketStatus) !== false || $lastEventStatus === $paketStatus) {
+            if (stripos($lastEventStatus, $paketStatus) !== false || strtolower($lastEventStatus) === strtolower($paketStatus)) {
                 $isPaketomat = true;
+                error_log("[Paketomati] MATCH: Order {$order['count_code']} - '$lastEventStatus' matches '$paketStatus'");
                 break;
             }
         }
         
         // If filter is not 'all_orders', only show paketomat orders
-        if ($filter !== 'all_orders' && !$isPaketomat) continue;
+        if ($filter !== 'all_orders' && !$isPaketomat) {
+            // Debug: log some skipped orders
+            if (strpos($lastEventStatus, 'InPost') !== false || strpos($lastEventStatus, 'paketomat') !== false) {
+                error_log("[Paketomati] SKIPPED but has keyword: Order {$order['count_code']} - '$lastEventStatus'");
+            }
+            continue;
+        }
         
         // Extract order details (merge from search + get_document results)
         $fullOrder = array_merge($order, $docData ?: []);
