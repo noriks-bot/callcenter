@@ -2075,62 +2075,38 @@ function saveLastSeen($data) {
 function fetchPaketomatOrders($filter = 'all') {
     global $stores;
     
-    // 5 min cache - API calls are slow
-    $cached = getCache('paketomat_orders_' . $filter, 300);
-    if ($cached !== null && $filter !== 'debug') return $cached;
+    $cached = getCache('paketomat_orders_' . $filter, 120); // 2 min cache
+    if ($cached !== null) return $cached;
     
     $statusData = loadPaketomatStatus();
     $allOrders = [];
     
     // PRAVILNA LOGIKA: Paketomat = naročilo kjer je ZADNJI delivery event eden od teh statusov
-    // To pomeni, da je paket TRENUTNO v paketomatu/pošti/pickup pointu in čaka na prevzem
+    // To pomeni, da je paket TRENUTNO v paketomatu in čaka na prevzem
     $PAKETOMAT_STATUSES = [
-        // GLS
         "Can be picked up from GLS parcel locker",
         "Can be picked up from ParcelShop",
-        // DPD / Pošta
         "Placed in the (collection) parcel machine",
         "Parcel stored in temporary parcel machine",
         "Packet has been delivered to its destination branch and is waiting for pickup",
-        // InPost / Packeta / Expedico
         "It's waiting to be collected at the Parcel Service Point",
         "Awaiting collection",
         "Accepted at an InPost branch",
-        "Rerouted to parcel machine",
-        // Croatian - Hrvatska Pošta / Overseas Express
-        "predana u paketomat",      // Delivered to paketomat
-        "Pošiljka predana u paketomat",
-        "predana na pickup",
-        "čeka preuzimanje",         // Waiting for pickup (HR)
-        // Generic waiting statuses (multiple languages)
-        "Čaka na prevzem",
-        "Waiting for pickup",
-        "Ready for pickup",
-        "Ready for collection",
-        "Available for pickup",
-        "Dostavljen na pošto",
-        "Dostavljen v paketnik",
-        "Dostavljen na prevzemno mesto",
-        "Delivered to parcel locker",
-        "Delivered to pickup point",
-        // Additional pickup indicators
-        "waiting at pickup",
-        "at collection point"
+        "Rerouted to parcel machine"
     ];
     
-    // STEP 1: Fetch recent orders from MetaKocka (search endpoint)
-    // Get 100 most recent orders (newest first)
-    $mkSearchUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
+    // MetaKocka API - fetch sales orders with delivery events (max 100 per request)
+    $mkUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
     $mkPayload = [
         'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
         'company_id' => '6371',
         'doc_type' => 'sales_order',
         'result_type' => 'doc',
         'limit' => 100,
-        'order_direction' => 'desc'
+        'return_delivery_service_events' => true
     ];
     
-    $ch = curl_init($mkSearchUrl);
+    $ch = curl_init($mkUrl);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
@@ -2145,184 +2121,75 @@ function fetchPaketomatOrders($filter = 'all') {
     curl_close($ch);
     
     if ($curlError || $httpCode !== 200) {
-        error_log("[Paketomati] MetaKocka search error: HTTP $httpCode, error: $curlError");
+        error_log("[Paketomati] MetaKocka API error: HTTP $httpCode, error: $curlError");
         return [];
     }
     
     $data = json_decode($response, true);
     if (!$data || !isset($data['opr_code']) || $data['opr_code'] !== '0') {
-        error_log("[Paketomati] MetaKocka search error response: " . json_encode($data));
+        error_log("[Paketomati] MetaKocka API error response: " . json_encode($data));
         return [];
     }
     
     $orders = $data['result'] ?? [];
     
-    error_log("[Paketomati] Found " . count($orders) . " orders, fetching delivery events...");
-    
-    // DEBUG: Track processing
-    $debugInfo = ['total_orders' => count($orders), 'processed' => 0, 'with_events' => 0, 'matched' => 0];
-    
-    // STEP 2: For each order, fetch delivery events using get_document
-    // Only check SHIPPED orders - those are the only ones that can be at pickup points
-    $mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
-    $processedCount = 0;
-    
-    // Filter to only shipped orders first (reduces API calls significantly)
-    $shippedOrders = array_filter($orders, function($o) {
-        return ($o['status_desc'] ?? '') === 'shipped';
-    });
-    $debugInfo['shipped_orders'] = count($shippedOrders);
-    
-    foreach ($shippedOrders as $order) {
-        $mkId = $order['mk_id'] ?? null;
-        if (!$mkId) continue;
-        
-        // Limit API calls - max 60 shipped orders to check
-        $processedCount++;
-        $debugInfo['processed'] = $processedCount;
-        if ($processedCount > 60) break;
-        
-        // Fetch delivery events for this order
-        $getDocPayload = [
-            'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
-            'company_id' => '6371',
-            'doc_type' => 'sales_order',
-            'doc_id' => $mkId,
-            'return_delivery_service_events' => 'true'
-        ];
-        
-        $ch = curl_init($mkGetDocUrl);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_POSTFIELDS => json_encode($getDocPayload),
-            CURLOPT_TIMEOUT => 10
-        ]);
-        
-        $docResponse = curl_exec($ch);
-        curl_close($ch);
-        
-        $docData = json_decode($docResponse, true);
-        $events = $docData['delivery_service_events'] ?? [];
-        
-        // MetaKocka returns dict for single event, array for multiple
-        if (is_array($events) && !isset($events['event_status'])) {
-            // It's an array of events
-        } else if (is_array($events) && isset($events['event_status'])) {
-            // Single event as dict
-            $events = [$events];
-        } else {
-            $events = [];
-        }
+    foreach ($orders as $order) {
+        $events = $order['delivery_service_events'] ?? [];
         
         // Skip orders without delivery events
         if (empty($events)) continue;
         
-        $debugInfo['with_events']++;
-        
-        // Get the FIRST (newest) event - MetaKocka returns events newest first
-        $lastEvent = $events[0] ?? [];
+        // Get the LAST (newest) event - array is chronological, last = newest
+        $lastEvent = end($events);
         $lastEventStatus = $lastEvent['event_status'] ?? '';
-        
-        // DEBUG: Check specific orders
-        $isDebugOrder = strpos($order['count_code'] ?? '', '5278') !== false || strpos($order['count_code'] ?? '', '5239') !== false;
-        if ($isDebugOrder) {
-            error_log("[Paketomati] DEBUG ORDER {$order['count_code']}: lastEventStatus = '$lastEventStatus'");
-        }
         
         // Check if last event status is a paketomat status
         $isPaketomat = false;
         foreach ($PAKETOMAT_STATUSES as $paketStatus) {
-            if (stripos($lastEventStatus, $paketStatus) !== false || strtolower($lastEventStatus) === strtolower($paketStatus)) {
+            if (stripos($lastEventStatus, $paketStatus) !== false || $lastEventStatus === $paketStatus) {
                 $isPaketomat = true;
-                error_log("[Paketomati] MATCH: Order {$order['count_code']} - '$lastEventStatus' matches '$paketStatus'");
-                $debugInfo['matched']++;
                 break;
             }
         }
         
-        if ($isDebugOrder) {
-            error_log("[Paketomati] DEBUG ORDER {$order['count_code']}: isPaketomat = " . ($isPaketomat ? 'true' : 'false'));
-        }
-        
         // If filter is not 'all_orders', only show paketomat orders
-        if ($filter !== 'all_orders' && !$isPaketomat) {
-            if ($isDebugOrder) {
-                error_log("[Paketomati] DEBUG ORDER {$order['count_code']}: SKIPPED (filter=$filter, isPaketomat=false)");
-            }
-            continue;
-        }
+        if ($filter !== 'all_orders' && !$isPaketomat) continue;
         
-        // Extract order details (merge from search + get_document results)
-        $fullOrder = array_merge($order, $docData ?: []);
-        
-        $orderId = 'mk_' . ($fullOrder['count_code'] ?? $fullOrder['mk_id'] ?? uniqid());
-        $orderNumber = $fullOrder['count_code'] ?? '';
+        // Extract order details
+        $orderId = 'mk_' . ($order['count_code'] ?? $order['mk_id'] ?? uniqid());
+        $orderNumber = $order['count_code'] ?? '';
         
         // Partner (customer) info
-        $partner = $fullOrder['partner'] ?? [];
-        $partnerContact = $partner['partner_contact'] ?? [];
-        $customerName = $partner['customer'] ?? $partner['name'] ?? '';
-        $email = $partnerContact['email'] ?? $partner['email'] ?? '';
-        $phone = $partnerContact['gsm'] ?? $partnerContact['phone'] ?? $partner['phone'] ?? '';
+        $partner = $order['partner'] ?? [];
+        $customerName = $partner['name'] ?? '';
+        $email = $partner['email'] ?? '';
+        $phone = $partner['phone'] ?? $partner['phone2'] ?? '';
         
         // Address info
         $street = $partner['street'] ?? '';
-        $city = $partner['place'] ?? $partner['city'] ?? '';
+        $city = $partner['city'] ?? '';
         $postcode = $partner['post_number'] ?? '';
         $country = $partner['country'] ?? '';
         
         // Delivery service info
-        $deliveryService = $fullOrder['delivery_type'] ?? $fullOrder['delivery_service'] ?? '';
-        $trackingCode = '';
-        $extraColumns = $fullOrder['extra_column'] ?? [];
-        foreach ($extraColumns as $col) {
-            if (($col['name'] ?? '') === 'tracking_number') {
-                $trackingCode = $col['value'] ?? '';
-                break;
-            }
-        }
+        $deliveryService = $order['delivery_service'] ?? '';
+        $trackingCode = $order['delivery_service_tracking_code'] ?? '';
         
         // Paketomat location - try to extract from delivery point or last event
-        $paketomatLocation = $fullOrder['parcel_shop_id'] ?? $fullOrder['delivery_point_name'] ?? '';
+        $paketomatLocation = $order['delivery_point_name'] ?? $order['delivery_service_point'] ?? '';
         if (!$paketomatLocation && $lastEvent) {
             $paketomatLocation = $lastEvent['location'] ?? $lastEventStatus;
         }
         
         // Order total and currency
-        $orderTotal = floatval($fullOrder['sum_all'] ?? $fullOrder['total'] ?? 0);
-        $currency = $fullOrder['currency_code'] ?? 'EUR';
+        $orderTotal = floatval($order['sum_all'] ?? $order['total'] ?? 0);
+        $currency = $order['currency_code'] ?? 'EUR';
         
         // Created date
-        $createdAt = $fullOrder['doc_date'] ?? $fullOrder['order_create_ts'] ?? '';
+        $createdAt = $order['doc_date'] ?? $order['date_created'] ?? '';
         
-        // Order status from MetaKocka
-        $orderStatus = $fullOrder['status_code'] ?? '';
-        
-        // Get store code from eshop_name or guess from country
-        $eshopName = $fullOrder['eshop_name'] ?? '';
-        $storeCode = 'si';
-        if (preg_match('/\.([a-z]{2})\./', $eshopName, $m)) {
-            $storeCode = $m[1];
-        } elseif (stripos($eshopName, 'sk') !== false) {
-            $storeCode = 'sk';
-        } elseif (stripos($eshopName, 'cz') !== false) {
-            $storeCode = 'cz';
-        } elseif (stripos($eshopName, 'pl') !== false) {
-            $storeCode = 'pl';
-        } elseif (stripos($eshopName, 'hr') !== false) {
-            $storeCode = 'hr';
-        } elseif (stripos($eshopName, 'hu') !== false) {
-            $storeCode = 'hu';
-        } elseif (stripos($eshopName, 'gr') !== false) {
-            $storeCode = 'gr';
-        } elseif (!empty($country)) {
-            // Fallback: guess from country name
-            $countryMap = ['Slovakia' => 'sk', 'Czech Republic' => 'cz', 'Poland' => 'pl', 
-                           'Croatia' => 'hr', 'Hungary' => 'hu', 'Greece' => 'gr', 'Slovenia' => 'si'];
-            $storeCode = $countryMap[$country] ?? strtolower(substr($country, 0, 2));
-        }
+        // Get store code from webshop or guess from country
+        $storeCode = strtolower($order['webshop'] ?? $country ?? 'si');
         $storeFlag = $stores[$storeCode]['flag'] ?? '🏳️';
         
         // Saved status
@@ -2351,7 +2218,7 @@ function fetchPaketomatOrders($filter = 'all') {
             'city' => $city,
             'postcode' => $postcode,
             'country' => strtoupper($country),
-            'orderStatus' => $orderStatus,
+            'orderStatus' => $order['status_code'] ?? '',
             'storeCode' => $storeCode,
             'storeFlag' => $storeFlag,
             'isPaketomat' => $isPaketomat
@@ -2365,14 +2232,7 @@ function fetchPaketomatOrders($filter = 'all') {
         return strtotime($dateB) - strtotime($dateA);
     });
     
-    // Don't cache while debugging
-    // setCache('paketomat_orders_' . $filter, $allOrders);
-    
-    // Add debug info to response if filter is 'debug'
-    if ($filter === 'debug') {
-        return ['debug' => $debugInfo, 'orders' => $allOrders];
-    }
-    
+    setCache('paketomat_orders_' . $filter, $allOrders);
     return $allOrders;
 }
 
@@ -3604,75 +3464,10 @@ try {
         case 'paketomati-debug':
             // Show ALL orders for debugging
             echo json_encode([
-                'debug_info' => fetchPaketomatOrders('debug'),
-                'paketomat_only_count' => count(fetchPaketomatOrders('all')),
-                'cache_info' => 'Cache disabled for debugging'
+                'all_orders' => fetchPaketomatOrders('all_orders'),
+                'paketomat_only' => fetchPaketomatOrders('all'),
+                'cache_info' => 'Cache TTL: 60 seconds'
             ]);
-            break;
-            
-        case 'paketomati-raw':
-            // Raw debug - check specific orders
-            $rawDebug = [];
-            $testOrders = ['1200043985993', '1200043941068']; // 5278 and 5239
-            
-            // First get mk_id for 5239
-            $searchPayload = [
-                'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
-                'company_id' => '6371',
-                'doc_type' => 'sales_order',
-                'result_type' => 'doc',
-                'limit' => 100,
-                'order_direction' => 'desc'
-            ];
-            $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/search');
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST => true,
-                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                CURLOPT_POSTFIELDS => json_encode($searchPayload),
-                CURLOPT_TIMEOUT => 30
-            ]);
-            $searchResp = curl_exec($ch);
-            curl_close($ch);
-            $searchData = json_decode($searchResp, true);
-            
-            // Find 5278 and 5239
-            $found = [];
-            foreach ($searchData['result'] ?? [] as $i => $o) {
-                if (strpos($o['count_code'] ?? '', '5278') !== false || strpos($o['count_code'] ?? '', '5239') !== false) {
-                    $found[] = ['position' => $i, 'mk_id' => $o['mk_id'], 'count_code' => $o['count_code']];
-                }
-            }
-            $rawDebug['found_orders'] = $found;
-            
-            // Check delivery events for each
-            foreach ($found as $f) {
-                $docPayload = [
-                    'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
-                    'company_id' => '6371',
-                    'doc_type' => 'sales_order',
-                    'doc_id' => $f['mk_id'],
-                    'return_delivery_service_events' => 'true'
-                ];
-                $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/get_document');
-                curl_setopt_array($ch, [
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_POST => true,
-                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                    CURLOPT_POSTFIELDS => json_encode($docPayload),
-                    CURLOPT_TIMEOUT => 10
-                ]);
-                $docResp = curl_exec($ch);
-                curl_close($ch);
-                $docData = json_decode($docResp, true);
-                $events = $docData['delivery_service_events'] ?? [];
-                if (is_array($events) && isset($events['event_status'])) {
-                    $events = [$events];
-                }
-                $rawDebug['events_' . $f['count_code']] = $events;
-            }
-            
-            echo json_encode($rawDebug, JSON_PRETTY_PRINT);
             break;
             
         case 'paketomati-update':
