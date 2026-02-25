@@ -1073,10 +1073,12 @@
     </div>
     
     <!-- Add/Edit Automation Modal -->
-    <div id="automationModalBg" class="modal-bg" style="position:fixed;inset:0;z-index:200;" onclick="if(event.target===this)closeAutomationModal()">
-        <div class="modal" style="max-width: 480px;">
+    <div id="automationModalBg" class="modal-bg" onclick="if(event.target===this)closeAutomationModal()">
+        <div class="modal" style="max-width: 500px;">
             <div class="modal-header">
-                <h3 class="modal-title" id="automationModalTitle">Nova SMS avtomatizacija</h3>
+                <h3 class="modal-title" id="automationModalTitle">
+                    <i class="fas fa-robot" style="margin-right: 8px; color: var(--primary);"></i>Nova SMS avtomatizacija
+                </h3>
                 <button class="modal-close" onclick="closeAutomationModal()">&times;</button>
             </div>
             
@@ -1117,8 +1119,8 @@
                         <select id="automationTemplate" class="form-select" required>
                             <option value="">Najprej izberi trgovino</option>
                         </select>
-                        <small style="color: var(--text-muted); font-size: 12px; margin-top: 4px; display: block;">
-                            Predloge se naložijo glede na izbrano trgovino
+                        <small style="color: var(--text-muted); font-size: 12px; margin-top: 6px; display: block;">
+                            <i class="fas fa-info-circle"></i> Predloge se naložijo glede na izbrano trgovino
                         </small>
                     </div>
                     
@@ -1130,10 +1132,13 @@
                         </div>
                     </div>
                     
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                            <input type="checkbox" id="automationEnabled" checked style="width: 18px; height: 18px;">
-                            <span style="font-size: 14px;">Avtomatizacija aktivna</span>
+                    <div class="form-group" style="margin-bottom: 0; padding: 16px; background: var(--content-bg); border-radius: var(--radius-md);">
+                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" id="automationEnabled" checked style="width: 18px; height: 18px; accent-color: var(--primary);">
+                            <div>
+                                <div style="font-weight: 500; font-size: 14px;">Avtomatizacija aktivna</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">SMS se bo pošiljal avtomatsko</div>
+                            </div>
                         </label>
                     </div>
                 </form>
