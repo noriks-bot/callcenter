@@ -4026,15 +4026,19 @@
             const product = smsTarget?.cartContents?.[0]?.name || 'vaš izdelek';
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[smsTarget?.currency] || '€';
             const price = sym + (smsTarget?.cartValue?.toFixed(2) || '0.00');
-            const storeUrl = `noriks.com/${storeCode}/checkout`;
+            const storeUrl = `noriks.com/${storeCode}`;
+            const couponUrl = `noriks.com/${storeCode}/checkout/?coupon=SMS20`;
 
             text = text.replace(/{ime}/g, firstName)
                        .replace(/{produkt}/g, product)
                        .replace(/{cena}/g, price)
-                       .replace(/{link}/g, storeUrl);
+                       .replace(/{link_coupon}/g, couponUrl)
+                       .replace(/{link}/g, storeUrl)
+                       .replace(/{shop_link}/g, storeUrl);
 
             document.getElementById('smsMessage').value = text;
             updateCharCount();
+            console.log('[SMS] Template applied:', tpl, 'for store:', storeCode);
         }
 
         function updateCharCount() {
