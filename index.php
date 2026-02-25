@@ -674,6 +674,27 @@
 
     <!-- Main -->
     <main class="main" id="main">
+        <!-- Stats Grid (at top) -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
+                <div><div class="stat-value" id="statCarts">0</div><div class="stat-label">Abandoned Carts</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-euro-sign"></i></div>
+                <div><div class="stat-value" id="statValue">€0</div><div class="stat-label">Total Value</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                <div><div class="stat-value" id="statPending">0</div><div class="stat-label">Pending Orders</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fas fa-comment-sms"></i></div>
+                <div><div class="stat-value" id="statSms">0</div><div class="stat-label">SMS Sent Today</div></div>
+            </div>
+        </div>
+        
+        <!-- Country Tabs -->
         <div class="country-tabs" id="countryTabs"></div>
 
         <!-- Content Type Tabs (below country tabs) -->
@@ -703,25 +724,6 @@
                 <span>Nujno</span>
                 <span class="count" id="contentCount-urgent">0</span>
             </button>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
-                <div><div class="stat-value" id="statCarts">0</div><div class="stat-label">Abandoned Carts</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon green"><i class="fas fa-euro-sign"></i></div>
-                <div><div class="stat-value" id="statValue">€0</div><div class="stat-label">Total Value</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
-                <div><div class="stat-value" id="statPending">0</div><div class="stat-label">Pending Orders</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon purple"><i class="fas fa-comment-sms"></i></div>
-                <div><div class="stat-value" id="statSms">0</div><div class="stat-label">SMS Sent Today</div></div>
-            </div>
         </div>
 
         <div class="content">
