@@ -2072,7 +2072,297 @@ function saveLastSeen($data) {
     file_put_contents($lastSeenFile, json_encode($data, JSON_PRETTY_PRINT));
 }
 
+/**
+ * BUILD FULL PAKETOMATI CACHE
+ * Fetches ALL orders in batches, checks delivery events in parallel
+ * Called by cron every 15 min
+ */
+function buildPaketomatiCacheFull() {
+    $startTime = microtime(true);
+    $cacheFile = __DIR__ . '/data/paketomati-cache.json';
+    
+    // Ensure data directory exists
+    $dataDir = __DIR__ . '/data';
+    if (!is_dir($dataDir)) mkdir($dataDir, 0755, true);
+    
+    $PAKETOMAT_STATUSES = [
+        // GLS
+        "Can be picked up from GLS parcel locker",
+        "Can be picked up from ParcelShop",
+        // DPD / Pošta
+        "Placed in the (collection) parcel machine",
+        "Parcel stored in temporary parcel machine",
+        "Packet has been delivered to its destination branch and is waiting for pickup",
+        // InPost / Packeta / Expedico
+        "It's waiting to be collected at the Parcel Service Point",
+        "Awaiting collection",
+        "Accepted at an InPost branch",
+        "Rerouted to parcel machine",
+        // Croatian - Hrvatska Pošta / Overseas Express
+        "predana u paketomat",
+        "Pošiljka predana u paketomat",
+        "predana na pickup",
+        "čeka preuzimanje",
+        // Generic waiting statuses
+        "Čaka na prevzem",
+        "Waiting for pickup",
+        "Ready for pickup",
+        "Ready for collection",
+        "Available for pickup",
+        "Dostavljen na pošto",
+        "Dostavljen v paketnik",
+        "Dostavljen na prevzemno mesto",
+        "Delivered to parcel locker",
+        "Delivered to pickup point",
+        "waiting at pickup",
+        "at collection point"
+    ];
+    
+    $mkSearchUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
+    $mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
+    $secretKey = 'ee759602-961d-4431-ac64-0725ae8d9665';
+    $companyId = '6371';
+    
+    $allShippedOrders = [];
+    $stats = ['batches' => 0, 'total_orders' => 0, 'shipped' => 0, 'with_events' => 0, 'matched' => 0];
+    
+    // STEP 1: Fetch orders in batches of 100 (up to 500 total)
+    for ($offset = 0; $offset < 500; $offset += 100) {
+        $stats['batches']++;
+        
+        $searchPayload = [
+            'secret_key' => $secretKey,
+            'company_id' => $companyId,
+            'doc_type' => 'sales_order',
+            'result_type' => 'doc',
+            'limit' => 100,
+            'offset' => $offset,
+            'order_direction' => 'desc'
+        ];
+        
+        $ch = curl_init($mkSearchUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode($searchPayload),
+            CURLOPT_TIMEOUT => 30
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode !== 200) {
+            error_log("[PaketomatiCache] Batch $offset failed: HTTP $httpCode");
+            break;
+        }
+        
+        $data = json_decode($response, true);
+        $orders = $data['result'] ?? [];
+        
+        if (empty($orders)) break; // No more orders
+        
+        $stats['total_orders'] += count($orders);
+        
+        // Filter to shipped only
+        foreach ($orders as $order) {
+            if (($order['status_desc'] ?? '') === 'shipped') {
+                $allShippedOrders[] = $order;
+            }
+        }
+        
+        // If we got less than 100, we've reached the end
+        if (count($orders) < 100) break;
+    }
+    
+    $stats['shipped'] = count($allShippedOrders);
+    error_log("[PaketomatiCache] Found {$stats['shipped']} shipped orders from {$stats['total_orders']} total");
+    
+    // STEP 2: Fetch delivery events in parallel using curl_multi
+    $paketomatOrders = [];
+    $statusData = loadPaketomatStatus();
+    $batchSize = 20; // Process 20 orders at a time
+    
+    for ($i = 0; $i < count($allShippedOrders); $i += $batchSize) {
+        $batch = array_slice($allShippedOrders, $i, $batchSize);
+        $multiHandle = curl_multi_init();
+        $curlHandles = [];
+        
+        // Setup parallel requests
+        foreach ($batch as $idx => $order) {
+            $mkId = $order['mk_id'] ?? null;
+            if (!$mkId) continue;
+            
+            $payload = [
+                'secret_key' => $secretKey,
+                'company_id' => $companyId,
+                'doc_type' => 'sales_order',
+                'doc_id' => $mkId,
+                'return_delivery_service_events' => 'true'
+            ];
+            
+            $ch = curl_init($mkGetDocUrl);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS => json_encode($payload),
+                CURLOPT_TIMEOUT => 15
+            ]);
+            
+            curl_multi_add_handle($multiHandle, $ch);
+            $curlHandles[$idx] = ['handle' => $ch, 'order' => $order];
+        }
+        
+        // Execute all requests
+        $running = null;
+        do {
+            curl_multi_exec($multiHandle, $running);
+            curl_multi_select($multiHandle);
+        } while ($running > 0);
+        
+        // Process responses
+        foreach ($curlHandles as $idx => $item) {
+            $response = curl_multi_getcontent($item['handle']);
+            curl_multi_remove_handle($multiHandle, $item['handle']);
+            curl_close($item['handle']);
+            
+            $docData = json_decode($response, true);
+            $order = $item['order'];
+            $events = $docData['delivery_service_events'] ?? [];
+            
+            // Normalize events (MetaKocka returns dict for single, array for multiple)
+            if (is_array($events) && isset($events['event_status'])) {
+                $events = [$events];
+            } else if (!is_array($events) || empty($events)) {
+                continue;
+            }
+            
+            $stats['with_events']++;
+            
+            // Check FIRST (newest) event
+            $lastEvent = $events[0] ?? [];
+            $lastEventStatus = $lastEvent['event_status'] ?? '';
+            
+            // Match against paketomat statuses
+            $isPaketomat = false;
+            foreach ($PAKETOMAT_STATUSES as $status) {
+                if (stripos($lastEventStatus, $status) !== false) {
+                    $isPaketomat = true;
+                    break;
+                }
+            }
+            
+            if (!$isPaketomat) continue;
+            
+            $stats['matched']++;
+            
+            // Build order object for cache
+            $fullOrder = array_merge($order, $docData ?: []);
+            $orderId = 'mk_' . ($fullOrder['count_code'] ?? $fullOrder['mk_id'] ?? uniqid());
+            $partner = $fullOrder['partner'] ?? [];
+            $partnerContact = $partner['partner_contact'] ?? [];
+            
+            // Extract tracking code
+            $trackingCode = '';
+            foreach ($fullOrder['extra_column'] ?? [] as $col) {
+                if (($col['name'] ?? '') === 'tracking_number') {
+                    $trackingCode = $col['value'] ?? '';
+                    break;
+                }
+            }
+            
+            // Get store code
+            $eshopName = $fullOrder['eshop_name'] ?? '';
+            $storeCode = 'si';
+            if (preg_match('/\.([a-z]{2})\./', $eshopName, $m)) {
+                $storeCode = $m[1];
+            } elseif (preg_match('/(sk|cz|pl|hr|hu|gr|it)/i', $eshopName, $m)) {
+                $storeCode = strtolower($m[1]);
+            }
+            
+            $paketomatOrders[] = [
+                'id' => $orderId,
+                'orderNumber' => $fullOrder['count_code'] ?? '',
+                'customer' => [
+                    'name' => $partner['customer'] ?? $partner['name'] ?? '',
+                    'email' => $partnerContact['email'] ?? $partner['email'] ?? '',
+                    'phone' => $partnerContact['gsm'] ?? $partnerContact['phone'] ?? $partner['phone'] ?? ''
+                ],
+                'address' => [
+                    'street' => $partner['street'] ?? '',
+                    'city' => $partner['place'] ?? $partner['city'] ?? '',
+                    'postcode' => $partner['post_number'] ?? '',
+                    'country' => $partner['country'] ?? ''
+                ],
+                'deliveryService' => $fullOrder['delivery_type'] ?? '',
+                'trackingCode' => $trackingCode,
+                'paketomatLocation' => $lastEventStatus,
+                'lastDeliveryEvent' => $lastEventStatus,
+                'orderTotal' => floatval($fullOrder['sum_all'] ?? 0),
+                'currency' => $fullOrder['currency_code'] ?? 'EUR',
+                'createdAt' => $fullOrder['doc_date'] ?? '',
+                'status' => $statusData[$orderId]['status'] ?? 'new',
+                'notes' => $statusData[$orderId]['notes'] ?? '',
+                'storeCode' => $storeCode
+            ];
+        }
+        
+        curl_multi_close($multiHandle);
+    }
+    
+    // Save to cache file
+    $cacheData = [
+        'generated_at' => date('c'),
+        'stats' => $stats,
+        'duration_sec' => round(microtime(true) - $startTime, 2),
+        'orders' => $paketomatOrders
+    ];
+    
+    file_put_contents($cacheFile, json_encode($cacheData, JSON_PRETTY_PRINT));
+    
+    error_log("[PaketomatiCache] Done: {$stats['matched']} paketomati from {$stats['shipped']} shipped orders in {$cacheData['duration_sec']}s");
+    
+    return $cacheData;
+}
+
 function fetchPaketomatOrders($filter = 'all') {
+    global $stores;
+    
+    // READ FROM JSON CACHE FILE (built by cron)
+    $cacheFile = __DIR__ . '/data/paketomati-cache.json';
+    if (file_exists($cacheFile)) {
+        $cacheData = json_decode(file_get_contents($cacheFile), true);
+        if ($cacheData && isset($cacheData['orders'])) {
+            $orders = $cacheData['orders'];
+            
+            // Apply status data overlay
+            $statusData = loadPaketomatStatus();
+            foreach ($orders as &$order) {
+                $orderId = $order['id'] ?? '';
+                if (isset($statusData[$orderId])) {
+                    $order['status'] = $statusData[$orderId]['status'] ?? $order['status'];
+                    $order['notes'] = $statusData[$orderId]['notes'] ?? $order['notes'];
+                }
+            }
+            
+            // Filter if needed
+            if ($filter !== 'all' && $filter !== 'debug') {
+                $orders = array_filter($orders, function($o) use ($filter) {
+                    return ($o['status'] ?? 'new') === $filter;
+                });
+            }
+            
+            return array_values($orders);
+        }
+    }
+    
+    // Fallback: return empty if no cache (cron will build it)
+    return [];
+}
+
+function fetchPaketomatOrdersLegacy($filter = 'all') {
     global $stores;
     
     // 5 min cache - API calls are slow
@@ -3613,11 +3903,12 @@ try {
         case 'refresh-paketomati-cache':
             // CRON: */15 * * * * curl -s "https://callcenter.noriks.com/api.php?action=refresh-paketomati-cache"
             set_time_limit(300);
-            // Force cache refresh by calling with no cache
-            $paketomati = fetchPaketomatOrders('all');
+            $cacheResult = buildPaketomatiCacheFull();
             echo json_encode([
                 'success' => true,
-                'paketomatCount' => count($paketomati)
+                'paketomatCount' => count($cacheResult['orders'] ?? []),
+                'stats' => $cacheResult['stats'] ?? [],
+                'duration' => $cacheResult['duration_sec'] ?? 0
             ]);
             break;
             
