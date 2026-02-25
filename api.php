@@ -2303,7 +2303,7 @@ function buildPaketomatiCacheFull() {
                 'orderTotal' => floatval($fullOrder['sum_all'] ?? 0),
                 'currency' => $fullOrder['currency_code'] ?? 'EUR',
                 'createdAt' => $fullOrder['doc_date'] ?? '',
-                'status' => $statusData[$orderId]['status'] ?? 'new',
+                'status' => $statusData[$orderId]['status'] ?? 'not_called',
                 'notes' => $statusData[$orderId]['notes'] ?? '',
                 'storeCode' => $storeCode
             ];
@@ -2350,7 +2350,7 @@ function fetchPaketomatOrders($filter = 'all') {
             // Filter if needed
             if ($filter !== 'all' && $filter !== 'debug') {
                 $orders = array_filter($orders, function($o) use ($filter) {
-                    return ($o['status'] ?? 'new') === $filter;
+                    return ($o['status'] ?? 'not_called') === $filter;
                 });
             }
             
