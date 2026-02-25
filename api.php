@@ -2082,31 +2082,50 @@ function fetchPaketomatOrders($filter = 'all') {
     $allOrders = [];
     
     // PRAVILNA LOGIKA: Paketomat = naročilo kjer je ZADNJI delivery event eden od teh statusov
-    // To pomeni, da je paket TRENUTNO v paketomatu in čaka na prevzem
+    // To pomeni, da je paket TRENUTNO v paketomatu/pošti/pickup pointu in čaka na prevzem
     $PAKETOMAT_STATUSES = [
+        // GLS
         "Can be picked up from GLS parcel locker",
         "Can be picked up from ParcelShop",
+        // DPD / Pošta
         "Placed in the (collection) parcel machine",
         "Parcel stored in temporary parcel machine",
         "Packet has been delivered to its destination branch and is waiting for pickup",
+        // InPost / Packeta
         "It's waiting to be collected at the Parcel Service Point",
         "Awaiting collection",
         "Accepted at an InPost branch",
-        "Rerouted to parcel machine"
+        "Rerouted to parcel machine",
+        // Generic waiting statuses (multiple languages)
+        "Čaka na prevzem",
+        "Waiting for pickup",
+        "Ready for pickup",
+        "Ready for collection",
+        "Available for pickup",
+        "Dostavljen na pošto",
+        "Dostavljen v paketnik",
+        "Dostavljen na prevzemno mesto",
+        "Delivered to parcel locker",
+        "Delivered to pickup point"
     ];
     
-    // MetaKocka API - fetch sales orders with delivery events (max 100 per request)
-    $mkUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
+    // STEP 1: Fetch recent orders from MetaKocka (search endpoint)
+    // Get orders from last 14 days to reduce API calls, then filter by delivery events
+    $mkSearchUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
+    $dateFrom = date('Y-m-d', strtotime('-14 days')) . '+01:00';
     $mkPayload = [
         'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
         'company_id' => '6371',
         'doc_type' => 'sales_order',
         'result_type' => 'doc',
         'limit' => 100,
-        'return_delivery_service_events' => true
+        'order_direction' => 'desc',
+        'query_advance' => [
+            ['type' => 'doc_date_from', 'value' => $dateFrom]
+        ]
     ];
     
-    $ch = curl_init($mkUrl);
+    $ch = curl_init($mkSearchUrl);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
@@ -2121,26 +2140,77 @@ function fetchPaketomatOrders($filter = 'all') {
     curl_close($ch);
     
     if ($curlError || $httpCode !== 200) {
-        error_log("[Paketomati] MetaKocka API error: HTTP $httpCode, error: $curlError");
+        error_log("[Paketomati] MetaKocka search error: HTTP $httpCode, error: $curlError");
         return [];
     }
     
     $data = json_decode($response, true);
     if (!$data || !isset($data['opr_code']) || $data['opr_code'] !== '0') {
-        error_log("[Paketomati] MetaKocka API error response: " . json_encode($data));
+        error_log("[Paketomati] MetaKocka search error response: " . json_encode($data));
         return [];
     }
     
     $orders = $data['result'] ?? [];
+    error_log("[Paketomati] Found " . count($orders) . " open orders, fetching delivery events...");
+    
+    // STEP 2: For each order, fetch delivery events using get_document
+    // Only process shipped orders (not completed/closed)
+    $mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
+    $processedCount = 0;
     
     foreach ($orders as $order) {
-        $events = $order['delivery_service_events'] ?? [];
+        $mkId = $order['mk_id'] ?? null;
+        if (!$mkId) continue;
+        
+        // Skip completed/closed orders - only shipped orders can be at pickup points
+        $orderStatusDesc = $order['status_desc'] ?? '';
+        if (in_array($orderStatusDesc, ['completed', 'manually_closed', 'finished', 'closed'])) {
+            continue;
+        }
+        
+        // Limit API calls - max 50 orders
+        $processedCount++;
+        if ($processedCount > 50) break;
+        
+        // Fetch delivery events for this order
+        $getDocPayload = [
+            'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+            'company_id' => '6371',
+            'doc_type' => 'sales_order',
+            'doc_id' => $mkId,
+            'return_delivery_service_events' => 'true'
+        ];
+        
+        $ch = curl_init($mkGetDocUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode($getDocPayload),
+            CURLOPT_TIMEOUT => 10
+        ]);
+        
+        $docResponse = curl_exec($ch);
+        curl_close($ch);
+        
+        $docData = json_decode($docResponse, true);
+        $events = $docData['delivery_service_events'] ?? [];
+        
+        // MetaKocka returns dict for single event, array for multiple
+        if (is_array($events) && !isset($events['event_status'])) {
+            // It's an array of events
+        } else if (is_array($events) && isset($events['event_status'])) {
+            // Single event as dict
+            $events = [$events];
+        } else {
+            $events = [];
+        }
         
         // Skip orders without delivery events
         if (empty($events)) continue;
         
-        // Get the LAST (newest) event - array is chronological, last = newest
-        $lastEvent = end($events);
+        // Get the FIRST (newest) event - MetaKocka returns events newest first
+        $lastEvent = $events[0] ?? [];
         $lastEventStatus = $lastEvent['event_status'] ?? '';
         
         // Check if last event status is a paketomat status
@@ -2155,41 +2225,75 @@ function fetchPaketomatOrders($filter = 'all') {
         // If filter is not 'all_orders', only show paketomat orders
         if ($filter !== 'all_orders' && !$isPaketomat) continue;
         
-        // Extract order details
-        $orderId = 'mk_' . ($order['count_code'] ?? $order['mk_id'] ?? uniqid());
-        $orderNumber = $order['count_code'] ?? '';
+        // Extract order details (merge from search + get_document results)
+        $fullOrder = array_merge($order, $docData ?: []);
+        
+        $orderId = 'mk_' . ($fullOrder['count_code'] ?? $fullOrder['mk_id'] ?? uniqid());
+        $orderNumber = $fullOrder['count_code'] ?? '';
         
         // Partner (customer) info
-        $partner = $order['partner'] ?? [];
-        $customerName = $partner['name'] ?? '';
-        $email = $partner['email'] ?? '';
-        $phone = $partner['phone'] ?? $partner['phone2'] ?? '';
+        $partner = $fullOrder['partner'] ?? [];
+        $partnerContact = $partner['partner_contact'] ?? [];
+        $customerName = $partner['customer'] ?? $partner['name'] ?? '';
+        $email = $partnerContact['email'] ?? $partner['email'] ?? '';
+        $phone = $partnerContact['gsm'] ?? $partnerContact['phone'] ?? $partner['phone'] ?? '';
         
         // Address info
         $street = $partner['street'] ?? '';
-        $city = $partner['city'] ?? '';
+        $city = $partner['place'] ?? $partner['city'] ?? '';
         $postcode = $partner['post_number'] ?? '';
         $country = $partner['country'] ?? '';
         
         // Delivery service info
-        $deliveryService = $order['delivery_service'] ?? '';
-        $trackingCode = $order['delivery_service_tracking_code'] ?? '';
+        $deliveryService = $fullOrder['delivery_type'] ?? $fullOrder['delivery_service'] ?? '';
+        $trackingCode = '';
+        $extraColumns = $fullOrder['extra_column'] ?? [];
+        foreach ($extraColumns as $col) {
+            if (($col['name'] ?? '') === 'tracking_number') {
+                $trackingCode = $col['value'] ?? '';
+                break;
+            }
+        }
         
         // Paketomat location - try to extract from delivery point or last event
-        $paketomatLocation = $order['delivery_point_name'] ?? $order['delivery_service_point'] ?? '';
+        $paketomatLocation = $fullOrder['parcel_shop_id'] ?? $fullOrder['delivery_point_name'] ?? '';
         if (!$paketomatLocation && $lastEvent) {
             $paketomatLocation = $lastEvent['location'] ?? $lastEventStatus;
         }
         
         // Order total and currency
-        $orderTotal = floatval($order['sum_all'] ?? $order['total'] ?? 0);
-        $currency = $order['currency_code'] ?? 'EUR';
+        $orderTotal = floatval($fullOrder['sum_all'] ?? $fullOrder['total'] ?? 0);
+        $currency = $fullOrder['currency_code'] ?? 'EUR';
         
         // Created date
-        $createdAt = $order['doc_date'] ?? $order['date_created'] ?? '';
+        $createdAt = $fullOrder['doc_date'] ?? $fullOrder['order_create_ts'] ?? '';
         
-        // Get store code from webshop or guess from country
-        $storeCode = strtolower($order['webshop'] ?? $country ?? 'si');
+        // Order status from MetaKocka
+        $orderStatus = $fullOrder['status_code'] ?? '';
+        
+        // Get store code from eshop_name or guess from country
+        $eshopName = $fullOrder['eshop_name'] ?? '';
+        $storeCode = 'si';
+        if (preg_match('/\.([a-z]{2})\./', $eshopName, $m)) {
+            $storeCode = $m[1];
+        } elseif (stripos($eshopName, 'sk') !== false) {
+            $storeCode = 'sk';
+        } elseif (stripos($eshopName, 'cz') !== false) {
+            $storeCode = 'cz';
+        } elseif (stripos($eshopName, 'pl') !== false) {
+            $storeCode = 'pl';
+        } elseif (stripos($eshopName, 'hr') !== false) {
+            $storeCode = 'hr';
+        } elseif (stripos($eshopName, 'hu') !== false) {
+            $storeCode = 'hu';
+        } elseif (stripos($eshopName, 'gr') !== false) {
+            $storeCode = 'gr';
+        } elseif (!empty($country)) {
+            // Fallback: guess from country name
+            $countryMap = ['Slovakia' => 'sk', 'Czech Republic' => 'cz', 'Poland' => 'pl', 
+                           'Croatia' => 'hr', 'Hungary' => 'hu', 'Greece' => 'gr', 'Slovenia' => 'si'];
+            $storeCode = $countryMap[$country] ?? strtolower(substr($country, 0, 2));
+        }
         $storeFlag = $stores[$storeCode]['flag'] ?? '🏳️';
         
         // Saved status
@@ -2218,7 +2322,7 @@ function fetchPaketomatOrders($filter = 'all') {
             'city' => $city,
             'postcode' => $postcode,
             'country' => strtoupper($country),
-            'orderStatus' => $order['status_code'] ?? '',
+            'orderStatus' => $orderStatus,
             'storeCode' => $storeCode,
             'storeFlag' => $storeFlag,
             'isPaketomat' => $isPaketomat
