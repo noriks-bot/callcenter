@@ -2075,9 +2075,13 @@ function saveLastSeen($data) {
 function fetchPaketomatOrders($filter = 'all') {
     global $stores;
     
-    // 5 min cache - API calls are slow
-    $cached = getCache('paketomat_orders_' . $filter, 300);
+    // 15 min cache - API calls are slow, use stale cache if available
+    $cached = getCache('paketomat_orders_' . $filter, 900);
     if ($cached !== null && $filter !== 'debug') return $cached;
+    
+    // Also check for stale cache (up to 1 hour old) - better than nothing
+    $staleCache = getCache('paketomat_orders_' . $filter, 3600);
+    $useStaleWhileFetching = ($staleCache !== null);
     
     $statusData = loadPaketomatStatus();
     $allOrders = [];
@@ -3599,6 +3603,17 @@ try {
         case 'paketomati':
             $filter = $_GET['filter'] ?? 'all';
             echo json_encode(fetchPaketomatOrders($filter));
+            break;
+            
+        case 'paketomati-cached':
+            // Return cached data instantly (or empty if no cache)
+            $filter = $_GET['filter'] ?? 'all';
+            $cached = getCache('paketomat_orders_' . $filter, 3600); // Accept up to 1 hour old
+            echo json_encode([
+                'orders' => $cached ?? [],
+                'fromCache' => $cached !== null,
+                'count' => $cached ? count($cached) : 0
+            ]);
             break;
         
         case 'paketomati-debug':
