@@ -3892,12 +3892,94 @@ try {
             break;
         
         case 'paketomati-debug':
-            // Show ALL orders for debugging
-            echo json_encode([
-                'debug_info' => fetchPaketomatOrders('debug'),
-                'paketomat_only_count' => count(fetchPaketomatOrders('all')),
-                'cache_info' => 'Cache disabled for debugging'
+            // FULL DEBUG - show exactly what MetaKocka returns
+            set_time_limit(120);
+            $debugResult = [];
+            
+            // Fetch 100 orders
+            $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/search');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS => json_encode([
+                    'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+                    'company_id' => '6371',
+                    'doc_type' => 'sales_order',
+                    'result_type' => 'doc',
+                    'limit' => 100,
+                    'order_direction' => 'desc'
+                ]),
+                CURLOPT_TIMEOUT => 30
             ]);
+            $response = curl_exec($ch);
+            curl_close($ch);
+            
+            $data = json_decode($response, true);
+            $orders = $data['result'] ?? [];
+            
+            // Group by status
+            $byStatus = [];
+            foreach ($orders as $o) {
+                $status = $o['status_desc'] ?? 'unknown';
+                if (!isset($byStatus[$status])) $byStatus[$status] = 0;
+                $byStatus[$status]++;
+            }
+            $debugResult['total_orders'] = count($orders);
+            $debugResult['by_status'] = $byStatus;
+            
+            // For shipped orders, get delivery events
+            $shipped = array_filter($orders, fn($o) => ($o['status_desc'] ?? '') === 'shipped');
+            $debugResult['shipped_count'] = count($shipped);
+            
+            $shippedDetails = [];
+            $eventStatuses = []; // Collect all unique event statuses
+            
+            foreach (array_slice($shipped, 0, 20) as $order) { // First 20 shipped
+                $mkId = $order['mk_id'] ?? null;
+                if (!$mkId) continue;
+                
+                $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/get_document');
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_POST => true,
+                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                    CURLOPT_POSTFIELDS => json_encode([
+                        'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+                        'company_id' => '6371',
+                        'doc_type' => 'sales_order',
+                        'doc_id' => $mkId,
+                        'return_delivery_service_events' => 'true'
+                    ]),
+                    CURLOPT_TIMEOUT => 10
+                ]);
+                $docResponse = curl_exec($ch);
+                curl_close($ch);
+                
+                $docData = json_decode($docResponse, true);
+                $events = $docData['delivery_service_events'] ?? [];
+                
+                // Normalize
+                if (is_array($events) && isset($events['event_status'])) {
+                    $events = [$events];
+                }
+                
+                $lastEventStatus = $events[0]['event_status'] ?? 'NO EVENTS';
+                $eventStatuses[] = $lastEventStatus;
+                
+                $shippedDetails[] = [
+                    'order' => $order['count_code'] ?? '',
+                    'mk_id' => $mkId,
+                    'events_count' => count($events),
+                    'last_event' => $lastEventStatus,
+                    'all_events' => array_map(fn($e) => $e['event_status'] ?? '', array_slice($events, 0, 3))
+                ];
+            }
+            
+            $debugResult['shipped_details'] = $shippedDetails;
+            $debugResult['unique_event_statuses'] = array_unique($eventStatuses);
+            
+            echo json_encode($debugResult, JSON_PRETTY_PRINT);
             break;
             
         case 'refresh-paketomati-cache':
