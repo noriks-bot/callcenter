@@ -7489,6 +7489,7 @@
                     <thead><tr>
                         <th>Customer</th>
                         <th>Order</th>
+                        <th>Items</th>
                         <th>Value</th>
                         <th>Phone</th>
                         <th>Delivery</th>
@@ -7511,6 +7512,13 @@
                                 <td>
                                     <strong>#${esc(order.orderNumber)}</strong>
                                     ${order.trackingCode ? `<br><a href="${getTrackingUrl(order.deliveryService, order.trackingCode)}" target="_blank" style="color:var(--accent-blue);font-size:11px;text-decoration:none;">📦 ${esc(order.trackingCode)} ↗</a>` : ''}
+                                </td>
+                                <td style="font-size:11px;max-width:200px;">
+                                    ${(order.items || []).length > 0 
+                                        ? order.items.map(item => `<div style="margin-bottom:2px;" title="${esc(item.variant || '')}">
+                                            <strong>${item.quantity}x</strong> ${esc(item.name)}
+                                          </div>`).join('')
+                                        : '<span style="color:var(--text-muted);">-</span>'}
                                 </td>
                                 <td><strong>${sym(order.currency)}${(order.orderTotal||0).toFixed(2)}</strong></td>
                                 <td>${order.phone ? `<a href="tel:${order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${esc(order.phone)}</a>` : '-'}</td>

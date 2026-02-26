@@ -2326,6 +2326,24 @@ function buildPaketomatiCacheFull() {
                 }
             }
             
+            // Extract items from product_list (skip shipping entries)
+            $items = [];
+            foreach ($fullOrder['product_list'] ?? [] as $product) {
+                $name = $product['name'] ?? '';
+                // Skip shipping/delivery entries
+                if (stripos($name, 'pošta') !== false || stripos($name, 'doručení') !== false || 
+                    stripos($name, 'shipping') !== false || stripos($name, 'delivery') !== false ||
+                    stripos($name, 'dostava') !== false || stripos($name, 'szállítás') !== false) {
+                    continue;
+                }
+                $items[] = [
+                    'name' => $name,
+                    'quantity' => intval($product['amount'] ?? 1),
+                    'price' => floatval($product['price_with_tax'] ?? $product['price'] ?? 0),
+                    'variant' => $product['doc_desc'] ?? '' // Contains size/color info
+                ];
+            }
+            
             $paketomatOrders[] = [
                 'id' => $orderId,
                 'orderNumber' => $fullOrder['count_code'] ?? '',
@@ -2349,7 +2367,8 @@ function buildPaketomatiCacheFull() {
                 'createdAt' => $fullOrder['doc_date'] ?? '',
                 'status' => $statusData[$orderId]['status'] ?? 'not_called',
                 'notes' => $statusData[$orderId]['notes'] ?? '',
-                'storeCode' => $storeCode
+                'storeCode' => $storeCode,
+                'items' => $items
             ];
         }
         
