@@ -1857,6 +1857,35 @@
         </div>
     </div>
 
+    <!-- Quick Callback Modal (for inline status change) -->
+    <div class="modal-bg" id="quickCallbackModal">
+        <div class="modal" style="max-width:400px;">
+            <div class="modal-header">
+                <div class="modal-title">🔄 Schedule Callback</div>
+                <button class="modal-close" onclick="cancelQuickCallback()">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="quickCallbackId">
+                <input type="hidden" id="quickCallbackType">
+                <p style="color:var(--text-muted);margin-bottom:16px;">Kdaj naj te spomnimo za klic nazaj?</p>
+                <div class="form-group">
+                    <label class="form-label">Datum in čas *</label>
+                    <input type="datetime-local" class="form-input" id="quickCallbackDateTime">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Opomba (opcijsko)</label>
+                    <input type="text" class="form-input" id="quickCallbackNote" placeholder="npr. Pokliči po 14h">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="cancelQuickCallback()">Prekliči</button>
+                <button class="btn btn-save" onclick="confirmQuickCallback()">
+                    <i class="fas fa-bell"></i> Dodaj v Follow-ups
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Agent Modal -->
     <div class="modal-bg" id="agentModal">
         <div class="modal">
@@ -3332,10 +3361,29 @@
         }
 
         // Inline Status Change
+        let pendingCallbackSelect = null; // Store reference to the select that triggered callback
+
         async function inlineStatusChange(select) {
             const id = select.dataset.id;
             const type = select.dataset.type;
             const newStatus = select.value;
+
+            // If callback is selected, show the quick callback modal
+            if (newStatus === 'called_callback') {
+                pendingCallbackSelect = select;
+                document.getElementById('quickCallbackId').value = id;
+                document.getElementById('quickCallbackType').value = type;
+                
+                // Set default datetime to tomorrow at 10:00
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(10, 0, 0, 0);
+                document.getElementById('quickCallbackDateTime').value = tomorrow.toISOString().slice(0, 16);
+                document.getElementById('quickCallbackNote').value = '';
+                
+                document.getElementById('quickCallbackModal').classList.add('open');
+                return;
+            }
 
             // Find the item and get current notes
             let item = null;
@@ -3355,6 +3403,85 @@
                 showToast('Status updated!');
             } catch (err) {
                 showToast('Error updating status', false, 'error');
+            }
+        }
+
+        function cancelQuickCallback() {
+            // Reset the select to previous value
+            if (pendingCallbackSelect) {
+                const id = pendingCallbackSelect.dataset.id;
+                const type = pendingCallbackSelect.dataset.type;
+                let item = null;
+                if (type === 'cart') item = carts.find(c => c.id === id);
+                else if (type === 'pending') item = pending.find(p => p.id === id);
+                else if (type === 'buyer') item = buyers.find(b => b.id === id);
+                
+                if (item) {
+                    pendingCallbackSelect.value = item.callStatus || 'not_called';
+                }
+                pendingCallbackSelect = null;
+            }
+            closeModal('quickCallbackModal');
+        }
+
+        async function confirmQuickCallback() {
+            const id = document.getElementById('quickCallbackId').value;
+            const type = document.getElementById('quickCallbackType').value;
+            const callbackDateTime = document.getElementById('quickCallbackDateTime').value;
+            const note = document.getElementById('quickCallbackNote').value.trim();
+
+            if (!callbackDateTime) {
+                showToast('Prosim izberi datum in čas!', true);
+                return;
+            }
+
+            // Find the item
+            let item = null;
+            if (type === 'cart') item = carts.find(c => c.id === id);
+            else if (type === 'pending') item = pending.find(p => p.id === id);
+            else if (type === 'buyer') item = buyers.find(b => b.id === id);
+
+            if (!item) {
+                showToast('Napaka: element ni najden', true);
+                return;
+            }
+
+            try {
+                // 1. Update status
+                await fetch('api.php?action=update-status', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({id, callStatus: 'called_callback', notes: item.notes || ''})
+                });
+
+                // 2. Create call log with callback (this creates the follow-up)
+                await fetch('api.php?action=log-call', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        customerId: id,
+                        storeCode: item.storeCode,
+                        status: 'callback',
+                        notes: note || 'Callback scheduled from quick action',
+                        duration: 0,
+                        callbackAt: new Date(callbackDateTime).toISOString()
+                    })
+                });
+
+                // Update local state
+                if (item) item.callStatus = 'called_callback';
+
+                closeModal('quickCallbackModal');
+                pendingCallbackSelect = null;
+                showToast('✅ Callback dodan v Follow-ups!');
+
+                // Refresh follow-ups if we're on that tab
+                if (currentTab === 'followups') {
+                    renderFollowups();
+                }
+            } catch (err) {
+                console.error('Error creating callback:', err);
+                showToast('Napaka pri ustvarjanju callbacka', true);
             }
         }
 
