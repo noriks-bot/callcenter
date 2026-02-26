@@ -7593,8 +7593,8 @@
                                 </td>
                                 <td><strong>${sym(order.currency)}${(order.orderTotal||0).toFixed(2)}</strong></td>
                                 <td style="font-size:11px;">
-                                    <div>📅 ${formatDateTime(order.createdAt)}</div>
-                                    ${order.shippedAt ? `<div>🚚 ${formatDateTime(order.shippedAt)}</div>` : ''}
+                                    <div>📅 ${order.createdAt ? order.createdAt.split('+')[0].split('T')[0] : '-'}</div>
+                                    ${order.shippedAt ? `<div>🚚 ${order.shippedAt.split('+')[0].split('T')[0]}</div>` : ''}
                                 </td>
                                 <td>${(order.customer?.phone || order.phone) ? `<a href="tel:${order.customer?.phone || order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${esc(order.customer?.phone || order.phone)}</a>` : '-'}</td>
                                 <td>
