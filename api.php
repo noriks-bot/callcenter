@@ -3887,6 +3887,16 @@ try {
             echo json_encode(getFollowUps($agentId, $includeAll));
             break;
         
+        case 'debug-call-logs':
+            // Debug endpoint to check call logs
+            $logs = loadCallLogs();
+            echo json_encode([
+                'count' => count($logs),
+                'logs' => array_slice($logs, -10), // Last 10 logs
+                'file' => realpath(__DIR__ . '/data/call-logs.json')
+            ]);
+            break;
+        
         case 'complete-followup':
             $data = json_decode(file_get_contents('php://input'), true);
             $followupId = $data['id'] ?? '';
@@ -4213,6 +4223,7 @@ try {
                     'call-logs-add',
                     'call-logs-customer',
                     'my-followups',
+                    'debug-call-logs',
                     'call-stats',
                     'paketomati',
                     'paketomati-update',
