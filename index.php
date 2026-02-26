@@ -7492,6 +7492,7 @@
                                 <td>
                                     <strong>#${esc(order.orderNumber)}</strong>
                                     ${order.trackingCode ? `<br><a href="${order.trackingLink || getTrackingUrl(order.deliveryService, order.trackingCode)}" target="_blank" style="color:var(--accent-blue);font-size:11px;text-decoration:none;">📦 ${esc(order.trackingCode)} ↗</a>` : ''}
+                                    ${order.trackingPageUrl ? `<br><a href="${esc(order.trackingPageUrl)}" target="_blank" style="color:var(--text-muted);font-size:10px;text-decoration:none;">📄 Tracking page ↗</a>` : ''}
                                 </td>
                                 <td style="font-size:11px;max-width:200px;">
                                     ${(order.items || []).length > 0 
