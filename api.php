@@ -3232,8 +3232,9 @@ try {
             break;
             
         case 'search-products':
+            // INSTANT LOCAL SEARCH - uses cached products
             $storeCode = $_GET['store'] ?? null;
-            $query = $_GET['q'] ?? '';
+            $query = strtolower(trim($_GET['q'] ?? ''));
             
             if (!$storeCode || !isset($stores[$storeCode])) {
                 http_response_code(400);
@@ -3246,87 +3247,132 @@ try {
                 break;
             }
             
-            $cacheKey = "products_search_{$storeCode}_" . md5($query);
-            $cached = getCache($cacheKey, 120);
-            if ($cached !== null) {
-                echo json_encode($cached);
+            // Load cached products
+            $cacheFile = __DIR__ . "/data/products-cache-{$storeCode}.json";
+            if (!file_exists($cacheFile)) {
+                echo json_encode(['error' => 'Products not cached. Run: api.php?action=refresh-products-cache&store=' . $storeCode]);
                 break;
             }
             
-            // Search products via WooCommerce API - FAST: just name + SKU search
-            // Use parallel requests for speed
+            $cacheData = json_decode(file_get_contents($cacheFile), true);
+            $allProducts = $cacheData['products'] ?? [];
             
-            $mh = curl_multi_init();
-            $handles = [];
-            
-            // Request 1: Search by name
-            $nameUrl = $stores[$storeCode]['url'] . '/wp-json/wc/v3/products?' . http_build_query([
-                'search' => $query,
-                'per_page' => 15,
-                'status' => 'publish'
-            ]);
-            $ch1 = curl_init($nameUrl);
-            curl_setopt_array($ch1, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 8,
-                CURLOPT_USERPWD => $stores[$storeCode]['ck'] . ':' . $stores[$storeCode]['cs']
-            ]);
-            curl_multi_add_handle($mh, $ch1);
-            $handles['name'] = $ch1;
-            
-            // Request 2: Search by SKU
-            $skuUrl = $stores[$storeCode]['url'] . '/wp-json/wc/v3/products?' . http_build_query([
-                'sku' => $query,
-                'per_page' => 5,
-                'status' => 'publish'
-            ]);
-            $ch2 = curl_init($skuUrl);
-            curl_setopt_array($ch2, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 8,
-                CURLOPT_USERPWD => $stores[$storeCode]['ck'] . ':' . $stores[$storeCode]['cs']
-            ]);
-            curl_multi_add_handle($mh, $ch2);
-            $handles['sku'] = $ch2;
-            
-            // Execute in parallel
-            $running = null;
-            do {
-                curl_multi_exec($mh, $running);
-                curl_multi_select($mh);
-            } while ($running > 0);
-            
-            // Get results
-            $productsByName = json_decode(curl_multi_getcontent($handles['name']), true) ?: [];
-            $productsBySku = json_decode(curl_multi_getcontent($handles['sku']), true) ?: [];
-            
-            curl_multi_remove_handle($mh, $ch1);
-            curl_multi_remove_handle($mh, $ch2);
-            curl_multi_close($mh);
-            
-            // Merge results, avoiding duplicates (SKU matches first)
-            $seenIds = [];
-            $products = [];
-            
-            // Add products from SKU search first
-            if (is_array($productsBySku)) {
-                foreach ($productsBySku as $p) {
-                    if (isset($p['id']) && !isset($seenIds[$p['id']])) {
-                        $seenIds[$p['id']] = true;
-                        $products[] = $p;
-                    }
+            // INSTANT local search
+            $results = [];
+            foreach ($allProducts as $p) {
+                $nameMatch = strpos(strtolower($p['name'] ?? ''), $query) !== false;
+                $skuMatch = strpos(strtolower($p['sku'] ?? ''), $query) !== false;
+                
+                if ($nameMatch || $skuMatch) {
+                    $results[] = $p;
+                    if (count($results) >= 20) break; // Limit results
                 }
             }
             
-            // Add products from name search
-            if (is_array($productsByName)) {
-                foreach ($productsByName as $p) {
-                    if (isset($p['id']) && !isset($seenIds[$p['id']])) {
-                        $seenIds[$p['id']] = true;
-                        $products[] = $p;
-                    }
-                }
+            // Sort: SKU matches first, then name matches
+            usort($results, function($a, $b) use ($query) {
+                $aSkuMatch = strpos(strtolower($a['sku'] ?? ''), $query) !== false;
+                $bSkuMatch = strpos(strtolower($b['sku'] ?? ''), $query) !== false;
+                if ($aSkuMatch && !$bSkuMatch) return -1;
+                if (!$aSkuMatch && $bSkuMatch) return 1;
+                return 0;
+            });
+            
+            echo json_encode($results);
+            break;
+            
+        case 'refresh-products-cache':
+            // Fetch ALL products from WooCommerce and cache locally
+            // Run this once or when products change: api.php?action=refresh-products-cache&store=hr
+            $storeCode = $_GET['store'] ?? null;
+            
+            if (!$storeCode || !isset($stores[$storeCode])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid or missing store. Use ?store=hr']);
+                break;
             }
+            
+            set_time_limit(120);
+            $startTime = microtime(true);
+            
+            $allProducts = [];
+            $page = 1;
+            $perPage = 100;
+            
+            // Fetch all products (paginated)
+            while (true) {
+                $products = wcApiRequest($storeCode, 'products', [
+                    'per_page' => $perPage,
+                    'page' => $page,
+                    'status' => 'publish'
+                ]);
+                
+                if (!is_array($products) || empty($products) || isset($products['error'])) {
+                    break;
+                }
+                
+                foreach ($products as $product) {
+                    $productData = [
+                        'id' => $product['id'],
+                        'name' => $product['name'],
+                        'sku' => $product['sku'] ?? '',
+                        'price' => floatval($product['price'] ?? 0),
+                        'regularPrice' => floatval($product['regular_price'] ?? 0),
+                        'image' => $product['images'][0]['src'] ?? null,
+                        'type' => $product['type'] ?? 'simple',
+                        'variations' => []
+                    ];
+                    
+                    // Fetch variations for variable products
+                    if ($product['type'] === 'variable' && !empty($product['variations'])) {
+                        $variations = wcApiRequest($storeCode, "products/{$product['id']}/variations", ['per_page' => 100]);
+                        if (is_array($variations) && !isset($variations['error'])) {
+                            foreach ($variations as $var) {
+                                $attrNames = [];
+                                foreach (($var['attributes'] ?? []) as $attr) {
+                                    $attrNames[] = $attr['option'] ?? '';
+                                }
+                                $productData['variations'][] = [
+                                    'id' => $var['id'],
+                                    'name' => implode(' / ', array_filter($attrNames)) ?: "Variation #{$var['id']}",
+                                    'price' => floatval($var['price'] ?? $productData['price']),
+                                    'sku' => $var['sku'] ?? '',
+                                    'inStock' => ($var['stock_status'] ?? 'instock') === 'instock'
+                                ];
+                            }
+                        }
+                    }
+                    
+                    $allProducts[] = $productData;
+                }
+                
+                if (count($products) < $perPage) break; // Last page
+                $page++;
+                if ($page > 20) break; // Safety limit: max 2000 products
+            }
+            
+            // Save to cache
+            $cacheFile = __DIR__ . "/data/products-cache-{$storeCode}.json";
+            $cacheData = [
+                'generated_at' => time(),
+                'generated_date' => date('c'),
+                'store' => $storeCode,
+                'count' => count($allProducts),
+                'fetch_time_seconds' => round(microtime(true) - $startTime, 2),
+                'products' => $allProducts
+            ];
+            
+            file_put_contents($cacheFile, json_encode($cacheData, JSON_PRETTY_PRINT));
+            
+            echo json_encode([
+                'success' => true,
+                'store' => $storeCode,
+                'count' => count($allProducts),
+                'fetch_time_seconds' => $cacheData['fetch_time_seconds']
+            ]);
+            break;
+            
+        case 'search-products-old':
             
             if (empty($products)) {
                 echo json_encode([]);
