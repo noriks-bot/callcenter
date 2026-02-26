@@ -2540,10 +2540,7 @@
             const filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
             const filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
             
-            // Update nav sidebar counts
-            document.getElementById('navCarts').textContent = filteredCarts.length;
-            document.getElementById('navPending').textContent = filteredPending.length;
-            document.getElementById('navBuyers').textContent = filteredBuyers.length;
+            // Update nav sidebar counts (safe - elements may not exist in all layouts)
             
             // Update content tab counts
             updateContentTabCounts();
@@ -6117,7 +6114,8 @@
         
         function updatePaketomatiCount() {
             const notCalled = paketomatiData.filter(o => o.status === 'not_called').length;
-            document.getElementById('navPaketomati').textContent = notCalled;
+            const navPaketEl = document.getElementById('navPaketomati');
+            if (navPaketEl) navPaketEl.textContent = notCalled;
         }
         
         // ========== REAL-TIME NOTIFICATION SYSTEM ==========
@@ -6192,21 +6190,19 @@
                 const data = await res.json();
                 
                 // Update badge counts
-                document.getElementById('navCarts').textContent = data.totalCarts;
-                document.getElementById('navPaketomati').textContent = data.totalPaketomati;
+                const nc = document.getElementById('navCarts'); if (nc) nc.textContent = data.totalCarts;
+                const np = document.getElementById('navPaketomati'); if (np) np.textContent = data.totalPaketomati;
                 
                 // Show notifications for new items
                 if (data.newCarts.length > 0 || data.newPaketomati.length > 0) {
                     // Update badge with "new" indicator
                     if (data.newCarts.length > 0) {
                         const cartsBadge = document.getElementById('navCarts');
-                        cartsBadge.style.background = 'var(--accent-red)';
-                        cartsBadge.style.color = 'white';
+                        if (cartsBadge) { cartsBadge.style.background = 'var(--accent-red)'; cartsBadge.style.color = 'white'; }
                     }
                     if (data.newPaketomati.length > 0) {
                         const paketBadge = document.getElementById('navPaketomati');
-                        paketBadge.style.background = 'var(--accent-red)';
-                        paketBadge.style.color = 'white';
+                        if (paketBadge) { paketBadge.style.background = 'var(--accent-red)'; paketBadge.style.color = 'white'; }
                     }
                     
                     // Play sound
@@ -6362,13 +6358,11 @@
                 const tab = item.dataset.tab;
                 if (tab === 'carts') {
                     const badge = document.getElementById('navCarts');
-                    badge.style.background = '';
-                    badge.style.color = '';
+                    if (badge) { badge.style.background = ''; badge.style.color = ''; }
                 }
                 if (tab === 'paketomati') {
                     const badge = document.getElementById('navPaketomati');
-                    badge.style.background = '';
-                    badge.style.color = '';
+                    if (badge) { badge.style.background = ''; badge.style.color = ''; }
                 }
             });
         });

@@ -3273,10 +3273,61 @@ try {
                 break;
             }
             
-            // Load cached products
+            // Load cached products (with API fallback)
             $cacheFile = __DIR__ . "/data/products-cache-{$storeCode}.json";
             if (!file_exists($cacheFile)) {
-                echo json_encode(['error' => 'Products not cached. Run: api.php?action=refresh-products-cache&store=' . $storeCode]);
+                // Fallback: search via WooCommerce API directly
+                $apiCacheKey = "products_search_{$storeCode}_" . md5($query);
+                $apiCached = getCache($apiCacheKey, 120);
+                if ($apiCached !== null) {
+                    echo json_encode($apiCached);
+                    break;
+                }
+                
+                $productsByName = wcApiRequest($storeCode, 'products', [
+                    'search' => $query, 'per_page' => 20, 'status' => 'publish'
+                ]);
+                $productsBySku = wcApiRequest($storeCode, 'products', [
+                    'sku' => $query, 'per_page' => 10, 'status' => 'publish'
+                ]);
+                
+                $seenIds = [];
+                $fallbackProducts = [];
+                foreach ([$productsBySku, $productsByName] as $batch) {
+                    if (is_array($batch) && !isset($batch['error'])) {
+                        foreach ($batch as $p) {
+                            if (!isset($seenIds[$p['id']])) {
+                                $seenIds[$p['id']] = true;
+                                $pd = [
+                                    'id' => $p['id'], 'name' => $p['name'],
+                                    'sku' => $p['sku'] ?? '', 'price' => floatval($p['price'] ?? 0),
+                                    'regularPrice' => floatval($p['regular_price'] ?? 0),
+                                    'image' => $p['images'][0]['src'] ?? null,
+                                    'type' => $p['type'] ?? 'simple', 'variations' => []
+                                ];
+                                if ($p['type'] === 'variable' && !empty($p['variations'])) {
+                                    $vars = wcApiRequest($storeCode, "products/{$p['id']}/variations", ['per_page' => 100]);
+                                    if (is_array($vars) && !isset($vars['error'])) {
+                                        foreach ($vars as $v) {
+                                            $an = array_map(fn($a) => $a['option'] ?? '', $v['attributes'] ?? []);
+                                            $pd['variations'][] = [
+                                                'id' => $v['id'],
+                                                'name' => implode(' / ', array_filter($an)) ?: "Var #{$v['id']}",
+                                                'price' => floatval($v['price'] ?? $pd['price']),
+                                                'sku' => $v['sku'] ?? '',
+                                                'inStock' => ($v['stock_status'] ?? 'instock') === 'instock'
+                                            ];
+                                        }
+                                    }
+                                }
+                                $fallbackProducts[] = $pd;
+                            }
+                        }
+                    }
+                }
+                
+                setCache($apiCacheKey, $fallbackProducts);
+                echo json_encode($fallbackProducts);
                 break;
             }
             

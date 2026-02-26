@@ -2489,6 +2489,112 @@ body.is-admin .admin-only {
     }
 }
 
+/* ============ VARIATION SELECTOR ============ */
+.variation-selector {
+    background: var(--content-bg);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--card-border);
+}
+
+.variation-selector-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.variation-selector-img {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+}
+
+.variation-selector-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.variation-selector-price {
+    font-weight: 700;
+    color: var(--accent-green);
+}
+
+.variation-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.variation-option {
+    padding: 8px 14px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all var(--transition-normal);
+}
+
+.variation-option:hover {
+    border-color: var(--accent-blue);
+}
+
+.variation-option.selected {
+    border-color: var(--accent-blue);
+    background: var(--accent-blue-light);
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+.variation-option.out-of-stock {
+    opacity: 0.4;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.variation-qty-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.variation-qty-row input[type="number"] {
+    width: 60px;
+    padding: 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+/* ============ DARK MODE ============ */
+body.dark {
+    --header-bg: #1a1a2e;
+    --header-border: #2a2a3e;
+    --content-bg: #0f0f1a;
+    --card-bg: #1a1a2e;
+    --card-border: #2a2a3e;
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --sidebar-bg: #0f0f1a;
+    --sidebar-bg-darker: #0a0a15;
+    --sidebar-hover: #1a1a2e;
+}
+
+body.dark .theme-toggle i::before {
+    content: "\f185"; /* sun icon */
+}
+
 /* ============ PRINT STYLES ============ */
 @media print {
     .sidebar,
@@ -2545,6 +2651,7 @@ body.is-admin .admin-only {
 #dashboardContent,
 #smsDashboardContent,
 #smsSettingsContent,
+#buyersSettingsContent,
 #agentsContent,
 #followupsContent,
 #paketomatiContent,
@@ -2563,6 +2670,7 @@ body.is-admin .admin-only {
     #dashboardContent,
     #smsDashboardContent,
     #smsSettingsContent,
+    #buyersSettingsContent,
     #agentsContent,
     #followupsContent,
     #paketomatiContent,
@@ -2576,6 +2684,7 @@ body.is-admin .admin-only {
     #dashboardContent,
     #smsDashboardContent,
     #smsSettingsContent,
+    #buyersSettingsContent,
     #agentsContent,
     #followupsContent,
     #paketomatiContent,
