@@ -4089,6 +4089,74 @@ try {
             ]);
             break;
             
+        case 'mk-order-dump':
+            // Dump FULL MetaKocka order JSON to find tracking URL field
+            $mkId = $_GET['mk_id'] ?? '';
+            $orderNum = $_GET['order'] ?? '';
+            
+            // If order number provided, first search for mk_id
+            if (!$mkId && $orderNum) {
+                $searchPayload = [
+                    'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+                    'company_id' => '6371',
+                    'doc_type' => 'sales_order',
+                    'result_type' => 'doc',
+                    'limit' => 50,
+                    'order_direction' => 'desc'
+                ];
+                $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/search');
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_POST => true,
+                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                    CURLOPT_POSTFIELDS => json_encode($searchPayload),
+                    CURLOPT_TIMEOUT => 30
+                ]);
+                $searchResp = curl_exec($ch);
+                curl_close($ch);
+                $searchData = json_decode($searchResp, true);
+                foreach ($searchData['result'] ?? [] as $o) {
+                    if (strpos($o['count_code'] ?? '', $orderNum) !== false) {
+                        $mkId = $o['mk_id'];
+                        break;
+                    }
+                }
+            }
+            
+            if (!$mkId) {
+                echo json_encode(['error' => 'No mk_id found. Use ?mk_id=XXX or ?order=5278']);
+                break;
+            }
+            
+            // Get FULL document with all fields
+            $docPayload = [
+                'secret_key' => 'ee759602-961d-4431-ac64-0725ae8d9665',
+                'company_id' => '6371',
+                'doc_type' => 'sales_order',
+                'doc_id' => $mkId,
+                'return_delivery_service_events' => 'true'
+            ];
+            $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/get_document');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS => json_encode($docPayload),
+                CURLOPT_TIMEOUT => 15
+            ]);
+            $docResp = curl_exec($ch);
+            curl_close($ch);
+            $fullOrder = json_decode($docResp, true);
+            
+            // Output full JSON for inspection
+            header('Content-Type: application/json');
+            echo json_encode([
+                'mk_id' => $mkId,
+                'order_number' => $fullOrder['count_code'] ?? 'unknown',
+                'FULL_ORDER_DATA' => $fullOrder
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            break;
+            
         case 'paketomati-raw':
             // Raw debug - check specific orders
             $rawDebug = [];
