@@ -2207,7 +2207,8 @@ function buildPaketomatiCacheFull() {
                 'company_id' => $companyId,
                 'doc_type' => 'sales_order',
                 'doc_id' => $mkId,
-                'return_delivery_service_events' => 'true'
+                'return_delivery_service_events' => 'true',
+                'show_tracking_url' => 'true'
             ];
             
             $ch = curl_init($mkGetDocUrl);
@@ -2546,7 +2547,8 @@ function fetchPaketomatOrdersLegacy($filter = 'all') {
             'company_id' => '6371',
             'doc_type' => 'sales_order',
             'doc_id' => $mkId,
-            'return_delivery_service_events' => 'true'
+            'return_delivery_service_events' => 'true',
+            'show_tracking_url' => 'true'
         ];
         
         $ch = curl_init($mkGetDocUrl);
@@ -4044,7 +4046,8 @@ try {
                         'company_id' => '6371',
                         'doc_type' => 'sales_order',
                         'doc_id' => $mkId,
-                        'return_delivery_service_events' => 'true'
+                        'return_delivery_service_events' => 'true',
+                        'show_tracking_url' => 'true'
                     ]),
                     CURLOPT_TIMEOUT => 10
                 ]);
@@ -4134,7 +4137,8 @@ try {
                 'company_id' => '6371',
                 'doc_type' => 'sales_order',
                 'doc_id' => $mkId,
-                'return_delivery_service_events' => 'true'
+                'return_delivery_service_events' => 'true',
+                'show_tracking_url' => 'true'
             ];
             $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/get_document');
             curl_setopt_array($ch, [
@@ -4199,7 +4203,8 @@ try {
                     'company_id' => '6371',
                     'doc_type' => 'sales_order',
                     'doc_id' => $f['mk_id'],
-                    'return_delivery_service_events' => 'true'
+                    'return_delivery_service_events' => 'true',
+                    'show_tracking_url' => 'true'
                 ];
                 $ch = curl_init('https://main.metakocka.si/rest/eshop/v1/get_document');
                 curl_setopt_array($ch, [
