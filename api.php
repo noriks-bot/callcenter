@@ -1060,13 +1060,54 @@ function fetchAbandonedCarts() {
                 foreach ($cartData as $item) {
                     if (!is_array($item)) continue;
                     $lines = $item['_orto_lines'] ?? [];
-                    $name = is_array($lines) && count($lines) > 0 ? implode(', ', $lines) : 'Product #' . ($item['product_id'] ?? '');
+                    $productId = $item['product_id'] ?? null;
+                    $variationId = $item['variation_id'] ?? null;
+                    
+                    // Build product name
+                    $name = '';
+                    if (is_array($lines) && count($lines) > 0) {
+                        $name = implode(', ', $lines);
+                    } else {
+                        // Fetch real product name from WooCommerce
+                        if ($productId) {
+                            $productData = wcApiRequest($storeCode, "products/{$productId}");
+                            if ($productData && !isset($productData['error'])) {
+                                $name = $productData['name'] ?? '';
+                                // If variation, add variation attributes
+                                if ($variationId) {
+                                    $varData = wcApiRequest($storeCode, "products/{$productId}/variations/{$variationId}");
+                                    if ($varData && !isset($varData['error']) && !empty($varData['attributes'])) {
+                                        $attrs = array_map(fn($a) => $a['option'] ?? '', $varData['attributes']);
+                                        $name .= ' (' . implode(' / ', array_filter($attrs)) . ')';
+                                    }
+                                }
+                            }
+                        }
+                        if (!$name) $name = 'Product #' . ($productId ?? 'unknown');
+                    }
+                    
+                    // Get product image and SKU
+                    $image = null;
+                    $sku = '';
+                    if ($productId && isset($productData)) {
+                        if (!empty($productData['images'][0]['src'])) {
+                            $image = $productData['images'][0]['src'];
+                        }
+                        $sku = $productData['sku'] ?? '';
+                        // Use variation SKU if available
+                        if ($variationId && isset($varData) && !empty($varData['sku'])) {
+                            $sku = $varData['sku'];
+                        }
+                    }
+                    
                     $cartContents[] = [
                         'name' => $name,
                         'quantity' => intval($item['quantity'] ?? 1),
                         'price' => floatval($item['line_total'] ?? 0),
-                        'productId' => $item['product_id'] ?? null,
-                        'variationId' => $item['variation_id'] ?? null
+                        'productId' => $productId,
+                        'variationId' => $variationId,
+                        'image' => $image,
+                        'sku' => $sku
                     ];
                 }
             }

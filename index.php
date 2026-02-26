@@ -3635,7 +3635,7 @@
                     ${item.image ? `<img src="${item.image}" alt="" style="width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
                     <div class="order-item-info">
                         <div class="order-item-name">${esc(item.name)}</div>
-                        <div class="order-item-id">ID: ${item.productId || 'N/A'}${item.variationId ? ' / Var: ' + item.variationId : ''}</div>
+                        ${item.sku ? `<div class="order-item-id" style="font-size:10px;color:var(--text-muted);">SKU: ${esc(item.sku)}</div>` : ''}
                     </div>
                     <div class="order-item-controls">
                         <div>
