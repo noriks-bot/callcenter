@@ -18,8 +18,7 @@
         #smsAutomationContent,
         #buyersSettingsContent,
         #agentsContent,
-        #followupsContent,
-        #analyticsContent {
+        #followupsContent {
             margin-left: 260px;
             padding-top: 64px;
             min-height: 100vh;
@@ -119,7 +118,6 @@
         .sidebar.collapsed ~ #buyersSettingsContent,
         .sidebar.collapsed ~ #agentsContent,
         .sidebar.collapsed ~ #followupsContent,
-        .sidebar.collapsed ~ #analyticsContent,
         .sidebar.collapsed ~ .dummy-selector-removed {
             margin-left: 70px;
         }
@@ -133,7 +131,6 @@
             #buyersSettingsContent,
             #agentsContent,
             #followupsContent,
-            #analyticsContent,
             .dummy-selector-mobile-removed {
                 margin-left: 0;
             }
@@ -408,19 +405,6 @@
         .call-status-option.not_interested.selected { border-color: var(--accent-red); background: var(--accent-red-light); color: var(--accent-red); }
         .call-status-option.callback.selected { border-color: var(--accent-orange); background: var(--accent-orange-light); color: var(--accent-orange); }
 
-        /* Analytics styles */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .analytics-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            border: 1px solid var(--card-border);
-        }
-        .analytics-card h3 { font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .leaderboard-item {
             display: flex;
             align-items: center;
@@ -1915,37 +1899,6 @@
         </div>
     </div>
 
-    <!-- Analytics Content -->
-    <div id="analyticsContent" style="display:none;">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title-large"><i class="fas fa-chart-pie"></i> Analytics</h1>
-        </div>
-
-        <div style="max-width:1200px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                <div>
-                    <h3 style="margin-bottom:8px;">📊 Analytics Dashboard</h3>
-                    <p style="color:var(--text-muted);">Statistika klicev, SMS in agent performance.</p>
-                </div>
-                <div style="display:flex;gap:8px;">
-                    <select class="filter-select" id="analyticsDateRange" onchange="renderAnalytics()">
-                        <option value="7">Zadnjih 7 dni</option>
-                        <option value="30" selected>Zadnjih 30 dni</option>
-                        <option value="90">Zadnjih 90 dni</option>
-                    </select>
-                    <button class="btn btn-save" onclick="renderAnalytics()">
-                        <i class="fas fa-sync"></i> Osveži
-                    </button>
-                </div>
-            </div>
-
-            <div class="analytics-grid" id="analyticsContainer">
-                <div class="loading"><div class="spinner"></div>Loading...</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Call Log Modal -->
     <div class="modal-bg" id="callLogModal">
         <div class="modal">
@@ -2219,13 +2172,20 @@
         console.log('[Auth] isAdmin:', isAdmin);
         console.log('[Auth] userCountries:', userCountries);
 
-        // Hide SMS Settings for non-admins
+        // Hide admin-only sections for non-admins
         if (!isAdmin) {
-            console.log('[Auth] Hiding SMS Settings nav for non-admin');
-            const smsSettingsNav = document.querySelector('[data-tab="sms-settings"]');
-            if (smsSettingsNav) smsSettingsNav.style.display = 'none';
+            console.log('[Auth] Hiding admin-only sections for non-admin');
+            // Hide entire Messaging section
+            const messagingSection = document.getElementById('messagingSection');
+            if (messagingSection) messagingSection.style.display = 'none';
+            // Hide Admin section
+            const adminSection = document.getElementById('adminSection');
+            if (adminSection) adminSection.style.display = 'none';
+            // Hide Reports/Statistics section
+            const reportsSection = document.getElementById('reportsSection');
+            if (reportsSection) reportsSection.style.display = 'none';
         } else {
-            console.log('[Auth] Admin user - showing all settings');
+            console.log('[Auth] Admin user - showing all sections');
         }
 
         // State
@@ -2279,8 +2239,7 @@
             // Hide all special content areas
             const specialAreas = [
                 'dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent',
-                'buyersSettingsContent', 'agentsContent', 'followupsContent',
-                'analyticsContent'
+                'buyersSettingsContent', 'agentsContent', 'followupsContent'
             ];
             specialAreas.forEach(id => {
                 const el = document.getElementById(id);
@@ -2363,8 +2322,7 @@
                     'sms-settings': 'SMS Provider Settings',
                     'buyers-settings': 'Options',
                     'agents': 'Agent Management',
-                    'followups': 'My Follow-ups',
-                    'analytics': 'Analytics'
+                    'followups': 'My Follow-ups'
                 };
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
 
@@ -2424,9 +2382,6 @@
                     } else if (currentTab === 'followups') {
                         showSpecialView('followupsContent');
                         renderFollowups();
-                    } else if (currentTab === 'analytics') {
-                        showSpecialView('analyticsContent');
-                        renderAnalytics();
                     }
                 }
             });
@@ -2586,8 +2541,7 @@
 
                 // Hide ALL special content areas first (ensures clean state)
                 ['dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
-                 'buyersSettingsContent', 'agentsContent', 'followupsContent',
-                 'analyticsContent'].forEach(id => {
+                 'buyersSettingsContent', 'agentsContent', 'followupsContent'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'none';
                 });
@@ -6858,7 +6812,6 @@
         let currentCallLogCustomer = null;
         let selectedCallStatus = 'not_called';
         let followupsData = [];
-        let analyticsCharts = {};
 
         function openCallLogModal(customer) {
             currentCallLogCustomer = customer;
@@ -7140,249 +7093,6 @@
             if (!dateStr) return '';
             const d = new Date(dateStr);
             return d.toLocaleDateString('sl-SI') + ' ' + d.toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' });
-        }
-
-        // ========== ANALYTICS FUNCTIONS ==========
-        async function renderAnalytics() {
-            const container = document.getElementById('analyticsContainer');
-            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
-
-            const days = parseInt(document.getElementById('analyticsDateRange').value) || 30;
-            const dateFrom = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
-
-            try {
-                const [statsRes, smsRes] = await Promise.all([
-                    fetch(`api.php?action=call-stats&dateFrom=${dateFrom}`),
-                    fetch('api.php?action=sms-queue')
-                ]);
-
-                const stats = await statsRes.json();
-                const smsData = await smsRes.json();
-
-                // Calculate SMS stats
-                const smsStats = {
-                    total: smsData.length,
-                    sent: smsData.filter(s => s.status === 'sent').length,
-                    queued: smsData.filter(s => s.status === 'queued').length,
-                    failed: smsData.filter(s => s.status === 'failed').length
-                };
-
-                container.innerHTML = `
-                    <!-- Summary Cards -->
-                    <div class="analytics-card" style="grid-column: span 2;">
-                        <h3><i class="fas fa-chart-line"></i> Overview (Last ${days} days)</h3>
-                        <div class="stats-grid" style="padding:0;grid-template-columns:repeat(4, 1fr);">
-                            <div class="stat-card" style="margin:0;">
-                                <div class="stat-icon" style="background:var(--accent-blue);"><i class="fas fa-phone"></i></div>
-                                <div class="stat-value">${stats.totalCalls || 0}</div>
-                                <div class="stat-label">Total Calls</div>
-                            </div>
-                            <div class="stat-card" style="margin:0;">
-                                <div class="stat-icon" style="background:var(--accent-green);"><i class="fas fa-check"></i></div>
-                                <div class="stat-value">${stats.statusCounts?.converted || 0}</div>
-                                <div class="stat-label">Conversions</div>
-                            </div>
-                            <div class="stat-card" style="margin:0;">
-                                <div class="stat-icon" style="background:var(--accent-orange);"><i class="fas fa-percentage"></i></div>
-                                <div class="stat-value">${stats.conversionRate || 0}%</div>
-                                <div class="stat-label">Conv. Rate</div>
-                            </div>
-                            <div class="stat-card" style="margin:0;">
-                                <div class="stat-icon" style="background:var(--accent-purple);"><i class="fas fa-sms"></i></div>
-                                <div class="stat-value">${smsStats.sent}</div>
-                                <div class="stat-label">SMS Sent</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Calls by Status -->
-                    <div class="analytics-card">
-                        <h3><i class="fas fa-chart-pie"></i> Calls by Status</h3>
-                        <div class="chart-container">
-                            <canvas id="statusChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Agent Leaderboard -->
-                    <div class="analytics-card">
-                        <h3><i class="fas fa-trophy"></i> Agent Leaderboard</h3>
-                        <div id="leaderboardContainer">
-                            ${renderLeaderboard(stats.agentStats)}
-                        </div>
-                    </div>
-
-                    <!-- Calls Over Time -->
-                    <div class="analytics-card" style="grid-column: span 2;">
-                        <h3><i class="fas fa-chart-line"></i> Calls Over Time</h3>
-                        <div class="chart-container">
-                            <canvas id="timelineChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Best Hours -->
-                    <div class="analytics-card">
-                        <h3><i class="fas fa-clock"></i> Calls by Hour</h3>
-                        <div class="chart-container">
-                            <canvas id="hourlyChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- SMS Stats -->
-                    <div class="analytics-card">
-                        <h3><i class="fas fa-sms"></i> SMS Performance</h3>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                            <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
-                                <div style="font-size:24px;font-weight:700;color:var(--accent-green);">${smsStats.sent}</div>
-                                <div style="font-size:12px;color:var(--text-muted);">Sent</div>
-                            </div>
-                            <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
-                                <div style="font-size:24px;font-weight:700;color:var(--accent-orange);">${smsStats.queued}</div>
-                                <div style="font-size:12px;color:var(--text-muted);">Queued</div>
-                            </div>
-                            <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
-                                <div style="font-size:24px;font-weight:700;color:var(--accent-red);">${smsStats.failed}</div>
-                                <div style="font-size:12px;color:var(--text-muted);">Failed</div>
-                            </div>
-                            <div style="background:var(--content-bg);padding:16px;border-radius:8px;text-align:center;">
-                                <div style="font-size:24px;font-weight:700;">${smsStats.total}</div>
-                                <div style="font-size:12px;color:var(--text-muted);">Total</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                // Render charts
-                renderAnalyticsCharts(stats);
-
-            } catch (e) {
-                container.innerHTML = `<div class="empty" style="color:var(--accent-red);"><i class="fas fa-exclamation-triangle"></i><p>Error: ${e.message}</p></div>`;
-            }
-        }
-
-        function renderLeaderboard(agentStats) {
-            if (!agentStats || Object.keys(agentStats).length === 0) {
-                return '<p style="color:var(--text-muted);text-align:center;padding:20px;">No agent data yet</p>';
-            }
-
-            const agents = Object.entries(agentStats)
-                .map(([id, data]) => ({
-                    id,
-                    calls: data.calls,
-                    converted: data.converted,
-                    rate: data.calls > 0 ? Math.round((data.converted / data.calls) * 100) : 0
-                }))
-                .sort((a, b) => b.converted - a.converted || b.calls - a.calls);
-
-            return agents.slice(0, 5).map((agent, i) => {
-                const rankClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : ''));
-                return `
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank ${rankClass}">${i + 1}</div>
-                        <div class="leaderboard-info">
-                            <div class="leaderboard-name">${esc(agent.id)}</div>
-                            <div class="leaderboard-stats">${agent.calls} calls, ${agent.converted} conv.</div>
-                        </div>
-                        <div class="leaderboard-rate">${agent.rate}%</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderAnalyticsCharts(stats) {
-            // Destroy existing charts
-            Object.values(analyticsCharts).forEach(chart => chart?.destroy());
-
-            // Status Pie Chart
-            const statusCtx = document.getElementById('statusChart')?.getContext('2d');
-            if (statusCtx && stats.statusCounts) {
-                const statusColors = {
-                    converted: '#22c55e',
-                    not_interested: '#ef4444',
-                    callback: '#f97316',
-                    no_answer_1: '#64748b',
-                    no_answer_2: '#64748b',
-                    no_answer_3: '#64748b',
-                    no_answer_4: '#64748b',
-                    no_answer_5: '#64748b',
-                    voicemail: '#8b5cf6',
-                    wrong_number: '#ec4899'
-                };
-
-                const labels = Object.keys(stats.statusCounts);
-                const data = Object.values(stats.statusCounts);
-                const colors = labels.map(l => statusColors[l] || '#64748b');
-
-                analyticsCharts.status = new Chart(statusCtx, {
-                    type: 'doughnut',
-                    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 8 } } },
-                        cutout: '60%'
-                    }
-                });
-            }
-
-            // Timeline Chart
-            const timelineCtx = document.getElementById('timelineChart')?.getContext('2d');
-            if (timelineCtx && stats.dailyStats) {
-                const labels = Object.keys(stats.dailyStats).map(d => {
-                    const date = new Date(d);
-                    return date.toLocaleDateString('sl-SI', { day: 'numeric', month: 'short' });
-                });
-
-                analyticsCharts.timeline = new Chart(timelineCtx, {
-                    type: 'line',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Calls',
-                            data: Object.values(stats.dailyStats),
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59,130,246,0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                            x: { grid: { display: false } }
-                        }
-                    }
-                });
-            }
-
-            // Hourly Chart
-            const hourlyCtx = document.getElementById('hourlyChart')?.getContext('2d');
-            if (hourlyCtx && stats.hourlyStats) {
-                const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-
-                analyticsCharts.hourly = new Chart(hourlyCtx, {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Calls',
-                            data: stats.hourlyStats,
-                            backgroundColor: '#3b82f6'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                            x: { grid: { display: false } }
-                        }
-                    }
-                });
-            }
         }
 
         // ========== CUSTOMER 360° CALL HISTORY ==========

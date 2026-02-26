@@ -31,13 +31,9 @@
                 <span>My Follow-ups</span>
                 <span class="badge followup-badge" id="navFollowups">0</span>
             </a>
-            <a href="index.php#analytics" class="nav-item" data-tab="analytics">
-                <i class="fas fa-chart-pie"></i>
-                <span>Analytics</span>
-            </a>
         </div>
         
-        <div class="nav-section">
+        <div class="nav-section admin-only" id="messagingSection">
             <div class="nav-title">Messaging</div>
             <a href="index.php#sms-automation" class="nav-item" data-tab="sms-automation">
                 <i class="fas fa-robot"></i>
@@ -66,7 +62,7 @@
             </a>
         </div>
         
-        <div class="nav-section">
+        <div class="nav-section admin-only" id="reportsSection">
             <div class="nav-title">Reports</div>
             <a href="report.php" class="nav-item">
                 <i class="fas fa-chart-bar"></i>
