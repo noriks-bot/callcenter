@@ -7399,53 +7399,78 @@
             if (countEl) countEl.textContent = uncalled;
         }
         
-        // Generate tracking URL based on delivery service
+        // Generate tracking URL based on delivery service and tracking code
         function getTrackingUrl(deliveryService, trackingCode) {
             if (!trackingCode) return '#';
             const service = (deliveryService || '').toLowerCase();
+            const code = trackingCode.toUpperCase();
             
+            // Detect carrier from tracking code suffix (international format)
+            if (code.endsWith('HR')) {
+                // Croatian tracking codes - Hrvatska Pošta
+                return `https://posiljka.posta.hr/?broj=${trackingCode}`;
+            }
+            if (code.endsWith('SI')) {
+                // Slovenian tracking codes - Pošta Slovenije
+                return `https://sledenje.posta.si/?id=${trackingCode}`;
+            }
+            if (code.endsWith('CZ')) {
+                // Czech tracking codes - Česká Pošta
+                return `https://www.postaonline.cz/trackandtrace/-/zasilka/cislo?parcelNumbers=${trackingCode}`;
+            }
+            if (code.endsWith('PL')) {
+                // Polish tracking codes
+                return `https://emonitoring.poczta-polska.pl/?numer=${trackingCode}`;
+            }
+            if (code.endsWith('HU')) {
+                // Hungarian tracking codes - Magyar Posta  
+                return `https://posta.hu/nyomkovetes?searchvalue=${trackingCode}`;
+            }
+            if (code.endsWith('GR')) {
+                // Greek tracking codes - ELTA
+                return `https://www.elta.gr/en-us/trackyourshipment.aspx?code=${trackingCode}`;
+            }
+            if (code.endsWith('IT')) {
+                // Italian tracking codes - Poste Italiane
+                return `https://www.poste.it/cerca/index.html#/risultati-ricerca-702702702/${trackingCode}`;
+            }
+            if (code.endsWith('SK')) {
+                // Slovak tracking codes - Slovenská Pošta
+                return `https://tandt.posta.sk/?zession=${trackingCode}`;
+            }
+            
+            // Detect carrier from delivery service name
             // GLS
             if (service.includes('gls')) {
-                return `https://gls-group.com/track/${trackingCode}`;
+                return `https://gls-group.com/EU/en/parcel-tracking?match=${trackingCode}`;
             }
             // DPD
             if (service.includes('dpd')) {
-                return `https://tracking.dpd.de/parcelstatus?query=${trackingCode}&locale=en_D`;
+                return `https://tracking.dpd.de/status/en_D/parcel/${trackingCode}`;
             }
             // InPost
             if (service.includes('inpost')) {
                 return `https://inpost.pl/sledzenie-przesylek?number=${trackingCode}`;
             }
-            // Pošta Slovenije
-            if (service.includes('pošta') || service.includes('posta slov')) {
-                return `https://sledenje.posta.si/sledenje?id=${trackingCode}`;
-            }
-            // Hrvatska Pošta
-            if (service.includes('hrvatska') || service.includes('hp express')) {
-                return `https://posiljka.posta.hr/Tracking/Info?Code=${trackingCode}`;
-            }
-            // Overseas Express
-            if (service.includes('overseas')) {
-                return `https://www.overseas.hr/pracenje-posiljke?code=${trackingCode}`;
-            }
-            // Packeta
-            if (service.includes('packeta') || service.includes('zásilkovna')) {
+            // Packeta / Expedico / Zásilkovna
+            if (service.includes('packeta') || service.includes('expedico') || service.includes('zásilkovna')) {
                 return `https://tracking.packeta.com/en/?id=${trackingCode}`;
             }
             // PPL (Czech)
             if (service.includes('ppl')) {
                 return `https://www.ppl.cz/vyhledat-zasilku?shipmentId=${trackingCode}`;
             }
-            // Česká Pošta
-            if (service.includes('česká') || service.includes('ceska posta')) {
-                return `https://www.postaonline.cz/trackandtrace/-/zasilka/cislo?telefonn=${trackingCode}`;
+            // Overseas Express
+            if (service.includes('overseas')) {
+                return `https://www.overseas.hr/pracenje-posiljke?code=${trackingCode}`;
             }
-            // Magyar Posta (Hungary)
-            if (service.includes('magyar') || service.includes('posta.hu')) {
-                return `https://posta.hu/nyomkovetes?searchvalue=${trackingCode}`;
+            // HR POŠTA in service name
+            if (service.includes('hr pošta') || service.includes('hr posta') || service.includes('hrvatska')) {
+                return `https://posiljka.posta.hr/?broj=${trackingCode}`;
             }
-            // Default - Google search for tracking
-            return `https://www.google.com/search?q=${encodeURIComponent(trackingCode)}+tracking`;
+            
+            // Default - use 17track universal tracker
+            return `https://t.17track.net/en#nums=${trackingCode}`;
         }
         
         async function renderPaketomatiInline() {
