@@ -2824,13 +2824,13 @@
                         <th>Phone</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
                         <th>Notes</th>
-                        <th>Actions</th>
+                        <th style="text-align:right;">Actions</th>
                     </tr></thead>
                     <tbody>
                         ${data.map(o => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[o.currency] || '€';
                             return `<tr>
-                                <td><div class="customer-cell"><div class="avatar">${initials(o.customerName)}</div><div><div class="customer-name">${esc(o.customerName)}</div><div class="customer-email">${esc(o.email)}</div></div></div></td>
+                                <td><div class="customer-cell" onclick="openCustomer360(pending.find(x=>x.id==='${o.id}'))" style="cursor:pointer;"><div class="avatar">${initials(o.customerName)}</div><div><div class="customer-name">${esc(o.customerName)}</div><div class="customer-email">${esc(o.email)}</div></div></div></td>
                                 <td>${o.storeFlag} ${o.storeName}</td>
                                 <td><strong>#${o.orderId}</strong></td>
                                 <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
@@ -2852,9 +2852,10 @@
                                         <button class="notes-save-btn" onclick="saveInlineNotes('${o.id}', 'pending')" title="Save">💾</button>
                                     </div>
                                 </td>
-                                <td style="white-space:nowrap;">
+                                <td style="white-space:nowrap;text-align:right;">
                                     ${o.phone ? `<button class="action-btn call" onclick="call('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
                                     ${o.phone ? `<button class="action-btn sms" onclick="openSmsModal('${o.id}','pending')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
+                                    <button class="action-btn-order-large" onclick="openOrderModal('${o.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i> CREATE ORDER</button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -2877,17 +2878,17 @@
                         <th class="sortable ${getSortClass('registeredAt')}" onclick="sortTable('registeredAt')">Registered</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
                         <th>Notes</th>
-                        <th>Actions</th>
+                        <th style="text-align:right;">Actions</th>
                     </tr></thead>
                     <tbody>
                         ${data.map(b => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[b.currency] || '€';
                             return `<tr>
-                                <td><div class="customer-cell"><div class="avatar">${initials(b.customerName)}</div><div><div class="customer-name">${esc(b.customerName)}</div><div class="customer-email">${esc(b.email)}</div></div></div></td>
+                                <td><div class="customer-cell" onclick="openCustomer360(buyers.find(x=>x.id==='${b.id}'))" style="cursor:pointer;"><div class="avatar">${initials(b.customerName)}</div><div><div class="customer-name">${esc(b.customerName)}</div><div class="customer-email">${esc(b.email)}</div></div></div></td>
                                 <td>${b.storeFlag} ${b.storeName}</td>
                                 <td><strong>${sym}${(b.totalSpent||0).toFixed(2)}</strong></td>
                                 <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '—'}</td>
-                                <td style="font-size:12px;">${formatDate(b.registeredAt)}</td>
+                                <td style="font-size:11px;">${formatDate(b.registeredAt)}</td>
                                 <td>
                                     <select class="inline-status-select" data-id="${b.id}" data-type="buyer" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${b.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
@@ -2905,9 +2906,10 @@
                                         <button class="notes-save-btn" onclick="saveInlineNotes('${b.id}', 'buyer')" title="Save">💾</button>
                                     </div>
                                 </td>
-                                <td style="white-space:nowrap;">
+                                <td style="white-space:nowrap;text-align:right;">
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
                                     ${b.phone ? `<button class="action-btn sms" onclick="openSmsModal('${b.id}','buyer')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
+                                    <button class="action-btn-order-large" onclick="openOrderModal('${b.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i> CREATE ORDER</button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -3000,7 +3002,9 @@
         // Order Modal (Enhanced)
         function openOrderModal(cartId) {
             orderCartId = cartId;
-            orderCart = carts.find(c => c.id === cartId);
+            orderCart = carts.find(c => c.id === cartId) 
+                || pending.find(p => p.id === cartId) 
+                || buyers.find(b => b.id === cartId);
             if (!orderCart) return;
             
             // Populate customer info
@@ -6018,10 +6022,10 @@
                         </td>
                         <td><strong>${order.orderTotal.toFixed(2)} ${order.currency}</strong></td>
                         <td>
-                            <select onchange="updatePaketomatStatus('${order.id}', this.value)" style="background:var(--card-border);border:1px solid var(--card-border);border-radius:4px;padding:4px 8px;color:${statusColors[order.status]};cursor:pointer;">
-                                <option value="not_called" ${order.status === 'not_called' ? 'selected' : ''}>Ni poklicano</option>
-                                <option value="called" ${order.status === 'called' ? 'selected' : ''}>Poklicano</option>
-                                <option value="notified" ${order.status === 'notified' ? 'selected' : ''}>Obveščeno</option>
+                            <select class="inline-status-select" onchange="updatePaketomatStatus('${order.id}', this.value)">
+                                <option value="not_called" ${order.status === 'not_called' ? 'selected' : ''}>⚪ Ni poklicano</option>
+                                <option value="called" ${order.status === 'called' ? 'selected' : ''}>📞 Poklicano</option>
+                                <option value="notified" ${order.status === 'notified' ? 'selected' : ''}>✅ Obveščeno</option>
                             </select>
                         </td>
                         <td>

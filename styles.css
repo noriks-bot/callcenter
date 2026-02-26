@@ -2489,6 +2489,29 @@ body.is-admin .admin-only {
     }
 }
 
+/* ============ ACTION BTN MINI (Paketomati) ============ */
+.action-btn-mini {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--content-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 11px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-normal);
+}
+
+.action-btn-mini:hover {
+    background: var(--accent-blue-light);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    text-decoration: none;
+}
+
 /* ============ VARIATION SELECTOR ============ */
 .variation-selector {
     background: var(--content-bg);
