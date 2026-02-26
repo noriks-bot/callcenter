@@ -996,7 +996,16 @@ function fetchAbandonedCarts() {
     global $stores, $storeCurrencies;
     
     $cached = getCache('abandoned_carts_filtered', 300);
-    if ($cached !== null) return $cached;
+    if ($cached !== null) {
+        // Re-merge call status from call_data.json (status stored separately, not in cache)
+        $callData = loadCallData();
+        foreach ($cached as &$cart) {
+            $savedData = $callData[$cart['id']] ?? [];
+            $cart['callStatus'] = $savedData['callStatus'] ?? 'not_called';
+            $cart['notes'] = $savedData['notes'] ?? '';
+        }
+        return $cached;
+    }
     
     $endpoints = [];
     foreach ($stores as $code => $config) {
@@ -1177,7 +1186,14 @@ function fetchOneTimeBuyers($storeFilter = null) {
     $cacheKey = 'one_time_buyers_' . ($storeFilter ?: 'all') . '_' . $minDaysFromPurchase;
     $cached = getCache($cacheKey, 300);  // 5 min cache - match auto-refresh for conversion detection
     if ($cached !== null) {
-        $logMsg("✓ Returning cached data: " . count($cached) . " buyers");
+        // Re-merge call status from call_data.json (status stored separately, not in cache)
+        $callData = loadCallData();
+        foreach ($cached as &$buyer) {
+            $savedData = $callData[$buyer['id']] ?? [];
+            $buyer['callStatus'] = $savedData['callStatus'] ?? 'not_called';
+            $buyer['notes'] = $savedData['notes'] ?? '';
+        }
+        $logMsg("✓ Returning cached data: " . count($cached) . " buyers (status re-merged)");
         return $cached;
     }
     
@@ -1534,7 +1550,16 @@ function fetchPendingOrders() {
     global $stores;
     
     $cached = getCache('pending_orders', 300);
-    if ($cached !== null) return $cached;
+    if ($cached !== null) {
+        // Re-merge call status from call_data.json (status stored separately, not in cache)
+        $callData = loadCallData();
+        foreach ($cached as &$order) {
+            $savedData = $callData[$order['id']] ?? [];
+            $order['callStatus'] = $savedData['callStatus'] ?? 'not_called';
+            $order['notes'] = $savedData['notes'] ?? '';
+        }
+        return $cached;
+    }
     
     $callData = loadCallData();
     $allOrders = [];
@@ -2985,6 +3010,15 @@ try {
                 
                 // Return cached data
                 $buyers = $cacheData['buyers'] ?? [];
+                
+                // Re-merge call status from call_data.json (status stored separately, not in cache)
+                $callData = loadCallData();
+                foreach ($buyers as &$buyer) {
+                    $savedData = $callData[$buyer['id']] ?? [];
+                    $buyer['callStatus'] = $savedData['callStatus'] ?? 'not_called';
+                    $buyer['notes'] = $savedData['notes'] ?? '';
+                }
+                unset($buyer); // break reference
                 
                 // Apply store filter if provided
                 if ($store) {
