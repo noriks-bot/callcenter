@@ -1739,7 +1739,7 @@
                     <p style="color:var(--text-muted);">Dogovorjeni callbacki za danes in prihodnje dni.</p>
                 </div>
                 <div style="display:flex;gap:8px;">
-                    <button class="btn" style="background:var(--card-border);" onclick="renderFollowups(true)">
+                    <button class="btn admin-only-btn" style="background:var(--card-border);" onclick="renderFollowups(true)">
                         <i class="fas fa-users"></i> Vsi agenti
                     </button>
                     <button class="btn btn-save" onclick="renderFollowups()">
@@ -2128,6 +2128,8 @@
             // Hide Reports/Statistics section
             const reportsSection = document.getElementById('reportsSection');
             if (reportsSection) reportsSection.style.display = 'none';
+            // Hide "Vsi agenti" button in Follow-ups
+            document.querySelectorAll('.admin-only-btn').forEach(btn => btn.style.display = 'none');
         } else {
             console.log('[Auth] Admin user - showing all sections');
         }
