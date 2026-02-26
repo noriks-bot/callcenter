@@ -7278,17 +7278,30 @@
         async function updatePaketomatStatus(orderId, status) {
             try {
                 const order = paketomatiData.find(o => o.id === orderId);
-                await fetch('api.php?action=paketomati-update', {
+                const res = await fetch('api.php?action=paketomati-update', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({id: orderId, status: status, notes: order?.notes || ''})
                 });
+                const result = await res.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Update failed');
+                }
 
                 // Update local data
                 if (order) order.status = status;
-                renderPaketomatiTable();
-                showToast(`Status posodobljen: ${status}`);
+                
+                // Re-render the correct table view
+                if (document.getElementById('paketomatiTableBody')) {
+                    renderPaketomatiTable();
+                } else {
+                    await renderPaketomatiInline();
+                }
+                
+                showToast(`Status posodobljen ✓`);
             } catch (e) {
+                console.error('[Paketomati] Status update error:', e);
                 showToast('Napaka pri posodabljanju statusa', 'error');
             }
         }
