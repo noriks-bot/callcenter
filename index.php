@@ -3447,26 +3447,34 @@
             }
 
             try {
-                // 1. Update status
-                await fetch('api.php?action=update-status', {
+                // 1. Update status to callback
+                const statusRes = await fetch('api.php?action=update-status', {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({id, callStatus: 'called_callback', notes: item.notes || ''})
                 });
+                console.log('[QuickCallback] Status update response:', await statusRes.clone().text());
 
                 // 2. Create call log with callback (this creates the follow-up)
-                await fetch('api.php?action=log-call', {
+                const logRes = await fetch('api.php?action=call-logs-add', {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({
                         customerId: id,
                         storeCode: item.storeCode,
                         status: 'callback',
-                        notes: note || 'Callback scheduled from quick action',
+                        notes: note || 'Callback scheduled',
                         duration: 0,
-                        callbackAt: new Date(callbackDateTime).toISOString()
+                        callbackAt: new Date(callbackDateTime).toISOString(),
+                        agentId: user?.username || 'unknown'
                     })
                 });
+                const logResult = await logRes.json();
+                console.log('[QuickCallback] Call log response:', logResult);
+
+                if (!logResult.success) {
+                    throw new Error(logResult.error || 'Failed to create callback');
+                }
 
                 // Update local state
                 if (item) item.callStatus = 'called_callback';
@@ -3481,7 +3489,7 @@
                 }
             } catch (err) {
                 console.error('Error creating callback:', err);
-                showToast('Napaka pri ustvarjanju callbacka', true);
+                showToast('Napaka pri ustvarjanju callbacka: ' + err.message, true);
             }
         }
 
