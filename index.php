@@ -6119,9 +6119,10 @@
             };
             return labels[s] || s;
         }
-        function formatDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
-        function formatDateTime(d) { if(!d)return''; const dt = new Date(d); return dt.toLocaleDateString('sl-SI',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' + dt.toLocaleTimeString('sl-SI',{hour:'2-digit',minute:'2-digit'}); }
-        function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+        function formatDate(d) { if(!d)return''; d = fixMkDate(d); return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+        function formatDateTime(d) { if(!d)return''; d = fixMkDate(d); const dt = new Date(d); if(isNaN(dt.getTime()))return d; return dt.toLocaleDateString('sl-SI',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' + dt.toLocaleTimeString('sl-SI',{hour:'2-digit',minute:'2-digit'}); }
+        function fixMkDate(d) { if(!d)return d; if(typeof d==='string' && d.match(/^\d{4}-\d{2}-\d{2}\+/)) { return d.split('+')[0] + 'T00:00:00'; } return d; }
+        function timeAgo(d) { if(!d)return''; d = fixMkDate(d); const s=Math.floor((new Date()-new Date(d))/1000); if(isNaN(s))return''; if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
         function timeAgoFull(d) { if(!d)return''; const ago = timeAgo(d); const full = formatDateTime(d); return `${ago} ago<br><span style="font-size:10px;color:var(--text-muted);">${full}</span>`; }
 
         // ========== CUSTOMER 360° FUNCTIONS ==========
