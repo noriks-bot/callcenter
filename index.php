@@ -3222,7 +3222,7 @@
                                         ${isConverted ? '' : '<button class="inline-notes-save" onclick="saveInlineNotes(this.previousElementSibling)" title="Save">💾</button>'}
                                     </div>
                                 </td>
-                                <td style="font-size:12px;">${timeAgo(c.abandonedAt)}</td>
+                                <td style="font-size:12px;">${timeAgoFull(c.abandonedAt)}</td>
                                 <td style="white-space:nowrap;text-align:right;">
                                     ${isConverted ? '<span style="color:#28a745;font-size:11px;">No action needed</span>' : `
                                     ${c.phone ? `<button class="action-btn call" onclick="call('${c.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
@@ -3248,6 +3248,7 @@
                         <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
                         <th class="sortable ${getSortClass('orderId')}" onclick="sortTable('orderId')">Order #</th>
                         <th class="sortable ${getSortClass('orderTotal')}" onclick="sortTable('orderTotal')">Total</th>
+                        <th class="sortable ${getSortClass('createdAt')}" onclick="sortTable('createdAt')">Time</th>
                         <th>Phone</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
                         <th>Notes</th>
@@ -3261,6 +3262,7 @@
                                 <td>${o.storeFlag} ${o.storeName}</td>
                                 <td><strong>#${o.orderId}</strong></td>
                                 <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
+                                <td style="font-size:12px;">${timeAgoFull(o.createdAt)}</td>
                                 <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '-'}</td>
                                 <td>
                                     <select class="inline-status-select" data-id="${o.id}" data-type="pending" onchange="inlineStatusChange(this)">
@@ -3332,7 +3334,7 @@
                                         : '<span style="color:var(--text-muted);">-</span>'}
                                 </td>
                                 <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '-'}</td>
-                                <td style="font-size:12px;">${formatDate(b.registeredAt)}</td>
+                                <td style="font-size:12px;">${timeAgoFull(b.registeredAt)}</td>
                                 <td>
                                     ${isConverted ? '<span style="color:#28a745;font-weight:600;">✅ Repeat Customer</span>' : `<select class="inline-status-select" data-id="${b.id}" data-type="buyer" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${b.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
@@ -6118,7 +6120,9 @@
             return labels[s] || s;
         }
         function formatDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+        function formatDateTime(d) { if(!d)return''; const dt = new Date(d); return dt.toLocaleDateString('sl-SI',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' + dt.toLocaleTimeString('sl-SI',{hour:'2-digit',minute:'2-digit'}); }
         function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+        function timeAgoFull(d) { if(!d)return''; const ago = timeAgo(d); const full = formatDateTime(d); return `${ago} ago<br><span style="font-size:10px;color:var(--text-muted);">${full}</span>`; }
 
         // ========== CUSTOMER 360° FUNCTIONS ==========
         let currentCustomer = null;
