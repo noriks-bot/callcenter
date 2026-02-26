@@ -3031,6 +3031,17 @@
                 data = data.filter(d => d.converted !== true);
             }
 
+            // Filter out orders older than 30 days for abandoned carts and pending orders
+            if (currentTab === 'carts' || currentTab === 'pending') {
+                const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+                data = data.filter(d => {
+                    const dateField = currentTab === 'carts' ? d.abandonedAt : d.createdAt;
+                    if (!dateField) return true; // Keep if no date
+                    const orderDate = new Date(dateField).getTime();
+                    return orderDate > thirtyDaysAgo;
+                });
+            }
+
             // Filter by user's allowed countries first (admins see everything)
             if (!hasAllCountries && !isAdmin) {
                 data = data.filter(d => userCountries.includes(d.storeCode));
@@ -3347,6 +3358,7 @@
                                     ${isConverted ? '<span style="color:#28a745;font-size:11px;">No action needed</span>' : `
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
                                     ${b.phone ? `<button class="action-btn sms" onclick="openSmsModal('${b.id}','buyer')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
+                                    <button class="action-btn" onclick="openCreateOrderModal('${b.id}','buyer')" title="Create Order" style="background:var(--accent-green);"><i class="fas fa-plus"></i></button>
                                     `}
                                 </td>
                             </tr>`;
@@ -7482,10 +7494,10 @@
                             <tr>
                                 <td>
                                     <div class="customer-cell">
-                                        <div class="avatar">${order.customerName ? order.customerName.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : '?'}</div>
+                                        <div class="avatar">${(order.customer?.name || order.customerName) ? (order.customer?.name || order.customerName).split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : '?'}</div>
                                         <div>
-                                            <div class="customer-name">${esc(order.customerName)}</div>
-                                            <div class="customer-email" style="font-size:11px;">${esc(order.address || '')}${order.address && order.city ? ', ' : ''}${esc(order.city || '')} ${esc(order.postcode || '')}</div>
+                                            <div class="customer-name">${esc(order.customer?.name || order.customerName || '')}</div>
+                                            <div class="customer-email" style="font-size:11px;">${esc(order.address?.street || order.address || '')}${(order.address?.street || order.address) && (order.address?.city || order.city) ? ', ' : ''}${esc(order.address?.city || order.city || '')} ${esc(order.address?.postcode || order.postcode || '')}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -7502,7 +7514,7 @@
                                         : '<span style="color:var(--text-muted);">-</span>'}
                                 </td>
                                 <td><strong>${sym(order.currency)}${(order.orderTotal||0).toFixed(2)}</strong></td>
-                                <td>${order.phone ? `<a href="tel:${order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${esc(order.phone)}</a>` : '-'}</td>
+                                <td>${(order.customer?.phone || order.phone) ? `<a href="tel:${order.customer?.phone || order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${esc(order.customer?.phone || order.phone)}</a>` : '-'}</td>
                                 <td>
                                     <span class="badge">${esc(order.deliveryService || '-')}</span>
                                     ${order.lastDeliveryEvent ? `<br><small style="color:var(--text-muted);">${esc(order.lastDeliveryEvent)}</small>` : ''}
@@ -7530,8 +7542,8 @@
                                     </div>
                                 </td>
                                 <td style="white-space:nowrap;text-align:right;">
-                                    ${order.phone ? `<button class="action-btn call" onclick="call('${order.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
-                                    ${order.phone ? `<button class="action-btn sms" onclick="openSmsModalForPaketomat('${order.id}')" title="Send SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
+                                    ${(order.customer?.phone || order.phone) ? `<button class="action-btn call" onclick="call('${order.customer?.phone || order.phone}')" title="Call"><i class="fas fa-phone"></i></button>` : ''}
+                                    ${(order.customer?.phone || order.phone) ? `<button class="action-btn sms" onclick="openSmsModalForPaketomat('${order.id}')" title="Send SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
                                 </td>
                             </tr>
                         `).join('')}
