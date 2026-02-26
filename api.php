@@ -3281,6 +3281,80 @@ try {
             echo json_encode($results);
             break;
             
+        case 'refresh-products-cache-all':
+            // Refresh products for ALL stores at once
+            // api.php?action=refresh-products-cache-all
+            set_time_limit(300);
+            $results = [];
+            
+            foreach ($stores as $code => $config) {
+                $startTime = microtime(true);
+                $allProducts = [];
+                $page = 1;
+                $perPage = 100;
+                
+                while (true) {
+                    $products = wcApiRequest($code, 'products', [
+                        'per_page' => $perPage,
+                        'page' => $page,
+                        'status' => 'publish'
+                    ]);
+                    
+                    if (!is_array($products) || empty($products) || isset($products['error'])) break;
+                    
+                    foreach ($products as $product) {
+                        $productData = [
+                            'id' => $product['id'],
+                            'name' => $product['name'],
+                            'sku' => $product['sku'] ?? '',
+                            'price' => floatval($product['price'] ?? 0),
+                            'regularPrice' => floatval($product['regular_price'] ?? 0),
+                            'image' => $product['images'][0]['src'] ?? null,
+                            'type' => $product['type'] ?? 'simple',
+                            'variations' => []
+                        ];
+                        
+                        if ($product['type'] === 'variable' && !empty($product['variations'])) {
+                            $variations = wcApiRequest($code, "products/{$product['id']}/variations", ['per_page' => 100]);
+                            if (is_array($variations) && !isset($variations['error'])) {
+                                foreach ($variations as $var) {
+                                    $attrNames = array_map(fn($a) => $a['option'] ?? '', $var['attributes'] ?? []);
+                                    $productData['variations'][] = [
+                                        'id' => $var['id'],
+                                        'name' => implode(' / ', array_filter($attrNames)) ?: "Var #{$var['id']}",
+                                        'price' => floatval($var['price'] ?? $productData['price']),
+                                        'sku' => $var['sku'] ?? '',
+                                        'inStock' => ($var['stock_status'] ?? 'instock') === 'instock'
+                                    ];
+                                }
+                            }
+                        }
+                        $allProducts[] = $productData;
+                    }
+                    
+                    if (count($products) < $perPage) break;
+                    $page++;
+                    if ($page > 20) break;
+                }
+                
+                $cacheFile = __DIR__ . "/data/products-cache-{$code}.json";
+                file_put_contents($cacheFile, json_encode([
+                    'generated_at' => time(),
+                    'generated_date' => date('c'),
+                    'store' => $code,
+                    'count' => count($allProducts),
+                    'products' => $allProducts
+                ], JSON_PRETTY_PRINT));
+                
+                $results[$code] = [
+                    'count' => count($allProducts),
+                    'time' => round(microtime(true) - $startTime, 2)
+                ];
+            }
+            
+            echo json_encode(['success' => true, 'stores' => $results]);
+            break;
+            
         case 'refresh-products-cache':
             // Fetch ALL products from WooCommerce and cache locally
             // Run this once or when products change: api.php?action=refresh-products-cache&store=hr
