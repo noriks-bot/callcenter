@@ -3307,6 +3307,7 @@
                         <th class="sortable ${getSortClass('customerName')}" onclick="sortTable('customerName')">Customer</th>
                         <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
                         <th class="sortable ${getSortClass('totalSpent')}" onclick="sortTable('totalSpent')">Spent</th>
+                        <th>Purchased</th>
                         <th>Phone</th>
                         <th class="sortable ${getSortClass('registeredAt')}" onclick="sortTable('registeredAt')">Registered</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
@@ -3323,6 +3324,13 @@
                                 <td><div class="customer-cell"><div class="avatar" style="${isConverted ? 'background:#28a745;' : ''}">${initials(b.customerName)}</div><div><div class="customer-name">${esc(b.customerName)}${convertedBadge}</div><div class="customer-email">${esc(b.email)}</div></div></div></td>
                                 <td>${b.storeFlag} ${b.storeName}</td>
                                 <td><strong>${sym}${(b.totalSpent||0).toFixed(2)}</strong></td>
+                                <td style="font-size:11px;max-width:200px;">
+                                    ${(b.orderItems || []).length > 0 
+                                        ? b.orderItems.map(item => `<div style="margin-bottom:2px;">
+                                            <strong>${item.quantity}x</strong> ${esc(item.name)}
+                                          </div>`).join('')
+                                        : '<span style="color:var(--text-muted);">-</span>'}
+                                </td>
                                 <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '-'}</td>
                                 <td style="font-size:12px;">${formatDate(b.registeredAt)}</td>
                                 <td>

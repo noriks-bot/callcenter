@@ -1428,6 +1428,16 @@ function fetchOneTimeBuyers($storeFilter = null) {
             // (because filter checks count($data['orders']) === 1)
             $isConverted = false;
             
+            // Extract order items (products purchased)
+            $orderItems = [];
+            foreach (($order['line_items'] ?? []) as $item) {
+                $orderItems[] = [
+                    'name' => $item['name'] ?? 'Unknown product',
+                    'quantity' => intval($item['quantity'] ?? 1),
+                    'total' => floatval($item['total'] ?? 0)
+                ];
+            }
+            
             $allBuyers[] = [
                 'id' => $customerId,
                 'storeCode' => $storeCode,
@@ -1444,7 +1454,8 @@ function fetchOneTimeBuyers($storeFilter = null) {
                 'orderStatus' => $order['status'] ?? '',
                 'callStatus' => $savedData['callStatus'] ?? 'not_called',
                 'notes' => $savedData['notes'] ?? '',
-                'converted' => $isConverted
+                'converted' => $isConverted,
+                'orderItems' => $orderItems
             ];
         }
     }
