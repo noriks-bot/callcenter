@@ -12,7 +12,6 @@
         /* Minimal overrides for compatibility - main styles in styles.css */
 
         /* Special view content areas - copy .main styles from styles.css */
-        #dashboardContent,
         #smsDashboardContent,
         #smsSettingsContent,
         #smsAutomationContent,
@@ -111,7 +110,6 @@
         }
 
         /* Collapsed sidebar */
-        .sidebar.collapsed ~ #dashboardContent,
         .sidebar.collapsed ~ #smsDashboardContent,
         .sidebar.collapsed ~ #smsSettingsContent,
         .sidebar.collapsed ~ #smsAutomationContent,
@@ -124,7 +122,6 @@
 
         /* Mobile */
         @media (max-width: 1024px) {
-            #dashboardContent,
             #smsDashboardContent,
             #smsSettingsContent,
             #smsAutomationContent,
@@ -991,88 +988,6 @@
                 <button class="btn btn-save" onclick="confirmSendSms()" style="background:var(--accent-green);">
                     <i class="fas fa-paper-plane"></i> Pošlji
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard Home Content -->
-    <div id="dashboardContent" style="display:none;">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title-large"><i class="fas fa-home"></i> Dashboard</h1>
-        </div>
-
-        <!-- KPI Cards -->
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-icon blue"><i class="fas fa-shopping-cart"></i></div>
-                <div class="kpi-content">
-                    <div class="kpi-value" id="kpiTotalValue">€0</div>
-                    <div class="kpi-label">Total Carts Value</div>
-                    <div class="kpi-change positive">+12% vs last week</div>
-                </div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-icon green"><i class="fas fa-percentage"></i></div>
-                <div class="kpi-content">
-                    <div class="kpi-value" id="kpiRecoveryRate">0%</div>
-                    <div class="kpi-label">Recovery Rate</div>
-                    <div class="kpi-change positive">+3% vs last week</div>
-                </div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-icon purple"><i class="fas fa-comment-sms"></i></div>
-                <div class="kpi-content">
-                    <div class="kpi-value" id="kpiSmsSent">0</div>
-                    <div class="kpi-label">SMS Sent (7 days)</div>
-                    <div class="kpi-change neutral">Same as last week</div>
-                </div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-icon orange"><i class="fas fa-euro-sign"></i></div>
-                <div class="kpi-content">
-                    <div class="kpi-value" id="kpiRecovered">€0</div>
-                    <div class="kpi-label">Revenue Recovered</div>
-                    <div class="kpi-change positive">+8% vs last week</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="dashboard-row">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3>📈 Cart Recovery (Last 7 Days)</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="recoveryChart"></canvas>
-                </div>
-            </div>
-            <div class="chart-card small">
-                <div class="chart-header">
-                    <h3>🌍 Carts by Country</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="countryChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="activity-card">
-            <div class="activity-header">
-                <h3>🔔 Recent Activity</h3>
-                <button class="btn btn-cancel" style="padding:8px 12px;" onclick="refreshActivity()">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-            <div class="activity-list" id="activityList">
-                <!-- Activity items will be rendered here -->
-                <div class="activity-loading">
-                    <div class="skeleton-loader"></div>
-                    <div class="skeleton-loader" style="width:80%;"></div>
-                    <div class="skeleton-loader" style="width:60%;"></div>
-                </div>
             </div>
         </div>
     </div>
@@ -2238,7 +2153,7 @@
         function hideAllContent() {
             // Hide all special content areas
             const specialAreas = [
-                'dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent',
+                'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent',
                 'buyersSettingsContent', 'agentsContent', 'followupsContent'
             ];
             specialAreas.forEach(id => {
@@ -2311,7 +2226,6 @@
 
                 // Update page title
                 const titles = {
-                    dashboard: 'Dashboard',
                     leads: 'Leads',
                     carts: 'Abandoned Carts',
                     pending: 'Pending Orders',
@@ -2359,10 +2273,7 @@
                     updateCounts();
                 } else {
                     // Show specific special content
-                    if (currentTab === 'dashboard') {
-                        showSpecialView('dashboardContent');
-                        renderDashboard();
-                    } else if (currentTab === 'sms-automation') {
+                    if (currentTab === 'sms-automation') {
                         showSpecialView('smsAutomationContent');
                         loadSmsAutomations();
                     } else if (currentTab === 'sms-dashboard') {
@@ -2540,7 +2451,7 @@
                 document.getElementById('pageTitle').textContent = 'Leads';
 
                 // Hide ALL special content areas first (ensures clean state)
-                ['dashboardContent', 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
+                ['smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
                  'buyersSettingsContent', 'agentsContent', 'followupsContent'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'none';
@@ -5988,212 +5899,6 @@
         }
         function formatDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
         function timeAgo(d) { if(!d)return''; const s=Math.floor((new Date()-new Date(d))/1000); if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
-
-        // ========== DASHBOARD FUNCTIONS ==========
-        let recoveryChart = null;
-        let countryChart = null;
-
-        function renderDashboard() {
-            updateKPIs();
-            renderCharts();
-            renderActivityFeed();
-        }
-
-        function updateKPIs() {
-            // Filter by user's allowed countries first (same as updateStats)
-            const shouldFilter = !hasAllCountries && !isAdmin;
-            let fc = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
-
-            // Then filter by currentStore if not 'all'
-            if (currentStore !== 'all') {
-                fc = fc.filter(c => c.storeCode === currentStore);
-            }
-
-            // Convert all values to EUR before summing
-            const totalValue = fc.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
-            const converted = fc.filter(c => c.callStatus === 'converted').length;
-            const recoveryRate = fc.length > 0 ? Math.round((converted / fc.length) * 100) : 0;
-
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            const smsSentWeek = smsLog.filter(s => new Date(s.date) > weekAgo && s.status === 'sent').length;
-
-            // Estimate recovered revenue (converted carts value) - convert to EUR
-            const recoveredValue = fc.filter(c => c.callStatus === 'converted')
-                .reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
-
-            document.getElementById('kpiTotalValue').textContent = '€' + Math.round(totalValue).toLocaleString();
-            document.getElementById('kpiRecoveryRate').textContent = recoveryRate + '%';
-            document.getElementById('kpiSmsSent').textContent = smsSentWeek;
-            document.getElementById('kpiRecovered').textContent = '€' + Math.round(recoveredValue).toLocaleString();
-        }
-
-        function renderCharts() {
-            // Recovery Chart (Line chart - last 7 days)
-            const recoveryCtx = document.getElementById('recoveryChart');
-            if (!recoveryCtx) return;
-
-            if (recoveryChart) recoveryChart.destroy();
-
-            const labels = [];
-            const cartsData = [];
-            const convertedData = [];
-
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toLocaleDateString('en-US', { weekday: 'short' });
-                labels.push(dateStr);
-
-                const dayStart = new Date(date.setHours(0,0,0,0));
-                const dayEnd = new Date(date.setHours(23,59,59,999));
-
-                const dayCarts = carts.filter(c => {
-                    const t = new Date(c.abandonedAt);
-                    return t >= dayStart && t <= dayEnd;
-                }).length;
-
-                const dayConverted = carts.filter(c => {
-                    const t = new Date(c.lastUpdated);
-                    return c.callStatus === 'converted' && t >= dayStart && t <= dayEnd;
-                }).length;
-
-                cartsData.push(dayCarts);
-                convertedData.push(dayConverted);
-            }
-
-            recoveryChart = new Chart(recoveryCtx, {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [{
-                        label: 'Abandoned Carts',
-                        data: cartsData,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59,130,246,0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }, {
-                        label: 'Converted',
-                        data: convertedData,
-                        borderColor: '#22c55e',
-                        backgroundColor: 'rgba(34,197,94,0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-
-            // Country Chart (Doughnut)
-            const countryCtx = document.getElementById('countryChart');
-            if (!countryCtx) return;
-
-            if (countryChart) countryChart.destroy();
-
-            const countryLabels = [];
-            const countryData = [];
-            const countryColors = ['#3b82f6', '#22c55e', '#f97316', '#a855f7', '#ef4444', '#06b6d4', '#eab308'];
-
-            stores.forEach((s, i) => {
-                const count = carts.filter(c => c.storeCode === s.code).length;
-                if (count > 0) {
-                    countryLabels.push(s.flag + ' ' + s.name);
-                    countryData.push(count);
-                }
-            });
-
-            countryChart = new Chart(countryCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: countryLabels,
-                    datasets: [{
-                        data: countryData,
-                        backgroundColor: countryColors.slice(0, countryData.length),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right', labels: { boxWidth: 12, padding: 8 } }
-                    },
-                    cutout: '60%'
-                }
-            });
-        }
-
-        function renderActivityFeed() {
-            const activityList = document.getElementById('activityList');
-            if (!activityList) return;
-
-            // Combine recent activities
-            const activities = [];
-
-            // Recent carts
-            carts.slice(0, 5).forEach(c => {
-                activities.push({
-                    type: 'cart',
-                    icon: 'fa-shopping-cart',
-                    title: 'New abandoned cart',
-                    desc: `${c.customerName} - ${c.storeFlag} €${c.cartValue?.toFixed(2) || '0.00'}`,
-                    time: c.abandonedAt,
-                    data: c
-                });
-            });
-
-            // Recent SMS
-            smsLog.slice(0, 5).forEach(s => {
-                activities.push({
-                    type: 'sms',
-                    icon: 'fa-comment-sms',
-                    title: s.status === 'sent' ? 'SMS sent' : 'SMS queued',
-                    desc: `To ${s.customerName} (${s.storeCode?.toUpperCase() || '?'})`,
-                    time: s.date,
-                    data: s
-                });
-            });
-
-            // Sort by time
-            activities.sort((a, b) => new Date(b.time) - new Date(a.time));
-
-            if (activities.length === 0) {
-                activityList.innerHTML = '<div class="empty" style="padding:40px;"><i class="fas fa-inbox"></i><p>No recent activity</p></div>';
-                return;
-            }
-
-            activityList.innerHTML = activities.slice(0, 10).map(a => `
-                <div class="activity-item" onclick="handleActivityClick('${a.type}', '${a.data?.id || ''}')">
-                    <div class="activity-icon ${a.type}"><i class="fas ${a.icon}"></i></div>
-                    <div class="activity-content">
-                        <div class="activity-title">${esc(a.title)}</div>
-                        <div class="activity-desc">${esc(a.desc)}</div>
-                    </div>
-                    <div class="activity-time">${timeAgo(a.time)}</div>
-                </div>
-            `).join('');
-        }
-
-        function handleActivityClick(type, id) {
-            if (type === 'cart' && id) {
-                const cart = carts.find(c => c.id === id);
-                if (cart) openCustomer360(cart);
-            }
-        }
-
-        function refreshActivity() {
-            renderActivityFeed();
-            showToast('Activity refreshed!', false, 'info');
-        }
 
         // ========== CUSTOMER 360° FUNCTIONS ==========
         let currentCustomer = null;

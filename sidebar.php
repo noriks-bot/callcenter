@@ -18,10 +18,6 @@
                 <i class="fas fa-users"></i>
                 <span>Leads</span>
             </a>
-            <a href="index.php#dashboard" class="nav-item" data-tab="dashboard">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
         </div>
         
         <div class="nav-section">
