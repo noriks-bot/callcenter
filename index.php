@@ -3354,7 +3354,7 @@
                                     ${isConverted ? '<span style="color:#28a745;font-size:11px;">No action needed</span>' : `
                                     ${b.phone ? `<button class="action-btn call" onclick="call('${b.phone}')"><i class="fas fa-phone"></i></button>` : ''}
                                     ${b.phone ? `<button class="action-btn sms" onclick="openSmsModal('${b.id}','buyer')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
-                                    <button class="action-btn" onclick="openCreateOrderModal('${b.id}','buyer')" title="Create Order" style="background:var(--accent-green);"><i class="fas fa-plus"></i></button>
+                                    <button class="action-btn-order-large" onclick="openOrderModalForBuyer('${b.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i> CREATE ORDER</button>
                                     `}
                                 </td>
                             </tr>`;
@@ -3604,6 +3604,45 @@
                 editPrice: item.price,
                 editQty: item.quantity
             }));
+
+            freeShipping = false;
+            document.getElementById('freeShippingToggle').classList.remove('active');
+
+            // Reset product search
+            document.getElementById('productSearchInput').value = '';
+            document.getElementById('productSearchResults').classList.remove('open');
+            document.getElementById('productSearchResults').innerHTML = '';
+            document.getElementById('variationSelector').style.display = 'none';
+            selectedProduct = null;
+            selectedVariation = null;
+
+            renderOrderItems();
+            document.getElementById('orderModal').classList.add('open');
+        }
+
+        function openOrderModalForBuyer(buyerId) {
+            const buyer = buyers.find(b => b.id === buyerId);
+            if (!buyer) return;
+
+            orderCartId = buyerId;
+            orderCart = {
+                ...buyer,
+                cartContents: [], // Buyers don't have cart contents - start empty
+                currency: buyer.currency || 'EUR'
+            };
+
+            // Populate customer info
+            const nameParts = (buyer.customerName || '').split(' ');
+            document.getElementById('orderFirstName').value = nameParts[0] || '';
+            document.getElementById('orderLastName').value = nameParts.slice(1).join(' ') || '';
+            document.getElementById('orderEmail').value = buyer.email || '';
+            document.getElementById('orderPhone').value = buyer.phone || '';
+            document.getElementById('orderAddress').value = buyer.address || '';
+            document.getElementById('orderCity').value = buyer.city || '';
+            document.getElementById('orderPostcode').value = buyer.postcode || '';
+
+            // Start with empty items - user will search and add products
+            orderItems = [];
 
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
