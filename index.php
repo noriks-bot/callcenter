@@ -6860,7 +6860,10 @@
                                 <td style="font-size:12px;">${esc(f.agentId)}</td>
                                 <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escAttr(f.notes || '')}">${esc(f.notes || '-')}</td>
                                 <td style="white-space:nowrap;text-align:right;">
-                                    ${isCompleted ? '<span style="color:#28a745;font-size:11px;">Zaključeno</span>' : `
+                                    ${isCompleted ? `
+                                        <span style="color:#28a745;font-size:11px;margin-right:8px;">✓ Zaključeno</span>
+                                        <button class="action-btn" style="background:#dc3545;color:white;" onclick="deleteFollowup('${f.id}')" title="Briši"><i class="fas fa-trash"></i></button>
+                                    ` : `
                                         <button class="action-btn call" onclick="callFollowupCustomer('${f.customerId}')" title="Pokliči"><i class="fas fa-phone"></i></button>
                                         <button class="action-btn" style="background:#28a745;color:white;" onclick="completeFollowup('${f.id}')" title="Zaključi"><i class="fas fa-check"></i></button>
                                         <button class="action-btn" style="background:#dc3545;color:white;" onclick="deleteFollowup('${f.id}')" title="Briši"><i class="fas fa-trash"></i></button>
