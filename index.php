@@ -2974,8 +2974,13 @@
             const status = document.getElementById('statusFilter').value;
             const container = document.getElementById('tableContainer');
 
+            // Determine effective tab - when in 'leads' view, use currentContentTab
+            const dataTab = ['carts', 'pending', 'buyers', 'paketomati', 'urgent'].includes(currentTab) 
+                ? currentTab 
+                : currentContentTab;
+
             // BUYERS: Check loading/error state first
-            if (currentTab === 'buyers') {
+            if (dataTab === 'buyers') {
                 // Still loading buyers
                 if (globalLoadingStatus.buyers) {
                     container.innerHTML = `
@@ -3009,29 +3014,29 @@
             if (urgentActionBar) urgentActionBar.style.display = 'none';
             
             // Handle urgent tab separately (uses localStorage, not server data)
-            if (currentTab === 'urgent') {
+            if (dataTab === 'urgent') {
                 renderUrgentTableInline();
                 return;
             }
             
             // Handle paketomati tab separately
-            if (currentTab === 'paketomati') {
+            if (dataTab === 'paketomati') {
                 renderPaketomatiInline();
                 return;
             }
             
-            let data = currentTab === 'carts' ? [...carts] : currentTab === 'pending' ? [...pending] : [...buyers];
+            let data = dataTab === 'carts' ? [...carts] : dataTab === 'pending' ? [...pending] : [...buyers];
 
             // Filter out converted carts - they should not appear in abandoned carts list
-            if (currentTab === 'carts') {
+            if (dataTab === 'carts') {
                 data = data.filter(d => d.converted !== true);
             }
 
             // Filter out orders older than 30 days for abandoned carts and pending orders
-            if (currentTab === 'carts' || currentTab === 'pending') {
+            if (dataTab === 'carts' || dataTab === 'pending') {
                 const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
                 data = data.filter(d => {
-                    const dateField = currentTab === 'carts' ? d.abandonedAt : d.createdAt;
+                    const dateField = dataTab === 'carts' ? d.abandonedAt : d.createdAt;
                     if (!dateField) return true; // Keep if no date
                     const orderDate = new Date(dateField).getTime();
                     return orderDate > thirtyDaysAgo;
@@ -3083,7 +3088,7 @@
                     'buyers': '<div class="empty"><i class="fas fa-user"></i><p>Ni enkratnih kupcev</p><small style="color:var(--text-muted);">Trenutno ni kupcev z natanko 1 naročilom ki ustrezajo filtru</small></div>',
                     'urgent': '<div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p><small style="color:var(--text-muted);">Klikni + Dodaj za vnos novega leada</small></div>'
                 };
-                container.innerHTML = emptyMessages[currentTab] || '<div class="empty"><i class="fas fa-inbox"></i><p>Ni podatkov za prikaz</p></div>';
+                container.innerHTML = emptyMessages[dataTab] || '<div class="empty"><i class="fas fa-inbox"></i><p>Ni podatkov za prikaz</p></div>';
                 return;
             }
 
@@ -3093,9 +3098,9 @@
             const startIdx = (currentPage - 1) * itemsPerPage;
             const paginatedData = data.slice(startIdx, startIdx + itemsPerPage);
 
-            if (currentTab === 'carts') renderCartsTable(paginatedData, totalItems, totalPages);
-            else if (currentTab === 'pending') renderPendingTable(paginatedData, totalItems, totalPages);
-            else if (currentTab === 'urgent') renderUrgentTableInline();
+            if (dataTab === 'carts') renderCartsTable(paginatedData, totalItems, totalPages);
+            else if (dataTab === 'pending') renderPendingTable(paginatedData, totalItems, totalPages);
+            else if (dataTab === 'urgent') renderUrgentTableInline();
             else renderBuyersTable(paginatedData, totalItems, totalPages);
         }
 
