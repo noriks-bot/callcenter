@@ -2555,15 +2555,16 @@
                 ? stores
                 : stores.filter(s => userCountries.includes(s.code));
 
-            // If agent has only one country, hide tabs and set that country
-            if (!hasAllCountries && allowedStores.length === 1) {
-                container.style.display = 'none';
-                currentStore = allowedStores[0].code;
-                return;
-            }
+            // Always show tabs container (even if user has only one country)
+            container.style.display = 'flex';
 
             // Show "All" tab only for admins or users with multiple countries
             const showAllTab = hasAllCountries || allowedStores.length > 1;
+            
+            // Set initial store for single-country users
+            if (!hasAllCountries && allowedStores.length === 1) {
+                currentStore = allowedStores[0].code;
+            }
 
             container.innerHTML = (showAllTab ? `
                 <button class="country-tab active" data-store="all">
@@ -2574,11 +2575,6 @@
                     <span class="flag">${s.flag}</span> ${s.name}
                 </button>
             `).join('');
-
-            // Set initial store for non-admins
-            if (!showAllTab && allowedStores.length > 0) {
-                currentStore = allowedStores[0].code;
-            }
 
             container.querySelectorAll('.country-tab').forEach(tab => {
                 tab.addEventListener('click', async () => {
