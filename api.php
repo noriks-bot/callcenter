@@ -865,6 +865,14 @@ function setCache($key, $data) {
     file_put_contents($cacheDir . md5($key) . '.json', json_encode($data));
 }
 
+function clearCache($key) {
+    global $cacheDir;
+    $file = $cacheDir . md5($key) . '.json';
+    if (file_exists($file)) {
+        @unlink($file);
+    }
+}
+
 function curlMultiGet($urls) {
     $mh = curl_multi_init();
     $handles = [];
@@ -2994,6 +3002,18 @@ try {
                 'orderId' => $callData[$id]['orderId'] ?? null
             ];
             saveCallData($callData);
+            
+            // Clear caches so updated status is reflected immediately
+            clearCache('abandoned_carts_filtered');
+            clearCache('pending_orders');
+            // Clear buyer caches for all stores
+            foreach (['hr', 'cz', 'pl', 'gr', 'sk', 'it', 'hu'] as $sc) {
+                clearCache('one_time_buyers_' . $sc . '_14');
+                clearCache('one_time_buyers_' . $sc . '_30');
+            }
+            clearCache('one_time_buyers_all_14');
+            clearCache('one_time_buyers_all_30');
+            
             echo json_encode(['success' => true]);
             break;
             
