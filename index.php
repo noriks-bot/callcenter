@@ -3946,13 +3946,18 @@
         function openSmsModal(id, type) {
             const data = type === 'cart' ? carts : type === 'pending' ? pending : type === 'paketomat' ? paketomatiData : buyers;
             const item = data.find(d => d.id === id);
-            if (!item || !item.phone) return;
+            
+            // Handle nested customer structure for paketomati
+            const phone = item?.customer?.phone || item?.phone;
+            const customerName = item?.customer?.name || item?.customerName;
+            
+            if (!item || !phone) return;
 
-            smsTarget = { ...item, type };
+            smsTarget = { ...item, phone, customerName, type };
 
-            document.getElementById('smsAvatar').textContent = initials(item.customerName);
-            document.getElementById('smsCustomerName').textContent = item.customerName;
-            document.getElementById('smsCustomerPhone').textContent = item.phone;
+            document.getElementById('smsAvatar').textContent = initials(customerName);
+            document.getElementById('smsCustomerName').textContent = customerName;
+            document.getElementById('smsCustomerPhone').textContent = phone;
             document.getElementById('smsMessage').value = '';
             document.getElementById('smsPreview').style.display = 'none';
             updateCharCount();
@@ -7376,7 +7381,8 @@
         // Open SMS modal for paketomati order
         function openSmsModalForPaketomat(orderId) {
             const order = paketomatiData.find(o => o.id === orderId);
-            if (!order || !order.phone) {
+            const phone = order?.customer?.phone || order?.phone;
+            if (!order || !phone) {
                 showToast('Ni telefonske številke', 'error');
                 return;
             }
