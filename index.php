@@ -714,14 +714,14 @@
                 <select class="filter-select" id="statusFilter">
                     <option value="">All Status</option>
                     <option value="not_called">Not Called</option>
-                    <option value="no_answer_1">No Answer (1)</option>
-                    <option value="no_answer_2">No Answer (2)</option>
-                    <option value="no_answer_3">No Answer (3+)</option>
-                    <option value="callback">Callback Scheduled</option>
-                    <option value="converted">Converted</option>
-                    <option value="not_interested">Not Interested</option>
-                    <option value="wrong_number">Wrong Number</option>
-                    <option value="voicemail">Voicemail</option>
+                    <option value="no_answer_1">No Answer 1</option>
+                    <option value="no_answer_2">No Answer 2</option>
+                    <option value="no_answer_3">No Answer 3</option>
+                    <option value="no_answer_4">No Answer 4+</option>
+                    <option value="called_callback">Callback Scheduled</option>
+                    <option value="called_interested">Interested</option>
+                    <option value="called_not_interested">Not Interested</option>
+                    <option value="invalid_number">Invalid Number</option>
                 </select>
             </div>
 
@@ -3193,11 +3193,13 @@
                                 <td>
                                     ${isConverted ? '<span style="color:#28a745;font-weight:600;">✅ Converted</span>' : `<select class="inline-status-select" data-id="${c.id}" data-type="cart" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${c.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
-                                        <option value="called_no_answer" ${c.callStatus==='called_no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="no_answer_1" ${c.callStatus==='no_answer_1'||c.callStatus==='called_no_answer'?'selected':''}>📵 No Answer 1</option>
+                                        <option value="no_answer_2" ${c.callStatus==='no_answer_2'?'selected':''}>📵 No Answer 2</option>
+                                        <option value="no_answer_3" ${c.callStatus==='no_answer_3'?'selected':''}>📵 No Answer 3</option>
+                                        <option value="no_answer_4" ${c.callStatus==='no_answer_4'?'selected':''}>📵 No Answer 4+</option>
                                         <option value="called_callback" ${c.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
                                         <option value="called_interested" ${c.callStatus==='called_interested'?'selected':''}>💡 Interested</option>
                                         <option value="called_not_interested" ${c.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
-                                        <option value="converted" ${c.callStatus==='converted'?'selected':''}>✅ Converted</option>
                                         <option value="invalid_number" ${c.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
                                     </select>`}
                                 </td>
@@ -3256,11 +3258,13 @@
                                 <td>
                                     <select class="inline-status-select" data-id="${o.id}" data-type="pending" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${o.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
-                                        <option value="called_no_answer" ${o.callStatus==='called_no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="no_answer_1" ${o.callStatus==='no_answer_1'||o.callStatus==='called_no_answer'?'selected':''}>📵 No Answer 1</option>
+                                        <option value="no_answer_2" ${o.callStatus==='no_answer_2'?'selected':''}>📵 No Answer 2</option>
+                                        <option value="no_answer_3" ${o.callStatus==='no_answer_3'?'selected':''}>📵 No Answer 3</option>
+                                        <option value="no_answer_4" ${o.callStatus==='no_answer_4'?'selected':''}>📵 No Answer 4+</option>
                                         <option value="called_callback" ${o.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
                                         <option value="called_interested" ${o.callStatus==='called_interested'?'selected':''}>💡 Interested</option>
                                         <option value="called_not_interested" ${o.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
-                                        <option value="converted" ${o.callStatus==='converted'?'selected':''}>✅ Converted</option>
                                         <option value="invalid_number" ${o.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
                                     </select>
                                 </td>
@@ -3317,11 +3321,13 @@
                                 <td>
                                     ${isConverted ? '<span style="color:#28a745;font-weight:600;">✅ Repeat Customer</span>' : `<select class="inline-status-select" data-id="${b.id}" data-type="buyer" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${b.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
-                                        <option value="called_no_answer" ${b.callStatus==='called_no_answer'?'selected':''}>📵 No Answer</option>
+                                        <option value="no_answer_1" ${b.callStatus==='no_answer_1'||b.callStatus==='called_no_answer'?'selected':''}>📵 No Answer 1</option>
+                                        <option value="no_answer_2" ${b.callStatus==='no_answer_2'?'selected':''}>📵 No Answer 2</option>
+                                        <option value="no_answer_3" ${b.callStatus==='no_answer_3'?'selected':''}>📵 No Answer 3</option>
+                                        <option value="no_answer_4" ${b.callStatus==='no_answer_4'?'selected':''}>📵 No Answer 4+</option>
                                         <option value="called_callback" ${b.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
                                         <option value="called_interested" ${b.callStatus==='called_interested'?'selected':''}>💡 Interested</option>
                                         <option value="called_not_interested" ${b.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
-                                        <option value="converted" ${b.callStatus==='converted'?'selected':''}>✅ Converted</option>
                                         <option value="invalid_number" ${b.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
                                     </select>`}
                                 </td>
@@ -7393,6 +7399,55 @@
             if (countEl) countEl.textContent = uncalled;
         }
         
+        // Generate tracking URL based on delivery service
+        function getTrackingUrl(deliveryService, trackingCode) {
+            if (!trackingCode) return '#';
+            const service = (deliveryService || '').toLowerCase();
+            
+            // GLS
+            if (service.includes('gls')) {
+                return `https://gls-group.com/track/${trackingCode}`;
+            }
+            // DPD
+            if (service.includes('dpd')) {
+                return `https://tracking.dpd.de/parcelstatus?query=${trackingCode}&locale=en_D`;
+            }
+            // InPost
+            if (service.includes('inpost')) {
+                return `https://inpost.pl/sledzenie-przesylek?number=${trackingCode}`;
+            }
+            // Pošta Slovenije
+            if (service.includes('pošta') || service.includes('posta slov')) {
+                return `https://sledenje.posta.si/sledenje?id=${trackingCode}`;
+            }
+            // Hrvatska Pošta
+            if (service.includes('hrvatska') || service.includes('hp express')) {
+                return `https://posiljka.posta.hr/Tracking/Info?Code=${trackingCode}`;
+            }
+            // Overseas Express
+            if (service.includes('overseas')) {
+                return `https://www.overseas.hr/pracenje-posiljke?code=${trackingCode}`;
+            }
+            // Packeta
+            if (service.includes('packeta') || service.includes('zásilkovna')) {
+                return `https://tracking.packeta.com/en/?id=${trackingCode}`;
+            }
+            // PPL (Czech)
+            if (service.includes('ppl')) {
+                return `https://www.ppl.cz/vyhledat-zasilku?shipmentId=${trackingCode}`;
+            }
+            // Česká Pošta
+            if (service.includes('česká') || service.includes('ceska posta')) {
+                return `https://www.postaonline.cz/trackandtrace/-/zasilka/cislo?telefonn=${trackingCode}`;
+            }
+            // Magyar Posta (Hungary)
+            if (service.includes('magyar') || service.includes('posta.hu')) {
+                return `https://posta.hu/nyomkovetes?searchvalue=${trackingCode}`;
+            }
+            // Default - Google search for tracking
+            return `https://www.google.com/search?q=${encodeURIComponent(trackingCode)}+tracking`;
+        }
+        
         async function renderPaketomatiInline() {
             const container = document.getElementById('tableContainer');
             if (!container) {
@@ -7449,13 +7504,13 @@
                                         <div class="avatar">${order.customerName ? order.customerName.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : '?'}</div>
                                         <div>
                                             <div class="customer-name">${esc(order.customerName)}</div>
-                                            <div class="customer-email">${esc(order.city || '')} ${esc(order.country || '')}</div>
+                                            <div class="customer-email" style="font-size:11px;">${esc(order.address || '')}${order.address && order.city ? ', ' : ''}${esc(order.city || '')} ${esc(order.postcode || '')}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <strong>#${esc(order.orderNumber)}</strong>
-                                    ${order.trackingCode ? `<br><small style="color:var(--text-muted);">📦 ${esc(order.trackingCode)}</small>` : ''}
+                                    ${order.trackingCode ? `<br><a href="${getTrackingUrl(order.deliveryService, order.trackingCode)}" target="_blank" style="color:var(--accent-blue);font-size:11px;text-decoration:none;">📦 ${esc(order.trackingCode)} ↗</a>` : ''}
                                 </td>
                                 <td><strong>${sym(order.currency)}${(order.orderTotal||0).toFixed(2)}</strong></td>
                                 <td>${order.phone ? `<a href="tel:${order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${esc(order.phone)}</a>` : '-'}</td>
@@ -7466,7 +7521,12 @@
                                 <td>
                                     <select class="inline-status-select" data-id="${order.id}" onchange="updatePaketomatStatusFromSelect(this)">
                                         <option value="not_called" ${order.status==='not_called'?'selected':''}>⚪ Čaka</option>
-                                        <option value="called" ${order.status==='called'?'selected':''}>📞 Poklicano</option>
+                                        <option value="called_1" ${order.status==='called_1'?'selected':''}>📞 Poklicano 1x</option>
+                                        <option value="called_2" ${order.status==='called_2'?'selected':''}>📞 Poklicano 2x</option>
+                                        <option value="called_3" ${order.status==='called_3'?'selected':''}>📞 Poklicano 3x</option>
+                                        <option value="sms_1" ${order.status==='sms_1'?'selected':''}>💬 SMS 1x</option>
+                                        <option value="sms_2" ${order.status==='sms_2'?'selected':''}>💬 SMS 2x</option>
+                                        <option value="sms_3" ${order.status==='sms_3'?'selected':''}>💬 SMS 3x</option>
                                         <option value="notified" ${order.status==='notified'?'selected':''}>✅ Obveščeno</option>
                                     </select>
                                 </td>
