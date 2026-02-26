@@ -3291,6 +3291,7 @@
                                 <td style="white-space:nowrap;">
                                     ${o.phone ? `<button class="action-btn call" onclick="call('${o.phone}')"><i class="fas fa-phone"></i></button>` : ''}
                                     ${o.phone ? `<button class="action-btn sms" onclick="openSmsModal('${o.id}','pending')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
+                                    <button class="action-btn-order-large" onclick="openOrderModalForPending('${o.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i> CREATE ORDER</button>
                                 </td>
                             </tr>`;
                         }).join('')}
@@ -3298,6 +3299,41 @@
                 </table>
                 </div>
                 ${renderPagination(totalItems, totalPages)}`;
+        }
+
+        function openOrderModalForPending(orderId) {
+            const order = pending.find(o => o.id === orderId);
+            if (!order) return;
+
+            orderCartId = orderId;
+            orderCart = {
+                ...order,
+                cartContents: [],
+                currency: order.currency || 'EUR'
+            };
+
+            const nameParts = (order.customerName || '').split(' ');
+            document.getElementById('orderFirstName').value = nameParts[0] || '';
+            document.getElementById('orderLastName').value = nameParts.slice(1).join(' ') || '';
+            document.getElementById('orderEmail').value = order.email || '';
+            document.getElementById('orderPhone').value = order.phone || '';
+            document.getElementById('orderAddress').value = order.address || '';
+            document.getElementById('orderCity').value = order.city || '';
+            document.getElementById('orderPostcode').value = order.postcode || '';
+
+            orderItems = [];
+            freeShipping = false;
+            document.getElementById('freeShippingToggle').classList.remove('active');
+
+            document.getElementById('productSearchInput').value = '';
+            document.getElementById('productSearchResults').classList.remove('open');
+            document.getElementById('productSearchResults').innerHTML = '';
+            document.getElementById('variationSelector').style.display = 'none';
+            selectedProduct = null;
+            selectedVariation = null;
+
+            renderOrderItems();
+            document.getElementById('orderModal').classList.add('open');
         }
 
         function renderBuyersTable(data, totalItems, totalPages) {
