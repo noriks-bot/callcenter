@@ -663,9 +663,6 @@
             <button class="action-btn-header" onclick="refreshData()">
                 <i class="fas fa-sync-alt"></i> <span class="hide-mobile">Refresh</span>
             </button>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                <i class="fas fa-moon"></i>
-            </button>
         </div>
     </div>
 
@@ -1019,14 +1016,6 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-home"></i> Dashboard</h1>
-            <div class="page-header-actions">
-                <button class="action-btn-header" onclick="refreshData()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </div>
 
         <!-- KPI Cards -->
@@ -1448,14 +1437,6 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-comment-sms"></i> SMS Dashboard</h1>
-            <div class="page-header-actions">
-                <button class="action-btn-header" onclick="loadSmsDashboardQueue()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </div>
 
         <div class="content">
@@ -1666,11 +1647,6 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-cog"></i> SMS Settings</h1>
-            <div class="page-header-actions">
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </div>
 
         <div class="content" style="max-width:1000px;">
@@ -1763,11 +1739,6 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-sliders-h"></i> Options</h1>
-            <div class="page-header-actions">
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </div>
 
         <div class="content" style="max-width:800px;">
@@ -1820,14 +1791,6 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-users-cog"></i> Agents</h1>
-            <div class="page-header-actions">
-                <button class="action-btn-header" onclick="loadAgents()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </div>
 
         <div class="content" style="max-width:1000px;">
@@ -1868,14 +1831,6 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-phone-volume"></i> Follow-ups</h1>
-            <div class="page-header-actions">
-                <button class="action-btn-header" onclick="renderFollowups()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </div>
 
         <div class="table-card" style="padding:24px;">
@@ -1965,14 +1920,6 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title-large"><i class="fas fa-chart-pie"></i> Analytics</h1>
-            <div class="page-header-actions">
-                <button class="action-btn-header" onclick="renderAnalytics()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </div>
 
         <div style="max-width:1200px;">
@@ -2267,32 +2214,6 @@
         }
 
         // ========== END BULLETPROOF UTILITIES ==========
-
-        // Theme Toggle (Dark/Light Mode)
-        function initTheme() {
-            const savedTheme = localStorage.getItem('callcenter_theme') || 'light';
-            document.body.classList.toggle('dark', savedTheme === 'dark');
-            updateThemeIcon(savedTheme);
-        }
-
-        function toggleTheme() {
-            const isDark = document.body.classList.toggle('dark');
-            const newTheme = isDark ? 'dark' : 'light';
-            localStorage.setItem('callcenter_theme', newTheme);
-            updateThemeIcon(newTheme);
-        }
-
-        function updateThemeIcon(theme) {
-            const btn = document.getElementById('themeToggle');
-            if (btn) {
-                btn.innerHTML = theme === 'dark'
-                    ? '<i class="fas fa-sun"></i>'
-                    : '<i class="fas fa-moon"></i>';
-            }
-        }
-
-        // Initialize theme on load
-        initTheme();
 
         console.log('[Auth] User:', user);
         console.log('[Auth] isAdmin:', isAdmin);
@@ -6597,11 +6518,6 @@
                 });
             });
         }
-        // ========== THEME TOGGLE ==========
-        // NOTE: Theme toggle functions are defined earlier in the file (initTheme, toggleTheme, updateThemeIcon)
-        // They use body.dark class and localStorage.callcenter_theme
-        // DO NOT add duplicate theme code here!
-
         // ========== AGENT MANAGEMENT FUNCTIONS ==========
         let agentsList = [];
         let editingAgentId = null;
