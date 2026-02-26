@@ -3253,84 +3253,78 @@ try {
                 break;
             }
             
-            // Search products via WooCommerce API - by name, SKU, and variations
+            // Search products via WooCommerce API - FAST: just name + SKU search
+            // Use parallel requests for speed
             
-            // 1. Search by product name
-            $productsByName = wcApiRequest($storeCode, 'products', [
+            $mh = curl_multi_init();
+            $handles = [];
+            
+            // Request 1: Search by name
+            $nameUrl = $stores[$storeCode]['url'] . '/wp-json/wc/v3/products?' . http_build_query([
                 'search' => $query,
-                'per_page' => 20,
+                'per_page' => 15,
                 'status' => 'publish'
             ]);
+            $ch1 = curl_init($nameUrl);
+            curl_setopt_array($ch1, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 8,
+                CURLOPT_USERPWD => $stores[$storeCode]['ck'] . ':' . $stores[$storeCode]['cs']
+            ]);
+            curl_multi_add_handle($mh, $ch1);
+            $handles['name'] = $ch1;
             
-            // 2. Exact SKU match (for simple products)
-            $productsBySku = wcApiRequest($storeCode, 'products', [
+            // Request 2: Search by SKU
+            $skuUrl = $stores[$storeCode]['url'] . '/wp-json/wc/v3/products?' . http_build_query([
                 'sku' => $query,
-                'per_page' => 10,
+                'per_page' => 5,
                 'status' => 'publish'
             ]);
+            $ch2 = curl_init($skuUrl);
+            curl_setopt_array($ch2, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 8,
+                CURLOPT_USERPWD => $stores[$storeCode]['ck'] . ':' . $stores[$storeCode]['cs']
+            ]);
+            curl_multi_add_handle($mh, $ch2);
+            $handles['sku'] = $ch2;
             
-            // 3. Search variations by SKU (variations often have unique SKUs)
-            // Try fetching all products and check their variations for SKU match
-            $variationParents = [];
-            if (strlen($query) >= 3) {
-                // Get recent variable products to check their variation SKUs
-                $variableProducts = wcApiRequest($storeCode, 'products', [
-                    'type' => 'variable',
-                    'per_page' => 30,
-                    'status' => 'publish',
-                    'orderby' => 'date',
-                    'order' => 'desc'
-                ]);
-                
-                if (is_array($variableProducts) && !isset($variableProducts['error'])) {
-                    foreach ($variableProducts as $vp) {
-                        // Check if any variation SKU contains the query
-                        $variations = wcApiRequest($storeCode, "products/{$vp['id']}/variations", ['per_page' => 50]);
-                        if (is_array($variations) && !isset($variations['error'])) {
-                            foreach ($variations as $var) {
-                                $varSku = strtolower($var['sku'] ?? '');
-                                if ($varSku && strpos($varSku, strtolower($query)) !== false) {
-                                    $variationParents[$vp['id']] = $vp;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            // Execute in parallel
+            $running = null;
+            do {
+                curl_multi_exec($mh, $running);
+                curl_multi_select($mh);
+            } while ($running > 0);
             
-            // Merge results, avoiding duplicates
+            // Get results
+            $productsByName = json_decode(curl_multi_getcontent($handles['name']), true) ?: [];
+            $productsBySku = json_decode(curl_multi_getcontent($handles['sku']), true) ?: [];
+            
+            curl_multi_remove_handle($mh, $ch1);
+            curl_multi_remove_handle($mh, $ch2);
+            curl_multi_close($mh);
+            
+            // Merge results, avoiding duplicates (SKU matches first)
             $seenIds = [];
             $products = [];
             
-            // Add products from name search
-            if (is_array($productsByName) && !isset($productsByName['error'])) {
-                foreach ($productsByName as $p) {
-                    if (!isset($seenIds[$p['id']])) {
+            // Add products from SKU search first
+            if (is_array($productsBySku)) {
+                foreach ($productsBySku as $p) {
+                    if (isset($p['id']) && !isset($seenIds[$p['id']])) {
                         $seenIds[$p['id']] = true;
                         $products[] = $p;
                     }
                 }
             }
             
-            // Add products from SKU search (prioritize - put at beginning)
-            if (is_array($productsBySku) && !isset($productsBySku['error'])) {
-                $skuProducts = [];
-                foreach ($productsBySku as $p) {
-                    if (!isset($seenIds[$p['id']])) {
+            // Add products from name search
+            if (is_array($productsByName)) {
+                foreach ($productsByName as $p) {
+                    if (isset($p['id']) && !isset($seenIds[$p['id']])) {
                         $seenIds[$p['id']] = true;
-                        $skuProducts[] = $p;
+                        $products[] = $p;
                     }
-                }
-                // Put SKU matches first
-                $products = array_merge($skuProducts, $products);
-            }
-            
-            // Add variation parent products (from SKU search in variations)
-            foreach ($variationParents as $vp) {
-                if (!isset($seenIds[$vp['id']])) {
-                    $seenIds[$vp['id']] = true;
-                    $products[] = $vp;
                 }
             }
             
