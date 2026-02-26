@@ -2272,12 +2272,16 @@ function buildPaketomatiCacheFull() {
             $partner = $fullOrder['partner'] ?? [];
             $partnerContact = $partner['partner_contact'] ?? [];
             
-            // Extract tracking code
+            // Extract tracking code and link from MetaKocka
             $trackingCode = '';
+            $trackingLink = '';
             foreach ($fullOrder['extra_column'] ?? [] as $col) {
-                if (($col['name'] ?? '') === 'tracking_number') {
+                $colName = strtolower($col['name'] ?? '');
+                if ($colName === 'tracking_number') {
                     $trackingCode = $col['value'] ?? '';
-                    break;
+                }
+                if ($colName === 'tracking_link' || $colName === 'tracking_url' || $colName === 'sledilna_povezava') {
+                    $trackingLink = $col['value'] ?? '';
                 }
             }
             
@@ -2360,6 +2364,7 @@ function buildPaketomatiCacheFull() {
                 ],
                 'deliveryService' => $fullOrder['delivery_type'] ?? '',
                 'trackingCode' => $trackingCode,
+                'trackingLink' => $trackingLink,
                 'paketomatLocation' => $lastEventStatus,
                 'lastDeliveryEvent' => $lastEventStatus,
                 'orderTotal' => floatval($fullOrder['sum_all'] ?? 0),
@@ -2629,11 +2634,15 @@ function fetchPaketomatOrdersLegacy($filter = 'all') {
         // Delivery service info
         $deliveryService = $fullOrder['delivery_type'] ?? $fullOrder['delivery_service'] ?? '';
         $trackingCode = '';
+        $trackingLink = '';
         $extraColumns = $fullOrder['extra_column'] ?? [];
         foreach ($extraColumns as $col) {
-            if (($col['name'] ?? '') === 'tracking_number') {
+            $colName = strtolower($col['name'] ?? '');
+            if ($colName === 'tracking_number') {
                 $trackingCode = $col['value'] ?? '';
-                break;
+            }
+            if ($colName === 'tracking_link' || $colName === 'tracking_url' || $colName === 'sledilna_povezava') {
+                $trackingLink = $col['value'] ?? '';
             }
         }
         
@@ -2691,6 +2700,7 @@ function fetchPaketomatOrdersLegacy($filter = 'all') {
             'phone' => $phone,
             'deliveryService' => $deliveryService,
             'trackingCode' => $trackingCode,
+            'trackingLink' => $trackingLink,
             'paketomatLocation' => $paketomatLocation,
             'lastDeliveryEvent' => $lastEventStatus,
             'lastEventDate' => $lastEvent['event_date'] ?? '',

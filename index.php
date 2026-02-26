@@ -7399,79 +7399,8 @@
             if (countEl) countEl.textContent = uncalled;
         }
         
-        // Generate tracking URL based on delivery service and tracking code
-        function getTrackingUrl(deliveryService, trackingCode) {
-            if (!trackingCode) return '#';
-            const service = (deliveryService || '').toLowerCase();
-            const code = trackingCode.toUpperCase();
-            
-            // Detect carrier from tracking code suffix (international format)
-            if (code.endsWith('HR')) {
-                // Croatian tracking codes - Hrvatska Pošta
-                return `https://posiljka.posta.hr/?broj=${trackingCode}`;
-            }
-            if (code.endsWith('SI')) {
-                // Slovenian tracking codes - Pošta Slovenije
-                return `https://sledenje.posta.si/?id=${trackingCode}`;
-            }
-            if (code.endsWith('CZ')) {
-                // Czech tracking codes - Česká Pošta
-                return `https://www.postaonline.cz/trackandtrace/-/zasilka/cislo?parcelNumbers=${trackingCode}`;
-            }
-            if (code.endsWith('PL')) {
-                // Polish tracking codes
-                return `https://emonitoring.poczta-polska.pl/?numer=${trackingCode}`;
-            }
-            if (code.endsWith('HU')) {
-                // Hungarian tracking codes - Magyar Posta  
-                return `https://posta.hu/nyomkovetes?searchvalue=${trackingCode}`;
-            }
-            if (code.endsWith('GR')) {
-                // Greek tracking codes - ELTA
-                return `https://www.elta.gr/en-us/trackyourshipment.aspx?code=${trackingCode}`;
-            }
-            if (code.endsWith('IT')) {
-                // Italian tracking codes - Poste Italiane
-                return `https://www.poste.it/cerca/index.html#/risultati-ricerca-702702702/${trackingCode}`;
-            }
-            if (code.endsWith('SK')) {
-                // Slovak tracking codes - Slovenská Pošta
-                return `https://tandt.posta.sk/?zession=${trackingCode}`;
-            }
-            
-            // Detect carrier from delivery service name
-            // GLS
-            if (service.includes('gls')) {
-                return `https://gls-group.com/EU/en/parcel-tracking?match=${trackingCode}`;
-            }
-            // DPD
-            if (service.includes('dpd')) {
-                return `https://tracking.dpd.de/status/en_D/parcel/${trackingCode}`;
-            }
-            // InPost
-            if (service.includes('inpost')) {
-                return `https://inpost.pl/sledzenie-przesylek?number=${trackingCode}`;
-            }
-            // Packeta / Expedico / Zásilkovna
-            if (service.includes('packeta') || service.includes('expedico') || service.includes('zásilkovna')) {
-                return `https://tracking.packeta.com/en/?id=${trackingCode}`;
-            }
-            // PPL (Czech)
-            if (service.includes('ppl')) {
-                return `https://www.ppl.cz/vyhledat-zasilku?shipmentId=${trackingCode}`;
-            }
-            // Overseas Express
-            if (service.includes('overseas')) {
-                return `https://www.overseas.hr/pracenje-posiljke?code=${trackingCode}`;
-            }
-            // HR POŠTA in service name
-            if (service.includes('hr pošta') || service.includes('hr posta') || service.includes('hrvatska')) {
-                return `https://posiljka.posta.hr/?broj=${trackingCode}`;
-            }
-            
-            // Default - use 17track universal tracker
-            return `https://t.17track.net/en#nums=${trackingCode}`;
-        }
+        // Tracking links now come directly from MetaKocka (trackingLink field)
+        // No need for getTrackingUrl() helper anymore
         
         async function renderPaketomatiInline() {
             const container = document.getElementById('tableContainer');
@@ -7536,7 +7465,7 @@
                                 </td>
                                 <td>
                                     <strong>#${esc(order.orderNumber)}</strong>
-                                    ${order.trackingCode ? `<br><a href="${getTrackingUrl(order.deliveryService, order.trackingCode)}" target="_blank" style="color:var(--accent-blue);font-size:11px;text-decoration:none;">📦 ${esc(order.trackingCode)} ↗</a>` : ''}
+                                    ${order.trackingCode ? `<br>${order.trackingLink ? `<a href="${esc(order.trackingLink)}" target="_blank" style="color:var(--accent-blue);font-size:11px;text-decoration:none;">📦 ${esc(order.trackingCode)} ↗</a>` : `<span style="font-size:11px;color:var(--text-muted);">📦 ${esc(order.trackingCode)}</span>`}` : ''}
                                 </td>
                                 <td style="font-size:11px;max-width:200px;">
                                     ${(order.items || []).length > 0 
