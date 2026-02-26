@@ -7549,6 +7549,7 @@
                         <th>Order</th>
                         <th>Items</th>
                         <th>Value</th>
+                        <th>Dates</th>
                         <th>Phone</th>
                         <th>Delivery</th>
                         <th>Status</th>
@@ -7580,6 +7581,10 @@
                                         : '<span style="color:var(--text-muted);">-</span>'}
                                 </td>
                                 <td><strong>${sym(order.currency)}${(order.orderTotal||0).toFixed(2)}</strong></td>
+                                <td style="font-size:11px;">
+                                    <div>📅 ${formatDateTime(order.createdAt)}</div>
+                                    ${order.shippedAt ? `<div>🚚 ${formatDateTime(order.shippedAt)}</div>` : ''}
+                                </td>
                                 <td>${(order.customer?.phone || order.phone) ? `<a href="tel:${order.customer?.phone || order.phone}" class="phone-link"><i class="fas fa-phone"></i> ${esc(order.customer?.phone || order.phone)}</a>` : '-'}</td>
                                 <td>
                                     <span class="badge">${esc(order.deliveryService || '-')}</span>

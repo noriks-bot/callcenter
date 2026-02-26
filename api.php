@@ -2428,6 +2428,7 @@ function buildPaketomatiCacheFull() {
                 'orderTotal' => floatval($fullOrder['sum_all'] ?? 0),
                 'currency' => $fullOrder['currency_code'] ?? 'EUR',
                 'createdAt' => $fullOrder['doc_date'] ?? '',
+                'shippedAt' => $fullOrder['shipped_date'] ?? '',
                 'status' => $statusData[$orderId]['status'] ?? 'not_called',
                 'notes' => $statusData[$orderId]['notes'] ?? '',
                 'storeCode' => $storeCode,
