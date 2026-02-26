@@ -3097,16 +3097,8 @@ try {
             ];
             saveCallData($callData);
             
-            // Clear caches so updated status is reflected immediately
-            clearCache('abandoned_carts_filtered');
-            clearCache('pending_orders');
-            // Clear buyer caches for all stores
-            foreach (['hr', 'cz', 'pl', 'gr', 'sk', 'it', 'hu'] as $sc) {
-                clearCache('one_time_buyers_' . $sc . '_14');
-                clearCache('one_time_buyers_' . $sc . '_30');
-            }
-            clearCache('one_time_buyers_all_14');
-            clearCache('one_time_buyers_all_30');
+            // NOTE: No cache clearing needed! Status is stored separately in call_data.json
+            // and merged with cached WooCommerce data on load. This keeps refreshes fast.
             
             echo json_encode(['success' => true]);
             break;
