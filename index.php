@@ -2397,6 +2397,9 @@
             let filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
             let filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
 
+            // Filter out converted carts - they should not be counted
+            filteredCarts = filteredCarts.filter(c => c.converted !== true);
+
             // Apply country filter if not "all"
             if (currentStore !== 'all') {
                 filteredCarts = filteredCarts.filter(c => c.storeCode === currentStore);
@@ -2905,9 +2908,12 @@
         function updateCounts() {
             // Filter by user's allowed countries (admins see everything)
             const shouldFilter = !hasAllCountries && !isAdmin;
-            const filteredCarts = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
+            let filteredCarts = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
             const filteredPending = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
             const filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
+
+            // Filter out converted carts
+            filteredCarts = filteredCarts.filter(c => c.converted !== true);
 
             // Update nav sidebar counts (guard against missing elements)
             const navCarts = document.getElementById('navCarts');
@@ -2940,6 +2946,9 @@
             const shouldFilter = !hasAllCountries && !isAdmin;
             let fc = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : carts;
             let fp = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : pending;
+
+            // Filter out converted carts
+            fc = fc.filter(c => c.converted !== true);
 
             // Then filter by currentStore if not 'all'
             if (currentStore !== 'all') {
@@ -3016,6 +3025,11 @@
             }
             
             let data = currentTab === 'carts' ? [...carts] : currentTab === 'pending' ? [...pending] : [...buyers];
+
+            // Filter out converted carts - they should not appear in abandoned carts list
+            if (currentTab === 'carts') {
+                data = data.filter(d => d.converted !== true);
+            }
 
             // Filter by user's allowed countries first (admins see everything)
             if (!hasAllCountries && !isAdmin) {
