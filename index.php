@@ -3483,7 +3483,10 @@
                 pendingCallbackSelect = null;
                 showToast('✅ Callback dodan v Follow-ups!');
 
-                // Refresh follow-ups if we're on that tab
+                // Always refresh follow-ups count in sidebar
+                loadFollowupsCount();
+
+                // Refresh follow-ups table if we're on that tab
                 if (currentTab === 'followups') {
                     renderFollowups();
                 }
