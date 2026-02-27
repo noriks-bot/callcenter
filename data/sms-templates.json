@@ -1,0 +1,102 @@
+{
+  "templates": {
+    "abandoned_cart_1": {
+      "hr": {
+        "name": "Napuštena košarica 1 - Podsjetnik",
+        "message": "Pozdrav {ime}! 🛒 Vaša košarica još uvijek čeka. Završite narudžbu i uživajte u {produkt}. 👉 {link}"
+      },
+      "cz": {
+        "name": "Opuštěný košík 1 - Připomínka",
+        "message": "Ahoj {ime}! 🛒 Váš košík na vás stále čeká. Dokončete objednávku a užijte si {produkt}. 👉 {link}"
+      },
+      "pl": {
+        "name": "Porzucony koszyk 1 - Przypomnienie",
+        "message": "Cześć {ime}! 🛒 Twój koszyk wciąż czeka. Dokończ zamówienie i ciesz się {produkt}. 👉 {link}"
+      },
+      "gr": {
+        "name": "Εγκαταλελειμμένο καλάθι 1 - Υπενθύμιση",
+        "message": "Γεια σου {ime}! 🛒 Το καλάθι σου περιμένει ακόμα. Ολοκλήρωσε την παραγγελία. 👉 {link}"
+      },
+      "sk": {
+        "name": "Opustený košík 1 - Pripomienka",
+        "message": "Ahoj {ime}! 🛒 Váš košík na vás stále čaká. Dokončite objednávku a užite si {produkt}. 👉 {link}"
+      },
+      "it": {
+        "name": "Carrello abbandonato 1 - Promemoria",
+        "message": "Ciao {ime}! 🛒 Il tuo carrello ti aspetta ancora. Completa l'ordine e goditi {produkt}. 👉 {link}"
+      },
+      "hu": {
+        "name": "Elhagyott kosár 1 - Emlékeztető",
+        "message": "Szia {ime}! 🛒 A kosarad még mindig vár. Fejezd be a rendelést és élvezd a {produkt}-t. 👉 {link}"
+      }
+    },
+    "abandoned_cart_2": {
+      "hr": {
+        "name": "Napuštena košarica 2 - 20% popust",
+        "message": "Pozdrav {ime}! 🎁 Evo 20% popusta za Vas! Završite narudžbu s kodom SMS20: 👉 {link_coupon}"
+      },
+      "cz": {
+        "name": "Opuštěný košík 2 - 20% sleva",
+        "message": "Ahoj {ime}! 🎁 Máme pro vás 20% slevu! Dokončete objednávku s kódem SMS20: 👉 {link_coupon}"
+      },
+      "pl": {
+        "name": "Porzucony koszyk 2 - 20% zniżki",
+        "message": "Cześć {ime}! 🎁 Mamy dla Ciebie 20% zniżki! Dokończ zamówienie z kodem SMS20: 👉 {link_coupon}"
+      },
+      "gr": {
+        "name": "Εγκαταλελειμμένο καλάθι 2 - 20% έκπτωση",
+        "message": "Γεια σου {ime}! 🎁 20% έκπτωση για σένα! Ολοκλήρωσε με κωδικό SMS20: 👉 {link_coupon}"
+      },
+      "sk": {
+        "name": "Opustený košík 2 - 20% zľava",
+        "message": "Ahoj {ime}! 🎁 Máme pre vás 20% zľavu! Dokončite objednávku s kódom SMS20: 👉 {link_coupon}"
+      },
+      "it": {
+        "name": "Carrello abbandonato 2 - 20% sconto",
+        "message": "Ciao {ime}! 🎁 20% di sconto per te! Completa con codice SMS20: 👉 {link_coupon}"
+      },
+      "hu": {
+        "name": "Elhagyott kosár 2 - 20% kedvezmény",
+        "message": "Szia {ime}! 🎁 20% kedvezmény neked! Fejezd be SMS20 kóddal: 👉 {link_coupon}"
+      }
+    },
+    "winback_1": {
+      "hr": {
+        "name": "Povratak kupca 1 - Generički",
+        "message": "Pozdrav {ime}! 💙 Vrijeme je za novi Noriks! Pogledajte naše novosti i uživajte u kvaliteti. 👉 {shop_link}"
+      },
+      "cz": {
+        "name": "Návrat zákazníka 1 - Obecný",
+        "message": "Ahoj {ime}! 💙 Čas na nový Noriks! Podívejte se na novinky a užijte si kvalitu. 👉 {shop_link}"
+      },
+      "pl": {
+        "name": "Powrót klienta 1 - Ogólny",
+        "message": "Cześć {ime}! 💙 Czas na nowy Noriks! Zobacz nowości i ciesz się jakością. 👉 {shop_link}"
+      },
+      "gr": {
+        "name": "Επιστροφή πελάτη 1 - Γενικό",
+        "message": "Γεια σου {ime}! 💙 Ώρα για νέο Noriks! Δες τα νέα μας και απόλαυσε την ποιότητα. 👉 {shop_link}"
+      },
+      "sk": {
+        "name": "Návrat zákazníka 1 - Všeobecný",
+        "message": "Ahoj {ime}! 💙 Čas na nový Noriks! Pozrite si novinky a užite si kvalitu. 👉 {shop_link}"
+      },
+      "it": {
+        "name": "Ritorno cliente 1 - Generico",
+        "message": "Ciao {ime}! 💙 È ora di un nuovo Noriks! Scopri le novità e goditi la qualità. 👉 {shop_link}"
+      },
+      "hu": {
+        "name": "Visszatérő vásárló 1 - Általános",
+        "message": "Szia {ime}! 💙 Ideje egy új Noriks-nak! Nézd meg az újdonságokat. 👉 {shop_link}"
+      }
+    }
+  },
+  "variables": {
+    "{ime}": "Ime kupca / Customer first name",
+    "{produkt}": "Ime produkta / Product name",
+    "{cena}": "Cena / Price",
+    "{link}": "Link do checkout / Checkout URL",
+    "{link_coupon}": "Checkout link s kuponom SMS20 / Checkout URL with coupon SMS20 applied",
+    "{shop_link}": "Link do trgovine / Shop URL"
+  }
+}

@@ -1,0 +1,5 @@
+{
+    "desktopEnabled": true,
+    "soundEnabled": true,
+    "pollingInterval": 30000
+}

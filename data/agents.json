@@ -1,0 +1,22 @@
+{
+  "users": [
+    {
+      "id": "admin_1",
+      "username": "noriks",
+      "password": "noriks2024",
+      "role": "admin",
+      "countries": ["all"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "active": true
+    },
+    {
+      "id": "agent_hr",
+      "username": "hr",
+      "password": "hr2024",
+      "role": "agent",
+      "countries": ["hr"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "active": true
+    }
+  ]
+}
