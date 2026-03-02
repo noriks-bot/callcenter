@@ -117,8 +117,9 @@ async function warmRAM() {
       fetchAbandonedCarts(),
       fetchPendingOrders()
     ]);
-    RAM.carts = cartsRes.status === 'fulfilled' ? cartsRes.value : [];
-    RAM.pending = pendingRes.status === 'fulfilled' ? pendingRes.value : [];
+    // Atomic swap: only replace if fetch succeeded, keep old data on failure
+    if (cartsRes.status === 'fulfilled' && cartsRes.value.length > 0) RAM.carts = cartsRes.value;
+    if (pendingRes.status === 'fulfilled' && pendingRes.value.length > 0) RAM.pending = pendingRes.value;
     
     // Buyers: try file cache first for fast startup, then fetch fresh in background
     const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
@@ -143,25 +144,7 @@ async function warmRAM() {
 }
 
 // Background refresh loop
-function startBackgroundRefresh() {
-  setInterval(async () => {
-    try {
-      // Clear file cache to force fresh fetch
-      clearAllCache();
-      // Refresh buyers separately (slow fetch)
-      try {
-        const freshBuyers = await fetchOneTimeBuyers(null);
-        RAM.buyers = freshBuyers;
-        const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
-        writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), count: freshBuyers.length, buyers: freshBuyers });
-      } catch(e) { console.error('[RAM] Buyers refresh failed:', e.message); }
-      await warmRAM();
-      console.log('[RAM] Background refresh complete');
-    } catch(e) {
-      console.error('[RAM] Refresh error:', e.message);
-    }
-  }, 5 * 60 * 1000); // 5 min
-}
+// (first startBackgroundRefresh removed - merged into second)
 
 // ========== DATA FILE PATHS ==========
 const callDataFile = path.join(DATA_DIR, 'call_data.json');
@@ -1697,7 +1680,20 @@ function startBackgroundRefresh() {
   setInterval(async () => {
     console.log('[Cron] Running 5-minute data refresh...');
     try {
+      clearAllCache();
+      await warmRAM();
       await warmAllCaches();
+      // Refresh buyers in background
+      try {
+        const freshBuyers = await fetchOneTimeBuyers(null);
+        if (freshBuyers && freshBuyers.length > 0) {
+          RAM.buyers = freshBuyers;
+          const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
+          writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), count: freshBuyers.length, buyers: freshBuyers });
+          console.log('[RAM] Buyers refreshed:', freshBuyers.length);
+        }
+      } catch(e) { console.error('[RAM] Buyers refresh failed:', e.message); }
+      console.log('[RAM] Background refresh complete');
     } catch (e) {
       console.error('[Cron] Refresh error:', e.message);
     }
