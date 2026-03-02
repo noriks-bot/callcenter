@@ -4201,7 +4201,34 @@ function renderCartsTable(data, totalItems, totalPages) {
             showToast(`✓ ${product.name} dodano`, false, 'info');
         }
 
-        function updateOrderTotals() {
+        let currentDiscount = 0;
+        let originalPrices = null;
+
+        function applyDiscount(pct) {
+            if (originalPrices) {
+                orderItems.forEach((item, i) => {
+                    if (originalPrices[i] !== undefined) item.editPrice = originalPrices[i];
+                });
+            }
+            originalPrices = orderItems.map(item => item.editPrice);
+            currentDiscount = pct;
+            if (pct > 0) {
+                orderItems.forEach(item => {
+                    item.editPrice = Math.round(item.editPrice * (1 - pct / 100) * 100) / 100;
+                });
+            }
+            document.querySelectorAll('.discount-btn').forEach(btn => btn.classList.remove('active'));
+            if (pct === 0) {
+                document.getElementById('discountBtnNone').classList.add('active');
+            } else {
+                document.querySelectorAll('.discount-btn').forEach(btn => {
+                    if (btn.textContent === '-' + pct + '%') btn.classList.add('active');
+                });
+            }
+            renderOrderItems();
+        }
+
+                function updateOrderTotals() {
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart?.currency] || '€';
             const subtotal = orderItems.reduce((sum, item) => sum + (item.editPrice * item.editQty), 0);
             const shipping = freeShipping ? 0 : SHIPPING_COST;
@@ -7832,8 +7859,18 @@ function renderCartsTable(data, totalItems, totalPages) {
             if (pakStatusFilter) {
                 displayData = displayData.filter(o => (o.status || 'not_called') === pakStatusFilter);
             }
+            // Apply search filter
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            if (search) {
+                displayData = displayData.filter(o =>
+                    (o.customerName || '').toLowerCase().includes(search) ||
+                    (o.email || '').toLowerCase().includes(search) ||
+                    (o.phone || '').includes(search) ||
+                    (o.orderId || '').toString().includes(search)
+                );
+            }
             if (currentStore !== 'all') {
-                displayData = paketomatiData.filter(o => o.storeCode === currentStore);
+                displayData = displayData.filter(o => o.storeCode === currentStore);
                 console.log('[Paketomati Render] Filtering by', currentStore, '- showing', displayData.length, 'of', paketomatiData.length);
             }
             
