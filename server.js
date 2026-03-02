@@ -93,6 +93,58 @@ function clearAllCache() {
   } catch (e) {}
 }
 
+
+// ========== RAM CACHE (instant responses) ==========
+const RAM = {
+  carts: [],
+  pending: [],
+  buyers: [],
+  paketomati: [],
+  ready: false,
+  lastRefresh: null
+};
+
+// Warm RAM cache on startup, then refresh every 5 min
+async function warmRAM() {
+  const start = Date.now();
+  console.log('[RAM] Warming cache...');
+  try {
+    const [cartsRes, pendingRes] = await Promise.allSettled([
+      fetchAbandonedCarts(),
+      fetchPendingOrders()
+    ]);
+    RAM.carts = cartsRes.status === 'fulfilled' ? cartsRes.value : [];
+    RAM.pending = pendingRes.status === 'fulfilled' ? pendingRes.value : [];
+    
+    // Buyers from file cache (slow to fetch, refreshed separately)
+    const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
+    if (fs.existsSync(buyersCacheFile)) {
+      const bd = readJson(buyersCacheFile, {});
+      RAM.buyers = bd.buyers || [];
+    }
+    
+    RAM.ready = true;
+    RAM.lastRefresh = new Date().toISOString();
+    console.log(`[RAM] Cache warm: ${RAM.carts.length} carts, ${RAM.pending.length} pending, ${RAM.buyers.length} buyers in ${Date.now()-start}ms`);
+  } catch(e) {
+    console.error('[RAM] Warm failed:', e.message);
+  }
+}
+
+// Background refresh loop
+function startBackgroundRefresh() {
+  setInterval(async () => {
+    try {
+      // Clear file cache to force fresh fetch
+      clearAllCache();
+      await warmRAM();
+      console.log('[RAM] Background refresh complete');
+    } catch(e) {
+      console.error('[RAM] Refresh error:', e.message);
+    }
+  }, 5 * 60 * 1000); // 5 min
+}
+
 // ========== DATA FILE PATHS ==========
 const callDataFile = path.join(DATA_DIR, 'call_data.json');
 const smsQueueFile = path.join(DATA_DIR, 'sms_queue.json');
@@ -971,12 +1023,15 @@ function pollForNewItems(userId) {
 // ========== API ROUTES ==========
 
 // Abandoned carts
-app.get('/api/abandoned-carts', async (req, res) => {
-  try {
-    let carts = await fetchAbandonedCarts();
-    if (req.query.store) carts = carts.filter(c => c.storeCode === req.query.store);
-    res.json(carts);
-  } catch (e) { res.status(500).json({ error: e.message }); }
+app.get('/api/abandoned-carts', (req, res) => {
+  // Merge call data into RAM cache on-the-fly (fast, in-memory)
+  const callData = loadCallData();
+  let carts = RAM.carts.map(cart => {
+    const saved = callData[cart.id] || {};
+    return { ...cart, callStatus: saved.callStatus || cart.callStatus || 'not_called', notes: saved.notes || cart.notes || '' };
+  });
+  if (req.query.store) carts = carts.filter(c => c.storeCode === req.query.store);
+  res.json({ success: true, data: carts, cached: true, lastRefresh: RAM.lastRefresh });
 });
 
 // Customer 360
@@ -1013,17 +1068,13 @@ app.get('/api/one-time-buyers', async (req, res) => {
 
 // Buyers cache (instant)
 app.get('/api/buyers-cache', (req, res) => {
-  const cacheFile = path.join(DATA_DIR, 'buyers-cache.json');
-  if (fs.existsSync(cacheFile)) {
-    const cacheData = readJson(cacheFile, {});
-    let buyers = cacheData.buyers || [];
-    const callData = loadCallData();
-    for (const b of buyers) { const s = callData[b.id] || {}; b.callStatus = s.callStatus || 'not_called'; b.notes = s.notes || ''; }
-    if (req.query.store) buyers = buyers.filter(b => b.storeCode === req.query.store);
-    res.json({ success: true, buyers, cached: true, cache_age_seconds: Math.floor((Date.now() - (cacheData.generated_at || 0) * 1000) / 1000), generated_at: cacheData.generated_at });
-  } else {
-    res.json({ success: true, buyers: [], cached: false, message: 'Cache not available' });
-  }
+  const callData = loadCallData();
+  let buyers = RAM.buyers.map(b => {
+    const s = callData[b.id] || {};
+    return { ...b, callStatus: s.callStatus || b.callStatus || 'not_called', notes: s.notes || b.notes || '' };
+  });
+  if (req.query.store) buyers = buyers.filter(b => b.storeCode === req.query.store);
+  res.json({ success: true, buyers, cached: true, lastRefresh: RAM.lastRefresh });
 });
 
 // Refresh buyers cache
@@ -1041,12 +1092,14 @@ app.get('/api/refresh-buyers-cache', async (req, res) => {
 });
 
 // Pending orders
-app.get('/api/pending-orders', async (req, res) => {
-  try {
-    let orders = await fetchPendingOrders();
-    if (req.query.store) orders = orders.filter(o => o.storeCode === req.query.store);
-    res.json(orders);
-  } catch (e) { res.status(500).json({ error: e.message }); }
+app.get('/api/pending-orders', (req, res) => {
+  const callData = loadCallData();
+  let orders = RAM.pending.map(order => {
+    const saved = callData[order.id] || {};
+    return { ...order, callStatus: saved.callStatus || order.callStatus || 'not_called', notes: saved.notes || order.notes || '' };
+  });
+  if (req.query.store) orders = orders.filter(o => o.storeCode === req.query.store);
+  res.json({ success: true, data: orders, cached: true, lastRefresh: RAM.lastRefresh });
 });
 
 // Stores
@@ -1733,8 +1786,12 @@ app.get('/report', (req, res) => res.sendFile('report.html', { root: path.join(_
 app.get('/statistics', (req, res) => res.sendFile('statistics.html', { root: path.join(__dirname, 'public') }));
 app.get('/', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, 'public') }));
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🎧 Noriks Call Center running on port ${PORT}`);
+  // Warm RAM cache immediately, then start background refresh
+  await warmRAM();
+  startBackgroundRefresh();
+  console.log('[RAM] Background refresh scheduled every 5 minutes');
   // Warm caches on startup (non-blocking)
   setTimeout(() => warmAllCaches(), 2000);
   // Start background refresh
