@@ -2909,7 +2909,7 @@
 
             // Process carts immediately
             if (cartsResult.status === 'fulfilled' && cartsResult.value.success) {
-                carts = Array.isArray(cartsResult.value.data) ? cartsResult.value.data : [];
+                carts = Array.isArray(cartsResult.value.data) ? cartsResult.value.data : (Array.isArray(cartsResult.value.data?.data) ? cartsResult.value.data.data : []);
                 console.log('[Data] ✓ Carts:', carts.length);
             } else {
                 console.error('[Data] ✗ Carts failed:', cartsResult.reason || cartsResult.value?.error);
@@ -2919,7 +2919,7 @@
 
             // Process pending immediately
             if (pendingResult.status === 'fulfilled' && pendingResult.value.success) {
-                pending = Array.isArray(pendingResult.value.data) ? pendingResult.value.data : [];
+                pending = Array.isArray(pendingResult.value.data) ? pendingResult.value.data : (Array.isArray(pendingResult.value.data?.data) ? pendingResult.value.data.data : []);
                 console.log('[Data] ✓ Pending:', pending.length);
             } else {
                 console.error('[Data] ✗ Pending failed:', pendingResult.reason || pendingResult.value?.error);
