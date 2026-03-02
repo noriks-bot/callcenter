@@ -1045,10 +1045,6 @@
                             <label>Količina:</label>
                             <div id="qbQtyBtns"></div>
                         </div>
-                        <div class="qb-row">
-                            <label>Velikost:</label>
-                            <div id="qbSizeBtns" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-                        </div>
                         <div id="qbColorRows" style="margin:8px 0;"></div>
                         <div class="qb-row">
                             <label>Cena/kos:</label>
@@ -1134,10 +1130,6 @@
                         </div>
                     </div>
                     <div class="upsell-config" id="upsellConfig">
-                        <div class="qb-row">
-                            <label>Velikost:</label>
-                            <div id="upsellSizeBtns" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-                        </div>
                         <div id="upsellColorRows" style="margin:8px 0;"></div>
                         <button class="qb-add-btn" onclick="upsellAdd()" style="margin-top:12px;padding:14px 20px;font-size:15px;font-weight:700;width:100%;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;cursor:pointer;position:sticky;bottom:0;z-index:5;box-shadow:0 -2px 10px rgba(0,0,0,0.1);"><i class="fas fa-cart-plus"></i> Dodaj v košarico</button>
                     </div>
@@ -4228,40 +4220,38 @@
         }
 
         function renderUpsellConfig() {
-            // Size buttons
-            document.getElementById('upsellSizeBtns').innerHTML = QB_SIZES.map(s =>
-                '<button class="qb-size-btn' + (s === upsellSize ? ' selected' : '') + '" onclick="upsellSetSize(\'' + s + '\')">' + s + '</button>'
-            ).join('');
-            // Color rows
             const container = document.getElementById('upsellColorRows');
-            const colorOpts = '<option value="">-- Izberi barvo --</option>' + getColorsForType(upsellType).map(c =>
+            const colorOpts = '<option value="">-- Barva --</option>' + getColorsForType(upsellType).map(c =>
                 '<option value="' + c.name + '">' + c.name + '</option>'
             ).join('');
-            let rows = '<label style="font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;display:block;">Barve:</label>';
+            const sizeOpts = '<option value="">-- Vel. --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+            let rows = '<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);font-weight:500;">Barva</span><span style="width:80px;font-size:11px;color:var(--text-muted);font-weight:500;">Velikost</span></div>';
             for (let i = 0; i < upsellQty; i++) {
-                rows += '<div class="qb-color-row"><span class="qb-piece-label">' + (i+1) + '.</span><select class="qb-color-select" id="upsellColor_' + i + '">' + colorOpts + '</select></div>';
+                rows += '<div class="qb-color-row" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+                    '<span class="qb-piece-label" style="width:24px;text-align:right;">' + (i+1) + '.</span>' +
+                    '<select class="qb-color-select" id="upsellColor_' + i + '" style="flex:1;">' + colorOpts + '</select>' +
+                    '<select class="qb-color-select" id="upsellSize_' + i + '" style="width:80px;">' + sizeOpts + '</select>' +
+                    '</div>';
             }
             container.innerHTML = rows;
-            // No auto-defaults - user must pick all colors
         }
 
-        function upsellSetSize(s) { upsellSize = s; renderUpsellConfig(); }
+        // upsellSetSize removed - size is now per-row
 
         function upsellAdd() {
             if (!upsellType || !upsellQty) return;
-            // Validate size selected
-            if (!upsellSize) {
-                showToast('⚠️ Izberi velikost!', 'error');
-                const szBtns = document.getElementById('upsellSizeBtns');
-                if (szBtns) { szBtns.style.outline = '2px solid #ef4444'; szBtns.style.borderRadius = '8px'; setTimeout(() => { szBtns.style.outline = 'none'; }, 2000); }
-                return;
-            }
-            // Validate all colors selected
+            // Validate all colors + sizes per row
             for (let i = 0; i < upsellQty; i++) {
-                const sel = document.getElementById('upsellColor_' + i);
-                if (!sel || !sel.value) {
-                    showToast('⚠️ Izberi vse barve!', 'error');
-                    if (sel) { sel.style.outline = '2px solid #ef4444'; setTimeout(() => { sel.style.outline = 'none'; }, 2000); }
+                const colorSel = document.getElementById('upsellColor_' + i);
+                const sizeSel = document.getElementById('upsellSize_' + i);
+                if (!colorSel || !colorSel.value) {
+                    showToast('⚠️ Izberi barvo za kos ' + (i+1) + '!', 'error');
+                    if (colorSel) { colorSel.style.outline = '2px solid #ef4444'; setTimeout(() => { colorSel.style.outline = 'none'; }, 2000); }
+                    return;
+                }
+                if (!sizeSel || !sizeSel.value) {
+                    showToast('⚠️ Izberi velikost za kos ' + (i+1) + '!', 'error');
+                    if (sizeSel) { sizeSel.style.outline = '2px solid #ef4444'; setTimeout(() => { sizeSel.style.outline = 'none'; }, 2000); }
                     return;
                 }
             }
@@ -4269,8 +4259,9 @@
             const typeNames = { bokserice: 'Bokserice', majice: 'Majice' };
             const colorParts = [];
             for (let i = 0; i < upsellQty; i++) {
-                const sel = document.getElementById('upsellColor_' + i);
-                colorParts.push((sel ? sel.value : 'Črna') + ' - ' + upsellSize);
+                const colorSel = document.getElementById('upsellColor_' + i);
+                const sizeSel = document.getElementById('upsellSize_' + i);
+                colorParts.push((colorSel ? colorSel.value : '') + ' - ' + (sizeSel ? sizeSel.value : ''));
             }
             orderItems.push({
                 name: colorParts.join(', '),
@@ -4361,62 +4352,57 @@
             document.getElementById('qbQtyBtns').innerHTML = QB_QTYS.map(q =>
                 '<button class="qb-qty-btn' + (q === qbQty ? ' selected' : '') + '" onclick="qbSetQty(' + q + ')">' + q + '</button>'
             ).join(' ');
-            // Size buttons
-            document.getElementById('qbSizeBtns').innerHTML = QB_SIZES.map(s =>
-                '<button class="qb-size-btn' + (s === qbSize ? ' selected' : '') + '" onclick="qbSetSize(\'' + s + '\')">' + s + '</button>'
-            ).join('');
-            // Color rows
+            // Color+size rows (per-item)
             renderQBColors();
         }
 
         function qbSetQty(q) { qbQty = q; renderQB(); }
-        function qbSetSize(s) { qbSize = s; renderQB(); }
+        // qbSetSize removed - size is now per-row
 
         function renderQBColors() {
             const container = document.getElementById('qbColorRows');
             const colorOpts = getColorsForType(currentQBType || 'majice').map(c => {
-                const dot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + c.hex + ';' + (c.border ? 'border:1px solid #ccc;' : '') + 'vertical-align:middle;margin-right:4px;"></span>';
                 return '<option value="' + c.name + '">' + c.name + '</option>';
             }).join('');
-            const qbColorOptsWithEmpty = '<option value="">-- Izberi barvo --</option>' + colorOpts;
-            let rows = '<label style="font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;display:block;">Barve:</label>';
+            const qbColorOptsWithEmpty = '<option value="">-- Barva --</option>' + colorOpts;
+            const sizeOpts = '<option value="">-- Vel. --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+            let rows = '<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);font-weight:500;">Barva</span><span style="width:80px;font-size:11px;color:var(--text-muted);font-weight:500;">Velikost</span></div>';
             for (let i = 0; i < qbQty; i++) {
-                rows += '<div class="qb-color-row">' +
-                    '<span class="qb-piece-label">' + (i+1) + '.</span>' +
-                    '<select class="qb-color-select" id="qbColor_' + i + '">' + qbColorOptsWithEmpty + '</select>' +
+                rows += '<div class="qb-color-row" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+                    '<span class="qb-piece-label" style="width:24px;text-align:right;">' + (i+1) + '.</span>' +
+                    '<select class="qb-color-select" id="qbColor_' + i + '" style="flex:1;">' + qbColorOptsWithEmpty + '</select>' +
+                    '<select class="qb-color-select" id="qbSize_' + i + '" style="width:80px;">' + sizeOpts + '</select>' +
                     '</div>';
             }
             container.innerHTML = rows;
-            // No auto-defaults - user must pick all colors
         }
 
         function qbAddToOrder() {
             if (!qbType) return;
-            // Validate size
-            if (!qbSize) {
-                showToast('⚠️ Izberi velikost!', 'error');
-                const szBtns = document.getElementById('qbSizeBtns');
-                if (szBtns) { szBtns.style.outline = '2px solid #ef4444'; szBtns.style.borderRadius = '8px'; setTimeout(() => { szBtns.style.outline = 'none'; }, 2000); }
-                return;
-            }
-            // Validate all colors
+            // Validate all colors + sizes per row
             for (let i = 0; i < qbQty; i++) {
-                const sel = document.getElementById('qbColor_' + i);
-                if (!sel || !sel.value) {
-                    showToast('⚠️ Izberi vse barve!', 'error');
-                    if (sel) { sel.style.outline = '2px solid #ef4444'; setTimeout(() => { sel.style.outline = 'none'; }, 2000); }
+                const colorSel = document.getElementById('qbColor_' + i);
+                const sizeSel = document.getElementById('qbSize_' + i);
+                if (!colorSel || !colorSel.value) {
+                    showToast('⚠️ Izberi barvo za kos ' + (i+1) + '!', 'error');
+                    if (colorSel) { colorSel.style.outline = '2px solid #ef4444'; setTimeout(() => { colorSel.style.outline = 'none'; }, 2000); }
+                    return;
+                }
+                if (!sizeSel || !sizeSel.value) {
+                    showToast('⚠️ Izberi velikost za kos ' + (i+1) + '!', 'error');
+                    if (sizeSel) { sizeSel.style.outline = '2px solid #ef4444'; setTimeout(() => { sizeSel.style.outline = 'none'; }, 2000); }
                     return;
                 }
             }
             const price = parseFloat(document.getElementById('qbPrice').value) || 0;
             const typeNames = { bokserice: 'Bokserice', majice: 'Majice', nogavice: 'Nogavice' };
             
-            // Build items list with colors
+            // Build items list with colors + sizes
             const colorParts = [];
             for (let i = 0; i < qbQty; i++) {
-                const sel = document.getElementById('qbColor_' + i);
-                const color = sel ? sel.value : 'Črna';
-                colorParts.push(color + ' - ' + qbSize);
+                const colorSel = document.getElementById('qbColor_' + i);
+                const sizeSel = document.getElementById('qbSize_' + i);
+                colorParts.push((colorSel ? colorSel.value : '') + ' - ' + (sizeSel ? sizeSel.value : ''));
             }
             
             const name = colorParts.join(', ');
