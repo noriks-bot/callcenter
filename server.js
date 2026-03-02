@@ -630,9 +630,18 @@ async function fetchAbandonedCarts() {
             if (item._orto_pairs_json) {
               try {
                 const pairs = typeof item._orto_pairs_json === 'string' ? JSON.parse(item._orto_pairs_json) : item._orto_pairs_json;
+                const sizePattern = /^(XS|S|M|L|XL|XXL|2XL|3XL|4XL|5XL|6XL|\d{2,3}(-\d{2,3})?)$/i;
                 const pairList = Object.values(pairs).map(p => {
-                  const color = p.attribute_boja || p.attribute_barva || p.attribute_szin || p.attribute_kolor || p.attribute_colore || p.attribute_χρώμα || p.attribute_farba || '';
-                  const size = p.attribute_velicina || p.attribute_velikost || p.attribute_meret || p.attribute_rozmiar || p.attribute_taglia || p.attribute_μέγεθος || p.attribute_velkost || '';
+                  // Decode URL-encoded keys and get all values
+                  const vals = {};
+                  for (const [k, v] of Object.entries(p)) {
+                    const decodedKey = decodeURIComponent(k).replace('attribute_', '').toLowerCase();
+                    vals[decodedKey] = v;
+                  }
+                  const allVals = Object.values(vals).filter(Boolean);
+                  // Separate size from color by pattern
+                  const size = allVals.find(v => sizePattern.test(v)) || '';
+                  const color = allVals.find(v => v !== size) || '';
                   return (color && size) ? color + ' - ' + size : (color || size || 'Unknown');
                 });
                 name = pairList.join(', ');

@@ -20,7 +20,8 @@
         "quantity": 1,
         "price": 144,
         "productId": 3534,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 155.99,
@@ -50,11 +51,12 @@
     "location": "Πάτρα",
     "cartContents": [
       {
-        "name": "Μαύρο - 4XL, Λευκό - 4XL, Σκούρο μπλε - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -88,7 +90,8 @@
         "quantity": 1,
         "price": 80.99,
         "productId": 5048,
-        "variationId": 5053
+        "variationId": 5053,
+        "selectedSize": "2XL"
       }
     ],
     "cartValue": 80.99,
@@ -118,11 +121,12 @@
     "location": "CZ, Dolní Dobrouč",
     "cartContents": [
       {
-        "name": "Boxerky 1: Černá - 3XL, Boxerky 2: Černá - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 290,
         "productId": 4810,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 359,
@@ -152,11 +156,12 @@
     "location": "CZ, Psáry",
     "cartContents": [
       {
-        "name": "Trička: Černá - 4XL, Boxerky: Černá - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 444,
@@ -190,14 +195,16 @@
         "quantity": 1,
         "price": 24.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       },
       {
         "name": "Verde - 4XL, Nero - 4XL, Nero - 4XL",
         "quantity": 1,
         "price": 24.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.97,
@@ -231,7 +238,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -261,11 +269,12 @@
     "location": "Περιστέρι",
     "cartContents": [
       {
-        "name": "Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -295,11 +304,12 @@
     "location": "Κέρκυρα",
     "cartContents": [
       {
-        "name": "Γκρι - 2XL, Καφέ - 2XL, Πράσινο - 2XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -333,7 +343,8 @@
         "quantity": 1,
         "price": 44.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 47.98,
@@ -367,7 +378,8 @@
         "quantity": 1,
         "price": 31.99,
         "productId": 2838,
-        "variationId": 3485
+        "variationId": 3485,
+        "selectedSize": "XL"
       }
     ],
     "cartValue": 34.98,
@@ -397,11 +409,12 @@
     "location": "",
     "cartContents": [
       {
-        "name": "Μαύρο - 2XL, Σκούρο μπλε - 2XL, Λευκό - 2XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -431,11 +444,12 @@
     "location": "Athens",
     "cartContents": [
       {
-        "name": "Μαύρο - 3XL, Μαύρο - 3XL, Μαύρο - 3XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -469,7 +483,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 1035,
-        "variationId": 6381
+        "variationId": 6381,
+        "selectedSize": "4XL"
       }
     ],
     "cartValue": 52.98,
@@ -503,7 +518,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 1035,
-        "variationId": 6381
+        "variationId": 6381,
+        "selectedSize": "4XL"
       }
     ],
     "cartValue": 52.98,
@@ -533,11 +549,12 @@
     "location": "Νίκαια",
     "cartContents": [
       {
-        "name": "Μπλούζα 1: Μαύρο - 2XL, Μπλούζα 2: Μαύρο - 2XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 22.99,
         "productId": 2998,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 25.98,
@@ -571,7 +588,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -605,7 +623,8 @@
         "quantity": 1,
         "price": 24.99,
         "productId": 504,
-        "variationId": 510
+        "variationId": 510,
+        "selectedSize": "3XL"
       }
     ],
     "cartValue": 27.98,
@@ -639,14 +658,16 @@
         "quantity": 1,
         "price": 44.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       },
       {
         "name": "Zelena - 2XL, Crna - 2XL, Siva - 2XL",
         "quantity": 1,
         "price": 44.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 89.98,
@@ -680,7 +701,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -714,7 +736,8 @@
         "quantity": 1,
         "price": 24.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 27.98,
@@ -744,11 +767,12 @@
     "location": "Κυθηρα",
     "cartContents": [
       {
-        "name": "Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -782,7 +806,8 @@
         "quantity": 1,
         "price": 44.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 47.98,
@@ -812,18 +837,20 @@
     "location": "",
     "cartContents": [
       {
-        "name": "Μαύρο - L, Μαύρο - L, Μαύρο - L",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       },
       {
-        "name": "Μαύρο - L, Μαύρο - L, Μαύρο - L",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 66.97,
@@ -853,11 +880,12 @@
     "location": "Νέα Φιλαδέλφεια",
     "cartContents": [
       {
-        "name": "Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -887,11 +915,12 @@
     "location": "Φλώρινα",
     "cartContents": [
       {
-        "name": "Μαύρο - 4XL, Πράσινο - 4XL, Γκρι - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -925,7 +954,8 @@
         "quantity": 1,
         "price": 39.99,
         "productId": 3120,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 42.98,
@@ -955,11 +985,12 @@
     "location": "Αμάραντα",
     "cartContents": [
       {
-        "name": "Μαύρο - XL, Μαύρο - XL, Μαύρο - XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -989,11 +1020,12 @@
     "location": "Χαλανδρι",
     "cartContents": [
       {
-        "name": "Μαύρο - M, Μαύρο - M, Μαύρο - M, Μαύρο - M, Μαύρο - M",
+        "name": "Unknown, Unknown, Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 48.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 51.98,
@@ -1023,32 +1055,36 @@
     "location": "Βουλα αθηνα",
     "cartContents": [
       {
-        "name": "Μαύρο - S, Μαύρο - S, Μαύρο - S",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       },
       {
-        "name": "Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       },
       {
-        "name": "Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       },
       {
-        "name": "Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 127.96,
@@ -1078,11 +1114,12 @@
     "location": "Thessaloniki",
     "cartContents": [
       {
-        "name": "Μαύρο - 2XL, Σκούρο μπλε - 2XL, Πράσινο - 2XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -1112,18 +1149,20 @@
     "location": "CZ, Praha 6 Břevnov",
     "cartContents": [
       {
-        "name": "Trička: Černá - XL, Boxerky: Černá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Trička: Bílá - XL, Boxerky: Modrá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 819,
@@ -1157,14 +1196,16 @@
         "quantity": 1,
         "price": 89.59,
         "productId": 5075,
-        "variationId": 5078
+        "variationId": 5078,
+        "selectedSize": "L"
       },
       {
-        "name": "Majica 1: Bijela - L, Majica 2: Crna - L",
+        "name": "Unknown",
         "quantity": 1,
         "price": 18.39,
         "productId": 4361,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 107.98,
@@ -1198,7 +1239,8 @@
         "quantity": 2,
         "price": 49.98,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.97,
@@ -1232,7 +1274,8 @@
         "quantity": 1,
         "price": 109.99,
         "productId": 4875,
-        "variationId": 4893
+        "variationId": 4893,
+        "selectedSize": "M"
       }
     ],
     "cartValue": 109.99,
@@ -1266,14 +1309,16 @@
         "quantity": 1,
         "price": 54.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       },
       {
         "name": "Rosso - 3XL, Rosso - 3XL, Blu - 3XL, Blu - 3XL, Grigio - 3XL, Grigio - 3XL, Nero - 3XL",
         "quantity": 1,
         "price": 54.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 109.98,
@@ -1303,11 +1348,12 @@
     "location": "CZ, Vlkoš okres Přerov",
     "cartContents": [
       {
-        "name": "Boxerky 1: Černá - XL, Boxerky 2: Černá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 290,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 359,
@@ -1341,7 +1387,8 @@
         "quantity": 1,
         "price": 510,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 579,
@@ -1375,21 +1422,24 @@
         "quantity": 1,
         "price": 670,
         "productId": 5480,
-        "variationId": 5486
+        "variationId": 5486,
+        "selectedSize": "3XL"
       },
       {
         "name": "Product #4596 (3XL)",
         "quantity": 1,
         "price": 1205,
         "productId": 4596,
-        "variationId": 4602
+        "variationId": 4602,
+        "selectedSize": "3XL"
       },
       {
         "name": "Product #605 (3XL)",
         "quantity": 1,
         "price": 1205,
         "productId": 605,
-        "variationId": 611
+        "variationId": 611,
+        "selectedSize": "3XL"
       }
     ],
     "cartValue": 3080,
@@ -1419,11 +1469,12 @@
     "location": "Περιστέρι",
     "cartContents": [
       {
-        "name": "Πράσινο - 3XL, Μαύρο - 3XL, Μαύρο - 3XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -1457,7 +1508,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -1491,7 +1543,8 @@
         "quantity": 1,
         "price": 1089,
         "productId": 4806,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 1158,
@@ -1525,7 +1578,8 @@
         "quantity": 1,
         "price": 510,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 579,
@@ -1555,18 +1609,20 @@
     "location": "CZ, Úpice",
     "cartContents": [
       {
-        "name": "Boxerky 1: Šedá - L, Boxerky 2: Modrá - L",
+        "name": "Unknown",
         "quantity": 1,
         "price": 290,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Trička: Béžová - L, Boxerky: Červená - L",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 734,
@@ -1596,18 +1652,20 @@
     "location": "Αθήνα",
     "cartContents": [
       {
-        "name": "Μαύρο - L, Γκρι - L, Κόκκινο - L",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       },
       {
-        "name": "Μαύρο - L, Γκρι - L, Κόκκινο - L",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 66.97,
@@ -1641,7 +1699,8 @@
         "quantity": 1,
         "price": 24.99,
         "productId": 3120,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 27.98,
@@ -1675,7 +1734,8 @@
         "quantity": 1,
         "price": 89,
         "productId": 3534,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 100.99,
@@ -1709,7 +1769,8 @@
         "quantity": 1,
         "price": 48.99,
         "productId": 2783,
-        "variationId": 3421
+        "variationId": 3421,
+        "selectedSize": "M"
       }
     ],
     "cartValue": 51.98,
@@ -1739,11 +1800,12 @@
     "location": "CZ, Benešov",
     "cartContents": [
       {
-        "name": "Trička: Bílá - M, Boxerky: Modrá - L",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 444,
@@ -1773,18 +1835,20 @@
     "location": "Lodi",
     "cartContents": [
       {
-        "name": "Maglietta: Grigio - L, Boxer: Grigio - L",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 4343,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
         "name": "Nero - XL, Nero - L, Nero - XL",
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 72.97,
@@ -1818,7 +1882,8 @@
         "quantity": 1,
         "price": 89,
         "productId": 3534,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 100.99,
@@ -1848,11 +1913,12 @@
     "location": "Πυλαία Θεσσαλονίκης",
     "cartContents": [
       {
-        "name": "Μαύρο - M, Μαύρο - M, Μαύρο - M, Μαύρο - M, Μαύρο - M",
+        "name": "Unknown, Unknown, Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 48.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 51.98,
@@ -1886,14 +1952,16 @@
         "quantity": 1,
         "price": 64.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       },
       {
         "name": "Nero - S, Nero - S, Nero - S, Nero - S, Nero - S, Nero - S, Nero - S",
         "quantity": 1,
         "price": 64.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 129.98,
@@ -1927,7 +1995,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -1957,32 +2026,36 @@
     "location": "Splitsko-Dalmatinska",
     "cartContents": [
       {
-        "name": "Majica: Crna - 3XL, Bokserica: Crna - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 4362,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Majica: Crna - 3XL, Bokserica: Crna - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 4362,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Majica: Crna - 3XL, Bokserica: Crna - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 4362,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Majica: Crna - 3XL, Bokserica: Crna - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 4362,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 79.96,
@@ -2012,11 +2085,12 @@
     "location": "CZ, Aš",
     "cartContents": [
       {
-        "name": "Boxerky 1: Černá - 3XL, Boxerky 2: Černá - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 290,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 359,
@@ -2046,18 +2120,20 @@
     "location": "Νέα Μάκρη",
     "cartContents": [
       {
-        "name": "Μπόξερ 1: Πράσινο - 3XL, Μπόξερ 2: Κόκκινο - 3XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 16.99,
         "productId": 3009,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Μπλούζα 1: Γκρι - 3XL, Μπλούζα 2: Καφέ - 3XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 22.99,
         "productId": 3009,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 42.97,
@@ -2087,18 +2163,20 @@
     "location": "CZ, Libochovice",
     "cartContents": [
       {
-        "name": "Trička: Černá - L, Boxerky: Šedá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Trička: Černá - L, Boxerky: Šedá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 819,
@@ -2132,7 +2210,8 @@
         "quantity": 3,
         "price": 419.97,
         "productId": 4675,
-        "variationId": 4683
+        "variationId": 4683,
+        "selectedSize": "S"
       }
     ],
     "cartValue": 419.97,
@@ -2162,11 +2241,12 @@
     "location": "PL, Swarzędz",
     "cartContents": [
       {
-        "name": "4XL - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 65,
         "productId": 3566,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 76.99,
@@ -2196,11 +2276,12 @@
     "location": "CZ, Šumperk",
     "cartContents": [
       {
-        "name": "Trička: Tmavě modrá - M, Boxerky: Modrá - M",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 444,
@@ -2234,7 +2315,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 605,
-        "variationId": 611
+        "variationId": 611,
+        "selectedSize": "3XL"
       }
     ],
     "cartValue": 52.98,
@@ -2264,11 +2346,12 @@
     "location": "Αγία Κυριακή",
     "cartContents": [
       {
-        "name": "Μπλε - 4XL, Γκρι - 4XL, Μπλε - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -2298,11 +2381,12 @@
     "location": "Βεροια",
     "cartContents": [
       {
-        "name": "Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -2332,18 +2416,20 @@
     "location": "SK, Belá pri Martine",
     "cartContents": [
       {
-        "name": "Tricka 1: Čierna - XL, Tricka 2: Modrá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 22.99,
         "productId": 3103,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Boxerky 1: Čierna - XL, Boxerky 2: Modrá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 16.99,
         "productId": 3103,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 42.97,
@@ -2377,7 +2463,8 @@
         "quantity": 1,
         "price": 48.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 51.98,
@@ -2411,7 +2498,8 @@
         "quantity": 1,
         "price": 1205,
         "productId": 1021,
-        "variationId": 1025
+        "variationId": 1025,
+        "selectedSize": "XL"
       }
     ],
     "cartValue": 1274,
@@ -2475,11 +2563,12 @@
     "location": "CZ, Kyjov",
     "cartContents": [
       {
-        "name": "Trička 1: Zelená - 4XL, Trička 2: Tmavě modrá - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 465,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 534,
@@ -2513,7 +2602,8 @@
         "quantity": 1,
         "price": 80.99,
         "productId": 2728,
-        "variationId": 3365
+        "variationId": 3365,
+        "selectedSize": "XL"
       }
     ],
     "cartValue": 80.99,
@@ -2547,7 +2637,8 @@
         "quantity": 1,
         "price": 1205,
         "productId": 4806,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 1274,
@@ -2581,7 +2672,8 @@
         "quantity": 1,
         "price": 670,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 739,
@@ -2611,11 +2703,12 @@
     "location": "Χανιά",
     "cartContents": [
       {
-        "name": "Μπλε - L, Μπλε - L, Μπλε - L, Μπλε - L, Μπλε - L",
+        "name": "Unknown, Unknown, Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 48.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 51.98,
@@ -2649,7 +2742,8 @@
         "quantity": 1,
         "price": 31.99,
         "productId": 3120,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -2679,11 +2773,12 @@
     "location": "CZ, Hlučín-Bobrovníky",
     "cartContents": [
       {
-        "name": "Trička: Černá - 2XL, Boxerky: Černá - 3XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 444,
@@ -2713,11 +2808,12 @@
     "location": "Αθήνα",
     "cartContents": [
       {
-        "name": "Μπλούζα: Μαύρο - 4XL, Μπόξερ: Μαύρο - 2XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 2992,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 22.98,
@@ -2751,7 +2847,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -2785,7 +2882,8 @@
         "quantity": 1,
         "price": 995,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 1064,
@@ -2819,7 +2917,8 @@
         "quantity": 1,
         "price": 995,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 1064,
@@ -2853,7 +2952,8 @@
         "quantity": 1,
         "price": 670,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 739,
@@ -2887,7 +2987,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -2921,7 +3022,8 @@
         "quantity": 1,
         "price": 1205,
         "productId": 4806,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 1274,
@@ -2951,11 +3053,12 @@
     "location": "Κομοτηνή",
     "cartContents": [
       {
-        "name": "Πράσινο - 4XL, Μαύρο - 4XL, Γκρι - 4XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -2989,7 +3092,8 @@
         "quantity": 1,
         "price": 48.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 51.98,
@@ -3019,11 +3123,12 @@
     "location": "Αθήνα - Κυψέλη",
     "cartContents": [
       {
-        "name": "Μπλούζα: Σκούρο μπλε - 4XL, Μπόξερ: Μπλε - 4XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 2992,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 22.98,
@@ -3053,18 +3158,20 @@
     "location": "Αγία Βαρβάρα",
     "cartContents": [
       {
-        "name": "Μπλούζα: Μαύρο - S, Μπόξερ: Μαύρο - S",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 3009,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Μπλούζα: Μαύρο - S, Μπόξερ: Μαύρο - S",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 3009,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 42.97,
@@ -3094,11 +3201,12 @@
     "location": "Argiroupoli",
     "cartContents": [
       {
-        "name": "Μαύρο - 2XL, Μαύρο - 2XL, Μαύρο - 2XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 49.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -3128,25 +3236,28 @@
     "location": "Λαμία",
     "cartContents": [
       {
-        "name": "Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S",
+        "name": "Unknown, Unknown, Unknown, Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 96.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 6
       },
       {
-        "name": "Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S",
+        "name": "Unknown, Unknown, Unknown, Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 96.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 6
       },
       {
-        "name": "Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S, Μαύρο - S",
+        "name": "Unknown, Unknown, Unknown, Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 96.99,
         "productId": 3015,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 6
       }
     ],
     "cartValue": 290.97,
@@ -3180,7 +3291,8 @@
         "quantity": 1,
         "price": 96.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 6
       }
     ],
     "cartValue": 96.99,
@@ -3210,11 +3322,12 @@
     "location": "Αμοργός",
     "cartContents": [
       {
-        "name": "Μαύρο - 3XL, Μαύρο - 3XL, Μαύρο - 3XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -3244,18 +3357,20 @@
     "location": "Κίσσαμος ή Καστέλλι Κισσάμου",
     "cartContents": [
       {
-        "name": "Μαύρο - S, Μαύρο - S, Μαύρο - 3XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       },
       {
-        "name": "Μαύρο - S, Μαύρο - S, Μαύρο - 3XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 66.97,
@@ -3289,7 +3404,8 @@
         "quantity": 1,
         "price": 109.99,
         "productId": 2893,
-        "variationId": 6207
+        "variationId": 6207,
+        "selectedSize": "4XL"
       }
     ],
     "cartValue": 109.99,
@@ -3323,7 +3439,8 @@
         "quantity": 1,
         "price": 1320,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 1389,
@@ -3357,7 +3474,8 @@
         "quantity": 1,
         "price": 31.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -3387,11 +3505,12 @@
     "location": "",
     "cartContents": [
       {
-        "name": "Μπλούζα: Μαύρο - XL, Μπόξερ: Μαύρο - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 3009,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 22.98,
@@ -3421,11 +3540,12 @@
     "location": "",
     "cartContents": [
       {
-        "name": "Majica 1: Crna - 3XL, Majica 2: Tamnoplava - 3XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 22.99,
         "productId": 4361,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 25.98,
@@ -3455,11 +3575,12 @@
     "location": "Τρίκαλα",
     "cartContents": [
       {
-        "name": "Μαύρο - XL, Μαύρο - XL, Μαύρο - XL",
+        "name": "Unknown, Unknown, Unknown",
         "quantity": 1,
         "price": 31.99,
         "productId": 3026,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 34.98,
@@ -3489,11 +3610,12 @@
     "location": "Βόλος",
     "cartContents": [
       {
-        "name": "Μπλούζα: Μαύρο - 3XL, Μπόξερ: Μαύρο - 2XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 19.99,
         "productId": 3009,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 22.98,
@@ -3527,7 +3649,8 @@
         "quantity": 1,
         "price": 48.99,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 51.98,
@@ -3561,7 +3684,8 @@
         "quantity": 1,
         "price": 79.99,
         "productId": 3287,
-        "variationId": 3328
+        "variationId": 3328,
+        "selectedSize": "3XL"
       }
     ],
     "cartValue": 79.99,
@@ -3595,7 +3719,8 @@
         "quantity": 1,
         "price": 670,
         "productId": 5488,
-        "variationId": 5491
+        "variationId": 5491,
+        "selectedSize": "L"
       }
     ],
     "cartValue": 739,
@@ -3629,7 +3754,8 @@
         "quantity": 1,
         "price": 1320,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 1389,
@@ -3663,7 +3789,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -3697,7 +3824,8 @@
         "quantity": 1,
         "price": 995,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 1064,
@@ -3731,7 +3859,8 @@
         "quantity": 1,
         "price": 670,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 739,
@@ -3765,7 +3894,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -3799,7 +3929,8 @@
         "quantity": 1,
         "price": 49.99,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 52.98,
@@ -3833,7 +3964,8 @@
         "quantity": 1,
         "price": 795,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 864,
@@ -3867,7 +3999,8 @@
         "quantity": 1,
         "price": 1055,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 1124,
@@ -3901,7 +4034,8 @@
         "quantity": 1,
         "price": 39.98,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 42.97,
@@ -3935,7 +4069,8 @@
         "quantity": 1,
         "price": 39.98,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 42.97,
@@ -3965,11 +4100,12 @@
     "location": "CZ, Jihlávka",
     "cartContents": [
       {
-        "name": "Boxerky 1: Černá - 3XL, Boxerky 2: Černá - 3XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 290,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 359,
@@ -4003,7 +4139,8 @@
         "quantity": 1,
         "price": 535,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 604,
@@ -4037,7 +4174,8 @@
         "quantity": 1,
         "price": 39.98,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 42.97,
@@ -4071,7 +4209,8 @@
         "quantity": 1,
         "price": 39.98,
         "productId": 3421,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 42.97,
@@ -4101,18 +4240,20 @@
     "location": "CZ, ",
     "cartContents": [
       {
-        "name": "Trička 1: Černá - XL, Trička 2: Tmavě modrá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 465,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Boxerky 1: Černá - 2XL, Boxerky 2: Modrá - 2XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 290,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 824,
@@ -4142,11 +4283,12 @@
     "location": "PL, Legnica",
     "cartContents": [
       {
-        "name": "Bokserki 1: Czarny - 2XL, Bokserki 2: Szary - 2XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 55,
         "productId": 3566,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 66.99,
@@ -4176,11 +4318,12 @@
     "location": "CZ, Děčín",
     "cartContents": [
       {
-        "name": "Boxerky 1: Černá - XL, Boxerky 2: Černá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 290,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 359,
@@ -4214,7 +4357,8 @@
         "quantity": 1,
         "price": 25.98,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 28.97,
@@ -4244,18 +4388,20 @@
     "location": "CZ, Olomouc",
     "cartContents": [
       {
-        "name": "Trička: Černá - XL, Boxerky: Černá - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4809,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       },
       {
-        "name": "Trička: Bílá - XL, Boxerky: Zelená - XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4809,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 819,
@@ -4289,7 +4435,8 @@
         "quantity": 1,
         "price": 535,
         "productId": 5495,
-        "variationId": 5500
+        "variationId": 5500,
+        "selectedSize": "2XL"
       }
     ],
     "cartValue": 604,
@@ -4323,7 +4470,8 @@
         "quantity": 1,
         "price": 535,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 604,
@@ -4357,7 +4505,8 @@
         "quantity": 1,
         "price": 1055,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 1124,
@@ -4391,7 +4540,8 @@
         "quantity": 1,
         "price": 105,
         "productId": 3534,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 116.99,
@@ -4421,11 +4571,12 @@
     "location": "CZ, Liberec",
     "cartContents": [
       {
-        "name": "Trička: Zelená - 3XL, Boxerky: Černá - 3XL",
+        "name": "Unknown",
         "quantity": 1,
         "price": 375,
         "productId": 4807,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 1
       }
     ],
     "cartValue": 444,
@@ -4459,7 +4610,8 @@
         "quantity": 1,
         "price": 535,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 604,
@@ -4493,7 +4645,8 @@
         "quantity": 1,
         "price": 105,
         "productId": 3534,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 116.99,
@@ -4527,7 +4680,8 @@
         "quantity": 1,
         "price": 795,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 864,
@@ -4561,7 +4715,8 @@
         "quantity": 1,
         "price": 965,
         "productId": 1021,
-        "variationId": 1027
+        "variationId": 1027,
+        "selectedSize": "3XL"
       }
     ],
     "cartValue": 1034,
@@ -4595,7 +4750,8 @@
         "quantity": 1,
         "price": 105,
         "productId": 3534,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 116.99,
@@ -4629,7 +4785,8 @@
         "quantity": 1,
         "price": 795,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 864,
@@ -4663,14 +4820,16 @@
         "quantity": 1,
         "price": 19.99,
         "productId": 490,
-        "variationId": 494
+        "variationId": 494,
+        "selectedSize": "XL"
       },
       {
         "name": "Product #1395 (XL)",
         "quantity": 1,
         "price": 19.99,
         "productId": 1395,
-        "variationId": 1399
+        "variationId": 1399,
+        "selectedSize": "XL"
       }
     ],
     "cartValue": 42.97,
@@ -4704,7 +4863,8 @@
         "quantity": 1,
         "price": 170,
         "productId": 1035,
-        "variationId": 1041
+        "variationId": 1041,
+        "selectedSize": "3XL"
       }
     ],
     "cartValue": 181.99,
@@ -4738,7 +4898,8 @@
         "quantity": 1,
         "price": 965,
         "productId": 605,
-        "variationId": 610
+        "variationId": 610,
+        "selectedSize": "2XL"
       }
     ],
     "cartValue": 1034,
@@ -4772,7 +4933,8 @@
         "quantity": 1,
         "price": 170,
         "productId": 3560,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 181.99,
@@ -4806,7 +4968,8 @@
         "quantity": 1,
         "price": 25.98,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 28.97,
@@ -4840,7 +5003,8 @@
         "quantity": 1,
         "price": 25.98,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 28.97,
@@ -4874,7 +5038,8 @@
         "quantity": 1,
         "price": 25.98,
         "productId": 3386,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 28.97,
@@ -4908,7 +5073,8 @@
         "quantity": 1,
         "price": 535,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 604,
@@ -4942,7 +5108,8 @@
         "quantity": 1,
         "price": 965,
         "productId": 4806,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 1034,
@@ -4976,7 +5143,8 @@
         "quantity": 1,
         "price": 795,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 5
       }
     ],
     "cartValue": 864,
@@ -5010,7 +5178,8 @@
         "quantity": 1,
         "price": 1055,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 1124,
@@ -5044,7 +5213,8 @@
         "quantity": 1,
         "price": 535,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 604,
@@ -5078,7 +5248,8 @@
         "quantity": 1,
         "price": 1055,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 1124,
@@ -5112,7 +5283,8 @@
         "quantity": 1,
         "price": 1055,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 7
       }
     ],
     "cartValue": 1124,
@@ -5146,7 +5318,8 @@
         "quantity": 1,
         "price": 535,
         "productId": 4811,
-        "variationId": null
+        "variationId": null,
+        "bundlePairs": 3
       }
     ],
     "cartValue": 604,
