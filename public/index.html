@@ -3315,13 +3315,36 @@
         
         // Color name → CSS color for dot
         const colorMap = {
-            'černá':'#000','black':'#000','nero':'#000','czarny':'#000','fekete':'#000','nera':'#000',
-            'modrá':'#2563eb','blue':'#2563eb','blu':'#2563eb','niebieski':'#2563eb','kék':'#2563eb','blu scuro':'#1e3a5f',
-            'šedá':'#9ca3af','grey':'#9ca3af','gray':'#9ca3af','grigio':'#9ca3af','szary':'#9ca3af','szürke':'#9ca3af','siva':'#9ca3af',
-            'bílá':'#f0f0f0','white':'#f0f0f0','bianco':'#f0f0f0','biały':'#f0f0f0','fehér':'#f0f0f0','bela':'#f0f0f0',
-            'červená':'#dc2626','red':'#dc2626','rosso':'#dc2626','czerwony':'#dc2626','piros':'#dc2626',
-            'zelená':'#16a34a','green':'#16a34a','verde':'#16a34a','zielony':'#16a34a','zöld':'#16a34a',
-            'modra':'#2563eb','rdeča':'#dc2626','zelena':'#16a34a','bež':'#d4a574','beige':'#d4a574'
+            // Black
+            'černá':'#000','black':'#000','nero':'#000','nera':'#000','czarny':'#000','czarna':'#000','fekete':'#000','čierna':'#000','čierna':'#000','crna':'#000','μαύρο':'#000','schwarz':'#000',
+            // White
+            'bílá':'#f0f0f0','white':'#f0f0f0','bianco':'#f0f0f0','bianca':'#f0f0f0','biały':'#f0f0f0','biała':'#f0f0f0','fehér':'#f0f0f0','biela':'#f0f0f0','bela':'#f0f0f0','bijela':'#f0f0f0','λευκό':'#f0f0f0','weiß':'#f0f0f0',
+            // Dark blue / Navy
+            'blu scuro':'#1e3a5f','tamnoplava':'#1e3a5f','tmavě modrá':'#1e3a5f','σκούρο μπλε':'#1e3a5f','granatowy':'#1e3a5f','sötétkék':'#1e3a5f','tmavomodrá':'#1e3a5f','blu navy':'#1e3a5f','dark blue':'#1e3a5f','navy':'#1e3a5f',
+            // Blue
+            'modrá':'#2563eb','blue':'#2563eb','blu':'#2563eb','niebieski':'#2563eb','niebieska':'#2563eb','kék':'#2563eb','modrá':'#2563eb','plava':'#2563eb','modra':'#2563eb','μπλε':'#2563eb',
+            // Grey
+            'šedá':'#9ca3af','grey':'#9ca3af','gray':'#9ca3af','grigio':'#9ca3af','grigia':'#9ca3af','szary':'#9ca3af','szara':'#9ca3af','szürke':'#9ca3af','sivá':'#9ca3af','siva':'#9ca3af','γκρι':'#9ca3af',
+            // Red
+            'červená':'#dc2626','red':'#dc2626','rosso':'#dc2626','rossa':'#dc2626','czerwony':'#dc2626','czerwona':'#dc2626','piros':'#dc2626','červená':'#dc2626','rdeča':'#dc2626','crvena':'#dc2626','κόκκινο':'#dc2626',
+            // Green
+            'zelená':'#16a34a','green':'#16a34a','verde':'#16a34a','zielony':'#16a34a','zielona':'#16a34a','zöld':'#16a34a','zelená':'#16a34a','zelena':'#16a34a','πράσινο':'#16a34a',
+            // Brown
+            'hnědá':'#8b4513','brown':'#8b4513','marrone':'#8b4513','brązowy':'#8b4513','brązowa':'#8b4513','barna':'#8b4513','hnedá':'#8b4513','smeđa':'#8b4513','καφέ':'#8b4513',
+            // Beige
+            'béžová':'#d4a574','beige':'#d4a574','bež':'#d4a574','μπεζ':'#d4a574',
+            // Burgundy / Wine
+            'vínová':'#722f37','burgundy':'#722f37','bordeaux':'#722f37','bordó':'#722f37','bordowy':'#722f37','μπορντό':'#722f37',
+            // Orange
+            'oranžová':'#ea580c','orange':'#ea580c','arancione':'#ea580c','pomarańczowy':'#ea580c','narancs':'#ea580c','πορτοκαλί':'#ea580c',
+            // Yellow
+            'žlutá':'#eab308','yellow':'#eab308','giallo':'#eab308','żółty':'#eab308','sárga':'#eab308','κίτρινο':'#eab308',
+            // Pink
+            'růžová':'#ec4899','pink':'#ec4899','rosa':'#ec4899','różowy':'#ec4899','rózsaszín':'#ec4899','ροζ':'#ec4899',
+            // Purple
+            'fialová':'#9333ea','purple':'#9333ea','viola':'#9333ea','fioletowy':'#9333ea','lila':'#9333ea','μωβ':'#9333ea',
+            // Olive / Military green
+            'olivová':'#6b7c3f','olive':'#6b7c3f','oliva':'#6b7c3f','olivový':'#6b7c3f','maslinasta':'#6b7c3f'
         };
         function colorDot(colorName) {
             const c = (colorName || '').toLowerCase().trim();
@@ -3409,7 +3432,7 @@
                             dot = colorDot(dashMatch[1].trim());
                             text = dashMatch[1].trim() + ' - ' + dashMatch[2].trim();
                         }
-                        out += '<div style="font-size:10px;line-height:1.3;color:var(--text-secondary);padding-left:8px;">' + dot + '• ' + esc(text) + '</div>';
+                        out += '<div style="font-size:10px;line-height:1.3;color:var(--text-secondary);padding-left:8px;">' + (dot ? dot : '• ') + esc(text) + '</div>';
                     }
                     if (rest > 0) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:8px;">+' + rest + ' more</div>';
                 } else {
