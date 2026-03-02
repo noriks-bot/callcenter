@@ -17,7 +17,6 @@
         #smsAutomationContent,
         #buyersSettingsContent,
         #agentsContent,
-        #followupsContent,
         #statisticsContent {
             margin-left: 260px;
             padding-top: 64px;
@@ -116,7 +115,6 @@
         .sidebar.collapsed ~ #smsAutomationContent,
         .sidebar.collapsed ~ #buyersSettingsContent,
         .sidebar.collapsed ~ #agentsContent,
-        .sidebar.collapsed ~ #followupsContent,
         .sidebar.collapsed ~ #statisticsContent,
         .sidebar.collapsed ~ .dummy-selector-removed {
             margin-left: 70px;
@@ -129,7 +127,6 @@
             #smsAutomationContent,
             #buyersSettingsContent,
             #agentsContent,
-            #followupsContent,
             #statisticsContent,
             .dummy-selector-mobile-removed {
                 margin-left: 0;
@@ -663,14 +660,7 @@
                 </a>
             </div>
             
-            <div class="nav-section">
-                <div class="nav-title">Calls</div>
-                <a href="/#followups" class="nav-item" data-tab="followups">
-                    <i class="fas fa-phone-volume"></i>
-                    <span>My Follow-ups</span>
-                    <span class="badge followup-badge" id="navFollowups">0</span>
-                </a>
-            </div>
+            
             
             <div class="nav-section admin-only" id="messagingSection">
                 <div class="nav-title">Messaging</div>
@@ -1839,33 +1829,7 @@
     </div>
 
     <!-- Follow-ups Content -->
-    <div id="followupsContent" style="display:none;">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title-large"><i class="fas fa-phone-volume"></i> Follow-ups</h1>
-        </div>
-
-        <div class="table-card" style="padding:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                <div>
-                    <h3 style="margin-bottom:8px;">📞 My Follow-ups</h3>
-                    <p style="color:var(--text-muted);">Dogovorjeni callbacki za danes in prihodnje dni.</p>
-                </div>
-                <div style="display:flex;gap:8px;">
-                    <button class="btn admin-only-btn" style="background:var(--card-border);" onclick="renderFollowups(true)">
-                        <i class="fas fa-users"></i> Vsi agenti
-                    </button>
-                    <button class="btn btn-save" onclick="renderFollowups()">
-                        <i class="fas fa-sync"></i> Osveži
-                    </button>
-                </div>
-            </div>
-
-            <div id="followupsContainer">
-                <div class="loading"><div class="spinner"></div>Loading...</div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Add Urgent Lead Modal -->
     <div class="modal-bg" id="addUrgentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:200;padding:20px;">
@@ -2296,7 +2260,7 @@
             // Hide all special content areas
             const specialAreas = [
                 'smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent',
-                'buyersSettingsContent', 'agentsContent', 'followupsContent', 'statisticsContent'
+                'buyersSettingsContent', 'agentsContent', 'statisticsContent'
             ];
             specialAreas.forEach(id => {
                 const el = document.getElementById(id);
@@ -2378,7 +2342,6 @@
                     'sms-settings': 'SMS Provider Settings',
                     'buyers-settings': 'Options',
                     'agents': 'Agent Management',
-                    'followups': 'My Follow-ups',
                     'statistics': 'Statistics'
                 };
                 document.getElementById('pageTitle').textContent = titles[currentTab] || currentTab;
@@ -2433,9 +2396,6 @@
                     } else if (currentTab === 'agents') {
                         showSpecialView('agentsContent');
                         loadAgents();
-                    } else if (currentTab === 'followups') {
-                        showSpecialView('followupsContent');
-                        renderFollowups();
                     } else if (currentTab === 'statistics') {
                         showSpecialView('statisticsContent');
                         loadInlineStats();
@@ -2558,7 +2518,7 @@
 
             // Hide ALL special content areas
             ['smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
-             'buyersSettingsContent', 'agentsContent', 'followupsContent'].forEach(id => {
+             'buyersSettingsContent', 'agentsContent'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
