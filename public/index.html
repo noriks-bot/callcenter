@@ -3103,21 +3103,12 @@
         }
 
         async function refreshData() {
-            console.log('[Refresh] Starting force refresh...');
+            console.log('[Refresh] Instant reload from cache...');
             const btn = document.querySelector('.action-btn-header .fa-sync-alt');
             if (btn) btn.classList.add('fa-spin');
-            document.getElementById('tableContainer').innerHTML = renderSkeletonTable(8);
 
             try {
-                // Force server to re-fetch from WooCommerce → SQLite
-                const result = await apiFetch('/api/force-refresh', {
-                    component: 'ForceRefresh',
-                    silent: true,
-                    retries: 1
-                });
-                console.log('[Refresh] Server refreshed:', result);
-
-                // Reload from API (now serving fresh SQLite data)
+                // Just re-read from SQLite cache (already refreshed in background)
                 await loadAllDataBulletproof();
                 await loadPaketomatiBulletproof();
                 showToast('✓ Podatki osveženi!');
