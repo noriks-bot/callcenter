@@ -18,7 +18,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files (except index.html which is served with SSR data injection)
+app.use((req, res, next) => {
+  if (req.path === '/' || req.path === '/index.html') return next();
+  express.static(path.join(__dirname, 'public'))(req, res, next);
+});
 
 // ========== CONFIGURATION ==========
 const stores = {
@@ -1803,7 +1807,34 @@ app.get('/api/statistics', async (req, res) => {
 app.get('/login', (req, res) => res.sendFile('login.html', { root: path.join(__dirname, 'public') }));
 app.get('/report', (req, res) => res.sendFile('report.html', { root: path.join(__dirname, 'public') }));
 app.get('/statistics', (req, res) => res.sendFile('statistics.html', { root: path.join(__dirname, 'public') }));
-app.get('/', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, 'public') }));
+// SSR: inject cached data into HTML so frontend has ZERO fetch delay
+app.get('/', (req, res) => {
+  const htmlPath = path.join(__dirname, 'public', 'index.html');
+  let html = fs.readFileSync(htmlPath, 'utf8');
+  
+  const callData = loadCallData();
+  const mergeCalls = (items) => items.map(item => {
+    const s = callData[item.id] || {};
+    return { ...item, callStatus: s.callStatus || item.callStatus || 'not_called', notes: s.notes || item.notes || '' };
+  });
+  
+  const initData = {
+    stores: Object.entries(stores).map(([code, c]) => ({ code, name: c.name, flag: c.flag })),
+    carts: mergeCalls(RAM.carts),
+    pending: mergeCalls(RAM.pending),
+    buyers: mergeCalls(RAM.buyers),
+    ready: RAM.ready,
+    lastRefresh: RAM.lastRefresh
+  };
+  
+  // Inject before closing </head>
+  const script = '<script>window.__INIT_DATA__=' + JSON.stringify(initData) + ';</script>';
+  html = html.replace('</head>', script + '</head>');
+  
+  res.set('Content-Type', 'text/html');
+  res.set('Cache-Control', 'no-store');
+  res.send(html);
+});
 
 app.listen(PORT, async () => {
   console.log(`🎧 Noriks Call Center running on port ${PORT}`);
