@@ -814,6 +814,17 @@
                     <option value="40-60">40-60 dni</option>
                     <option value="60+">60+ dni</option>
                 </select>
+                <select class="filter-select" id="paketomatiStatusFilter" style="max-width:250px;display:none;">
+                    <option value="">Vsi statusi</option>
+                    <option value="not_called">⚪ Čaka</option>
+                    <option value="called_1">📞 Poklicano 1x</option>
+                    <option value="called_2">📞 Poklicano 2x</option>
+                    <option value="called_3">📞 Poklicano 3x</option>
+                    <option value="sms_1">💬 SMS 1x</option>
+                    <option value="sms_2">💬 SMS 2x</option>
+                    <option value="sms_3">💬 SMS 3x</option>
+                    <option value="notified">✅ Obveščeno</option>
+                </select>
             </div>
 
             <!-- Bulk Actions Bar -->
@@ -2467,6 +2478,7 @@
                     // Update current content tab
                     currentContentTab = newTab;
                         document.getElementById('buyerDaysFilter').style.display = (newTab === 'buyers') ? '' : 'none';
+                        document.getElementById('paketomatiStatusFilter').style.display = (newTab === 'paketomati') ? '' : 'none';
                     currentTab = newTab; // Sync with main tab state
 
                     // Update page title
@@ -3028,6 +3040,7 @@
         // Filters
         document.getElementById('searchInput').addEventListener('input', renderTable);
         document.getElementById('statusFilter').addEventListener('change', renderTable);
+        document.getElementById('paketomatiStatusFilter').addEventListener('change', () => { renderTable(); });
         document.getElementById('buyerDaysFilter').addEventListener('change', () => { currentPage = 1; renderTable(); });
 
         function renderTable() {
@@ -7737,7 +7750,12 @@ function renderCartsTable(data, totalItems, totalPages) {
             const sym = (curr) => ({EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[curr] || '€');
             
             // Filter by country
-            let displayData = paketomatiData;
+            let displayData = [...paketomatiData];
+            // Apply paketomati status filter
+            const pakStatusFilter = document.getElementById('paketomatiStatusFilter')?.value;
+            if (pakStatusFilter) {
+                displayData = displayData.filter(o => (o.status || 'not_called') === pakStatusFilter);
+            }
             if (currentStore !== 'all') {
                 displayData = paketomatiData.filter(o => o.storeCode === currentStore);
                 console.log('[Paketomati Render] Filtering by', currentStore, '- showing', displayData.length, 'of', paketomatiData.length);
