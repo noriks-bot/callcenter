@@ -694,7 +694,7 @@
                 </a>
             </div>
             
-            <div class="nav-section admin-only" id="reportsSection">
+            <div class="nav-section" id="reportsSection">
                 <div class="nav-title">Reports</div>
                 <a href="/statistics" class="nav-item">
                     <i class="fas fa-chart-bar"></i>
@@ -2237,9 +2237,7 @@
             // Hide Admin section
             const adminSection = document.getElementById('adminSection');
             if (adminSection) adminSection.style.display = 'none';
-            // Hide Reports/Statistics section
-            const reportsSection = document.getElementById('reportsSection');
-            if (reportsSection) reportsSection.style.display = 'none';
+            // Reports/Statistics visible for ALL users (country-filtered)
             // Hide "Vsi agenti" button in Follow-ups
             document.querySelectorAll('.admin-only-btn').forEach(btn => btn.style.display = 'none');
         } else {
