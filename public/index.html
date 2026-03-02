@@ -2450,7 +2450,7 @@
         let currentTab = 'leads'; // Default to Leads view
         let editId = null;
         let orderCartId = null;
-        let orderCart = null;
+        let orderCart = null, currentOrderStoreCode = null;
         let orderItems = [];
         let freeShipping = false;
         let smsTarget = null;
@@ -3769,6 +3769,7 @@
             if (!order) return;
 
             orderCartId = orderId;
+            currentOrderStoreCode = order.storeCode || null;
             orderCart = {
                 ...order,
                 cartContents: [],
@@ -4091,6 +4092,7 @@
             orderCartId = cartId;
             orderCart = carts.find(c => c.id === cartId);
             if (!orderCart) return;
+            currentOrderStoreCode = orderCart.storeCode || null;
 
             // Populate customer info
             const nameParts = orderCart.customerName.split(' ');
@@ -4128,6 +4130,7 @@
 
         function openOrderModalForBuyer(buyerId) {
             const buyer = buyers.find(b => b.id === buyerId);
+            currentOrderStoreCode = buyer?.storeCode || null;
             if (!buyer) return;
 
             orderCartId = buyerId;
@@ -4222,7 +4225,7 @@
 
         function renderUpsellConfig() {
             const container = document.getElementById('upsellColorRows');
-            const colorOpts = '<option value="">-- Barva --</option>' + getColorsForType(upsellType).map(c =>
+            const colorOpts = '<option value="">-- Barva --</option>' + getColorsForType(upsellType, currentOrderStoreCode).map(c =>
                 '<option value="' + c.name + '">' + c.name + '</option>'
             ).join('');
             const sizeOpts = '<option value="">-- Vel. --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
@@ -4323,11 +4326,7 @@
                 if (type === 'majice' && sc.majice && sc.majice.length > 0) return sc.majice;
                 if (type === 'bokserice' && sc.bokserice && sc.bokserice.length > 0) return sc.bokserice;
             }
-            // Try to find colors from any store that has them
-            for (const [code, sc] of Object.entries(STORE_PRODUCT_COLORS)) {
-                if (type === 'majice' && sc.majice && sc.majice.length > 0) return sc.majice;
-                if (type === 'bokserice' && sc.bokserice && sc.bokserice.length > 0) return sc.bokserice;
-            }
+            // No store match - use defaults (Slovenian)
             return QB_COLORS_DEFAULT;
         }
         const QB_SIZES = ['S','M','L','XL','2XL','3XL','4XL'];
@@ -4362,7 +4361,7 @@
 
         function renderQBColors() {
             const container = document.getElementById('qbColorRows');
-            const colorOpts = getColorsForType(currentQBType || 'majice').map(c => {
+            const colorOpts = getColorsForType(currentQBType || 'majice', currentOrderStoreCode).map(c => {
                 return '<option value="' + c.name + '">' + c.name + '</option>';
             }).join('');
             const qbColorOptsWithEmpty = '<option value="">-- Barva --</option>' + colorOpts;
