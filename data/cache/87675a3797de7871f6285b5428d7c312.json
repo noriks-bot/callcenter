@@ -1,5 +1,30 @@
 [
   {
+    "id": "gr_buyer_d4d450270d126bfd01f29bcf36be58c6",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6477,
+    "customerName": "Γεωργιος Ξυδας",
+    "email": "xidas@windowslive.com",
+    "phone": "6974041474",
+    "location": "Καλαμαριά, GR",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-20T18:27:33",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Μπλουζάκι",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
     "id": "cz_buyer_86a84fc5aeb69c96f3e002b945089f93",
     "storeCode": "cz",
     "storeName": "Czech",

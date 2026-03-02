@@ -2534,6 +2534,7 @@
                 carts = initData.carts || [];
                 pending = initData.pending || [];
                 buyers = initData.buyers || [];
+                paketomatiData = initData.paketomati || [];
 
                 renderCountryTabs();
                 setupContentTabs();
@@ -2554,7 +2555,7 @@
                 } catch (e) { console.error('[Init]', e); }
             }
 
-            Promise.allSettled([loadSmsDataBulletproof(), loadSmsTemplatesBulletproof(), loadPaketomatiBulletproof()]).catch(() => {});
+            // SMS/templates loaded silently in background (no loading indicators)
 
             if (window.location.hash) {
                 const h = window.location.hash.substring(1);
@@ -2622,10 +2623,13 @@
         async function loadAllDataBulletproof() {
             console.log('[Data] Loading main data with progressive loading...');
 
-            // Reset global loading status
-            globalLoadingStatus.carts = true;
-            globalLoadingStatus.pending = true;
-            globalLoadingStatus.buyers = true;
+            // Don't show loading indicators on auto-refresh (data already visible)
+            const isRefresh = carts.length > 0 || pending.length > 0;
+            if (!isRefresh) {
+                globalLoadingStatus.carts = true;
+                globalLoadingStatus.pending = true;
+                globalLoadingStatus.buyers = true;
+            }
             globalLoadingStatus.buyersError = null;
 
             // Helper to update tab loading indicators
@@ -2639,10 +2643,12 @@
                 }
             };
 
-            // Show loading on all tabs
-            updateTabLoading('carts', true);
-            updateTabLoading('pending', true);
-            updateTabLoading('buyers', true);
+            // Show loading on tabs only for initial load
+            if (!isRefresh) {
+                updateTabLoading('carts', true);
+                updateTabLoading('pending', true);
+                updateTabLoading('buyers', true);
+            }
 
             // PROGRESSIVE LOADING: Load carts & pending first (fastest), show them immediately
             // Then load buyers in background (slowest)
