@@ -2016,6 +2016,62 @@
         </div>
     </div>
 
+
+    <!-- Statistics Content -->
+    <div id="statisticsContent" style="display:none;">
+        <div class="page-header" style="padding:16px;">
+            <h2 class="page-title-large"><i class="fas fa-chart-bar" style="margin-right:8px;color:var(--accent-blue);"></i>Statistics</h2>
+        </div>
+        <div style="padding:0 16px;">
+            <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;">
+                <select id="statsPeriodSelect" style="padding:8px 12px;border-radius:var(--radius-md);border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-primary);font-size:14px;">
+                    <option value="7">Last 7 days</option>
+                    <option value="14">Last 14 days</option>
+                    <option value="30" selected>Last 30 days</option>
+                    <option value="60">Last 60 days</option>
+                    <option value="90">Last 90 days</option>
+                </select>
+                <button class="btn btn-save" onclick="loadInlineStats()" style="padding:8px 16px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div class="stats-grid" style="display:grid;margin-bottom:16px;">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                    <div><div class="stat-value" id="statsLeads">0</div><div class="stat-label">Total Leads</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                    <div><div class="stat-value" id="statsConversions">0</div><div class="stat-label">Conversions</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#8b5cf6;"><i class="fas fa-phone"></i></div>
+                    <div><div class="stat-value" id="statsCalls">0</div><div class="stat-label">Total Calls</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange"><i class="fas fa-percentage"></i></div>
+                    <div><div class="stat-value" id="statsConvRate">0%</div><div class="stat-label">Conv. Rate</div></div>
+                </div>
+            </div>
+            <div class="table-card" style="margin-bottom:16px;padding:20px;">
+                <h3 style="margin:0 0 16px;font-size:15px;font-weight:600;">Daily Leads & Conversions</h3>
+                <div style="position:relative;height:300px;"><canvas id="inlineDailyChart"></canvas></div>
+            </div>
+            <div class="table-card" style="margin-bottom:16px;">
+                <div style="padding:16px 16px 0;"><h3 style="margin:0 0 12px;font-size:15px;font-weight:600;">Performance by Country</h3></div>
+                <table class="data-table">
+                    <thead><tr><th>Country</th><th>Leads</th><th>Conversions</th><th>Conv. Rate</th></tr></thead>
+                    <tbody id="statsCountryBody"><tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</td></tr></tbody>
+                </table>
+            </div>
+            <div class="table-card" style="margin-bottom:16px;">
+                <div style="padding:16px 16px 0;"><h3 style="margin:0 0 12px;font-size:15px;font-weight:600;">Daily Breakdown</h3></div>
+                <table class="data-table">
+                    <thead><tr><th>Date</th><th>Leads</th><th>Calls</th><th>Conversions</th><th>Conv. Rate</th></tr></thead>
+                    <tbody id="statsDailyBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container (Enhanced) -->
     <div class="toast-container" id="toastContainer"></div>
 
@@ -8188,7 +8244,7 @@
         let inlineDailyChart = null;
         
         async function loadInlineStats() {
-            const days = document.getElementById('statsPeriodSelect').value;
+            const days = document.getElementById('statsPeriodSelect')?.value || '30';
             const countriesParam = (isAdmin || hasAllCountries) ? 'all' : userCountries.join(',');
             
             try {
@@ -8248,7 +8304,7 @@
             }
         }
         
-        document.getElementById('statsPeriodSelect').addEventListener('change', loadInlineStats);
+        document.getElementById('statsPeriodSelect')?.addEventListener('change', loadInlineStats);
 
         init();
     </script>
