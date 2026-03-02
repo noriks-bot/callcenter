@@ -1836,14 +1836,13 @@ app.get('/', (req, res) => {
   res.send(html);
 });
 
-app.listen(PORT, async () => {
-  console.log(`🎧 Noriks Call Center running on port ${PORT}`);
-  // Warm RAM cache immediately, then start background refresh
+// Warm RAM BEFORE listening so first request always has data
+(async () => {
   await warmRAM();
-  startBackgroundRefresh();
-  console.log('[RAM] Background refresh scheduled every 5 minutes');
-  // Warm caches on startup (non-blocking)
-  setTimeout(() => warmAllCaches(), 2000);
-  // Start background refresh
-  startBackgroundRefresh();
-});
+  app.listen(PORT, () => {
+    console.log(`🎧 Noriks Call Center running on port ${PORT}`);
+    startBackgroundRefresh();
+    console.log('[RAM] Background refresh scheduled every 5 minutes');
+    setTimeout(() => warmAllCaches(), 2000);
+  });
+})();
