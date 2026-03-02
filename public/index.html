@@ -807,6 +807,13 @@
                     <option value="called_not_interested">Not Interested</option>
                     <option value="invalid_number">Invalid Number</option>
                 </select>
+                <select class="filter-select" id="buyerDaysFilter" style="max-width:200px;display:none;">
+                    <option value="">All Time</option>
+                    <option value="10-20">10-20 dni</option>
+                    <option value="20-30">20-30 dni</option>
+                    <option value="40-60">40-60 dni</option>
+                    <option value="60+">60+ dni</option>
+                </select>
             </div>
 
             <!-- Bulk Actions Bar -->
@@ -2459,6 +2466,7 @@
 
                     // Update current content tab
                     currentContentTab = newTab;
+                        document.getElementById('buyerDaysFilter').style.display = (newTab === 'buyers') ? '' : 'none';
                     currentTab = newTab; // Sync with main tab state
 
                     // Update page title
@@ -3020,6 +3028,7 @@
         // Filters
         document.getElementById('searchInput').addEventListener('input', renderTable);
         document.getElementById('statusFilter').addEventListener('change', renderTable);
+        document.getElementById('buyerDaysFilter').addEventListener('change', () => { currentPage = 1; renderTable(); });
 
         function renderTable() {
             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -3102,6 +3111,23 @@
 
             if (currentStore !== 'all') data = data.filter(d => d.storeCode === currentStore);
             if (status) data = data.filter(d => d.callStatus === status);
+            // Buyer days filter
+            if (dataTab === 'buyers') {
+                const daysVal = document.getElementById('buyerDaysFilter').value;
+                if (daysVal) {
+                    const now = Date.now();
+                    data = data.filter(b => {
+                        const regDate = b.registeredAt ? new Date(b.registeredAt).getTime() : 0;
+                        if (!regDate) return false;
+                        const daysSince = (now - regDate) / 86400000;
+                        if (daysVal === '10-20') return daysSince >= 10 && daysSince < 20;
+                        if (daysVal === '20-30') return daysSince >= 20 && daysSince < 30;
+                        if (daysVal === '40-60') return daysSince >= 40 && daysSince < 60;
+                        if (daysVal === '60+') return daysSince >= 60;
+                        return true;
+                    });
+                }
+            }
             if (search) data = data.filter(d =>
                 (d.customerName || '').toLowerCase().includes(search) ||
                 (d.email || '').toLowerCase().includes(search) ||
