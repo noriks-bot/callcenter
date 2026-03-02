@@ -664,6 +664,19 @@
             color: #fff;
         }
         
+        /* Upsell Grid */
+        .upsell-section { margin: 16px 0 8px; }
+        .upsell-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+        .upsell-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .upsell-card { padding: 10px; border: 1px solid var(--card-border); border-radius: var(--radius-md); background: var(--card-bg); cursor: pointer; text-align: center; transition: all 0.15s; }
+        .upsell-card:hover { border-color: var(--accent); background: rgba(99,102,241,0.04); }
+        .upsell-card.upsell-active { border-color: var(--accent); background: rgba(99,102,241,0.08); }
+        .upsell-card .upsell-icon { font-size: 18px; margin-bottom: 2px; }
+        .upsell-card .upsell-label { font-size: 11px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+        .upsell-card .upsell-sub { font-size: 10px; color: var(--text-muted); }
+        .upsell-config { display: none; background: var(--bg-main); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 12px; margin-top: 8px; }
+        .upsell-config.visible { display: block; }
+
         /* Quick Product Builder */
         .quick-builder { margin: 12px 0; }
         .quick-builder-btns { display: flex; gap: 6px; margin-bottom: 8px; }
@@ -1055,6 +1068,51 @@
                 </div>
 
                 <!-- Options -->
+                <!-- Upsell Section -->
+                <div class="upsell-section">
+                    <div class="upsell-title">⚡ Hitri upsell</div>
+                    <div class="upsell-grid">
+                        <div class="upsell-card" onclick="upsellClick('majice',3,this)">
+                            <div class="upsell-icon">👕</div>
+                            <div class="upsell-label">3 majice</div>
+                            <div class="upsell-sub">€38.97</div>
+                        </div>
+                        <div class="upsell-card" onclick="upsellClick('majice',6,this)">
+                            <div class="upsell-icon">👕👕</div>
+                            <div class="upsell-label">6 majic</div>
+                            <div class="upsell-sub">€77.94</div>
+                        </div>
+                        <div class="upsell-card" onclick="upsellClick('majice',9,this)">
+                            <div class="upsell-icon">👕👕👕</div>
+                            <div class="upsell-label">9 majic</div>
+                            <div class="upsell-sub">€116.91</div>
+                        </div>
+                        <div class="upsell-card" onclick="upsellClick('bokserice',3,this)">
+                            <div class="upsell-icon">🩲</div>
+                            <div class="upsell-label">3 bokserice</div>
+                            <div class="upsell-sub">€29.97</div>
+                        </div>
+                        <div class="upsell-card" onclick="upsellClick('bokserice',7,this)">
+                            <div class="upsell-icon">🩲🩲</div>
+                            <div class="upsell-label">7 bokseric</div>
+                            <div class="upsell-sub">€69.93</div>
+                        </div>
+                        <div class="upsell-card" onclick="upsellClick('bokserice',10,this)">
+                            <div class="upsell-icon">🩲🩲🩲</div>
+                            <div class="upsell-label">10 bokseric</div>
+                            <div class="upsell-sub">€99.90</div>
+                        </div>
+                    </div>
+                    <div class="upsell-config" id="upsellConfig">
+                        <div class="qb-row">
+                            <label>Velikost:</label>
+                            <div id="upsellSizeBtns" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+                        </div>
+                        <div id="upsellColorRows" style="margin:8px 0;"></div>
+                        <button class="qb-add-btn" onclick="upsellAdd()"><i class="fas fa-plus"></i> Dodaj upsell</button>
+                    </div>
+                </div>
+
                 <div class="toggle-row">
                     <span class="toggle-label">🚚 Brezplačna dostava</span>
                     <div class="toggle" id="freeShippingToggle" onclick="toggleFreeShipping()"></div>
@@ -4083,7 +4141,80 @@ function renderCartsTable(data, totalItems, totalPages) {
             updateOrderTotals();
         }
 
-        // ===== Quick Product Builder =====
+        // ===== Upsell =====
+        let upsellType = null, upsellQty = 0, upsellSize = 'XL', upsellCard = null;
+
+        function upsellClick(type, qty, cardEl) {
+            const panel = document.getElementById('upsellConfig');
+            // Toggle off if same card clicked
+            if (upsellCard === cardEl) {
+                upsellCard = null; upsellType = null;
+                panel.classList.remove('visible');
+                document.querySelectorAll('.upsell-card').forEach(c => c.classList.remove('upsell-active'));
+                return;
+            }
+            upsellType = type; upsellQty = qty; upsellCard = cardEl;
+            document.querySelectorAll('.upsell-card').forEach(c => c.classList.remove('upsell-active'));
+            cardEl.classList.add('upsell-active');
+            panel.classList.add('visible');
+            renderUpsellConfig();
+        }
+
+        function renderUpsellConfig() {
+            // Size buttons
+            document.getElementById('upsellSizeBtns').innerHTML = QB_SIZES.map(s =>
+                '<button class="qb-size-btn' + (s === upsellSize ? ' selected' : '') + '" onclick="upsellSetSize(\'' + s + '\')">' + s + '</button>'
+            ).join('');
+            // Color rows
+            const container = document.getElementById('upsellColorRows');
+            const colorOpts = QB_COLORS.map(c =>
+                '<option value="' + c.name + '">' + c.name + '</option>'
+            ).join('');
+            let rows = '<label style="font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;display:block;">Barve:</label>';
+            for (let i = 0; i < upsellQty; i++) {
+                rows += '<div class="qb-color-row"><span class="qb-piece-label">' + (i+1) + '.</span><select class="qb-color-select" id="upsellColor_' + i + '">' + colorOpts + '</select></div>';
+            }
+            container.innerHTML = rows;
+            const defaults = ['Črna','Siva','Temno modra','Zelena','Rdeča','Bela','Rjava','Modra','Bež','Oranžna','Vijolična','Roza'];
+            for (let i = 0; i < upsellQty; i++) {
+                const sel = document.getElementById('upsellColor_' + i);
+                if (sel) sel.value = defaults[i % defaults.length];
+            }
+        }
+
+        function upsellSetSize(s) { upsellSize = s; renderUpsellConfig(); }
+
+        function upsellAdd() {
+            if (!upsellType || !upsellQty) return;
+            const price = QB_PRICES[upsellType] || 9.99;
+            const typeNames = { bokserice: 'Bokserice', majice: 'Majice' };
+            const colorParts = [];
+            for (let i = 0; i < upsellQty; i++) {
+                const sel = document.getElementById('upsellColor_' + i);
+                colorParts.push((sel ? sel.value : 'Črna') + ' - ' + upsellSize);
+            }
+            orderItems.push({
+                name: colorParts.join(', '),
+                productTitle: typeNames[upsellType] + ' (' + upsellQty + ' kos)',
+                productId: null, variationId: null,
+                sku: 'UPSELL-' + upsellType.toUpperCase(),
+                image: null,
+                editPrice: price * upsellQty,
+                editQty: 1, quantity: 1,
+                isQuickBuild: true
+            });
+            currentDiscount = 0; originalPrices = null;
+            document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('discountBtnNone').classList.add('active');
+            renderOrderItems();
+            showToast('✓ Upsell: ' + typeNames[upsellType] + ' (' + upsellQty + ') dodano');
+            // Close
+            upsellCard = null; upsellType = null;
+            document.getElementById('upsellConfig').classList.remove('visible');
+            document.querySelectorAll('.upsell-card').forEach(c => c.classList.remove('upsell-active'));
+        }
+
+                // ===== Quick Product Builder =====
         const QB_COLORS = [
             { name: 'Črna', hex: '#000' },
             { name: 'Bela', hex: '#f0f0f0', border: true },
