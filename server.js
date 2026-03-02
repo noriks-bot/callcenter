@@ -678,6 +678,7 @@ async function fetchAbandonedCarts() {
                 name = pairList.join(', ');
                 pairsData = pairList;
               } catch(e) {
+                console.error('[PairsJson] Error parsing for product', productId, ':', e.message);
                 // Fall through to _orto_lines
               }
             }
