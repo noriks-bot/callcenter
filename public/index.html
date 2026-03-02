@@ -3442,10 +3442,15 @@
                     // Show bundle contents if available
                     if (item.bundleContents && item.bundleContents.length > 0) {
                         for (const bc of item.bundleContents) {
-                            const colorMatch = bc.desc.match(/^(\S+)/);
-                            const dot = colorMatch ? colorDot(colorMatch[1]) : '';
-                            out += '<div style="font-size:10px;line-height:1.3;color:var(--text-secondary);padding-left:8px;">' + (dot || '• ') + esc(bc.qty + '× ' + bc.desc) + '</div>';
+                            // Extract first word as potential color name
+                            const words = bc.desc.split(/\s+/);
+                            const dot = colorDot(words[0]);
+                            const sizeNote = item.selectedSize ? ' (' + item.selectedSize + ')' : '';
+                            out += '<div style="font-size:10px;line-height:1.3;color:var(--text-secondary);padding-left:8px;">' + (dot || '• ') + esc(bc.qty + '× ' + bc.desc + sizeNote) + '</div>';
                         }
+                    } else if (item.selectedSize && !rawName.includes(item.selectedSize)) {
+                        // Pack product with size but no bundle contents - show the size
+                        out += '<div style="font-size:10px;line-height:1.3;color:var(--text-muted);padding-left:8px;">Velikost: ' + esc(item.selectedSize) + '</div>';
                     }
                 }
             }

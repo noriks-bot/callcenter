@@ -624,9 +624,29 @@ async function fetchAbandonedCarts() {
             const productId = item.product_id || null;
             const variationId = item.variation_id || null;
             let name;
-            if (lines.length > 0) {
+            let pairsData = null;
+            
+            // Try _orto_pairs_json first (structured color+size per piece)
+            if (item._orto_pairs_json) {
+              try {
+                const pairs = typeof item._orto_pairs_json === 'string' ? JSON.parse(item._orto_pairs_json) : item._orto_pairs_json;
+                const pairList = Object.values(pairs).map(p => {
+                  const color = p.attribute_boja || p.attribute_barva || p.attribute_szin || p.attribute_kolor || p.attribute_colore || p.attribute_χρώμα || p.attribute_farba || '';
+                  const size = p.attribute_velicina || p.attribute_velikost || p.attribute_meret || p.attribute_rozmiar || p.attribute_taglia || p.attribute_μέγεθος || p.attribute_velkost || '';
+                  return (color && size) ? color + ' - ' + size : (color || size || 'Unknown');
+                });
+                name = pairList.join(', ');
+                pairsData = pairList;
+              } catch(e) {
+                // Fall through to _orto_lines
+              }
+            }
+            
+            if (!name && lines.length > 0) {
               name = lines.join(', ');
-            } else {
+            }
+            
+            if (!name) {
               // Try to build name from variation attributes
               const attrs = item.variation || {};
               const attrValues = Object.values(attrs).filter(Boolean);
@@ -636,11 +656,23 @@ async function fetchAbandonedCarts() {
                 name = `Product #${productId || 'unknown'}`;
               }
             }
-            cartContents.push({
+            
+            const cartItem = {
               name, quantity: parseInt(item.quantity) || 1,
               price: parseFloat(item.line_total) || 0,
               productId, variationId
-            });
+            };
+            
+            // Store variation size for pack products
+            if (item.variation && typeof item.variation === 'object') {
+              const sizeVal = Object.values(item.variation).find(v => typeof v === 'string' && v.match(/^(XS|S|M|L|XL|2XL|3XL|4XL|5XL|6XL)$/i));
+              if (sizeVal) cartItem.selectedSize = sizeVal;
+            }
+            
+            // Store bundle metadata
+            if (item._orto_bundle_pairs) cartItem.bundlePairs = parseInt(item._orto_bundle_pairs);
+            
+            cartContents.push(cartItem);
           }
         }
 
