@@ -1766,12 +1766,10 @@ app.get('/api/statistics', async (req, res) => {
     
     // Get carts and pending orders from cache
     let allCarts = await fetchAbandonedCarts();
-    let allOrders = await fetchPendingOrders();
     
     // Filter by country
     if (allowedCountries) {
       allCarts = allCarts.filter(c => allowedCountries.includes(c.storeCode));
-      allOrders = allOrders.filter(o => allowedCountries.includes(o.storeCode));
     }
     
     // Get call logs for conversions
