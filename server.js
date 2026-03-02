@@ -103,7 +103,7 @@ function clearAllCache() {
 // ========== RAM CACHE (instant responses) ==========
 // RAM is now backed by SQLite — reads from DB, writes on refresh
 const RAM = {
-  get carts() { return dbReadData('carts'); },
+  get carts() { return enrichCartsFromCache(dbReadData('carts')); },
   get pending() { return dbReadData('pending'); },
   get buyers() { return dbReadData('buyers'); },
   get paketomati() { return dbReadData('paketomati'); },
@@ -122,6 +122,8 @@ async function warmRAM() {
     ]);
     // Only write to DB if fetch succeeded and returned data
     if (cartsRes.status === 'fulfilled' && cartsRes.value.length > 0) {
+      // Enrich "Product #XXXX" with real names from WooCommerce
+      await enrichCartProductNames(cartsRes.value);
       dbWrite('carts', cartsRes.value);
     }
     if (pendingRes.status === 'fulfilled' && pendingRes.value.length > 0) {
@@ -268,6 +270,113 @@ async function wcApiRequest(storeCode, endpoint, params = {}, method = 'GET', bo
     const msg = error.response?.data?.message || error.message;
     return { error: msg, code: error.response?.status };
   }
+}
+
+
+// ========== PRODUCT NAME CACHE ==========
+// Stores product_id → name mapping in SQLite to resolve "Product #XXXX"
+function getProductNameCache() {
+  const row = dbRead('product_names');
+  return row ? row.data : {};
+}
+
+function setProductNameCache(cache) {
+  dbWrite('product_names', cache);
+}
+
+async function resolveProductName(storeCode, productId, variationId) {
+  const key = storeCode + '_' + productId + (variationId ? '_' + variationId : '');
+  const existing = getProductNameCache();
+  if (existing[key]) return existing[key];
+  
+  try {
+    let name = null;
+    // Try variation first if we have variationId
+    if (variationId) {
+      const variation = await wcApiRequest(storeCode, 'products/' + productId + '/variations/' + variationId);
+      if (variation && !variation.error) {
+        const parent = await wcApiRequest(storeCode, 'products/' + productId);
+        const parentName = (parent && !parent.error) ? parent.name : 'Product';
+        const attrs = (variation.attributes || []).map(a => a.option).filter(Boolean).join(' - ');
+        name = parentName + (attrs ? ' (' + attrs + ')' : '');
+      }
+    }
+    
+    if (!name) {
+      const product = await wcApiRequest(storeCode, 'products/' + productId);
+      if (product && !product.error && product.name) name = product.name;
+    }
+    
+    if (name) {
+      // Re-read cache to avoid race condition, then merge
+      const freshCache = getProductNameCache();
+      freshCache[key] = name;
+      setProductNameCache(freshCache);
+      return name;
+    }
+  } catch (e) {
+    console.error('[ProductCache] Error resolving', key, e.message);
+  }
+  return null;
+}
+
+// Batch resolve all "Product #XXXX" in carts
+async function enrichCartProductNames(carts) {
+  const cache = getProductNameCache();
+  const toResolve = [];
+  
+  for (const cart of carts) {
+    for (const item of (cart.cartContents || [])) {
+      if ((item.name || '').startsWith('Product #') && item.productId) {
+        const key = cart.storeCode + '_' + item.productId + (item.variationId ? '_' + item.variationId : '');
+        if (!cache[key]) {
+          toResolve.push({ storeCode: cart.storeCode, productId: item.productId, variationId: item.variationId, key });
+        }
+      }
+    }
+  }
+  
+  if (toResolve.length === 0) return;
+  
+  // Deduplicate
+  const unique = [...new Map(toResolve.map(r => [r.key, r])).values()];
+  console.log('[ProductCache] Resolving', unique.length, 'unknown products...');
+  
+  // Fetch in batches of 5 to not hammer API
+  for (let i = 0; i < unique.length; i += 5) {
+    const batch = unique.slice(i, i + 5);
+    await Promise.allSettled(batch.map(async (r) => {
+      const name = await resolveProductName(r.storeCode, r.productId, r.variationId);
+      if (name) console.log('[ProductCache] ✓', r.key, '→', name);
+    }));
+  }
+  
+  // Now apply cache to all carts
+  const updatedCache = getProductNameCache();
+  for (const cart of carts) {
+    for (const item of (cart.cartContents || [])) {
+      if ((item.name || '').startsWith('Product #') && item.productId) {
+        const key = cart.storeCode + '_' + item.productId + (item.variationId ? '_' + item.variationId : '');
+        if (updatedCache[key]) item.name = updatedCache[key];
+      }
+    }
+  }
+}
+
+
+// Apply product name cache to carts at read time (instant, no API calls)
+function enrichCartsFromCache(carts) {
+  const cache = getProductNameCache();
+  if (!cache || Object.keys(cache).length === 0) return carts;
+  for (const cart of carts) {
+    for (const item of (cart.cartContents || [])) {
+      if ((item.name || '').startsWith('Product #') && item.productId) {
+        const key = cart.storeCode + '_' + item.productId + (item.variationId ? '_' + item.variationId : '');
+        if (cache[key]) item.name = cache[key];
+      }
+    }
+  }
+  return carts;
 }
 
 // ========== FETCH RECENT ORDER CONTACTS ==========
@@ -1705,8 +1814,11 @@ function startBackgroundRefresh() {
 
     const results = await Promise.allSettled([
       // 1. Abandoned carts
-      fetchAbandonedCarts().then(carts => {
-        if (carts && carts.length > 0) dbWrite('carts', carts);
+      fetchAbandonedCarts().then(async carts => {
+        if (carts && carts.length > 0) {
+          await enrichCartProductNames(carts);
+          dbWrite('carts', carts);
+        }
         console.log('[Cron] ✓ Carts:', (carts || []).length);
       }),
       // 2. Pending orders
