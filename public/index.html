@@ -3439,6 +3439,14 @@
                     // Plain product name without variation details
                     const short = rawName.length > 50 ? rawName.substring(0, 50) + '...' : rawName;
                     out += '<div style="font-size:11px;font-weight:600;line-height:1.4;">' + (qty > 1 ? qty + '× ' : '') + esc(short) + '</div>';
+                    // Show bundle contents if available
+                    if (item.bundleContents && item.bundleContents.length > 0) {
+                        for (const bc of item.bundleContents) {
+                            const colorMatch = bc.desc.match(/^(\S+)/);
+                            const dot = colorMatch ? colorDot(colorMatch[1]) : '';
+                            out += '<div style="font-size:10px;line-height:1.3;color:var(--text-secondary);padding-left:8px;">' + (dot || '• ') + esc(bc.qty + '× ' + bc.desc) + '</div>';
+                        }
+                    }
                 }
             }
             return out;

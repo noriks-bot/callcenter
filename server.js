@@ -124,6 +124,7 @@ async function warmRAM() {
     if (cartsRes.status === 'fulfilled' && cartsRes.value.length > 0) {
       // Enrich "Product #XXXX" with real names from WooCommerce
       await enrichCartProductNames(cartsRes.value);
+      await enrichBundleContents(cartsRes.value);
       dbWrite('carts', cartsRes.value);
     }
     if (pendingRes.status === 'fulfilled' && pendingRes.value.length > 0) {
@@ -377,6 +378,10 @@ function enrichCartsFromCache(carts) {
           if ((item.name || '').startsWith('Product #')) item.name = cache[key];
           // Always set productTitle for frontend display
           item.productTitle = cache[key].replace(/\s*\([^)]*\)\s*$/, ''); // strip size suffix like "(XL)"
+          // Add bundle contents if available
+          const bundleCache = getBundleContentsCache();
+          const bundleKey = cart.storeCode + '_' + item.productId;
+          if (bundleCache[bundleKey]) item.bundleContents = bundleCache[bundleKey];
         }
       }
     }
@@ -384,6 +389,94 @@ function enrichCartsFromCache(carts) {
   return carts;
 }
 
+
+// ========== BUNDLE CONTENTS CACHE ==========
+// Cache bundle/pack product contents from WC short_description
+const BUNDLE_CONTENTS_CACHE_KEY = 'bundle_contents';
+
+function getBundleContentsCache() {
+  return dbReadData(BUNDLE_CONTENTS_CACHE_KEY) || {};
+}
+
+function saveBundleContentsCache(cache) {
+  dbWrite(BUNDLE_CONTENTS_CACHE_KEY, cache);
+}
+
+function parseBundleContents(shortDesc) {
+  if (!shortDesc) return null;
+  // Strip HTML tags
+  const text = shortDesc.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
+  // Match "Komplet sadrži:", "Contains:", "Contiene:", "Zawiera:", etc.
+  const m = text.match(/(?:komplet\s+)?(?:sadrži|contains|contiene|zawiera|tartalmaz|obsahuje|περιέχει|enthält)[:\s]+(.*?)(?:\.|$)/i);
+  if (!m) return null;
+  const raw = m[1].trim().replace(/\.$/, '');
+  // Parse "2x crne bokserice, 3x plave bokserice i 1x crvene bokserice"
+  // Split on comma and "i "/"and "/"und "/"e "/"και "/"a "/"oraz "
+  const parts = raw.split(/,\s*|\s+(?:i|and|und|e|και|a|oraz|és)\s+/i).filter(Boolean);
+  const items = [];
+  for (const part of parts) {
+    const pm = part.trim().match(/^(\d+)\s*x?\s+(.+)$/i);
+    if (pm) {
+      items.push({ qty: parseInt(pm[1]), desc: pm[2].trim() });
+    } else if (part.trim()) {
+      items.push({ qty: 1, desc: part.trim() });
+    }
+  }
+  return items.length > 0 ? items : null;
+}
+
+async function fetchBundleContents(storeCode, productId) {
+  const cache = getBundleContentsCache();
+  const key = storeCode + '_' + productId;
+  if (cache[key]) return cache[key];
+  
+  try {
+    const product = await wcApiRequest(storeCode, 'products/' + productId);
+    if (product && product.short_description) {
+      const contents = parseBundleContents(product.short_description);
+      if (contents) {
+        cache[key] = contents;
+        saveBundleContentsCache(cache);
+        console.log('[BundleCache] ✓', key, '→', contents.length, 'items');
+        return contents;
+      }
+    }
+  } catch (e) {
+    console.error('[BundleCache] Error fetching', key, ':', e.message);
+  }
+  return null;
+}
+
+// Enrich cart items with bundle contents during warm/refresh
+async function enrichBundleContents(carts) {
+  const cache = getBundleContentsCache();
+  const toFetch = new Set();
+  
+  for (const cart of carts) {
+    for (const item of (cart.cartContents || [])) {
+      if (!item.productId) continue;
+      const key = cart.storeCode + '_' + item.productId;
+      if (!cache[key]) {
+        // Check if name suggests it's a pack/bundle
+        const n = (item.name || '').toLowerCase();
+        if (n.includes('paket') || n.includes('balíček') || n.includes('pakiet') || n.includes('csomag') || 
+            n.includes('pacchetto') || n.includes('συσκευασία') || n.includes('pack') || n.includes('komplet') ||
+            n.includes('mix') || n.includes('μιξ') || n.includes('miješani') || n.includes('sada') || n.includes('set') || n.includes('σετ')) {
+          toFetch.add(JSON.stringify({ storeCode: cart.storeCode, productId: item.productId }));
+        }
+      }
+    }
+  }
+  
+  if (toFetch.size === 0) return;
+  const items = [...toFetch].map(s => JSON.parse(s));
+  console.log('[BundleCache] Fetching contents for', items.length, 'pack products...');
+  
+  for (let i = 0; i < items.length; i += 3) {
+    const batch = items.slice(i, i + 3);
+    await Promise.allSettled(batch.map(r => fetchBundleContents(r.storeCode, r.productId)));
+  }
+}
 
 // Extract variation details from WC line item meta_data
 function extractLineItemDetails(item) {
@@ -1586,7 +1679,7 @@ app.get('/api/force-refresh', async (req, res) => {
   try {
     const results = await Promise.allSettled([
       fetchAbandonedCarts().then(async carts => {
-        if (carts && carts.length > 0) { await enrichCartProductNames(carts); dbWrite('carts', carts); }
+        if (carts && carts.length > 0) { await enrichCartProductNames(carts); await enrichBundleContents(carts); dbWrite('carts', carts); }
         return (carts || []).length;
       }),
       fetchPendingOrders().then(orders => {
@@ -1879,6 +1972,7 @@ function startBackgroundRefresh() {
       fetchAbandonedCarts().then(async carts => {
         if (carts && carts.length > 0) {
           await enrichCartProductNames(carts);
+          await enrichBundleContents(carts);
           dbWrite('carts', carts);
         }
         console.log('[Cron] ✓ Carts:', (carts || []).length);
