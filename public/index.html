@@ -4209,7 +4209,7 @@
         }
 
         // ===== Upsell =====
-        let upsellType = null, upsellQty = 0, upsellSize = 'XL', upsellCard = null;
+        let upsellType = null, upsellQty = 0, upsellSize = null, upsellCard = null;
 
         function upsellClick(type, qty, cardEl) {
             const panel = document.getElementById('upsellConfig');
@@ -4234,7 +4234,7 @@
             ).join('');
             // Color rows
             const container = document.getElementById('upsellColorRows');
-            const colorOpts = getColorsForType(upsellType).map(c =>
+            const colorOpts = '<option value="">-- Izberi barvo --</option>' + getColorsForType(upsellType).map(c =>
                 '<option value="' + c.name + '">' + c.name + '</option>'
             ).join('');
             let rows = '<label style="font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;display:block;">Barve:</label>';
@@ -4242,17 +4242,29 @@
                 rows += '<div class="qb-color-row"><span class="qb-piece-label">' + (i+1) + '.</span><select class="qb-color-select" id="upsellColor_' + i + '">' + colorOpts + '</select></div>';
             }
             container.innerHTML = rows;
-            const defaults = ['Črna','Siva','Temno modra','Zelena','Rdeča','Bela','Rjava','Modra','Bež','Oranžna','Vijolična','Roza'];
-            for (let i = 0; i < upsellQty; i++) {
-                const sel = document.getElementById('upsellColor_' + i);
-                if (sel) sel.value = defaults[i % defaults.length];
-            }
+            // No auto-defaults - user must pick all colors
         }
 
         function upsellSetSize(s) { upsellSize = s; renderUpsellConfig(); }
 
         function upsellAdd() {
             if (!upsellType || !upsellQty) return;
+            // Validate size selected
+            if (!upsellSize) {
+                showToast('⚠️ Izberi velikost!', 'error');
+                const szBtns = document.getElementById('upsellSizeBtns');
+                if (szBtns) { szBtns.style.outline = '2px solid #ef4444'; szBtns.style.borderRadius = '8px'; setTimeout(() => { szBtns.style.outline = 'none'; }, 2000); }
+                return;
+            }
+            // Validate all colors selected
+            for (let i = 0; i < upsellQty; i++) {
+                const sel = document.getElementById('upsellColor_' + i);
+                if (!sel || !sel.value) {
+                    showToast('⚠️ Izberi vse barve!', 'error');
+                    if (sel) { sel.style.outline = '2px solid #ef4444'; setTimeout(() => { sel.style.outline = 'none'; }, 2000); }
+                    return;
+                }
+            }
             const price = QB_PRICES[upsellType] || 9.99;
             const typeNames = { bokserice: 'Bokserice', majice: 'Majice' };
             const colorParts = [];
