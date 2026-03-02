@@ -631,19 +631,50 @@ async function fetchAbandonedCarts() {
               try {
                 const pairs = typeof item._orto_pairs_json === 'string' ? JSON.parse(item._orto_pairs_json) : item._orto_pairs_json;
                 const sizePattern = /^(XS|S|M|L|XL|XXL|2XL|3XL|4XL|5XL|6XL|\d{2,3}(-\d{2,3})?)$/i;
-                const pairList = Object.values(pairs).map(p => {
-                  // Decode URL-encoded keys and get all values
-                  const vals = {};
+                const pairList = [];
+                
+                for (const p of Object.values(pairs)) {
+                  // Decode all attribute keys
+                  const decoded = {};
                   for (const [k, v] of Object.entries(p)) {
-                    const decodedKey = decodeURIComponent(k).replace('attribute_', '').toLowerCase();
-                    vals[decodedKey] = v;
+                    decoded[decodeURIComponent(k).replace('attribute_', '').toLowerCase()] = v;
                   }
-                  const allVals = Object.values(vals).filter(Boolean);
-                  // Separate size from color by pattern
-                  const size = allVals.find(v => sizePattern.test(v)) || '';
-                  const color = allVals.find(v => v !== size) || '';
-                  return (color && size) ? color + ' - ' + size : (color || size || 'Unknown');
-                });
+                  
+                  // Check if attributes have numbered suffixes (barva-boxerek-1, velikost-boxerek-1, barva-boxerek-2...)
+                  const keys = Object.keys(decoded);
+                  const numberedGroups = {};
+                  let hasGroups = false;
+                  
+                  for (const k of keys) {
+                    // Match patterns like "barva-boxerek-1" or "velikost-tricka" or just "boja"
+                    const numMatch = k.match(/^(.+?)-?(\d+)?$/);
+                    const baseKey = numMatch ? numMatch[1] : k;
+                    const num = numMatch && numMatch[2] ? numMatch[2] : '0';
+                    // Group by the suffix (item type + number)
+                    const suffixMatch = k.match(/-([a-z]+-\d+)$/) || k.match(/-([a-z]+)$/);
+                    const group = suffixMatch ? suffixMatch[1] : '0';
+                    if (!numberedGroups[group]) numberedGroups[group] = {};
+                    numberedGroups[group][baseKey] = decoded[k];
+                    if (suffixMatch) hasGroups = true;
+                  }
+                  
+                  if (hasGroups && Object.keys(numberedGroups).length > 1) {
+                    // Multi-item pair (e.g., CZ boxerky-1, boxerky-2 or trička + boxerky)
+                    for (const [grp, attrs] of Object.entries(numberedGroups)) {
+                      const vals = Object.values(attrs).filter(Boolean);
+                      const size = vals.find(v => sizePattern.test(v)) || '';
+                      const color = vals.find(v => v !== size) || '';
+                      if (color || size) pairList.push((color && size) ? color + ' - ' + size : (color || size));
+                    }
+                  } else {
+                    // Simple pair (2 attrs: color + size)
+                    const allVals = Object.values(decoded).filter(Boolean);
+                    const size = allVals.find(v => sizePattern.test(v)) || '';
+                    const color = allVals.find(v => v !== size) || '';
+                    pairList.push((color && size) ? color + ' - ' + size : (color || size || 'Unknown'));
+                  }
+                }
+                
                 name = pairList.join(', ');
                 pairsData = pairList;
               } catch(e) {
