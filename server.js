@@ -128,6 +128,18 @@ async function warmRAM() {
       dbWrite('pending', pendingRes.value);
     }
 
+    // Paketomati: seed from file cache if DB empty
+    if (dbReadData('paketomati').length === 0) {
+      const pakFile = path.join(DATA_DIR, 'paketomati-cache.json');
+      if (fs.existsSync(pakFile)) {
+        const pd = readJson(pakFile, { orders: [] });
+        if (pd.orders && pd.orders.length > 0) {
+          dbWrite('paketomati', pd.orders);
+          console.log('[DB] Paketomati seeded from file cache:', pd.orders.length);
+        }
+      }
+    }
+
     // Buyers: try file cache for fast startup, then fetch fresh in background
     const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
     if (dbReadData('buyers').length === 0 && fs.existsSync(buyersCacheFile)) {
@@ -1003,25 +1015,23 @@ async function buildPaketomatiCache() {
 
   const cacheData = { generated_at: new Date().toISOString(), orders: paketomatOrders };
   writeJson(path.join(DATA_DIR, 'paketomati-cache.json'), cacheData);
+  // Persist to SQLite
+  if (paketomatOrders.length > 0) dbWrite('paketomati', paketomatOrders);
+  console.log('[DB] Paketomati persisted:', paketomatOrders.length);
   return cacheData;
 }
 
 function fetchPaketomatOrders(filter = 'all') {
-  const cacheFile = path.join(DATA_DIR, 'paketomati-cache.json');
-  if (fs.existsSync(cacheFile)) {
-    const cacheData = readJson(cacheFile, { orders: [] });
-    let orders = cacheData.orders || [];
-    const statusData = loadPaketomatStatus();
-    for (const order of orders) {
-      const saved = statusData[order.id];
-      if (saved) { order.status = saved.status || order.status; order.notes = saved.notes || order.notes; }
-    }
-    if (filter !== 'all' && filter !== 'debug') {
-      orders = orders.filter(o => (o.status || 'not_called') === filter);
-    }
-    return orders;
+  let orders = RAM.paketomati;
+  const statusData = loadPaketomatStatus();
+  for (const order of orders) {
+    const saved = statusData[order.id];
+    if (saved) { order.status = saved.status || order.status; order.notes = saved.notes || order.notes; }
   }
-  return [];
+  if (filter !== 'all' && filter !== 'debug') {
+    orders = orders.filter(o => (o.status || 'not_called') === filter);
+  }
+  return orders;
 }
 
 // ========== POLL FOR NEW ITEMS ==========
@@ -1831,6 +1841,7 @@ app.get('/', (req, res) => {
     carts: mergeCalls(RAM.carts),
     pending: mergeCalls(RAM.pending),
     buyers: mergeCalls(RAM.buyers),
+    paketomati: RAM.paketomati,
     ready: RAM.ready,
     lastRefresh: RAM.lastRefresh
   };
