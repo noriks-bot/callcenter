@@ -1,0 +1,326 @@
+{
+  "generated_at": "2026-03-02T17:38:00.721Z",
+  "orders": [
+    {
+      "id": "mk_5351/2026",
+      "orderNumber": "5351/2026",
+      "customer": {
+        "name": "Jaroslav Kosnar",
+        "email": "obchod@jarkos.com",
+        "phone": "+420777302988"
+      },
+      "address": {
+        "street": "V průčelí 1655/4, 101",
+        "city": "Praha 11",
+        "postcode": "149 00",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2172138192395",
+      "trackingLink": "https://expedico.eu/tracking?code=2172138192395",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 3080,
+      "currency": "CZK",
+      "createdAt": "2026-02-26+02:00",
+      "shippedAt": "2026-02-27+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "Crne bokserice 3-paket - 3XL",
+          "quantity": 1,
+          "price": 670
+        },
+        {
+          "name": "Bijele majice 3-paket - 3XL",
+          "quantity": 1,
+          "price": 1205
+        },
+        {
+          "name": "3-Paket Crnih Majica - 3XL",
+          "quantity": 1,
+          "price": 1205
+        }
+      ]
+    },
+    {
+      "id": "mk_5344/2026",
+      "orderNumber": "5344/2026",
+      "customer": {
+        "name": "Petar Fabijanić",
+        "email": "pero.fabijanic@gmail.com",
+        "phone": "0917342496"
+      },
+      "address": {
+        "street": "Lussijeva Ulica, 6",
+        "city": "Pula - Pola",
+        "postcode": "52100",
+        "country": "Croatia"
+      },
+      "deliveryService": "NORIKS HR POŠTA",
+      "trackingCode": "LD522341172HR",
+      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD522341172HR",
+      "paketomatLocation": "Pošiljka predana u paketomat",
+      "lastDeliveryEvent": "Pošiljka predana u paketomat",
+      "orderTotal": 47.98,
+      "currency": "EUR",
+      "createdAt": "2026-02-26+02:00",
+      "shippedAt": "2026-02-27+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hr",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 44.99
+        },
+        {
+          "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5321/2026",
+      "orderNumber": "5321/2026",
+      "customer": {
+        "name": "Vlastimil kuchynka",
+        "email": "kuchynkavl@seznam.cz",
+        "phone": "737927220"
+      },
+      "address": {
+        "street": "Kroučová 54, 54",
+        "city": "Kroučová",
+        "postcode": "270 54",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2171267104389",
+      "trackingLink": "https://expedico.eu/tracking?code=2171267104389",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 898,
+      "currency": "CZK",
+      "createdAt": "2026-02-25+02:00",
+      "shippedAt": "2026-02-26+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 829
+        }
+      ]
+    },
+    {
+      "id": "mk_5303/2026",
+      "orderNumber": "5303/2026",
+      "customer": {
+        "name": "Ondřej Daněk",
+        "email": "odanek.bn@gmail.com",
+        "phone": "606615049"
+      },
+      "address": {
+        "street": "Wolkerova 667, 1",
+        "city": "Benešov",
+        "postcode": "256 01",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2169546237664",
+      "trackingLink": "https://expedico.eu/tracking?code=2169546237664",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 444,
+      "currency": "CZK",
+      "createdAt": "2026-02-25+02:00",
+      "shippedAt": "2026-02-25+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS | Starter paket",
+          "quantity": 1,
+          "price": 375
+        }
+      ]
+    },
+    {
+      "id": "mk_5293/2026",
+      "orderNumber": "5293/2026",
+      "customer": {
+        "name": "Milan Dalecký",
+        "email": "milan.dalecky@gmail.com",
+        "phone": "+420792283345"
+      },
+      "address": {
+        "street": "Jaromírova 174/46, Jaromírova 46",
+        "city": "Praha",
+        "postcode": "128 00",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2169546237663",
+      "trackingLink": "https://expedico.eu/tracking?code=2169546237663",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 444,
+      "currency": "CZK",
+      "createdAt": "2026-02-24+02:00",
+      "shippedAt": "2026-02-25+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS | Starter paket",
+          "quantity": 1,
+          "price": 375
+        }
+      ]
+    },
+    {
+      "id": "mk_5252/2026",
+      "orderNumber": "5252/2026",
+      "customer": {
+        "name": "Pavel Kalous",
+        "email": "pavka.64@seznam.cz",
+        "phone": "702916887"
+      },
+      "address": {
+        "street": "Volgogradská 2504/31, Byt č 8",
+        "city": "Ostrava Jih",
+        "postcode": "700 30",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2159889527349",
+      "trackingLink": "https://expedico.eu/tracking?code=2159889527349",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 534,
+      "currency": "CZK",
+      "createdAt": "2026-02-22+02:00",
+      "shippedAt": "2026-02-23+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS | Starter paket",
+          "quantity": 1,
+          "price": 465
+        }
+      ]
+    },
+    {
+      "id": "mk_5219/2026",
+      "orderNumber": "5219/2026",
+      "customer": {
+        "name": "Jiri Gorol",
+        "email": "jirkagorol86@gmail.com",
+        "phone": "+420604136020"
+      },
+      "address": {
+        "street": "Podolská 1049/56, Podoli",
+        "city": "Praha 4",
+        "postcode": "147 00",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2159889527357",
+      "trackingLink": "https://expedico.eu/tracking?code=2159889527357",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 1274,
+      "currency": "CZK",
+      "createdAt": "2026-02-22+02:00",
+      "shippedAt": "2026-02-23+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "Pobřežní 3-balíček - XL",
+          "quantity": 1,
+          "price": 1205
+        }
+      ]
+    },
+    {
+      "id": "mk_5175/2026",
+      "orderNumber": "5175/2026",
+      "customer": {
+        "name": "Monika Bárnetová",
+        "email": "barnetova123@seznam.cz",
+        "phone": "731 922 616"
+      },
+      "address": {
+        "street": "Rudoltice, 623",
+        "city": "Rudoltice",
+        "postcode": "561 25",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2159889527346",
+      "trackingLink": "https://expedico.eu/tracking?code=2159889527346",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 1064,
+      "currency": "CZK",
+      "createdAt": "2026-02-20+02:00",
+      "shippedAt": "2026-02-23+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 995
+        }
+      ]
+    },
+    {
+      "id": "mk_5156/2026",
+      "orderNumber": "5156/2026",
+      "customer": {
+        "name": "Josef Šťastný",
+        "email": "luckyman6666@seznam.cz",
+        "phone": "776602126"
+      },
+      "address": {
+        "street": "K. Weise 2517/16, České Budějovice",
+        "city": "Jihočeský Kraj",
+        "postcode": "370 04",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2171267104386",
+      "trackingLink": "https://expedico.eu/tracking?code=2171267104386",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 739,
+      "currency": "CZK",
+      "createdAt": "2026-02-20+02:00",
+      "shippedAt": "2026-02-26+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 670
+        }
+      ]
+    }
+  ]
+}

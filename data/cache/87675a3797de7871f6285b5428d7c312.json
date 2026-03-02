@@ -1,5 +1,30 @@
 [
   {
+    "id": "hr_buyer_2fc4b24022e3c5b0085c331da4b6ff25",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5736,
+    "customerName": "Blanka Vuka",
+    "email": "bvuka59@gmai.com",
+    "phone": "0981928120",
+    "location": "Osijek",
+    "totalSpent": 34.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-20T17:07:41",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal",
+        "quantity": 1,
+        "total": 31.99
+      }
+    ]
+  },
+  {
     "id": "it_buyer_04c9b7382576e576cffbbe70aaf32091",
     "storeCode": "it",
     "storeName": "Italy",

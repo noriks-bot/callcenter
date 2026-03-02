@@ -2548,46 +2548,29 @@
             console.log('[Init] Starting application...');
             const startTime = Date.now();
 
-            // === INSTANT UI: Show skeleton immediately, no blocking loader ===
-            currentTab = 'leads';
-            currentContentTab = 'carts';
-            document.getElementById('pageTitle').textContent = 'Leads';
+            // Show global loading state
+            loadingState.show('init');
 
-            // Hide ALL special content areas
-            ['smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
-             'buyersSettingsContent', 'agentsContent', 'followupsContent'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-
-            // Show main UI IMMEDIATELY with skeleton content
-            document.getElementById('main').style.display = 'block';
-            document.querySelector('.stats-grid').style.display = 'grid';
-            document.querySelector('.country-tabs').style.display = 'flex';
-            document.getElementById('contentTabs').style.display = 'flex';
-            document.querySelector('.content').style.display = 'block';
-
-            // Show skeleton in table while data loads
-            showLoadingSkeleton('tableBody');
-
-            // Update sidebar
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.querySelector('.nav-item[data-tab="leads"]')?.classList.add('active');
-
-            console.log(`[Init] UI visible in ${Date.now() - startTime}ms — loading data in background...`);
-
-            // === BACKGROUND DATA LOADING (non-blocking) ===
             try {
-                // 1. Load stores (needed for country tabs)
-                const storesResult = await apiFetch('/api/stores', { component: 'Stores', retries: 3, silent: true });
-                if (storesResult.success && storesResult.data) {
-                    stores = storesResult.data;
-                    renderCountryTabs();
-                    setupContentTabs();
-                }
-                console.log(`[Init] Stores loaded in ${Date.now() - startTime}ms`);
+                // 1. Load stores (critical - app won't work without it)
+                console.log('[Init] Loading stores...');
+                const storesResult = await apiFetch('/api/stores', {
+                    component: 'Stores',
+                    retries: 3
+                });
 
-                // 2. Load ALL data in parallel — UI already visible
+                if (!storesResult.success || !storesResult.data) {
+                    throw new Error('Napaka pri nalaganju trgovin');
+                }
+                stores = storesResult.data;
+                console.log('[Init] Stores loaded:', stores.length);
+
+                // 2. Render UI components
+                renderCountryTabs();
+                setupContentTabs();
+
+                // 3. Load all data in parallel with graceful degradation
+                console.log('[Init] Loading all data in parallel...');
                 const results = await Promise.allSettled([
                     loadAllDataBulletproof(),
                     loadSmsDataBulletproof(),
@@ -2595,29 +2578,59 @@
                     loadPaketomatiBulletproof()
                 ]);
 
+                // Log results
                 const labels = ['MainData', 'SmsData', 'SmsTemplates', 'Paketomati'];
                 results.forEach((result, i) => {
                     if (result.status === 'fulfilled') {
-                        console.log(`[Init] ✓ ${labels[i]} loaded`);
+                        console.log(`[Init] ✓ ${labels[i]} loaded successfully`);
                     } else {
                         console.error(`[Init] ✗ ${labels[i]} failed:`, result.reason);
                     }
                 });
 
+                // Update counts after all data loaded
                 updateContentTabCounts();
+
+                // 4. Set default view - LEADS (shows carts/pending/buyers tabs)
+                currentTab = 'leads';
+                currentContentTab = 'carts';
+                document.getElementById('pageTitle').textContent = 'Leads';
+
+                // Hide ALL special content areas first (ensures clean state)
+                ['smsAutomationContent', 'smsDashboardContent', 'smsSettingsContent', 
+                 'buyersSettingsContent', 'agentsContent', 'followupsContent'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+
+                // Show the main content area
+                document.getElementById('main').style.display = 'block';
+                document.querySelector('.stats-grid').style.display = 'grid';
+                document.querySelector('.country-tabs').style.display = 'flex';
+                document.getElementById('contentTabs').style.display = 'flex';
+                document.querySelector('.content').style.display = 'block';
+
+                // Update sidebar - Leads is active by default
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelector('.nav-item[data-tab="leads"]')?.classList.add('active');
+
                 renderTable();
 
-                console.log(`[Init] ✓ All data ready in ${Date.now() - startTime}ms`);
+                const loadTime = Date.now() - startTime;
+                console.log(`[Init] ✓ Application ready in ${loadTime}ms`);
 
-                // Handle hash navigation
+                // Handle hash navigation (from sidebar links)
                 if (window.location.hash) {
-                    const hash = window.location.hash.substring(1);
+                    const hash = window.location.hash.substring(1); // Remove #
                     const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
-                    if (navItem) navItem.click();
+                    if (navItem) {
+                        navItem.click();
+                    }
                 }
 
-                // Auto-refresh every 5 minutes
+                // Auto-refresh data every 5 minutes (300000ms)
                 setInterval(async () => {
+                    console.log('[AutoRefresh] Refreshing data...');
                     try {
                         await loadAllDataBulletproof();
                         console.log('[AutoRefresh] ✓ Data refreshed');
@@ -2627,8 +2640,22 @@
                 }, 5 * 60 * 1000);
 
             } catch (error) {
-                console.error('[Init] Error loading data:', error);
-                showToast(`❌ Napaka: ${error.message}`, 'error');
+                console.error('[Init] Critical error:', error);
+                showToast(`❌ Napaka pri zagonu: ${error.message}`, 'error');
+
+                // Show error state in main content
+                document.querySelector('.content').innerHTML = `
+                    <div style="padding:60px;text-align:center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:var(--accent-red);margin-bottom:20px;display:block;"></i>
+                        <h3 style="margin-bottom:12px;">Napaka pri nalaganju aplikacije</h3>
+                        <p style="color:var(--text-muted);margin-bottom:20px;">${error.message}</p>
+                        <button class="btn btn-save" onclick="location.reload()">
+                            <i class="fas fa-redo"></i> Ponovno naloži
+                        </button>
+                    </div>
+                `;
+            } finally {
+                loadingState.hide('init');
             }
         }
 
