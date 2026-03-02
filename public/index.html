@@ -3584,7 +3584,56 @@
             }
             return out;
         }
-function renderCartsTable(data, totalItems, totalPages) {
+
+        function renderModalItemName(item) {
+            const rawName = item.name || 'Unknown';
+            // Check for "ProductName: variation1, variation2" format
+            const colonIdx = rawName.indexOf(': ');
+            if (colonIdx > 0) {
+                const before = rawName.substring(0, colonIdx);
+                const after = rawName.substring(colonIdx + 2);
+                if (after.includes(' - ') || after.split(',').length > 1) {
+                    const parts = after.split(/,\s*/);
+                    let out = '<strong>' + esc(before) + '</strong>';
+                    for (const p of parts.slice(0, 6)) {
+                        const cleaned = p.replace(/^.+?\d*\s*:\s*/, '').trim();
+                        const dm = cleaned.match(/^(.+?)\s*-\s*(.+)$/);
+                        const dot = dm ? colorDot(dm[1].trim()) : '';
+                        out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + esc(cleaned) + '</div>';
+                    }
+                    if (parts.length > 6) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:4px;">+' + (parts.length - 6) + ' more</div>';
+                    return out;
+                }
+            }
+            // Check for comma-separated variations
+            const parts = rawName.split(/,\s*/);
+            if (parts.length > 1 && parts.some(p => p.includes(' - '))) {
+                const pTitle = item.productTitle || '';
+                let out = '<strong>' + esc(pTitle || parts.length + ' kos') + '</strong>';
+                for (const p of parts.slice(0, 6)) {
+                    const cleaned = p.replace(/^.+?\d*\s*:\s*/, '').trim();
+                    const dm = cleaned.match(/^(.+?)\s*-\s*(.+)$/);
+                    const dot = dm ? colorDot(dm[1].trim()) : '';
+                    out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + esc(cleaned) + '</div>';
+                }
+                if (parts.length > 6) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:4px;">+' + (parts.length - 6) + ' more</div>';
+                return out;
+            }
+            // Plain name with optional bundle contents
+            let out = '<strong>' + esc(rawName.length > 60 ? rawName.substring(0, 60) + '...' : rawName) + '</strong>';
+            if (item.bundleContents && item.bundleContents.length > 0) {
+                for (const bc of item.bundleContents) {
+                    const words = bc.desc.split(/\s+/);
+                    const dot = colorDot(words[0]);
+                    out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + esc(bc.qty + '× ' + bc.desc) + '</div>';
+                }
+            } else if (item.sku) {
+                out += '<div style="font-size:10px;color:var(--text-muted);">SKU: ' + esc(item.sku) + '</div>';
+            }
+            return out;
+        }
+
+        function renderCartsTable(data, totalItems, totalPages) {
             const getSortClass = (col) => sortColumn === col ? sortDirection : '';
             // Clear selection when table changes
             selectedItems.clear();
@@ -4139,8 +4188,7 @@ function renderCartsTable(data, totalItems, totalPages) {
                 <div class="order-item">
                     ${item.image ? `<img src="${item.image}" alt="" style="width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
                     <div class="order-item-info">
-                        <div class="order-item-name">${esc(item.name)}</div>
-                        ${item.sku ? `<div class="order-item-id" style="font-size:10px;color:var(--text-muted);">SKU: ${esc(item.sku)}</div>` : ''}
+                        <div class="order-item-name">${renderModalItemName(item)}</div>
                     </div>
                     <div class="order-item-controls">
                         <div>
