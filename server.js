@@ -1,4 +1,6 @@
 const express = require('express');
+const { dbWrite, dbRead, dbReadData, dbLastRefresh } = require('./db');
+
 const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
@@ -99,51 +101,60 @@ function clearAllCache() {
 
 
 // ========== RAM CACHE (instant responses) ==========
+// RAM is now backed by SQLite — reads from DB, writes on refresh
 const RAM = {
-  carts: [],
-  pending: [],
-  buyers: [],
-  paketomati: [],
-  ready: false,
-  lastRefresh: null
+  get carts() { return dbReadData('carts'); },
+  get pending() { return dbReadData('pending'); },
+  get buyers() { return dbReadData('buyers'); },
+  get paketomati() { return dbReadData('paketomati'); },
+  get ready() { return dbReadData('carts').length > 0 || dbRead('carts') !== null; },
+  get lastRefresh() { return dbLastRefresh(); }
 };
 
 // Warm RAM cache on startup, then refresh every 5 min
 async function warmRAM() {
   const start = Date.now();
-  console.log('[RAM] Warming cache...');
+  console.log('[RAM] Warming cache from WooCommerce APIs...');
   try {
     const [cartsRes, pendingRes] = await Promise.allSettled([
       fetchAbandonedCarts(),
       fetchPendingOrders()
     ]);
-    // Atomic swap: only replace if fetch succeeded, keep old data on failure
-    if (cartsRes.status === 'fulfilled' && cartsRes.value.length > 0) RAM.carts = cartsRes.value;
-    if (pendingRes.status === 'fulfilled' && pendingRes.value.length > 0) RAM.pending = pendingRes.value;
-    
-    // Buyers: try file cache first for fast startup, then fetch fresh in background
+    // Only write to DB if fetch succeeded and returned data
+    if (cartsRes.status === 'fulfilled' && cartsRes.value.length > 0) {
+      dbWrite('carts', cartsRes.value);
+    }
+    if (pendingRes.status === 'fulfilled' && pendingRes.value.length > 0) {
+      dbWrite('pending', pendingRes.value);
+    }
+
+    // Buyers: try file cache for fast startup, then fetch fresh in background
     const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
-    if (fs.existsSync(buyersCacheFile)) {
+    if (dbReadData('buyers').length === 0 && fs.existsSync(buyersCacheFile)) {
       const bd = readJson(buyersCacheFile, {});
-      RAM.buyers = bd.buyers || [];
-      console.log('[RAM] Buyers loaded from file cache:', RAM.buyers.length);
+      if (bd.buyers && bd.buyers.length > 0) {
+        dbWrite('buyers', bd.buyers);
+        console.log('[DB] Buyers seeded from file cache:', bd.buyers.length);
+      }
     }
     // Fetch fresh buyers in background (don't block startup)
     fetchOneTimeBuyers(null).then(buyers => {
-      RAM.buyers = buyers;
-      writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), generated_date: new Date().toISOString(), count: buyers.length, buyers });
-      console.log('[RAM] Buyers refreshed:', buyers.length);
-    }).catch(e => console.error('[RAM] Buyers refresh failed:', e.message));
-    
-    RAM.ready = true;
-    RAM.lastRefresh = new Date().toISOString();
-    console.log(`[RAM] Cache warm: ${RAM.carts.length} carts, ${RAM.pending.length} pending, ${RAM.buyers.length} buyers in ${Date.now()-start}ms`);
+      if (buyers && buyers.length > 0) {
+        dbWrite('buyers', buyers);
+        writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), count: buyers.length, buyers });
+        console.log('[DB] Buyers refreshed:', buyers.length);
+      }
+    }).catch(e => console.error('[DB] Buyers refresh failed:', e.message));
+
+    const carts = dbReadData('carts');
+    const pending = dbReadData('pending');
+    const buyers = dbReadData('buyers');
+    console.log(`[DB] Cache warm: ${carts.length} carts, ${pending.length} pending, ${buyers.length} buyers in ${Date.now()-start}ms`);
   } catch(e) {
-    console.error('[RAM] Warm failed:', e.message);
+    console.error('[DB] Warm failed:', e.message);
   }
 }
 
-// Background refresh loop
 // (first startBackgroundRefresh removed - merged into second)
 
 // ========== DATA FILE PATHS ==========
@@ -1683,23 +1694,24 @@ function startBackgroundRefresh() {
       clearAllCache();
       await warmRAM();
       await warmAllCaches();
-      // Refresh buyers in background
+      // Refresh buyers
       try {
         const freshBuyers = await fetchOneTimeBuyers(null);
         if (freshBuyers && freshBuyers.length > 0) {
-          RAM.buyers = freshBuyers;
+          dbWrite('buyers', freshBuyers);
           const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
           writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), count: freshBuyers.length, buyers: freshBuyers });
-          console.log('[RAM] Buyers refreshed:', freshBuyers.length);
+          console.log('[DB] Buyers refreshed:', freshBuyers.length);
         }
-      } catch(e) { console.error('[RAM] Buyers refresh failed:', e.message); }
-      console.log('[RAM] Background refresh complete');
+      } catch(e) { console.error('[DB] Buyers refresh failed:', e.message); }
+      console.log('[DB] Background refresh complete');
     } catch (e) {
       console.error('[Cron] Refresh error:', e.message);
     }
   }, 5 * 60 * 1000);
   console.log('[Cron] Background refresh scheduled every 5 minutes');
 }
+
 
 // ========== FIX 5: Pending orders filtered by country ==========
 app.get('/api/pending-orders-count', async (req, res) => {
@@ -1832,13 +1844,28 @@ app.get('/', (req, res) => {
   res.send(html);
 });
 
-// Warm RAM BEFORE listening so first request always has data
+// Start server — SQLite has persistent data, so we can listen immediately
 (async () => {
-  await warmRAM();
-  app.listen(PORT, () => {
-    console.log(`🎧 Noriks Call Center running on port ${PORT}`);
-    startBackgroundRefresh();
-    console.log('[RAM] Background refresh scheduled every 5 minutes');
-    setTimeout(() => warmAllCaches(), 2000);
-  });
+  const dbCarts = dbReadData('carts');
+  const dbPending = dbReadData('pending');
+  const dbBuyers = dbReadData('buyers');
+  
+  if (dbCarts.length > 0 || dbPending.length > 0 || dbBuyers.length > 0) {
+    console.log(`[DB] Found persistent data: ${dbCarts.length} carts, ${dbPending.length} pending, ${dbBuyers.length} buyers`);
+    console.log('[DB] Starting server immediately, refreshing in background...');
+    app.listen(PORT, () => {
+      console.log(`🎧 Noriks Call Center running on port ${PORT}`);
+      startBackgroundRefresh();
+      // Refresh data in background (non-blocking)
+      warmRAM().then(() => warmAllCaches()).catch(e => console.error('[DB] Background warm failed:', e.message));
+    });
+  } else {
+    console.log('[DB] No persistent data found, warming from APIs first...');
+    await warmRAM();
+    app.listen(PORT, () => {
+      console.log(`🎧 Noriks Call Center running on port ${PORT}`);
+      startBackgroundRefresh();
+      setTimeout(() => warmAllCaches(), 2000);
+    });
+  }
 })();

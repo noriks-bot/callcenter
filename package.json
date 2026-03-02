@@ -7,11 +7,17 @@
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
-  "keywords": ["callcenter", "noriks", "woocommerce", "klaviyo"],
+  "keywords": [
+    "callcenter",
+    "noriks",
+    "woocommerce",
+    "klaviyo"
+  ],
   "author": "Noriks",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.13.5",
+    "better-sqlite3": "^12.6.2",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1"
