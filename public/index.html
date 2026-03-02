@@ -904,14 +904,14 @@
                 </select>
                 <select class="filter-select" id="paketomatiStatusFilter" style="max-width:250px;display:none;">
                     <option value="">Vsi statusi</option>
-                    <option value="not_called">⚪ Čaka</option>
-                    <option value="called_1">📞 Poklicano 1x</option>
-                    <option value="called_2">📞 Poklicano 2x</option>
-                    <option value="called_3">📞 Poklicano 3x</option>
-                    <option value="sms_1">💬 SMS 1x</option>
-                    <option value="sms_2">💬 SMS 2x</option>
-                    <option value="sms_3">💬 SMS 3x</option>
-                    <option value="notified">✅ Obveščeno</option>
+                    <option value="not_called">⚪ Ni klicano</option>
+                    <option value="called">📞 Klicano</option>
+                    <option value="sms_sent">💬 SMS poslan</option>
+                    <option value="pickup_reminded">🔔 Opomnik poslan</option>
+                    <option value="picked_up">✅ Prevzeto</option>
+                    <option value="returning">🔄 V vračanju</option>
+                    <option value="returned">📦 Vrnjeno</option>
+                    <option value="expired">⏰ Poteklo</option>
                 </select>
             </div>
 
@@ -2746,7 +2746,7 @@
             }
 
             // Paketomati count (filtered by country like other tabs)
-            let filteredPaketomati = paketomatiData ? paketomatiData.filter(p => p.status === 'not_called') : [];
+            let filteredPaketomati = paketomatiData ? paketomatiData.filter(p => !['picked_up','returned','expired'].includes(p.status)) : [];
             console.log('[Paketomati Count] Total not_called:', filteredPaketomati.length, 'currentStore:', currentStore);
             if (currentStore !== 'all') {
                 const beforeFilter = filteredPaketomati.length;
@@ -8119,7 +8119,7 @@ function renderCartsTable(data, totalItems, totalPages) {
         }
 
         function updatePaketomatiCount() {
-            let filtered = paketomatiData.filter(o => o.status === 'not_called');
+            let filtered = paketomatiData.filter(o => !['picked_up','returned','expired'].includes(o.status));
             // Filter by country if not 'all'
             if (currentStore !== 'all') {
                 filtered = filtered.filter(o => o.storeCode === currentStore);
@@ -8320,14 +8320,14 @@ function renderCartsTable(data, totalItems, totalPages) {
                                 </td>
                                 <td>
                                     <select class="inline-status-select" data-id="${order.id}" onchange="updatePaketomatStatusFromSelect(this)">
-                                        <option value="not_called" ${order.status==='not_called'?'selected':''}>⚪ Čaka</option>
-                                        <option value="called_1" ${order.status==='called_1'?'selected':''}>📞 Poklicano 1x</option>
-                                        <option value="called_2" ${order.status==='called_2'?'selected':''}>📞 Poklicano 2x</option>
-                                        <option value="called_3" ${order.status==='called_3'?'selected':''}>📞 Poklicano 3x</option>
-                                        <option value="sms_1" ${order.status==='sms_1'?'selected':''}>💬 SMS 1x</option>
-                                        <option value="sms_2" ${order.status==='sms_2'?'selected':''}>💬 SMS 2x</option>
-                                        <option value="sms_3" ${order.status==='sms_3'?'selected':''}>💬 SMS 3x</option>
-                                        <option value="notified" ${order.status==='notified'?'selected':''}>✅ Obveščeno</option>
+                                        <option value="not_called" ${order.status==='not_called'?'selected':''}>⚪ Ni klicano</option>
+                                        <option value="called" ${order.status==='called'?'selected':''}>📞 Klicano</option>
+                                        <option value="sms_sent" ${order.status==='sms_sent'?'selected':''}>💬 SMS poslan</option>
+                                        <option value="pickup_reminded" ${order.status==='pickup_reminded'?'selected':''}>🔔 Opomnik poslan</option>
+                                        <option value="picked_up" ${order.status==='picked_up'?'selected':''}>✅ Prevzeto</option>
+                                        <option value="returning" ${order.status==='returning'?'selected':''}>🔄 V vračanju</option>
+                                        <option value="returned" ${order.status==='returned'?'selected':''}>📦 Vrnjeno</option>
+                                        <option value="expired" ${order.status==='expired'?'selected':''}>⏰ Poteklo</option>
                                     </select>
                                 </td>
                                 <td>
