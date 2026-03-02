@@ -402,41 +402,80 @@ function saveBundleContentsCache(cache) {
   dbWrite(BUNDLE_CONTENTS_CACHE_KEY, cache);
 }
 
-function parseBundleContents(shortDesc) {
-  if (!shortDesc) return null;
-  // Strip HTML tags
-  const text = shortDesc.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
-  // Match "Komplet sadrži:", "Contains:", "Contiene:", "Zawiera:", etc.
-  const m = text.match(/(?:komplet\s+)?(?:sadrži|contains|contiene|zawiera|tartalmaz|obsahuje|περιέχει|enthält)[:\s]+(.*?)(?:\.|$)/i);
-  if (!m) return null;
-  const raw = m[1].trim().replace(/\.$/, '');
-  // Parse "2x crne bokserice, 3x plave bokserice i 1x crvene bokserice"
-  // Split on comma and "i "/"and "/"und "/"e "/"και "/"a "/"oraz "
-  const parts = raw.split(/,\s*|\s+(?:i|and|und|e|και|a|oraz|és)\s+/i).filter(Boolean);
-  const items = [];
-  for (const part of parts) {
-    const pm = part.trim().match(/^(\d+)\s*x?\s+(.+)$/i);
-    if (pm) {
-      items.push({ qty: parseInt(pm[1]), desc: pm[2].trim() });
-    } else if (part.trim()) {
-      items.push({ qty: 1, desc: part.trim() });
+function parseBundleContents(shortDesc, productName, categories) {
+  if (!shortDesc && !productName) return null;
+  
+  // Try to extract from description first
+  if (shortDesc) {
+    const text = shortDesc.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
+    // Match various "contains/includes" keywords in all languages
+    const m = text.match(/(?:komplet\s+)?(?:sadrži|contains|contiene|zawiera|tartalmaz|obsahuje|περιέχει|περιλαμβάνει|enthält|balení obsahuje|sada obsahuje|set includes|σετ περιλαμβάνει|zestaw zawiera)[:\s]+(.*?)(?:\.|$)/i);
+    if (m) {
+      const raw = m[1].trim().replace(/\.$/, '');
+      const parts = raw.split(/,\s*|\s+(?:i|and|und|e|και|a|oraz|és|și)\s+/i).filter(Boolean);
+      const items = [];
+      for (const part of parts) {
+        const pm = part.trim().match(/^(\d+)\s*x?\s+(.+)$/i);
+        if (pm) {
+          items.push({ qty: parseInt(pm[1]), desc: pm[2].trim() });
+        } else if (part.trim()) {
+          items.push({ qty: 1, desc: part.trim() });
+        }
+      }
+      if (items.length > 0) return items;
     }
   }
-  return items.length > 0 ? items : null;
+  
+  // Fallback: infer from product name + categories
+  if (productName) {
+    return inferBundleFromName(productName, categories);
+  }
+  return null;
 }
 
-async function fetchBundleContents(storeCode, productId) {
-  const cache = getBundleContentsCache();
+function inferBundleFromName(name, categories) {
+  if (!name) return null;
+  const n = name.toLowerCase();
+  
+  // "Komplet: 5 majica + 5 bokserica" / "Σετ: 5 μπλουζάκια + 5 μπόξερ"
+  const kompletMatch = n.match(/(?:komplet|σετ|set|sada|zestaw|csomag):\s*(\d+)\s*(.+?)\s*\+\s*(\d+)\s*(.+)/i);
+  if (kompletMatch) {
+    return [
+      { qty: parseInt(kompletMatch[1]), desc: kompletMatch[2].trim() },
+      { qty: parseInt(kompletMatch[3]), desc: kompletMatch[4].trim().replace(/\s*\(.*\)$/, '') }
+    ];
+  }
+  
+  // "Miješani 10-paket" / "3-balíček černých triček" / "Mix północny 3-pakiet"
+  const packMatch = n.match(/(\d+)[-\s]*(?:paket|balíček|pakiet|csomag|pacchetto|pack)/i);
+  const pieceMatch = n.match(/(?:συσκευασία|τεμ)\s*(\d+)\s*τεμ/i) || n.match(/(\d+)\s*(?:τεμ|ks|szt|db)/i);
+  const count = packMatch ? parseInt(packMatch[1]) : (pieceMatch ? parseInt(pieceMatch[1]) : null);
+  
+  if (!count) return null;
+  
+  // Determine product type from name + categories
+  const ctx = n + ' ' + (categories || '');
+  let type = 'kos';
+  if (ctx.match(/boxer|bokser|bokseric|μπόξερ|boxerk/i)) type = 'bokserice';
+  else if (ctx.match(/majic|tričk|trič|μπλουζ|magliett|koszul|t-shirt|tee|shirt|póló/i)) type = 'majice';
+  else if (ctx.match(/čarap|sock|ponožk|κάλτσ|calzin|skarpe/i)) type = 'čarape';
+  // For mixed packs, try to determine from context
+  else if (ctx.match(/mix|miješan|μιξ|mieszany/i)) type = 'bokserice';  // most mixes are boxers
+  
+  return [{ qty: count, desc: type }];
+}
+
+async function fetchBundleContents(storeCode, productId, sharedCache) {
   const key = storeCode + '_' + productId;
-  if (cache[key]) return cache[key];
+  if (sharedCache[key]) return sharedCache[key];
   
   try {
     const product = await wcApiRequest(storeCode, 'products/' + productId);
-    if (product && product.short_description) {
-      const contents = parseBundleContents(product.short_description);
+    if (product) {
+      const cats = (product.categories || []).map(c => c.name).join(' ').toLowerCase();
+      const contents = parseBundleContents(product.short_description, product.name, cats);
       if (contents) {
-        cache[key] = contents;
-        saveBundleContentsCache(cache);
+        sharedCache[key] = contents;
         console.log('[BundleCache] ✓', key, '→', contents.length, 'items');
         return contents;
       }
@@ -474,8 +513,12 @@ async function enrichBundleContents(carts) {
   
   for (let i = 0; i < items.length; i += 3) {
     const batch = items.slice(i, i + 3);
-    await Promise.allSettled(batch.map(r => fetchBundleContents(r.storeCode, r.productId)));
+    await Promise.allSettled(batch.map(r => fetchBundleContents(r.storeCode, r.productId, cache)));
   }
+  
+  // Save all at once
+  saveBundleContentsCache(cache);
+  console.log('[BundleCache] Saved', Object.keys(cache).length, 'entries');
 }
 
 // Extract variation details from WC line item meta_data
