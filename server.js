@@ -1699,27 +1699,46 @@ async function warmAllCaches() {
 // Background refresh every 5 minutes
 function startBackgroundRefresh() {
   setInterval(async () => {
-    console.log('[Cron] Running 5-minute data refresh...');
-    try {
-      clearAllCache();
-      await warmRAM();
-      await warmAllCaches();
-      // Refresh buyers
-      try {
-        const freshBuyers = await fetchOneTimeBuyers(null);
-        if (freshBuyers && freshBuyers.length > 0) {
-          dbWrite('buyers', freshBuyers);
+    const start = Date.now();
+    console.log('[Cron] Running 5-minute refresh for ALL 4 tabs...');
+    clearAllCache();
+
+    const results = await Promise.allSettled([
+      // 1. Abandoned carts
+      fetchAbandonedCarts().then(carts => {
+        if (carts && carts.length > 0) dbWrite('carts', carts);
+        console.log('[Cron] ✓ Carts:', (carts || []).length);
+      }),
+      // 2. Pending orders
+      fetchPendingOrders().then(orders => {
+        if (orders && orders.length > 0) dbWrite('pending', orders);
+        console.log('[Cron] ✓ Pending:', (orders || []).length);
+      }),
+      // 3. One-time buyers
+      fetchOneTimeBuyers(null).then(buyers => {
+        if (buyers && buyers.length > 0) {
+          dbWrite('buyers', buyers);
           const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
-          writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), count: freshBuyers.length, buyers: freshBuyers });
-          console.log('[DB] Buyers refreshed:', freshBuyers.length);
+          writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), count: buyers.length, buyers });
         }
-      } catch(e) { console.error('[DB] Buyers refresh failed:', e.message); }
-      console.log('[DB] Background refresh complete');
-    } catch (e) {
-      console.error('[Cron] Refresh error:', e.message);
-    }
+        console.log('[Cron] ✓ Buyers:', (buyers || []).length);
+      }),
+      // 4. Paketomati (Metakocka)
+      buildPaketomatiCache().then(cache => {
+        console.log('[Cron] ✓ Paketomati:', (cache?.orders || []).length);
+      })
+    ]);
+
+    // Log failures
+    const labels = ['Carts', 'Pending', 'Buyers', 'Paketomati'];
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') console.error('[Cron] ✗ ' + labels[i] + ' failed:', r.reason?.message || r.reason);
+    });
+
+    const ok = results.filter(r => r.status === 'fulfilled').length;
+    console.log('[Cron] Refresh done: ' + ok + '/4 OK in ' + ((Date.now()-start)/1000).toFixed(1) + 's');
   }, 5 * 60 * 1000);
-  console.log('[Cron] Background refresh scheduled every 5 minutes');
+  console.log('[Cron] Background refresh scheduled every 5 minutes (all 4 tabs)');
 }
 
 
