@@ -113,8 +113,6 @@ const RAM = {
 
 // Warm RAM cache on startup, then refresh every 5 min
 async function warmRAM() {
-  // Fetch product colors in background (don't block startup)
-  fetchProductColors().catch(e => console.error('Color fetch error:', e.message));
   const start = Date.now();
   console.log('[RAM] Warming cache from WooCommerce APIs...');
   try {
@@ -2125,6 +2123,8 @@ function startBackgroundRefresh() {
     const ok = results.filter(r => r.status === 'fulfilled').length;
     console.log('[Cron] Refresh done: ' + ok + '/4 OK in ' + ((Date.now()-start)/1000).toFixed(1) + 's');
   }, 5 * 60 * 1000);
+  // Refresh product colors every hour
+  setInterval(() => fetchProductColors().catch(e => console.error("[Colors] refresh error:", e.message)), 3600000);
   console.log('[Cron] Background refresh scheduled every 5 minutes (all 4 tabs)');
 }
 
@@ -2260,6 +2260,81 @@ app.get('/', (req, res) => {
 });
 
 // Start server — SQLite has persistent data, so we can listen immediately
+
+// ========== PRODUCT COLORS API ==========
+const COLOR_HEX = {
+  'Crna':'#000','Černá':'#000','Czarny':'#000','Μαύρο':'#000','Čierna':'#000','Nero':'#000','Fekete':'#000','Black':'#000',
+  'Bijela':'#f0f0f0','Bílá':'#f0f0f0','Biały':'#f0f0f0','Λευκό':'#f0f0f0','Biela':'#f0f0f0','Bianco':'#f0f0f0','Fehér':'#f0f0f0','White':'#f0f0f0',
+  'Siva':'#9ca3af','Šedá':'#9ca3af','Szary':'#9ca3af','Γκρι':'#9ca3af','Sivá':'#9ca3af','Grigio':'#9ca3af','Szürke':'#9ca3af','Grey':'#9ca3af',
+  'Bez':'#d4a574','Béžová':'#d4a574','Beżowy':'#d4a574','Μπεζ':'#d4a574','Beige':'#d4a574','Bézs':'#d4a574',
+  'Tamnoplava':'#1e3a5f','Tmavě modrá':'#1e3a5f','Granatowy':'#1e3a5f','Σκούρο μπλε':'#1e3a5f','Tmavomodrá':'#1e3a5f','Blu scuro':'#1e3a5f','Sötétkék':'#1e3a5f',
+  'Smeđa':'#8b4513','Hnědá':'#8b4513','Brązowy':'#8b4513','Καφέ':'#8b4513','Hnedá':'#8b4513','Marrone':'#8b4513','Barna':'#8b4513',
+  'Zelena':'#16a34a','Zelená':'#16a34a','Zielony':'#16a34a','Πράσινο':'#16a34a','Verde':'#16a34a','Zöld':'#16a34a',
+  'Plava':'#2563eb','Modrá':'#2563eb','Niebieski':'#2563eb','Μπλε':'#2563eb','Blu':'#2563eb','Kék':'#2563eb',
+  'Crvena':'#dc2626','Červená':'#dc2626','Czerwony':'#dc2626','Κόκκινο':'#dc2626','Rosso':'#dc2626','Piros':'#dc2626',
+  'Roza':'#ec4899','Růžová':'#ec4899','Różowy':'#ec4899','Ροζ':'#ec4899','Rosa':'#ec4899','Rózsaszín':'#ec4899',
+  'Oranžna':'#ea580c','Oranžová':'#ea580c','Pomarańczowy':'#ea580c','Πορτοκαλί':'#ea580c','Arancione':'#ea580c','Narancssárga':'#ea580c',
+  'Vijolična':'#9333ea','Fialová':'#9333ea','Fioletowy':'#9333ea','Μωβ':'#9333ea','Viola':'#9333ea','Lila':'#9333ea',
+};
+const WHITISH = new Set(['Bijela','Bílá','Biały','Λευκό','Biela','Bianco','Fehér','White']);
+
+async function fetchProductColors() {
+  const majKw = ['boja majice','barva trička','kolor koszulk','kolor koszulki','χρώμα μπλούζ','χρώμα-mployzakia','farba trič','colore magliett','póló szín'];
+  const boxKw = ['boja bokser','barva boxer','kolor boxer','kolor bokserek','χρώμα boxer','χρώμα-mpoxer','farba boxer','colore boxer','boxer szín'];
+  const majNames = ['majica','tričko','triko','koszulk','μπλούζ','μπλουζ','magliett','póló','shirt'];
+  const boxNames = ['airflow','modal','bokser','boxer','bokserki','μπόξερ','μπόξ','alsónadág'];
+
+  const result = {};
+  await Promise.allSettled(Object.keys(stores).map(async (sc) => {
+    try {
+      const products = await wcApiRequest(sc, 'products', { per_page: 50 });
+      if (!Array.isArray(products)) { result[sc] = { majice: [], bokserice: [] }; return; }
+      let mc = [], bc = [], mcDirect = false, bcDirect = false;
+      for (const p of products) {
+        for (const attr of (p.attributes || [])) {
+          const an = attr.name.toLowerCase(), pn = p.name.toLowerCase(), opts = attr.options || [];
+          if (!opts.length) continue;
+          const isM = majKw.some(k => an.includes(k));
+          const isB = boxKw.some(k => an.includes(k));
+          // Direct keyword match always wins over generic
+          if (isM && (!mcDirect || opts.length > mc.length)) { mc = opts; mcDirect = true; }
+          if (isB && (!bcDirect || opts.length > bc.length)) { bc = opts; bcDirect = true; }
+          // Generic fallback only if no direct match yet
+          if (!isM && !isB && ['boja','barva','kolor','χρώμα','farba','colore','szín','color'].includes(an)) {
+            if (!mcDirect && majNames.some(k => pn.includes(k)) && opts.length > mc.length) mc = opts;
+            else if (!bcDirect && boxNames.some(k => pn.includes(k)) && opts.length > bc.length) bc = opts;
+          }
+        }
+      }
+      result[sc] = {
+        majice: mc.map(c => ({ name: c, hex: COLOR_HEX[c] || '#9ca3af', border: WHITISH.has(c) })),
+        bokserice: bc.map(c => ({ name: c, hex: COLOR_HEX[c] || '#9ca3af', border: WHITISH.has(c) }))
+      };
+    } catch (e) {
+      console.error('[Colors] ' + sc + ':', e.message);
+      result[sc] = { majice: [], bokserice: [] };
+    }
+  }));
+  dbWrite('product_colors', result);
+  console.log('[Colors] Cached:', Object.entries(result).map(([k,v]) => k+':'+v.majice.length+'m/'+v.bokserice.length+'b').join(', '));
+  return result;
+}
+
+app.get('/api/product-colors', async (req, res) => {
+  try {
+    const cached = dbReadData('product_colors');
+    if (cached && Object.keys(cached).length > 0) {
+      // Check if any store has data
+      const hasData = Object.values(cached).some(v => v.majice?.length > 0 || v.bokserice?.length > 0);
+      if (hasData) return res.json({ success: true, data: cached });
+    }
+    const colors = await fetchProductColors();
+    return res.json({ success: true, data: colors });
+  } catch (e) {
+    res.json({ success: false, error: e.message });
+  }
+});
+
 (async () => {
   const dbCarts = dbReadData('carts');
   const dbPending = dbReadData('pending');
@@ -2269,106 +2344,10 @@ app.get('/', (req, res) => {
     console.log(`[DB] Found persistent data: ${dbCarts.length} carts, ${dbPending.length} pending, ${dbBuyers.length} buyers`);
     console.log('[DB] Starting server immediately, refreshing in background...');
     
-// ========== PRODUCT COLORS API ==========
-app.get('/api/product-colors', async (req, res) => {
-  try {
-    // Try SQLite cache first
-    const cached = dbReadData('product_colors');
-    if (cached && Object.keys(cached).length > 0) {
-      return res.json({ success: true, data: cached });
-    }
-    // Fetch fresh
-    const colors = await fetchProductColors();
-    return res.json({ success: true, data: colors });
-  } catch (e) {
-    console.error('Error fetching product colors:', e.message);
-    res.json({ success: false, error: e.message });
-  }
-});
-
-async function fetchProductColors() {
-  const colorMap = {
-    'Crna': '#000', 'Černá': '#000', 'Czarny': '#000', 'Μαύρο': '#000', 'Čierna': '#000', 'Nero': '#000', 'Fekete': '#000', 'Black': '#000',
-    'Bijela': '#f0f0f0', 'Bílá': '#f0f0f0', 'Biały': '#f0f0f0', 'Λευκό': '#f0f0f0', 'Biela': '#f0f0f0', 'Bianco': '#f0f0f0', 'Fehér': '#f0f0f0', 'White': '#f0f0f0',
-    'Siva': '#9ca3af', 'Šedá': '#9ca3af', 'Szary': '#9ca3af', 'Γκρι': '#9ca3af', 'Sivá': '#9ca3af', 'Grigio': '#9ca3af', 'Szürke': '#9ca3af', 'Grey': '#9ca3af',
-    'Bez': '#d4a574', 'Béžová': '#d4a574', 'Beżowy': '#d4a574', 'Μπεζ': '#d4a574', 'Béžová': '#d4a574', 'Beige': '#d4a574', 'Bézs': '#d4a574',
-    'Tamnoplava': '#1e3a5f', 'Tmavě modrá': '#1e3a5f', 'Granatowy': '#1e3a5f', 'Σκούρο μπλε': '#1e3a5f', 'Tmavomodrá': '#1e3a5f', 'Blu scuro': '#1e3a5f', 'Sötétkék': '#1e3a5f', 'Dark Blue': '#1e3a5f',
-    'Smeđa': '#8b4513', 'Hnědá': '#8b4513', 'Brązowy': '#8b4513', 'Καφέ': '#8b4513', 'Hnedá': '#8b4513', 'Marrone': '#8b4513', 'Barna': '#8b4513', 'Brown': '#8b4513',
-    'Zelena': '#16a34a', 'Zelená': '#16a34a', 'Zielony': '#16a34a', 'Πράσινο': '#16a34a', 'Verde': '#16a34a', 'Zöld': '#16a34a', 'Green': '#16a34a',
-    'Plava': '#2563eb', 'Modrá': '#2563eb', 'Niebieski': '#2563eb', 'Μπλε': '#2563eb', 'Blu': '#2563eb', 'Kék': '#2563eb', 'Blue': '#2563eb',
-    'Crvena': '#dc2626', 'Červená': '#dc2626', 'Czerwony': '#dc2626', 'Κόκκινο': '#dc2626', 'Rosso': '#dc2626', 'Piros': '#dc2626', 'Red': '#dc2626',
-    'Roza': '#ec4899', 'Růžová': '#ec4899', 'Różowy': '#ec4899', 'Ροζ': '#ec4899', 'Rosa': '#ec4899', 'Rózsaszín': '#ec4899', 'Pink': '#ec4899',
-    'Oranžna': '#ea580c', 'Oranžová': '#ea580c', 'Pomarańczowy': '#ea580c', 'Πορτοκαλί': '#ea580c', 'Arancione': '#ea580c', 'Narancssárga': '#ea580c', 'Orange': '#ea580c',
-    'Vijolična': '#9333ea', 'Fialová': '#9333ea', 'Fioletowy': '#9333ea', 'Μωβ': '#9333ea', 'Viola': '#9333ea', 'Lila': '#9333ea', 'Purple': '#9333ea',
-  };
-
-  const result = {};
-  const fetchPromises = Object.entries(stores).map(async ([storeCode, store]) => {
-    try {
-      const WooCommerce = require('@woocommerce/woocommerce-rest-api').default || require('@woocommerce/woocommerce-rest-api');
-      const api = new WooCommerce({ url: store.url, consumerKey: store.ck, consumerSecret: store.cs, version: 'wc/v3' });
-      // Fetch products with color attributes - look for starter paket or single products
-      const { data: products } = await api.get('products', { per_page: 50 });
-      
-      let majiceColors = [];
-      let boksericeColors = [];
-      
-      for (const p of products) {
-        for (const attr of (p.attributes || [])) {
-          const name = attr.name.toLowerCase();
-          // Majice colors
-          if ((name.includes('boja majice') || name.includes('barva trička') || name.includes('barva tri') || name.includes('kolor koszul') || name.includes('χρώμα μπλούζ') || name.includes('farba trič') || name.includes('colore magliett') || name.includes('póló szín'))
-              || (name === 'boja' && (p.name.toLowerCase().includes('majica') || p.name.toLowerCase().includes('tričko') || p.name.toLowerCase().includes('tričko') || p.name.toLowerCase().includes('koszulk') || p.name.toLowerCase().includes('μπλούζ') || p.name.toLowerCase().includes('magliett') || p.name.toLowerCase().includes('póló')))
-              || (name === 'barva' && (p.name.toLowerCase().includes('tričko') || p.name.toLowerCase().includes('trič')))
-              || (name === 'boja' && p.name.toLowerCase().includes('majica'))
-              || (name === 'barva' && p.name.toLowerCase().includes('trič'))
-              || (name === 'color' && p.name.toLowerCase().includes('shirt'))
-              || (name.includes('boja') && !name.includes('bokser') && !name.includes('boxer') && p.name.toLowerCase().includes('majic'))
-          ) {
-            if (attr.options.length > majiceColors.length) majiceColors = attr.options;
-          }
-          // Bokserice colors
-          if ((name.includes('boja bokser') || name.includes('barva boxer') || name.includes('kolor boxer') || name.includes('χρώμα boxer') || name.includes('farba boxer') || name.includes('colore boxer') || name.includes('boxer szín'))
-              || (name === 'boja' && (p.name.toLowerCase().includes('airflow') || p.name.toLowerCase().includes('bokser') || p.name.toLowerCase().includes('modal')))
-              || (name === 'barva' && (p.name.toLowerCase().includes('airflow') || p.name.toLowerCase().includes('boxer')))
-              || (name === 'color' && p.name.toLowerCase().includes('boxer'))
-              || (name.includes('boja') && !name.includes('majic') && !name.includes('trič') && (p.name.toLowerCase().includes('bokser') || p.name.toLowerCase().includes('airflow')))
-          ) {
-            if (attr.options.length > boksericeColors.length) boksericeColors = attr.options;
-          }
-          // Generic "Boja"/"Barva"/"Color" on single product
-          if (majiceColors.length === 0 && (name === 'boja' || name === 'barva' || name === 'kolor' || name === 'χρώμα' || name === 'farba' || name === 'colore' || name === 'szín' || name === 'color')) {
-            const pName = p.name.toLowerCase();
-            if (pName.includes('majic') || pName.includes('trič') || pName.includes('koszulk') || pName.includes('μπλούζ') || pName.includes('magliett') || pName.includes('póló') || pName.includes('shirt')) {
-              majiceColors = attr.options;
-            } else if (pName.includes('airflow') || pName.includes('modal') || pName.includes('bokser') || pName.includes('boxer')) {
-              boksericeColors = attr.options;
-            }
-          }
-        }
-      }
-      
-      result[storeCode] = {
-        majice: majiceColors.map(c => ({ name: c, hex: colorMap[c] || '#9ca3af', border: c === 'Bijela' || c === 'Bílá' || c === 'Biały' || c === 'Λευκό' || c === 'Biela' || c === 'Bianco' || c === 'Fehér' || c === 'White' })),
-        bokserice: boksericeColors.map(c => ({ name: c, hex: colorMap[c] || '#9ca3af', border: c === 'Bijela' || c === 'Bílá' || c === 'Biały' || c === 'Λευκό' || c === 'Biela' || c === 'Bianco' || c === 'Fehér' || c === 'White' }))
-      };
-    } catch (e) {
-      console.error('Error fetching colors for ' + storeCode + ':', e.message);
-      result[storeCode] = { majice: [], bokserice: [] };
-    }
-  });
-  
-  await Promise.allSettled(fetchPromises);
-  
-  // Save to SQLite
-  dbWrite('product_colors', result);
-  console.log('Product colors cached:', Object.entries(result).map(([k,v]) => k + ':' + v.majice.length + 'm/' + v.bokserice.length + 'b').join(', '));
-  return result;
-}
-
 app.listen(PORT, () => {
       console.log(`🎧 Noriks Call Center running on port ${PORT}`);
       startBackgroundRefresh();
+      fetchProductColors().catch(e => console.error("[Colors] startup error:", e.message));
       // Refresh data in background (non-blocking)
       warmRAM().then(() => warmAllCaches()).catch(e => console.error('[DB] Background warm failed:', e.message));
     });
