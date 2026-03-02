@@ -894,11 +894,20 @@ async function createOrderFromCart(input) {
   let lineItems = [];
   if (items.length > 0) {
     lineItems = items.map(item => {
-      const li = { product_id: parseInt(item.productId), quantity: parseInt(item.quantity) || 1 };
-      if (item.variationId) li.variation_id = parseInt(item.variationId);
+      const qty = parseInt(item.quantity) || 1;
+      const li = {};
+      if (item.productId) {
+        li.product_id = parseInt(item.productId);
+        if (item.variationId) li.variation_id = parseInt(item.variationId);
+      } else {
+        // QB/Upsell/Komplet items - use name as custom line item
+        li.name = item.name || item.productTitle || 'Custom item';
+        li.product_id = 0;
+      }
+      li.quantity = qty;
       if (item.price !== undefined) {
-        li.subtotal = String(item.price * (item.quantity || 1));
-        li.total = String(item.price * (item.quantity || 1));
+        li.subtotal = String(item.price * qty);
+        li.total = String(item.price * qty);
       }
       return li;
     });
