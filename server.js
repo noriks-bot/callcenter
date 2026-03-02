@@ -116,12 +116,19 @@ async function warmRAM() {
     RAM.carts = cartsRes.status === 'fulfilled' ? cartsRes.value : [];
     RAM.pending = pendingRes.status === 'fulfilled' ? pendingRes.value : [];
     
-    // Buyers from file cache (slow to fetch, refreshed separately)
+    // Buyers: try file cache first for fast startup, then fetch fresh in background
     const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
     if (fs.existsSync(buyersCacheFile)) {
       const bd = readJson(buyersCacheFile, {});
       RAM.buyers = bd.buyers || [];
+      console.log('[RAM] Buyers loaded from file cache:', RAM.buyers.length);
     }
+    // Fetch fresh buyers in background (don't block startup)
+    fetchOneTimeBuyers(null).then(buyers => {
+      RAM.buyers = buyers;
+      writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), generated_date: new Date().toISOString(), count: buyers.length, buyers });
+      console.log('[RAM] Buyers refreshed:', buyers.length);
+    }).catch(e => console.error('[RAM] Buyers refresh failed:', e.message));
     
     RAM.ready = true;
     RAM.lastRefresh = new Date().toISOString();
@@ -137,6 +144,13 @@ function startBackgroundRefresh() {
     try {
       // Clear file cache to force fresh fetch
       clearAllCache();
+      // Refresh buyers separately (slow fetch)
+      try {
+        const freshBuyers = await fetchOneTimeBuyers(null);
+        RAM.buyers = freshBuyers;
+        const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
+        writeJson(buyersCacheFile, { generated_at: Math.floor(Date.now()/1000), count: freshBuyers.length, buyers: freshBuyers });
+      } catch(e) { console.error('[RAM] Buyers refresh failed:', e.message); }
       await warmRAM();
       console.log('[RAM] Background refresh complete');
     } catch(e) {
@@ -1061,9 +1075,14 @@ app.get('/api/customer-360', async (req, res) => {
 });
 
 // One-time buyers
-app.get('/api/one-time-buyers', async (req, res) => {
-  try { res.json(await fetchOneTimeBuyers(req.query.store || null)); }
-  catch (e) { res.status(500).json({ error: e.message }); }
+app.get('/api/one-time-buyers', (req, res) => {
+  const callData = loadCallData();
+  let buyers = RAM.buyers.map(b => {
+    const s = callData[b.id] || {};
+    return { ...b, callStatus: s.callStatus || b.callStatus || 'not_called', notes: s.notes || b.notes || '' };
+  });
+  if (req.query.store) buyers = buyers.filter(b => b.storeCode === req.query.store);
+  res.json({ success: true, data: buyers, cached: true, lastRefresh: RAM.lastRefresh });
 });
 
 // Buyers cache (instant)
