@@ -2652,6 +2652,7 @@
                     // Update current content tab
                     currentContentTab = newTab;
                         document.getElementById('buyerDaysFilter').style.display = (newTab === 'buyers') ? '' : 'none';
+                        document.getElementById('statusFilter').style.display = (newTab === 'paketomati') ? 'none' : '';
                         document.getElementById('paketomatiStatusFilter').style.display = (newTab === 'paketomati') ? '' : 'none';
                     currentTab = newTab; // Sync with main tab state
 
