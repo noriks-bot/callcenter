@@ -2592,6 +2592,12 @@
                 buyers = initData.buyers || [];
                 paketomatiData = initData.paketomati || [];
 
+                // Mark all loading as complete (data came from SSR)
+                globalLoadingStatus.carts = false;
+                globalLoadingStatus.pending = false;
+                globalLoadingStatus.buyers = false;
+                globalLoadingStatus.buyersError = null;
+
                 renderCountryTabs();
                 setupContentTabs();
                 updateContentTabCounts();
