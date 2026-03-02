@@ -813,7 +813,7 @@
             </div>
             
             <div class="filters-bar">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone...">
+                <input type="text" class="search-input" id="searchInput" style="max-width:300px;" placeholder="Search name, email, phone...">
                 <select class="filter-select" id="statusFilter">
                     <option value="">All Status</option>
                     <option value="not_called">Not Called</option>
@@ -3274,7 +3274,20 @@
             `;
         }
 
-        function renderCartsTable(data, totalItems, totalPages) {
+        
+        // Helper: render cart/order items as compact list
+        function renderItemsCell(items, maxShow = 2) {
+            if (!items || items.length === 0) return '<span style="color:var(--text-muted);font-size:11px;">-</span>';
+            const shown = items.slice(0, maxShow);
+            const rest = items.length - maxShow;
+            let html = shown.map(i => {
+                const name = (i.name || 'Unknown').length > 35 ? (i.name || 'Unknown').substring(0, 35) + '…' : (i.name || 'Unknown');
+                return '<div style="font-size:11px;line-height:1.3;margin-bottom:1px;"><strong>' + (i.quantity || 1) + '×</strong> ' + esc(name) + '</div>';
+            }).join('');
+            if (rest > 0) html += '<div style="font-size:10px;color:var(--text-muted);">+' + rest + ' more</div>';
+            return html;
+        }
+function renderCartsTable(data, totalItems, totalPages) {
             const getSortClass = (col) => sortColumn === col ? sortDirection : '';
             // Clear selection when table changes
             selectedItems.clear();
@@ -3287,6 +3300,7 @@
                         <th class="checkbox-cell"><input type="checkbox" class="row-checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"></th>
                         <th class="sortable ${getSortClass('customerName')}" onclick="sortTable('customerName')">Customer</th>
                         <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
+                        <th>Items</th>
                         <th class="sortable ${getSortClass('cartValue')}" onclick="sortTable('cartValue')">Value</th>
                         <th>Phone</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
@@ -3304,6 +3318,7 @@
                                 <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${c.id}" onchange="toggleRowSelection(this)" ${isConverted ? 'disabled' : ''}></td>
                                 <td><div class="customer-cell" onclick="openCustomer360(carts.find(x=>x.id==='${c.id}'))" style="cursor:pointer;"><div class="avatar" style="${isConverted ? 'background:#28a745;' : ''}">${initials(c.customerName)}</div><div><div class="customer-name">${esc(c.customerName)}${convertedBadge}</div><div class="customer-email">${esc(c.email)}</div></div></div></td>
                                 <td>${c.storeFlag} ${c.storeName}</td>
+                                <td style="max-width:220px;">${renderItemsCell(c.cartContents)}</td>
                                 <td><strong>${sym}${(c.cartValue||0).toFixed(2)}</strong></td>
                                 <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '-'}</td>
                                 <td>
@@ -3356,6 +3371,7 @@
                         <th class="sortable ${getSortClass('customerName')}" onclick="sortTable('customerName')">Customer</th>
                         <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
                         <th class="sortable ${getSortClass('orderId')}" onclick="sortTable('orderId')">Order #</th>
+                        <th>Items</th>
                         <th class="sortable ${getSortClass('orderTotal')}" onclick="sortTable('orderTotal')">Total</th>
                         <th class="sortable ${getSortClass('createdAt')}" onclick="sortTable('createdAt')">Time</th>
                         <th>Phone</th>
@@ -3370,6 +3386,7 @@
                                 <td><div class="customer-cell"><div class="avatar">${initials(o.customerName)}</div><div><div class="customer-name">${esc(o.customerName)}</div><div class="customer-email">${esc(o.email)}</div></div></div></td>
                                 <td>${o.storeFlag} ${o.storeName}</td>
                                 <td><strong>#${o.orderId}</strong></td>
+                                <td style="max-width:220px;">${renderItemsCell(o.items)}</td>
                                 <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
                                 <td style="font-size:12px;">${timeAgoFull(o.createdAt)}</td>
                                 <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '-'}</td>
