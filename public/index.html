@@ -3297,40 +3297,52 @@
             if (!items || items.length === 0) return '<span style="color:var(--text-muted);font-size:11px;">-</span>';
             let out = '';
             for (const item of items) {
-                const name = item.name || 'Unknown';
+                const rawName = item.name || 'Unknown';
                 const qty = item.quantity || 1;
                 
-                // Split by comma to get individual pieces
-                const parts = name.split(/,\s*/);
+                // Check if name has "ProductName: detail1, detail2" format
+                let title = '';
+                let detailStr = '';
+                const colonIdx = rawName.indexOf(': ');
                 
-                // Check if parts look like "Color - Size" or "Label: Color - Size"
-                const hasBullets = parts.length > 1 && parts.some(p => p.includes(' - '));
-                
-                if (hasBullets) {
-                    // Extract title: find common prefix label
-                    let title = '';
-                    const labels = parts.map(p => {
-                        const m = p.match(/^(.+?)\s*\d*\s*:\s*/);
-                        return m ? m[1].replace(/\s*\d+$/, '').trim() : null;
-                    }).filter(Boolean);
-                    
-                    if (labels.length > 0) {
-                        // Has labels like "Boxerky 1:", "Trička:"
-                        const uniqueLabels = [...new Set(labels)];
-                        title = uniqueLabels.join(' + ');
-                    } else {
-                        // Just colors: "Černá - 3XL, Modrá - 3XL" → use piece count as title
-                        title = parts.length + ' kos';
+                // Only split on colon if the part after has comma-separated variations
+                if (colonIdx > 0) {
+                    const afterColon = rawName.substring(colonIdx + 2);
+                    const beforeColon = rawName.substring(0, colonIdx);
+                    // Check if afterColon looks like variations (has " - ")
+                    if (afterColon.includes(' - ') || afterColon.split(',').length > 1) {
+                        title = beforeColon;
+                        detailStr = afterColon;
                     }
+                }
+                
+                // If no colon split worked, check if the whole name is comma-separated variations
+                if (!title && !detailStr) {
+                    const parts = rawName.split(/,\s*/);
+                    if (parts.length > 1 && parts.some(p => p.includes(' - '))) {
+                        // Check for labeled variations like "Boxerky 1: Černá - 3XL"
+                        const labels = parts.map(p => {
+                            const m = p.match(/^(.+?)\s*\d*\s*:\s*/);
+                            return m ? m[1].replace(/\s*\d+$/, '').trim() : null;
+                        }).filter(Boolean);
+                        
+                        if (labels.length > 0) {
+                            title = [...new Set(labels)].join(' + ');
+                        } else {
+                            title = parts.length + ' kos';
+                        }
+                        detailStr = rawName;
+                    }
+                }
+                
+                if (title && detailStr) {
+                    // Show title bold, then bullet points
+                    out += '<div style="font-size:11px;font-weight:600;line-height:1.4;margin-bottom:1px;">' + (qty > 1 ? qty + '× ' : '') + esc(title) + '</div>';
                     
-                    // Title line
-                    out += '<div style="font-size:11px;font-weight:600;line-height:1.4;margin-bottom:1px;">' + esc(title) + '</div>';
-                    
-                    // Bullet points
+                    const parts = detailStr.split(/,\s*/);
                     const bullets = parts.slice(0, maxShow);
                     const rest = parts.length - maxShow;
                     for (const p of bullets) {
-                        // Strip "Label N: " prefix for cleaner display
                         const cleaned = p.replace(/^.+?\d*\s*:\s*/, '').trim();
                         const dashMatch = cleaned.match(/^(.+?)\s*-\s*(.+)$/);
                         let dot = '';
@@ -3343,8 +3355,8 @@
                     }
                     if (rest > 0) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:8px;">+' + rest + ' more</div>';
                 } else {
-                    // Single product name (e.g. "Miješani 10-paket (2XL)", "Tamnoplava majica (3XL)")
-                    const short = name.length > 50 ? name.substring(0, 50) + '...' : name;
+                    // Plain product name without variation details
+                    const short = rawName.length > 50 ? rawName.substring(0, 50) + '...' : rawName;
                     out += '<div style="font-size:11px;font-weight:600;line-height:1.4;">' + (qty > 1 ? qty + '× ' : '') + esc(short) + '</div>';
                 }
             }

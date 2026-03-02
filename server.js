@@ -379,6 +379,23 @@ function enrichCartsFromCache(carts) {
   return carts;
 }
 
+
+// Extract variation details from WC line item meta_data
+function extractLineItemDetails(item) {
+  const name = item.name || 'Unknown product';
+  const quantity = parseInt(item.quantity) || 1;
+  const total = parseFloat(item.total) || 0;
+  
+  // Get variation details from meta_data (numeric keys = item contents)
+  const meta = (item.meta_data || []).filter(m => /^\d+$/.test(m.key));
+  const details = meta.map(m => m.display_value || m.value).filter(Boolean);
+  
+  // Build full name: "Product Name: detail1, detail2..."
+  const fullName = details.length > 0 ? name + ': ' + details.join(', ') : name;
+  
+  return { name: fullName, quantity, total };
+}
+
 // ========== FETCH RECENT ORDER CONTACTS ==========
 async function getRecentOrderContacts(storeCode) {
   const cacheKey = `recent_order_contacts_${storeCode}`;
@@ -573,9 +590,7 @@ async function fetchOneTimeBuyers(storeFilter = null) {
       const savedData = callData[customerId] || {};
       if (savedData.callStatus === 'converted') continue;
 
-      const orderItems = (order.line_items || []).map(item => ({
-        name: item.name || 'Unknown product', quantity: parseInt(item.quantity) || 1, total: parseFloat(item.total) || 0
-      }));
+      const orderItems = (order.line_items || []).map(extractLineItemDetails);
 
       const billing = data.billing || {};
       allBuyers.push({
@@ -631,7 +646,7 @@ async function fetchPendingOrders() {
           location: `${billing.city || ''}, ${billing.country || ''}`.replace(/^,\s*|,\s*$/g, ''),
           orderStatus: order.status || '', orderTotal: parseFloat(order.total) || 0,
           currency: order.currency || 'EUR', createdAt: order.date_created || '',
-          items: (order.line_items || []).map(i => ({ name: i.name, quantity: i.quantity, price: i.total })),
+          items: (order.line_items || []).map(extractLineItemDetails),
           callStatus: savedData.callStatus || 'not_called', notes: savedData.notes || ''
         });
       }
