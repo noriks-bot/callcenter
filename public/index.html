@@ -698,6 +698,26 @@
         .qb-add-btn:hover { filter: brightness(1.1); }
         .qb-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .qb-price-input { padding: 4px 8px; border: 1px solid var(--card-border); border-radius: var(--radius-md); background: var(--bg-main); color: var(--text-primary); font-size: 12px; width: 70px; }
+        
+        /* Fix active state visibility */
+        .variation-option.selected,
+        .qb-size-btn.selected,
+        .qb-qty-btn.selected {
+            border-color: var(--accent) !important;
+            background: var(--accent) !important;
+            color: #fff !important;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+        }
+        .variation-option:not(.selected) {
+            border: 2px solid var(--card-border);
+            background: var(--card-bg);
+        }
+        .inline-status-select:focus,
+        .qb-color-select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+        }
         </style>
 </head>
 <body>
@@ -3637,11 +3657,10 @@ function renderCartsTable(data, totalItems, totalPages) {
                     <thead><tr>
                         <th class="sortable ${getSortClass('customerName')}" onclick="sortTable('customerName')">Customer</th>
                         <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
-                        <th class="sortable ${getSortClass('orderId')}" onclick="sortTable('orderId')">Order #</th>
                         <th>Items</th>
-                        <th class="sortable ${getSortClass('orderTotal')}" onclick="sortTable('orderTotal')">Total</th>
-                        <th class="sortable ${getSortClass('createdAt')}" onclick="sortTable('createdAt')">Time</th>
+                        <th class="sortable ${getSortClass('orderTotal')}" onclick="sortTable('orderTotal')">Value</th>
                         <th>Phone</th>
+                        <th class="sortable ${getSortClass('createdAt')}" onclick="sortTable('createdAt')">Time</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
                         <th>Notes</th>
                         <th>Actions</th>
@@ -3650,13 +3669,12 @@ function renderCartsTable(data, totalItems, totalPages) {
                         ${data.map(o => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[o.currency] || '€';
                             return `<tr>
-                                <td><div class="customer-cell"><div class="avatar">${initials(o.customerName)}</div><div><div class="customer-name">${esc(o.customerName)}</div><div class="customer-email">${esc(o.email)}</div></div></div></td>
+                                <td><div class="customer-cell"><div class="avatar">${initials(o.customerName)}</div><div><div class="customer-name">${esc(o.customerName)}</div><div class="customer-email">${esc(o.email)}</div><div style="font-size:10px;color:var(--text-muted);">#${o.orderId}</div></div></div></td>
                                 <td>${o.storeFlag} ${o.storeName}</td>
-                                <td><strong>#${o.orderId}</strong></td>
                                 <td style="max-width:220px;">${renderItemsCell(o.items)}</td>
                                 <td><strong>${sym}${(o.orderTotal||0).toFixed(2)}</strong></td>
-                                <td style="font-size:12px;">${timeAgoFull(o.createdAt)}</td>
                                 <td>${o.phone ? `<a href="tel:${o.phone}" class="phone-link"><i class="fas fa-phone"></i> ${o.phone}</a>` : '-'}</td>
+                                <td style="font-size:12px;">${timeAgoFull(o.createdAt)}</td>
                                 <td>
                                     <select class="inline-status-select" data-id="${o.id}" data-type="pending" onchange="inlineStatusChange(this)">
                                         <option value="not_called" ${o.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
@@ -3737,10 +3755,10 @@ function renderCartsTable(data, totalItems, totalPages) {
                     <thead><tr>
                         <th class="sortable ${getSortClass('customerName')}" onclick="sortTable('customerName')">Customer</th>
                         <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
-                        <th class="sortable ${getSortClass('totalSpent')}" onclick="sortTable('totalSpent')">Spent</th>
-                        <th>Purchased</th>
+                        <th>Items</th>
+                        <th class="sortable ${getSortClass('totalSpent')}" onclick="sortTable('totalSpent')">Value</th>
                         <th>Phone</th>
-                        <th class="sortable ${getSortClass('registeredAt')}" onclick="sortTable('registeredAt')">Registered</th>
+                        <th class="sortable ${getSortClass('registeredAt')}" onclick="sortTable('registeredAt')">Time</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
                         <th>Notes</th>
                         <th>Actions</th>
@@ -3754,10 +3772,10 @@ function renderCartsTable(data, totalItems, totalPages) {
                             return `<tr style="${rowStyle}">
                                 <td><div class="customer-cell"><div class="avatar" style="${isConverted ? 'background:#28a745;' : ''}">${initials(b.customerName)}</div><div><div class="customer-name">${esc(b.customerName)}${convertedBadge}</div><div class="customer-email">${esc(b.email)}</div></div></div></td>
                                 <td>${b.storeFlag} ${b.storeName}</td>
-                                <td><strong>${sym}${(b.totalSpent||0).toFixed(2)}</strong></td>
                                 <td style="font-size:11px;max-width:200px;">
                                     ${renderItemsCell(b.orderItems)}
                                 </td>
+                                <td><strong>${sym}${(b.totalSpent||0).toFixed(2)}</strong></td>
                                 <td>${b.phone ? `<a href="tel:${b.phone}" class="phone-link"><i class="fas fa-phone"></i> ${b.phone}</a>` : '-'}</td>
                                 <td style="font-size:12px;">${timeAgoFull(b.registeredAt)}</td>
                                 <td>
