@@ -884,11 +884,12 @@ async function createOrderFromCart(input) {
 
   const carts = await fetchAbandonedCarts();
   const cart = carts.find(c => c.id === cartId);
-  if (!cart) return { error: 'Cart not found' };
-
-  const storeCode = cart.storeCode;
+  
+  // Support buyers/pending - they won't be in abandoned carts
+  const storeCode = cart?.storeCode || input.storeCode;
+  if (!storeCode) return { error: 'Cannot determine store (no cart found and no storeCode provided)' };
   const config = stores[storeCode];
-  if (!config) return { error: 'Invalid store' };
+  if (!config) return { error: 'Invalid store: ' + storeCode };
 
   let lineItems = [];
   if (items.length > 0) {
@@ -902,7 +903,7 @@ async function createOrderFromCart(input) {
       return li;
     });
   } else {
-    lineItems = (cart.cartContents || []).map(item => {
+    lineItems = (cart?.cartContents || []).map(item => {
       const li = { product_id: item.productId, quantity: item.quantity };
       if (item.variationId) li.variation_id = item.variationId;
       return li;
@@ -911,13 +912,13 @@ async function createOrderFromCart(input) {
 
   if (lineItems.length === 0) return { error: 'No items in order' };
 
-  const firstName = customerData.firstName || cart.firstName || '';
-  const lastName = customerData.lastName || cart.lastName || '';
-  const email = customerData.email || cart.email || '';
-  const phone = customerData.phone || cart.phone || '';
-  const address = customerData.address || cart.address || '';
-  const city = customerData.city || cart.city || '';
-  const postcode = customerData.postcode || cart.postcode || '';
+  const firstName = customerData.firstName || cart?.firstName || '';
+  const lastName = customerData.lastName || cart?.lastName || '';
+  const email = customerData.email || cart?.email || '';
+  const phone = customerData.phone || cart?.phone || '';
+  const address = customerData.address || cart?.address || '';
+  const city = customerData.city || cart?.city || '';
+  const postcode = customerData.postcode || cart?.postcode || '';
   const countryCode = storeCountryCodes[storeCode] || storeCode.toUpperCase();
 
   const orderData = {
@@ -929,10 +930,10 @@ async function createOrderFromCart(input) {
     meta_data: [
       { key: '_call_center', value: 'yes' }, { key: '_call_center_agent', value: agentName },
       { key: '_call_center_date', value: new Date().toISOString() },
-      { key: '_abandoned_cart_id', value: String(cart.cartDbId) },
+      { key: '_abandoned_cart_id', value: String(cart?.cartDbId || cartId) },
       { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' }
     ],
-    customer_note: (req.body.notes ? req.body.notes + ' — ' : '') + `Order created via Call Center by ${agentName}`
+    customer_note: (input.notes ? input.notes + ' \u2014 ' : '') + `Order created via Call Center by ${agentName}`
   };
 
   if (freeShipping) {
