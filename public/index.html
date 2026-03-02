@@ -1039,6 +1039,10 @@
                         <button class="quick-builder-btn" onclick="toggleQB('bokserice')"><i class="fas fa-plus"></i> Bokserice</button>
                         <button class="quick-builder-btn" onclick="toggleQB('majice')"><i class="fas fa-plus"></i> Majice</button>
                         <button class="quick-builder-btn" onclick="toggleQB('nogavice')"><i class="fas fa-plus"></i> Nogavice</button>
+                        <span style="width:1px;height:24px;background:var(--card-border);margin:0 4px;"></span>
+                        <button class="quick-builder-btn" onclick="toggleKomplet('2+5')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:#6366f1;">🩲2+👕5</button>
+                        <button class="quick-builder-btn" onclick="toggleKomplet('4+10')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:#6366f1;">🩲4+👕10</button>
+                        <button class="quick-builder-btn" onclick="toggleKomplet('5+5')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:#6366f1;">🩲5+👕5</button>
                     </div>
                     <div class="qb-panel" id="qbPanel">
                         <div class="qb-row">
@@ -1052,6 +1056,20 @@
                         </div>
                         <button class="qb-add-btn" id="qbAddBtn" onclick="qbAddToOrder()"><i class="fas fa-plus"></i> Dodaj v naročilo</button>
                     </div>
+                </div>
+
+                <!-- Komplet Panel -->
+                <div class="qb-panel" id="kompletPanel" style="border:2px solid #6366f1;">
+                    <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:#6366f1;">📦 Komplet: <span id="kompletTitle"></span></div>
+                    <div style="font-weight:600;font-size:12px;color:var(--text-muted);margin-bottom:6px;">🩲 Bokserice (<span id="kompletBoxQty"></span>x)</div>
+                    <div id="kompletBoxRows" style="margin-bottom:12px;"></div>
+                    <div style="font-weight:600;font-size:12px;color:var(--text-muted);margin-bottom:6px;">👕 Majice (<span id="kompletMajQty"></span>x)</div>
+                    <div id="kompletMajRows" style="margin-bottom:12px;"></div>
+                    <div class="qb-row">
+                        <label>Cena kompleta:</label>
+                        <input type="number" step="0.01" min="0" class="qb-price-input" id="kompletPrice" value="0">
+                    </div>
+                    <button class="qb-add-btn" onclick="kompletAdd()" style="margin-top:12px;padding:14px 20px;font-size:15px;font-weight:700;width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;cursor:pointer;"><i class="fas fa-cart-plus"></i> Dodaj komplet v košarico</button>
                 </div>
 
                 <!-- Variation Selector (shown when selecting a variable product) -->
@@ -4329,6 +4347,116 @@
             // No store match - use defaults (Slovenian)
             return QB_COLORS_DEFAULT;
         }
+        // ===== KOMPLET BUILDER =====
+        const KOMPLET_CONFIGS = {
+            '2+5': { box: 2, maj: 5, label: '2 bokserice + 5 majic', defaultPrice: 64.83 },
+            '4+10': { box: 4, maj: 10, label: '4 bokserice + 10 majic', defaultPrice: 169.86 },
+            '5+5': { box: 5, maj: 5, label: '5 bokseric + 5 majic', defaultPrice: 114.90 }
+        };
+        let currentKomplet = null;
+
+        function toggleKomplet(type) {
+            const panel = document.getElementById('kompletPanel');
+            const qbPanel = document.getElementById('qbPanel');
+            // Close QB if open
+            if (qbPanel.classList.contains('visible')) { qbPanel.classList.remove('visible'); qbType = null; }
+            document.querySelectorAll('.quick-builder-btn').forEach(b => b.classList.remove('active'));
+
+            if (currentKomplet === type) { currentKomplet = null; panel.classList.remove('visible'); return; }
+            currentKomplet = type;
+            event.target.closest('.quick-builder-btn').classList.add('active');
+            panel.classList.add('visible');
+
+            const cfg = KOMPLET_CONFIGS[type];
+            document.getElementById('kompletTitle').textContent = cfg.label;
+            document.getElementById('kompletBoxQty').textContent = cfg.box;
+            document.getElementById('kompletMajQty').textContent = cfg.maj;
+            document.getElementById('kompletPrice').value = cfg.defaultPrice;
+            renderKompletRows();
+        }
+
+        function renderKompletRows() {
+            const cfg = KOMPLET_CONFIGS[currentKomplet];
+            if (!cfg) return;
+            const sc = currentOrderStoreCode;
+            const boxColors = getColorsForType('bokserice', sc);
+            const majColors = getColorsForType('majice', sc);
+            const sizeOpts = '<option value="">-- Vel. --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+            const boxColorOpts = '<option value="">-- Barva --</option>' + boxColors.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
+            const majColorOpts = '<option value="">-- Barva --</option>' + majColors.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
+
+            let boxRows = '<div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);">Barva</span><span style="width:80px;font-size:11px;color:var(--text-muted);">Velikost</span></div>';
+            for (let i = 0; i < cfg.box; i++) {
+                boxRows += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+                    '<span style="width:24px;text-align:right;font-size:12px;color:var(--text-muted);">' + (i+1) + '.</span>' +
+                    '<select class="qb-color-select" id="kompletBoxColor_' + i + '" style="flex:1;">' + boxColorOpts + '</select>' +
+                    '<select class="qb-color-select" id="kompletBoxSize_' + i + '" style="width:80px;">' + sizeOpts + '</select>' +
+                    '</div>';
+            }
+            document.getElementById('kompletBoxRows').innerHTML = boxRows;
+
+            let majRows = '<div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);">Barva</span><span style="width:80px;font-size:11px;color:var(--text-muted);">Velikost</span></div>';
+            for (let i = 0; i < cfg.maj; i++) {
+                majRows += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+                    '<span style="width:24px;text-align:right;font-size:12px;color:var(--text-muted);">' + (i+1) + '.</span>' +
+                    '<select class="qb-color-select" id="kompletMajColor_' + i + '" style="flex:1;">' + majColorOpts + '</select>' +
+                    '<select class="qb-color-select" id="kompletMajSize_' + i + '" style="width:80px;">' + sizeOpts + '</select>' +
+                    '</div>';
+            }
+            document.getElementById('kompletMajRows').innerHTML = majRows;
+        }
+
+        function kompletAdd() {
+            if (!currentKomplet) return;
+            const cfg = KOMPLET_CONFIGS[currentKomplet];
+            // Validate all fields
+            for (let i = 0; i < cfg.box; i++) {
+                const c = document.getElementById('kompletBoxColor_' + i);
+                const s = document.getElementById('kompletBoxSize_' + i);
+                if (!c?.value) { showToast('⚠️ Izberi barvo za bokserice ' + (i+1) + '!', 'error'); if(c){c.style.outline='2px solid #ef4444';setTimeout(()=>{c.style.outline='none';},2000);} return; }
+                if (!s?.value) { showToast('⚠️ Izberi velikost za bokserice ' + (i+1) + '!', 'error'); if(s){s.style.outline='2px solid #ef4444';setTimeout(()=>{s.style.outline='none';},2000);} return; }
+            }
+            for (let i = 0; i < cfg.maj; i++) {
+                const c = document.getElementById('kompletMajColor_' + i);
+                const s = document.getElementById('kompletMajSize_' + i);
+                if (!c?.value) { showToast('⚠️ Izberi barvo za majice ' + (i+1) + '!', 'error'); if(c){c.style.outline='2px solid #ef4444';setTimeout(()=>{c.style.outline='none';},2000);} return; }
+                if (!s?.value) { showToast('⚠️ Izberi velikost za majice ' + (i+1) + '!', 'error'); if(s){s.style.outline='2px solid #ef4444';setTimeout(()=>{s.style.outline='none';},2000);} return; }
+            }
+
+            const price = parseFloat(document.getElementById('kompletPrice').value) || 0;
+            // Build box items
+            const boxParts = [];
+            for (let i = 0; i < cfg.box; i++) {
+                boxParts.push(document.getElementById('kompletBoxColor_' + i).value + ' - ' + document.getElementById('kompletBoxSize_' + i).value);
+            }
+            // Build maj items
+            const majParts = [];
+            for (let i = 0; i < cfg.maj; i++) {
+                majParts.push(document.getElementById('kompletMajColor_' + i).value + ' - ' + document.getElementById('kompletMajSize_' + i).value);
+            }
+
+            const name = 'BOX: ' + boxParts.join(', ') + ' | MAJ: ' + majParts.join(', ');
+            orderItems.push({
+                name: name,
+                productTitle: '📦 Komplet ' + currentKomplet + ' (' + cfg.label + ')',
+                productId: null, variationId: null,
+                sku: 'KOMPLET-' + currentKomplet.replace('+', '-'),
+                image: null,
+                editPrice: price,
+                editQty: 1, quantity: 1,
+                isQuickBuild: true
+            });
+
+            currentDiscount = 0; originalPrices = null;
+            document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('discountBtnNone').classList.add('active');
+            renderOrderItems();
+            showToast('✓ Komplet ' + currentKomplet + ' dodan!');
+            currentKomplet = null;
+            document.getElementById('kompletPanel').classList.remove('visible');
+            document.querySelectorAll('.quick-builder-btn').forEach(c => c.classList.remove('active'));
+        }
+
         const QB_SIZES = ['S','M','L','XL','2XL','3XL','4XL'];
         const QB_QTYS = [1,2,3,4,5,6,7,8,9,10,15];
         const QB_PRICES = { bokserice: 9.99, majice: 12.99, nogavice: 4.99 };
@@ -4338,6 +4466,9 @@
         function toggleQB(type) {
             currentQBType = type;
             const panel = document.getElementById('qbPanel');
+            // Close komplet if open
+            const kp = document.getElementById('kompletPanel');
+            if (kp && kp.classList.contains('visible')) { kp.classList.remove('visible'); currentKomplet = null; }
             document.querySelectorAll('.quick-builder-btn').forEach(b => b.classList.remove('active'));
             if (qbType === type) { qbType = null; panel.classList.remove('visible'); return; }
             qbType = type;
