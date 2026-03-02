@@ -960,6 +960,9 @@
                     </div>
                 </div>
 
+                <!-- Notes -->
+                <h4 style="margin:20px 0 8px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Opombe</h4>
+                <textarea id="orderNotes" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-md);background:var(--bg-main);color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;" placeholder="Opombe za naročilo..."></textarea>
                 <!-- Products -->
                 <h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Izdelki</h4>
 
@@ -3932,6 +3935,7 @@ function renderCartsTable(data, totalItems, totalPages) {
             document.getElementById('orderAddress').value = orderCart.address || '';
             document.getElementById('orderCity').value = orderCart.city || '';
             document.getElementById('orderPostcode').value = orderCart.postcode || '';
+            document.getElementById('orderNotes').value = orderCart.notes || '';
 
             // Copy cart items for editing
             orderItems = (orderCart.cartContents || []).map((item, idx) => ({
@@ -4317,7 +4321,8 @@ function renderCartsTable(data, totalItems, totalPages) {
                     quantity: item.editQty,
                     price: item.editPrice
                 })),
-                freeShipping: freeShipping
+                freeShipping: freeShipping,
+                notes: document.getElementById('orderNotes').value
             };
 
             try {

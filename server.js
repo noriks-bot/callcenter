@@ -931,7 +931,7 @@ async function createOrderFromCart(input) {
       { key: '_abandoned_cart_id', value: String(cart.cartDbId) },
       { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' }
     ],
-    customer_note: `Order created via Call Center by ${agentName}`
+    customer_note: (req.body.notes ? req.body.notes + ' — ' : '') + `Order created via Call Center by ${agentName}`
   };
 
   if (freeShipping) {
