@@ -4186,7 +4186,7 @@ function renderCartsTable(data, totalItems, totalPages) {
             ).join('');
             // Color rows
             const container = document.getElementById('upsellColorRows');
-            const colorOpts = QB_COLORS.map(c =>
+            const colorOpts = getColorsForType(upsellType).map(c =>
                 '<option value="' + c.name + '">' + c.name + '</option>'
             ).join('');
             let rows = '<label style="font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;display:block;">Barve:</label>';
@@ -4234,7 +4234,8 @@ function renderCartsTable(data, totalItems, totalPages) {
         }
 
                 // ===== Quick Product Builder =====
-        const QB_COLORS = [
+        // Default fallback colors (Slovenian)
+        const QB_COLORS_DEFAULT = [
             { name: 'Črna', hex: '#000' },
             { name: 'Bela', hex: '#f0f0f0', border: true },
             { name: 'Siva', hex: '#9ca3af' },
@@ -4248,12 +4249,43 @@ function renderCartsTable(data, totalItems, totalPages) {
             { name: 'Vijolična', hex: '#9333ea' },
             { name: 'Roza', hex: '#ec4899' }
         ];
+        let QB_COLORS = QB_COLORS_DEFAULT;
+        let STORE_PRODUCT_COLORS = {}; // { storeCode: { majice: [...], bokserice: [...] } }
+
+        // Fetch real WooCommerce colors
+        (async function loadProductColors() {
+            try {
+                const resp = await fetch('/api/product-colors');
+                const json = await resp.json();
+                if (json.success && json.data) {
+                    STORE_PRODUCT_COLORS = json.data;
+                    console.log('Product colors loaded:', Object.keys(json.data).join(', '));
+                }
+            } catch(e) { console.warn('Could not load product colors:', e); }
+        })();
+
+        function getColorsForType(type, storeCode) {
+            // If we have store-specific colors, use them
+            if (storeCode && STORE_PRODUCT_COLORS[storeCode]) {
+                const sc = STORE_PRODUCT_COLORS[storeCode];
+                if (type === 'majice' && sc.majice && sc.majice.length > 0) return sc.majice;
+                if (type === 'bokserice' && sc.bokserice && sc.bokserice.length > 0) return sc.bokserice;
+            }
+            // Try to find colors from any store that has them
+            for (const [code, sc] of Object.entries(STORE_PRODUCT_COLORS)) {
+                if (type === 'majice' && sc.majice && sc.majice.length > 0) return sc.majice;
+                if (type === 'bokserice' && sc.bokserice && sc.bokserice.length > 0) return sc.bokserice;
+            }
+            return QB_COLORS_DEFAULT;
+        }
         const QB_SIZES = ['S','M','L','XL','2XL','3XL','4XL'];
         const QB_QTYS = [1,2,3,4,5,6,7,8,9,10,15];
         const QB_PRICES = { bokserice: 9.99, majice: 12.99, nogavice: 4.99 };
         let qbType = null, qbQty = 3, qbSize = 'XL';
 
+        let currentQBType = null;
         function toggleQB(type) {
+            currentQBType = type;
             const panel = document.getElementById('qbPanel');
             document.querySelectorAll('.quick-builder-btn').forEach(b => b.classList.remove('active'));
             if (qbType === type) { qbType = null; panel.classList.remove('visible'); return; }
@@ -4282,7 +4314,7 @@ function renderCartsTable(data, totalItems, totalPages) {
 
         function renderQBColors() {
             const container = document.getElementById('qbColorRows');
-            const colorOpts = QB_COLORS.map(c => {
+            const colorOpts = getColorsForType(currentQBType || 'majice').map(c => {
                 const dot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + c.hex + ';' + (c.border ? 'border:1px solid #ccc;' : '') + 'vertical-align:middle;margin-right:4px;"></span>';
                 return '<option value="' + c.name + '">' + c.name + '</option>';
             }).join('');
