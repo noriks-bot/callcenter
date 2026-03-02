@@ -465,7 +465,19 @@ async function fetchAbandonedCarts() {
             const lines = item._orto_lines || [];
             const productId = item.product_id || null;
             const variationId = item.variation_id || null;
-            let name = lines.length > 0 ? lines.join(', ') : `Product #${productId || 'unknown'}`;
+            let name;
+            if (lines.length > 0) {
+              name = lines.join(', ');
+            } else {
+              // Try to build name from variation attributes
+              const attrs = item.variation || {};
+              const attrValues = Object.values(attrs).filter(Boolean);
+              if (attrValues.length > 0) {
+                name = `Product #${productId || 'unknown'} (${attrValues.join(' - ')})`;
+              } else {
+                name = `Product #${productId || 'unknown'}`;
+              }
+            }
             cartContents.push({
               name, quantity: parseInt(item.quantity) || 1,
               price: parseFloat(item.line_total) || 0,

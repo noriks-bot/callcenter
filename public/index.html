@@ -3254,26 +3254,38 @@
             });
         }
 
-        function renderItemsCell(items, maxShow = 3) {
+        function renderItemsCell(items, maxShow = 4) {
             if (!items || items.length === 0) return '<span style="color:var(--text-muted);font-size:11px;">-</span>';
             let out = '';
             for (const item of items) {
                 const name = item.name || 'Unknown';
                 const qty = item.quantity || 1;
                 const variations = parseItemVariations(name);
-                const hasVariations = variations.length > 0 && variations.some(v => v.color || v.label);
+                const hasVariations = variations.length > 1 && variations.some(v => v.color || v.label);
+                
                 if (hasVariations) {
+                    // Multiple variations: show each as bullet with color dot
                     const lines = variations.slice(0, maxShow);
                     const rest = variations.length - maxShow;
                     for (const v of lines) {
                         const dot = colorDot(v.color || '');
-                        const text = (v.label ? v.label + ': ' : '') + (v.color || '') + (v.size ? ' - ' + v.size : '');
-                        out += '<div style="font-size:11px;line-height:1.4;">' + dot + esc(text) + '</div>';
+                        const parts = [];
+                        if (v.label) parts.push(v.label + ':');
+                        if (v.color) parts.push(v.color);
+                        if (v.size) parts.push('- ' + v.size);
+                        out += '<div style="font-size:11px;line-height:1.4;">' + dot + esc(parts.join(' ')) + '</div>';
                     }
                     if (rest > 0) out += '<div style="font-size:10px;color:var(--text-muted);">+' + rest + ' more</div>';
+                } else if (variations.length === 1 && variations[0].color) {
+                    // Single variation: "Color - Size"
+                    const v = variations[0];
+                    const dot = colorDot(v.color);
+                    const text = (v.color || '') + (v.size ? ' - ' + v.size : '');
+                    out += '<div style="font-size:11px;line-height:1.4;">' + (qty > 1 ? '<strong>' + qty + 'x</strong> ' : '') + dot + esc(text) + '</div>';
                 } else {
-                    const short = name.length > 40 ? name.substring(0, 40) + '...' : name;
-                    out += '<div style="font-size:11px;line-height:1.4;"><strong>' + qty + 'x</strong> ' + esc(short) + '</div>';
+                    // Plain product name (e.g. "Miješani 10-paket (2XL)")
+                    const short = name.length > 45 ? name.substring(0, 45) + '...' : name;
+                    out += '<div style="font-size:11px;line-height:1.4;">' + (qty > 1 ? '<strong>' + qty + 'x</strong> ' : '') + esc(short) + '</div>';
                 }
             }
             return out;
