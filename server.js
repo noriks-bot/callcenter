@@ -327,7 +327,7 @@ async function enrichCartProductNames(carts) {
   
   for (const cart of carts) {
     for (const item of (cart.cartContents || [])) {
-      if ((item.name || '').startsWith('Product #') && item.productId) {
+      if (item.productId) {
         const key = cart.storeCode + '_' + item.productId + (item.variationId ? '_' + item.variationId : '');
         if (!cache[key]) {
           toResolve.push({ storeCode: cart.storeCode, productId: item.productId, variationId: item.variationId, key });
@@ -370,9 +370,14 @@ function enrichCartsFromCache(carts) {
   if (!cache || Object.keys(cache).length === 0) return carts;
   for (const cart of carts) {
     for (const item of (cart.cartContents || [])) {
-      if ((item.name || '').startsWith('Product #') && item.productId) {
+      if (item.productId) {
         const key = cart.storeCode + '_' + item.productId + (item.variationId ? '_' + item.variationId : '');
-        if (cache[key]) item.name = cache[key];
+        if (cache[key]) {
+          // Fix "Product #XXXX" names
+          if ((item.name || '').startsWith('Product #')) item.name = cache[key];
+          // Always set productTitle for frontend display
+          item.productTitle = cache[key].replace(/\s*\([^)]*\)\s*$/, ''); // strip size suffix like "(XL)"
+        }
       }
     }
   }
