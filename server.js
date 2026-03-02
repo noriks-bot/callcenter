@@ -1576,6 +1576,36 @@ app.post('/api/email-templates-save', (req, res) => { writeJson(emailTemplatesFi
 app.get('/api/clear-cache', (req, res) => { clearAllCache(); res.json({ success: true }); });
 
 // Warm cache
+app.get('/api/force-refresh', async (req, res) => {
+  console.log('[ForceRefresh] Triggered by user...');
+  try {
+    const results = await Promise.allSettled([
+      fetchAbandonedCarts().then(async carts => {
+        if (carts && carts.length > 0) { await enrichCartProductNames(carts); dbWrite('carts', carts); }
+        return (carts || []).length;
+      }),
+      fetchPendingOrders().then(orders => {
+        if (orders && orders.length > 0) dbWrite('pending', orders);
+        return (orders || []).length;
+      }),
+      fetchOneTimeBuyers(null).then(buyers => {
+        if (buyers && buyers.length > 0) dbWrite('buyers', buyers);
+        return (buyers || []).length;
+      }),
+      fetchPaketomati().then(orders => {
+        if (orders && orders.length > 0) dbWrite('paketomati', orders);
+        return (orders || []).length;
+      })
+    ]);
+    const counts = results.map((r, i) => r.status === 'fulfilled' ? r.value : 0);
+    console.log('[ForceRefresh] Done — carts:', counts[0], 'pending:', counts[1], 'buyers:', counts[2], 'paketomati:', counts[3]);
+    res.json({ success: true, carts: counts[0], pending: counts[1], buyers: counts[2], paketomati: counts[3] });
+  } catch (e) {
+    console.error('[ForceRefresh] Error:', e);
+    res.json({ success: false, error: e.message });
+  }
+});
+
 app.get('/api/warm-cache', async (req, res) => {
   await fetchAbandonedCarts();
   await fetchPendingOrders();

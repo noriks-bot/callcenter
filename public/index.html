@@ -2996,23 +2996,29 @@
         }
 
         async function refreshData() {
-            console.log('[Refresh] Starting data refresh...');
+            console.log('[Refresh] Starting force refresh...');
+            const btn = document.querySelector('.action-btn-header .fa-sync-alt');
+            if (btn) btn.classList.add('fa-spin');
             document.getElementById('tableContainer').innerHTML = renderSkeletonTable(8);
 
             try {
-                // Clear cache first
-                await apiFetch('/api/clear-cache', {
-                    component: 'ClearCache',
+                // Force server to re-fetch from WooCommerce → SQLite
+                const result = await apiFetch('/api/force-refresh', {
+                    component: 'ForceRefresh',
                     silent: true,
                     retries: 1
                 });
+                console.log('[Refresh] Server refreshed:', result);
 
-                // Reload all data
+                // Reload from API (now serving fresh SQLite data)
                 await loadAllDataBulletproof();
+                await loadPaketomatiBulletproof();
                 showToast('✓ Podatki osveženi!');
             } catch (e) {
                 console.error('[Refresh] Error:', e);
                 showToast('⚠️ Napaka pri osvežitvi podatkov', 'error');
+            } finally {
+                if (btn) btn.classList.remove('fa-spin');
             }
         }
 

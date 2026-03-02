@@ -1,5 +1,39 @@
 [
   {
+    "id": "pl_856",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "cartDbId": "856",
+    "customerName": "Paweł Spinek",
+    "firstName": "Paweł",
+    "lastName": "Spinek",
+    "email": "spinekpawel@gmail.com",
+    "phone": "48572112591",
+    "address": "Ul. Zalesie 80616/80616 80616",
+    "city": "PL, Ostrów Mazowiecka",
+    "postcode": "07-302",
+    "location": "PL, Ostrów Mazowiecka",
+    "cartContents": [
+      {
+        "name": "Czarny - XL, Czarny - XL, Czarny - XL, Czarny - XL, Czarny - XL",
+        "quantity": 1,
+        "price": 144,
+        "productId": 3534,
+        "variationId": null
+      }
+    ],
+    "cartValue": 155.99,
+    "currency": "PLN",
+    "abandonedAt": "2026-03-02 19:02:53",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "converted": false
+  },
+  {
     "id": "gr_1084",
     "storeCode": "gr",
     "storeName": "Greece",
