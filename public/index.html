@@ -663,6 +663,28 @@
             background: var(--accent);
             color: #fff;
         }
+        
+        /* Quick Product Builder */
+        .quick-builder { margin: 12px 0; }
+        .quick-builder-btns { display: flex; gap: 6px; margin-bottom: 8px; }
+        .quick-builder-btn { padding: 6px 14px; border: 1px solid var(--card-border); border-radius: 20px; background: var(--card-bg); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+        .quick-builder-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .quick-builder-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+        .quick-builder-btn i { font-size: 11px; }
+        .qb-panel { display: none; background: var(--bg-main); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 14px; margin-top: 8px; }
+        .qb-panel.visible { display: block; }
+        .qb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .qb-row label { font-size: 12px; color: var(--text-muted); font-weight: 500; min-width: 60px; }
+        .qb-size-btn, .qb-qty-btn { padding: 4px 10px; border: 1px solid var(--card-border); border-radius: 16px; background: var(--card-bg); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.12s; }
+        .qb-size-btn:hover, .qb-qty-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .qb-size-btn.selected, .qb-qty-btn.selected { border-color: var(--accent); background: var(--accent); color: #fff; }
+        .qb-color-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+        .qb-color-row span.qb-piece-label { font-size: 11px; color: var(--text-muted); min-width: 20px; }
+        .qb-color-select { padding: 4px 8px; border: 1px solid var(--card-border); border-radius: var(--radius-md); background: var(--card-bg); color: var(--text-primary); font-size: 12px; min-width: 120px; }
+        .qb-add-btn { padding: 8px 20px; border: none; border-radius: 20px; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-top: 4px; }
+        .qb-add-btn:hover { filter: brightness(1.1); }
+        .qb-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .qb-price-input { padding: 4px 8px; border: 1px solid var(--card-border); border-radius: var(--radius-md); background: var(--bg-main); color: var(--text-primary); font-size: 12px; width: 70px; }
         </style>
 </head>
 <body>
@@ -975,6 +997,31 @@
                     <i class="fas fa-spinner fa-spin product-search-spinner" id="productSearchSpinner"></i>
                     <div class="product-search-results" id="productSearchResults">
                         <!-- Results will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Quick Product Builder -->
+                <div class="quick-builder">
+                    <div class="quick-builder-btns">
+                        <button class="quick-builder-btn" onclick="toggleQB('bokserice')"><i class="fas fa-plus"></i> Bokserice</button>
+                        <button class="quick-builder-btn" onclick="toggleQB('majice')"><i class="fas fa-plus"></i> Majice</button>
+                        <button class="quick-builder-btn" onclick="toggleQB('nogavice')"><i class="fas fa-plus"></i> Nogavice</button>
+                    </div>
+                    <div class="qb-panel" id="qbPanel">
+                        <div class="qb-row">
+                            <label>Količina:</label>
+                            <div id="qbQtyBtns"></div>
+                        </div>
+                        <div class="qb-row">
+                            <label>Velikost:</label>
+                            <div id="qbSizeBtns" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+                        </div>
+                        <div id="qbColorRows" style="margin:8px 0;"></div>
+                        <div class="qb-row">
+                            <label>Cena/kos:</label>
+                            <input type="number" step="0.01" min="0" class="qb-price-input" id="qbPrice" value="9.99">
+                        </div>
+                        <button class="qb-add-btn" id="qbAddBtn" onclick="qbAddToOrder()"><i class="fas fa-plus"></i> Dodaj v naročilo</button>
                     </div>
                 </div>
 
@@ -4036,7 +4083,120 @@ function renderCartsTable(data, totalItems, totalPages) {
             updateOrderTotals();
         }
 
-        function updateItemQty(idx, val) {
+        // ===== Quick Product Builder =====
+        const QB_COLORS = [
+            { name: 'Črna', hex: '#000' },
+            { name: 'Bela', hex: '#f0f0f0', border: true },
+            { name: 'Siva', hex: '#9ca3af' },
+            { name: 'Temno modra', hex: '#1e3a5f' },
+            { name: 'Modra', hex: '#2563eb' },
+            { name: 'Zelena', hex: '#16a34a' },
+            { name: 'Rdeča', hex: '#dc2626' },
+            { name: 'Rjava', hex: '#8b4513' },
+            { name: 'Bež', hex: '#d4a574' },
+            { name: 'Oranžna', hex: '#ea580c' },
+            { name: 'Vijolična', hex: '#9333ea' },
+            { name: 'Roza', hex: '#ec4899' }
+        ];
+        const QB_SIZES = ['S','M','L','XL','2XL','3XL','4XL'];
+        const QB_QTYS = [1,2,3,4,5,6,7,8,9,10,15];
+        const QB_PRICES = { bokserice: 9.99, majice: 12.99, nogavice: 4.99 };
+        let qbType = null, qbQty = 3, qbSize = 'XL';
+
+        function toggleQB(type) {
+            const panel = document.getElementById('qbPanel');
+            document.querySelectorAll('.quick-builder-btn').forEach(b => b.classList.remove('active'));
+            if (qbType === type) { qbType = null; panel.classList.remove('visible'); return; }
+            qbType = type;
+            event.target.closest('.quick-builder-btn').classList.add('active');
+            panel.classList.add('visible');
+            document.getElementById('qbPrice').value = QB_PRICES[type] || 9.99;
+            renderQB();
+        }
+
+        function renderQB() {
+            // Qty buttons
+            document.getElementById('qbQtyBtns').innerHTML = QB_QTYS.map(q =>
+                '<button class="qb-qty-btn' + (q === qbQty ? ' selected' : '') + '" onclick="qbSetQty(' + q + ')">' + q + '</button>'
+            ).join(' ');
+            // Size buttons
+            document.getElementById('qbSizeBtns').innerHTML = QB_SIZES.map(s =>
+                '<button class="qb-size-btn' + (s === qbSize ? ' selected' : '') + '" onclick="qbSetSize(\'' + s + '\')">' + s + '</button>'
+            ).join('');
+            // Color rows
+            renderQBColors();
+        }
+
+        function qbSetQty(q) { qbQty = q; renderQB(); }
+        function qbSetSize(s) { qbSize = s; renderQB(); }
+
+        function renderQBColors() {
+            const container = document.getElementById('qbColorRows');
+            const colorOpts = QB_COLORS.map(c => {
+                const dot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + c.hex + ';' + (c.border ? 'border:1px solid #ccc;' : '') + 'vertical-align:middle;margin-right:4px;"></span>';
+                return '<option value="' + c.name + '">' + c.name + '</option>';
+            }).join('');
+            let rows = '<label style="font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;display:block;">Barve:</label>';
+            for (let i = 0; i < qbQty; i++) {
+                rows += '<div class="qb-color-row">' +
+                    '<span class="qb-piece-label">' + (i+1) + '.</span>' +
+                    '<select class="qb-color-select" id="qbColor_' + i + '">' + colorOpts + '</select>' +
+                    '</div>';
+            }
+            container.innerHTML = rows;
+            // Pre-select: distribute colors
+            const defaults = ['Črna','Siva','Temno modra','Zelena','Rdeča','Bela','Rjava','Modra','Bež','Oranžna','Vijolična','Roza'];
+            for (let i = 0; i < qbQty; i++) {
+                const sel = document.getElementById('qbColor_' + i);
+                if (sel) sel.value = defaults[i % defaults.length];
+            }
+        }
+
+        function qbAddToOrder() {
+            if (!qbType || !qbSize) return;
+            const price = parseFloat(document.getElementById('qbPrice').value) || 0;
+            const typeNames = { bokserice: 'Bokserice', majice: 'Majice', nogavice: 'Nogavice' };
+            
+            // Build items list with colors
+            const colorParts = [];
+            for (let i = 0; i < qbQty; i++) {
+                const sel = document.getElementById('qbColor_' + i);
+                const color = sel ? sel.value : 'Črna';
+                colorParts.push(color + ' - ' + qbSize);
+            }
+            
+            const name = colorParts.join(', ');
+            const title = typeNames[qbType] + ' (' + qbQty + ' kos)';
+            
+            orderItems.push({
+                name: name,
+                productTitle: title,
+                productId: null,
+                variationId: null,
+                sku: 'QB-' + qbType.toUpperCase(),
+                image: null,
+                editPrice: price * qbQty,
+                editQty: 1,
+                quantity: 1,
+                isQuickBuild: true
+            });
+            
+            // Reset discount
+            currentDiscount = 0;
+            originalPrices = null;
+            document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('discountBtnNone').classList.add('active');
+            
+            renderOrderItems();
+            showToast('✓ ' + title + ' dodano');
+            
+            // Close panel
+            qbType = null;
+            document.getElementById('qbPanel').classList.remove('visible');
+            document.querySelectorAll('.quick-builder-btn').forEach(b => b.classList.remove('active'));
+        }
+
+                function updateItemQty(idx, val) {
             orderItems[idx].editQty = Math.max(1, parseInt(val) || 1);
             renderOrderItems();
         }
