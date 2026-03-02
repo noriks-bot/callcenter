@@ -752,25 +752,7 @@
 
     <!-- Main -->
     <main class="main" id="main">
-        <!-- Stats Grid (at top) -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
-                <div><div class="stat-value" id="statCarts">0</div><div class="stat-label">Abandoned Carts</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon green"><i class="fas fa-euro-sign"></i></div>
-                <div><div class="stat-value" id="statValue">€0</div><div class="stat-label">Total Value of Abandoned</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
-                <div><div class="stat-value" id="statPending">0</div><div class="stat-label">Pending Orders</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon purple"><i class="fas fa-comment-sms"></i></div>
-                <div><div class="stat-value" id="statSms">0</div><div class="stat-label">SMS Sent Today</div></div>
-            </div>
-        </div>
+        
         
         <!-- Country Tabs -->
         <div class="country-tabs" id="countryTabs"></div>
@@ -3034,40 +3016,7 @@
             return value * rate;
         }
 
-        function updateStats() {
-            const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-            // Filter by user's allowed countries first (same as updateContentTabCounts)
-            const shouldFilter = !hasAllCountries && !isAdmin;
-            let fc = shouldFilter ? carts.filter(c => userCountries.includes(c.storeCode)) : [...carts];
-            let fp = shouldFilter ? pending.filter(p => userCountries.includes(p.storeCode)) : [...pending];
-
-            // Filter out converted carts
-            fc = fc.filter(c => c.converted !== true);
-
-            // 30-day cutoff (same as renderTable)
-            fc = fc.filter(c => !c.abandonedAt || new Date(c.abandonedAt).getTime() > thirtyDaysAgo);
-            fp = fp.filter(p => !p.createdAt || new Date(p.createdAt).getTime() > thirtyDaysAgo);
-
-            // Then filter by currentStore if not 'all'
-            if (currentStore !== 'all') {
-                fc = fc.filter(c => c.storeCode === currentStore);
-                fp = fp.filter(p => p.storeCode === currentStore);
-            }
-
-            // Convert all values to EUR before summing
-            const totalValue = fc.reduce((sum, c) => sum + convertToEur(c.cartValue || 0, c.currency), 0);
-            const sym = '€'; // Always show in EUR since we're converting
-
-            const today = new Date().toDateString();
-            const smsToday = smsLog.filter(s => new Date(s.date).toDateString() === today).length;
-
-            document.getElementById('statCarts').textContent = fc.length;
-            document.getElementById('statValue').textContent = sym + Math.round(totalValue).toLocaleString();
-            // Count only actual pending/on-hold orders for stat card (not cancelled/failed)
-            const actualPending = fp.filter(p => p.orderStatus === 'pending' || p.orderStatus === 'on-hold');
-            document.getElementById('statPending').textContent = actualPending.length;
-            document.getElementById('statSms').textContent = smsToday;
-        }
+        function updateStats() { /* removed - stats bar deleted */ }
 
         // Filters
         document.getElementById('searchInput').addEventListener('input', renderTable);
