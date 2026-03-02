@@ -1,5 +1,39 @@
 [
   {
+    "id": "gr_1084",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1084",
+    "customerName": "Χρηστος Μοσχοπουλος",
+    "firstName": "Χρηστος",
+    "lastName": "Μοσχοπουλος",
+    "email": "football.society@gmail.com",
+    "phone": "6936122849",
+    "address": "Τροιας 28",
+    "city": "Πάτρα",
+    "postcode": "264 43",
+    "location": "Πάτρα",
+    "cartContents": [
+      {
+        "name": "Μαύρο - 4XL, Λευκό - 4XL, Σκούρο μπλε - 4XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3015,
+        "variationId": null
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-02 18:53:40",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "converted": false
+  },
+  {
     "id": "hr_2255",
     "storeCode": "hr",
     "storeName": "Croatia",
@@ -16,7 +50,7 @@
     "location": "",
     "cartContents": [
       {
-        "name": "Product #5048",
+        "name": "Product #5048 (2XL)",
         "quantity": 1,
         "price": 80.99,
         "productId": 5048,
@@ -295,7 +329,7 @@
     "location": "Γουμένισσα",
     "cartContents": [
       {
-        "name": "Product #2838",
+        "name": "Product #2838 (XL)",
         "quantity": 1,
         "price": 31.99,
         "productId": 2838,
@@ -397,7 +431,7 @@
     "location": "Διδυμότειχο",
     "cartContents": [
       {
-        "name": "Product #1035",
+        "name": "Product #1035 (4XL)",
         "quantity": 1,
         "price": 49.99,
         "productId": 1035,
@@ -431,7 +465,7 @@
     "location": "Θεσσαλονίκη",
     "cartContents": [
       {
-        "name": "Product #1035",
+        "name": "Product #1035 (4XL)",
         "quantity": 1,
         "price": 49.99,
         "productId": 1035,
@@ -533,7 +567,7 @@
     "location": "Zagreb-susedgrad",
     "cartContents": [
       {
-        "name": "Product #504",
+        "name": "Product #504 (3XL)",
         "quantity": 1,
         "price": 24.99,
         "productId": 504,
@@ -1085,7 +1119,7 @@
     "location": "Umag",
     "cartContents": [
       {
-        "name": "Product #5075",
+        "name": "Product #5075 (L)",
         "quantity": 1,
         "price": 89.59,
         "productId": 5075,
@@ -1160,7 +1194,7 @@
     "location": "Šibenik",
     "cartContents": [
       {
-        "name": "Product #4875",
+        "name": "Product #4875 (M - XL)",
         "quantity": 1,
         "price": 109.99,
         "productId": 4875,
@@ -1303,21 +1337,21 @@
     "location": "CZ, Praha 11",
     "cartContents": [
       {
-        "name": "Product #5480",
+        "name": "Product #5480 (3XL)",
         "quantity": 1,
         "price": 670,
         "productId": 5480,
         "variationId": 5486
       },
       {
-        "name": "Product #4596",
+        "name": "Product #4596 (3XL)",
         "quantity": 1,
         "price": 1205,
         "productId": 4596,
         "variationId": 4602
       },
       {
-        "name": "Product #605",
+        "name": "Product #605 (3XL)",
         "quantity": 1,
         "price": 1205,
         "productId": 605,
@@ -1637,7 +1671,7 @@
     "location": "Παλαιό Φάληρο",
     "cartContents": [
       {
-        "name": "Product #2783",
+        "name": "Product #2783 (M)",
         "quantity": 1,
         "price": 48.99,
         "productId": 2783,
@@ -2060,7 +2094,7 @@
     "location": "Rab",
     "cartContents": [
       {
-        "name": "Product #4675",
+        "name": "Product #4675 (S - S)",
         "quantity": 3,
         "price": 419.97,
         "productId": 4675,
@@ -2162,7 +2196,7 @@
     "location": "Τρίκαλα",
     "cartContents": [
       {
-        "name": "Product #605",
+        "name": "Product #605 (3XL)",
         "quantity": 1,
         "price": 49.99,
         "productId": 605,
@@ -2339,7 +2373,7 @@
     "location": "CZ, Praha 4",
     "cartContents": [
       {
-        "name": "Product #1021",
+        "name": "Product #1021 (XL)",
         "quantity": 1,
         "price": 1205,
         "productId": 1021,
@@ -2373,7 +2407,7 @@
     "location": "Grad Zagreb",
     "cartContents": [
       {
-        "name": "Product #3007",
+        "name": "Product #3007 (43-46)",
         "quantity": 2,
         "price": 39.98,
         "productId": 3007,
@@ -2441,7 +2475,7 @@
     "location": "Νικήτη ή Νικήτας",
     "cartContents": [
       {
-        "name": "Product #2728",
+        "name": "Product #2728 (XL)",
         "quantity": 1,
         "price": 80.99,
         "productId": 2728,
@@ -3217,7 +3251,7 @@
     "location": "(Λασιθίου)",
     "cartContents": [
       {
-        "name": "Product #2893",
+        "name": "Product #2893 (4XL - 2XL)",
         "quantity": 1,
         "price": 109.99,
         "productId": 2893,
@@ -3489,7 +3523,7 @@
     "location": "Virovitica",
     "cartContents": [
       {
-        "name": "Product #3287",
+        "name": "Product #3287 (3XL - 3XL)",
         "quantity": 1,
         "price": 79.99,
         "productId": 3287,
@@ -3523,7 +3557,7 @@
     "location": "CZ, Prostějov",
     "cartContents": [
       {
-        "name": "Product #5488",
+        "name": "Product #5488 (L)",
         "quantity": 1,
         "price": 670,
         "productId": 5488,
@@ -4217,7 +4251,7 @@
     "location": "CZ, ",
     "cartContents": [
       {
-        "name": "Product #5495",
+        "name": "Product #5495 (2XL)",
         "quantity": 1,
         "price": 535,
         "productId": 5495,
@@ -4489,7 +4523,7 @@
     "location": "CZ, Zlín",
     "cartContents": [
       {
-        "name": "Product #1021",
+        "name": "Product #1021 (3XL)",
         "quantity": 1,
         "price": 965,
         "productId": 1021,
@@ -4591,14 +4625,14 @@
     "location": "Cres",
     "cartContents": [
       {
-        "name": "Product #490",
+        "name": "Product #490 (XL)",
         "quantity": 1,
         "price": 19.99,
         "productId": 490,
         "variationId": 494
       },
       {
-        "name": "Product #1395",
+        "name": "Product #1395 (XL)",
         "quantity": 1,
         "price": 19.99,
         "productId": 1395,
@@ -4632,7 +4666,7 @@
     "location": "PL, Poznań",
     "cartContents": [
       {
-        "name": "Product #1035",
+        "name": "Product #1035 (3XL)",
         "quantity": 1,
         "price": 170,
         "productId": 1035,
@@ -4666,7 +4700,7 @@
     "location": "CZ, Přibyslavice",
     "cartContents": [
       {
-        "name": "Product #605",
+        "name": "Product #605 (2XL)",
         "quantity": 1,
         "price": 965,
         "productId": 605,

@@ -15,9 +15,9 @@
     "createdAt": "2026-03-01T20:26:25",
     "items": [
       {
-        "name": "Noriks | AirFlow Modal",
+        "name": "Noriks | AirFlow Modal: Nero - 2XL, Blu - 2XL, Grigio - 2XL, Verde - 2XL, Rosso - 2XL, Blu - 2XL, Nero - 2XL",
         "quantity": 1,
-        "price": "49.99"
+        "total": 49.99
       }
     ],
     "callStatus": "not_called",
@@ -41,7 +41,7 @@
       {
         "name": "Maglietta grigia - S",
         "quantity": 1,
-        "price": "24.99"
+        "total": 24.99
       }
     ],
     "callStatus": "not_called",
@@ -63,14 +63,14 @@
     "createdAt": "2026-02-24T19:42:54",
     "items": [
       {
-        "name": "NORIKS | Pacchetto starter",
+        "name": "NORIKS | Pacchetto starter: Maglietta: Grigio - L, Boxer: Grigio - L",
         "quantity": 1,
-        "price": "19.99"
+        "total": 19.99
       },
       {
-        "name": "NORIKS | Maglietta",
+        "name": "NORIKS | Maglietta: Nero - XL, Nero - L, Nero - XL",
         "quantity": 1,
-        "price": "49.99"
+        "total": 49.99
       }
     ],
     "callStatus": "not_called",
@@ -92,9 +92,9 @@
     "createdAt": "2026-02-24T19:14:38",
     "items": [
       {
-        "name": "NORIKS | Pacchetto starter",
+        "name": "NORIKS | Pacchetto starter: Maglietta: Grigio - L, Boxer: Grigio - L",
         "quantity": 1,
-        "price": "19.99"
+        "total": 19.99
       }
     ],
     "callStatus": "not_called",
@@ -116,9 +116,9 @@
     "createdAt": "2026-02-24T18:31:39",
     "items": [
       {
-        "name": "Noriks | AirFlow Modal",
+        "name": "Noriks | AirFlow Modal: Zielony - L, Czarny - L, Zielony - L",
         "quantity": 1,
-        "price": "89.00"
+        "total": 89
       }
     ],
     "callStatus": "not_called",
@@ -142,7 +142,7 @@
       {
         "name": "NORIKS | Maglietta",
         "quantity": 1,
-        "price": "19.99"
+        "total": 19.99
       }
     ],
     "callStatus": "not_called",
@@ -164,9 +164,9 @@
     "createdAt": "2026-02-23T08:46:15",
     "items": [
       {
-        "name": "Noriks | AirFlow Modal",
+        "name": "Noriks | AirFlow Modal: Crna - S, Crna - S, Crna - S",
         "quantity": 1,
-        "price": "32"
+        "total": 32
       }
     ],
     "callStatus": "not_called",
@@ -188,9 +188,9 @@
     "createdAt": "2026-02-16T09:27:25",
     "items": [
       {
-        "name": "Σετ εκκίνησης | 2× μπόξερ",
+        "name": "Σετ εκκίνησης | 2× μπόξερ: Μπόξερ 1: Μαύρο - S, Μπόξερ 2 2: Μαύρο - S",
         "quantity": 1,
-        "price": "16.99"
+        "total": 16.99
       }
     ],
     "callStatus": "not_called",
@@ -214,7 +214,7 @@
       {
         "name": "Αστικό-γήινο – συσκευασία 3 τεμ - S",
         "quantity": 1,
-        "price": "49.99"
+        "total": 49.99
       }
     ],
     "callStatus": "not_called",
@@ -236,9 +236,9 @@
     "createdAt": "2026-02-16T08:57:28",
     "items": [
       {
-        "name": "NORIKS | Σετ εκκίνησης",
+        "name": "NORIKS | Σετ εκκίνησης: Μπλούζα: Μαύρο - S, Μπόξερ: Μαύρο - S",
         "quantity": 1,
-        "price": "19.99"
+        "total": 19.99
       }
     ],
     "callStatus": "not_called",
@@ -260,9 +260,9 @@
     "createdAt": "2026-02-07T10:10:56",
     "items": [
       {
-        "name": "Noriks | Pakiet startowy",
+        "name": "Noriks | Pakiet startowy: Bokserki 1: Czarny - 2XL, Bokserki 2: Szary - 2XL",
         "quantity": 1,
-        "price": "55.00"
+        "total": 55
       }
     ],
     "callStatus": "not_called",
@@ -286,17 +286,17 @@
       {
         "name": "Crne bokserice 15-paket - S",
         "quantity": 1,
-        "price": "89.85"
+        "total": 89.85
       },
       {
         "name": "Crne bokserice 10-paket - S",
         "quantity": 1,
-        "price": "64.99"
+        "total": 64.99
       },
       {
         "name": "Crne bokserice 5-paket - S",
         "quantity": 1,
-        "price": "38.97"
+        "total": 38.97
       }
     ],
     "callStatus": "not_called",
@@ -318,9 +318,9 @@
     "createdAt": "2026-02-04T10:41:34",
     "items": [
       {
-        "name": "Noriks | Koszulki",
+        "name": "Noriks | Koszulki: Czarny - 3XL, Granatowy - 3XL, Czarny - 3XL",
         "quantity": 1,
-        "price": "170.00"
+        "total": 170
       }
     ],
     "callStatus": "not_called",
@@ -342,9 +342,9 @@
     "createdAt": "2026-01-31T04:28:33",
     "items": [
       {
-        "name": "NORIKS | Tričko",
+        "name": "NORIKS | Tričko: Tmavě modrá - 4XL, Šedá - 4XL, Zelená - 4XL",
         "quantity": 1,
-        "price": "965"
+        "total": 965
       }
     ],
     "callStatus": "not_called",
@@ -368,7 +368,7 @@
       {
         "name": "Komplet bokseric – 8+7 Gratis - 2XL",
         "quantity": 1,
-        "price": "107.93"
+        "total": 107.93
       }
     ],
     "callStatus": "not_called",
@@ -392,12 +392,12 @@
       {
         "name": "Urbano-Zemljani 3-Paket - S",
         "quantity": 1,
-        "price": "28.99"
+        "total": 28.99
       },
       {
         "name": "NORIKS komplet: 2 majici + 5 bokseric GRATIS",
         "quantity": 1,
-        "price": "49.99"
+        "total": 49.99
       }
     ],
     "callStatus": "not_called",
@@ -419,9 +419,9 @@
     "createdAt": "2025-12-16T21:05:48",
     "items": [
       {
-        "name": "Noriks AirFlow Modal",
+        "name": "Noriks AirFlow Modal: Plava - S, Siva - S, Plava - S, Siva - S, Plava - S",
         "quantity": 1,
-        "price": "38.97"
+        "total": 38.97
       }
     ],
     "callStatus": "not_called",
@@ -445,7 +445,7 @@
       {
         "name": "Komplet bokseric – 3+1 Gratis - XL",
         "quantity": 1,
-        "price": "44.97"
+        "total": 44.97
       }
     ],
     "callStatus": "not_called",
@@ -467,14 +467,14 @@
     "createdAt": "2025-12-11T21:32:53",
     "items": [
       {
-        "name": "Složi 2-paket",
+        "name": "Složi 2-paket: Crna Majica - M, Bijela Majica - M",
         "quantity": 1,
-        "price": "37.98"
+        "total": 37.98
       },
       {
         "name": "Komplet crnih bokseric – 3+1 Gratis - L",
         "quantity": 1,
-        "price": "44.97"
+        "total": 44.97
       }
     ],
     "callStatus": "not_called",
@@ -496,9 +496,9 @@
     "createdAt": "2025-12-11T20:20:31",
     "items": [
       {
-        "name": "NORIKS bokserice",
+        "name": "NORIKS bokserice: Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL",
         "quantity": 1,
-        "price": "51.96"
+        "total": 51.96
       }
     ],
     "callStatus": "not_called",
@@ -520,9 +520,9 @@
     "createdAt": "2025-12-11T20:14:05",
     "items": [
       {
-        "name": "NORIKS bokserice",
+        "name": "NORIKS bokserice: Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL",
         "quantity": 1,
-        "price": "51.96"
+        "total": 51.96
       }
     ],
     "callStatus": "not_called",
@@ -546,7 +546,7 @@
       {
         "name": "NORIKS komplet: 2 majici + 5 bokseric GRATIS",
         "quantity": 1,
-        "price": "49.99"
+        "total": 49.99
       }
     ],
     "callStatus": "not_called",
@@ -568,9 +568,9 @@
     "createdAt": "2025-10-21T14:11:56",
     "items": [
       {
-        "name": "2+1 GRATIS koszulka",
+        "name": "2+1 GRATIS koszulka: biała koszulka - 3XL, biała koszulka - 3XL, biała koszulka - 3XL",
         "quantity": 1,
-        "price": "164.99"
+        "total": 164.99
       }
     ],
     "callStatus": "not_called",
@@ -592,14 +592,14 @@
     "createdAt": "2025-10-02T21:00:34",
     "items": [
       {
-        "name": "2+2 GRATIS koszulka",
+        "name": "2+2 GRATIS koszulka: czarna koszulka - 2XL, biała koszulka - 2XL, szara koszulka - 2XL, biała koszulka - 2XL",
         "quantity": 1,
-        "price": "164.99"
+        "total": 164.99
       },
       {
-        "name": "2+2 GRATIS koszulka",
+        "name": "2+2 GRATIS koszulka: granatowa koszulka - 2XL, beżowa koszulka - 2XL, brązowa koszulka - 2XL, zielona koszulka - 2XL",
         "quantity": 1,
-        "price": "164.99"
+        "total": 164.99
       }
     ],
     "callStatus": "not_called",
@@ -621,9 +621,9 @@
     "createdAt": "2025-09-24T15:22:51",
     "items": [
       {
-        "name": "Poskladajte 2-balík",
+        "name": "Poskladajte 2-balík: Jedno čierne tričko - XL, Jedno zelené tričko - L",
         "quantity": 1,
-        "price": "37.98"
+        "total": 37.98
       }
     ],
     "callStatus": "not_called",
@@ -647,12 +647,12 @@
       {
         "name": "Jedna czarna koszulka - 2XL",
         "quantity": 1,
-        "price": "84.99"
+        "total": 84.99
       },
       {
         "name": "Skarpetki ze 100% bawełny, opakowanie po 5. - 43-46, Czarny",
         "quantity": 1,
-        "price": "39.99"
+        "total": 39.99
       }
     ],
     "callStatus": "not_called",
@@ -676,12 +676,12 @@
       {
         "name": "Jedna czarna koszulka - 2XL",
         "quantity": 1,
-        "price": "84.99"
+        "total": 84.99
       },
       {
         "name": "Skarpetki ze 100% bawełny, opakowanie po 5. - 39-42, Czarny",
         "quantity": 1,
-        "price": "39.99"
+        "total": 39.99
       }
     ],
     "callStatus": "not_called",
@@ -705,7 +705,7 @@
       {
         "name": "Jedno černé tričko - 3XL",
         "quantity": 1,
-        "price": "490"
+        "total": 490
       }
     ],
     "callStatus": "not_called",
@@ -727,9 +727,9 @@
     "createdAt": "2025-09-06T21:55:26",
     "items": [
       {
-        "name": "Złóż 3-pakiet",
+        "name": "Złóż 3-pakiet: granatowa koszulka - 2XL, czarna koszulka - 2XL, czarna koszulka - 2XL",
         "quantity": 1,
-        "price": "230.99"
+        "total": 230.99
       }
     ],
     "callStatus": "not_called",
@@ -751,9 +751,9 @@
     "createdAt": "2025-09-06T14:12:40",
     "items": [
       {
-        "name": "Poskladajte 3-balík",
+        "name": "Poskladajte 3-balík: Jedno zelené tričko - 2XL, Jedno zelené tričko - 2XL, Jedno béžové tričko - 2XL",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -777,7 +777,7 @@
       {
         "name": "Αστικό-Γήινο 3-πακέτο - S",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -801,7 +801,7 @@
       {
         "name": "3-Paket Crnih Majica - S",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -823,9 +823,9 @@
     "createdAt": "2025-09-02T20:22:46",
     "items": [
       {
-        "name": "Złóż 3-pakiet",
+        "name": "Złóż 3-pakiet: zielona koszulka - 3XL, szara koszulka - 3XL, granatowa koszulka - 3XL",
         "quantity": 1,
-        "price": "230.99"
+        "total": 230.99
       }
     ],
     "callStatus": "not_called",
@@ -849,12 +849,12 @@
       {
         "name": "Jedna granatowa koszulka - 2XL",
         "quantity": 1,
-        "price": "84.99"
+        "total": 84.99
       },
       {
         "name": "Skarpetki ze 100% bawełny, opakowanie po 5. - 43-46, Biały",
         "quantity": 1,
-        "price": "39.99"
+        "total": 39.99
       }
     ],
     "callStatus": "not_called",
@@ -878,12 +878,12 @@
       {
         "name": "Jedno hnědé tričko - 2XL",
         "quantity": 1,
-        "price": "490"
+        "total": 490
       },
       {
         "name": "Jedno tmavomodré tričko - 3XL",
         "quantity": 1,
-        "price": "490"
+        "total": 490
       }
     ],
     "callStatus": "not_called",
@@ -905,9 +905,9 @@
     "createdAt": "2025-08-23T05:38:06",
     "items": [
       {
-        "name": "Složi 6-paket",
+        "name": "Složi 6-paket: Crna Majica - 3XL, Tamnoplava Majica - 3XL, Tamnoplava Majica - 3XL, Siva Majica - 3XL, Crna Majica - 3XL, Crna Majica - 3XL",
         "quantity": 1,
-        "price": "101.94"
+        "total": 101.94
       }
     ],
     "callStatus": "not_called",
@@ -931,7 +931,7 @@
       {
         "name": "Uštedite do 60% s paketima - XL",
         "quantity": 12,
-        "price": "151.13"
+        "total": 151.13
       }
     ],
     "callStatus": "not_called",
@@ -955,7 +955,7 @@
       {
         "name": "Monokromni 3-Paket - L",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -979,7 +979,7 @@
       {
         "name": "Monokromni 3-Paket - S",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -1003,7 +1003,7 @@
       {
         "name": "3-Paket Crnih Majica - 3XL",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -1027,7 +1027,7 @@
       {
         "name": "Ponoćni Mix 3-Paket - 3XL",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -1051,12 +1051,12 @@
       {
         "name": "Zemljani Tonovi 6-Paket - 2XL",
         "quantity": 1,
-        "price": "107.94"
+        "total": 107.94
       },
       {
         "name": "Čarape od 100% pamuka, pakiranje od 5 - 43-46, Crna",
         "quantity": 1,
-        "price": "8.99"
+        "total": 8.99
       }
     ],
     "callStatus": "not_called",
@@ -1080,7 +1080,7 @@
       {
         "name": "3-Paket Crnih Majica - XL",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -1104,12 +1104,12 @@
       {
         "name": "3-Paket Bijelih Majica - XL",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       },
       {
         "name": "3-Paket Crnih Majica - XL",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",
@@ -1133,7 +1133,7 @@
       {
         "name": "3-Paket Bijelih Majica - XL",
         "quantity": 1,
-        "price": "53.97"
+        "total": 53.97
       }
     ],
     "callStatus": "not_called",

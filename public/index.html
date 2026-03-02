@@ -630,7 +630,43 @@
         .called-row td:first-child,
         .called-row td:last-child,
         .called-row td:nth-child(5) { text-decoration: none; }
-    </style>
+    
+        .discount-buttons-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 0;
+            padding: 10px 14px;
+            background: var(--bg-main);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--card-border);
+        }
+        .discount-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+        .discount-btn {
+            padding: 6px 16px;
+            border: 2px solid var(--card-border);
+            border-radius: var(--radius-md);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .discount-btn:hover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.08);
+        }
+        .discount-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        </style>
 </head>
 <body>
     <!-- Sidebar Overlay (Mobile) -->
@@ -975,6 +1011,15 @@
                 <div class="toggle-row">
                     <span class="toggle-label">🚚 Brezplačna dostava</span>
                     <div class="toggle" id="freeShippingToggle" onclick="toggleFreeShipping()"></div>
+                </div>
+
+                <!-- Discount Buttons -->
+                <div class="discount-buttons-row" id="discountButtonsRow">
+                    <span class="discount-label">🏷️ Popust:</span>
+                    <button class="discount-btn" onclick="applyDiscount(10)">-10%</button>
+                    <button class="discount-btn" onclick="applyDiscount(20)">-20%</button>
+                    <button class="discount-btn" onclick="applyDiscount(30)">-30%</button>
+                    <button class="discount-btn active" onclick="applyDiscount(0)" id="discountBtnNone">Brez</button>
                 </div>
 
                 <!-- Summary -->
@@ -3886,6 +3931,8 @@ function renderCartsTable(data, totalItems, totalPages) {
 
             // Start with empty items - user will search and add products
             orderItems = [];
+            currentDiscount = 0;
+            originalPrices = null;
 
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
