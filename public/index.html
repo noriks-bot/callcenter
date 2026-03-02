@@ -3344,10 +3344,6 @@
             });
         }
 
-        function detectProductType(count) {
-            return count + ' kos';
-        }
-
         function renderItemsCell(items, maxShow = 5) {
             if (!items || items.length === 0) return '<span style="color:var(--text-muted);font-size:11px;">-</span>';
             let out = '';
@@ -3366,7 +3362,8 @@
                     const beforeColon = rawName.substring(0, colonIdx);
                     // Check if afterColon looks like variations (has " - ")
                     if (afterColon.includes(' - ') || afterColon.split(',').length > 1) {
-                        title = beforeColon;
+                        const varCount = afterColon.split(',').length;
+                        title = beforeColon + (varCount > 1 ? ' (' + varCount + ' kos)' : '');
                         detailStr = afterColon;
                     }
                 }
@@ -3387,9 +3384,9 @@
                             // Try to get product type from productTitle or detect from context
                         const pTitle = item.productTitle || '';
                         if (pTitle) {
-                            title = pTitle;
+                            title = pTitle + ' (' + parts.length + ' kos)';
                         } else {
-                            title = detectProductType(parts.length);
+                            title = parts.length + ' kos';
                         }
                         }
                         detailStr = rawName;

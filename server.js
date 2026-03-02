@@ -1597,9 +1597,9 @@ app.get('/api/force-refresh', async (req, res) => {
         if (buyers && buyers.length > 0) dbWrite('buyers', buyers);
         return (buyers || []).length;
       }),
-      fetchPaketomati().then(orders => {
-        if (orders && orders.length > 0) dbWrite('paketomati', orders);
-        return (orders || []).length;
+      buildPaketomatiCache().then(() => {
+        const pak = dbReadData('paketomati');
+        return pak.length;
       })
     ]);
     const counts = results.map((r, i) => r.status === 'fulfilled' ? r.value : 0);
