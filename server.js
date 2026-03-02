@@ -409,10 +409,10 @@ function parseBundleContents(shortDesc, productName, categories) {
   if (shortDesc) {
     const text = shortDesc.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
     // Match various "contains/includes" keywords in all languages
-    const m = text.match(/(?:komplet\s+)?(?:sadrži|contains|contiene|zawiera|tartalmaz|obsahuje|περιέχει|περιλαμβάνει|enthält|balení obsahuje|sada obsahuje|set includes|σετ περιλαμβάνει|zestaw zawiera)[:\s]+(.*?)(?:\.|$)/i);
+    const m = text.match(/(?:komplet\s+|set\s+|sada\s+|balení\s+|zestaw\s+|csomag\s+|pacchetto\s+|confezione\s+|pacco\s+|súprava\s+|paket\s+|σετ\s+|πακέτο\s+|συσκευασία\s+)?(?:sadrži|vsebuje|contains|includes|contiene|comprende|include|zawiera|obejmuje|tartalmaz|tartalmazza|obsahuje|zahrnuje|περιέχει|περιλαμβάνει|enthält|beinhaltet)[:\s]+(.*?)(?:\.|$)/i);
     if (m) {
       const raw = m[1].trim().replace(/\.$/, '');
-      const parts = raw.split(/,\s*|\s+(?:i|and|und|e|και|a|oraz|és|și)\s+/i).filter(Boolean);
+      const parts = raw.split(/,\s*|\s+(?:i|in|and|und|e|ed|και|και|a|oraz|és|și|ja|og|y|et)\s+/i).filter(Boolean);
       const items = [];
       for (const part of parts) {
         const pm = part.trim().match(/^(\d+)\s*x?\s+(.+)$/i);
@@ -456,11 +456,11 @@ function inferBundleFromName(name, categories) {
   // Determine product type from name + categories
   const ctx = n + ' ' + (categories || '');
   let type = 'kos';
-  if (ctx.match(/boxer|bokser|bokseric|μπόξερ|boxerk/i)) type = 'bokserice';
-  else if (ctx.match(/majic|tričk|trič|μπλουζ|magliett|koszul|t-shirt|tee|shirt|póló/i)) type = 'majice';
-  else if (ctx.match(/čarap|sock|ponožk|κάλτσ|calzin|skarpe/i)) type = 'čarape';
+  if (ctx.match(/boxer|bokser|bokseric|μπόξερ|boxerk|spodky|alsónemű|mutande|bokserki|trenírk/i)) type = 'bokserice';
+  else if (ctx.match(/majic|tričk|trič|μπλουζ|magliett|koszul|t-shirt|tee|shirt|póló|trikó|maglia|triko|trika|trička|μπλούζ/i)) type = 'majice';
+  else if (ctx.match(/čarap|sock|ponožk|κάλτσ|calzin|skarpe|zokni|calze|ponožky/i)) type = 'čarape';
   // For mixed packs, try to determine from context
-  else if (ctx.match(/mix|miješan|μιξ|mieszany/i)) type = 'bokserice';  // most mixes are boxers
+  else if (ctx.match(/mix|miješan|μιξ|mieszany|vegyes|misto|zmiešan|směs/i)) type = 'bokserice';  // most mixes are boxers
   
   return [{ qty: count, desc: type }];
 }
@@ -498,9 +498,10 @@ async function enrichBundleContents(carts) {
       if (!cache[key]) {
         // Check if name suggests it's a pack/bundle
         const n = (item.name || '').toLowerCase();
-        if (n.includes('paket') || n.includes('balíček') || n.includes('pakiet') || n.includes('csomag') || 
-            n.includes('pacchetto') || n.includes('συσκευασία') || n.includes('pack') || n.includes('komplet') ||
-            n.includes('mix') || n.includes('μιξ') || n.includes('miješani') || n.includes('sada') || n.includes('set') || n.includes('σετ')) {
+        if (n.includes('paket') || n.includes('balíček') || n.includes('balení') || n.includes('pakiet') || n.includes('paczk') || n.includes('csomag') || 
+            n.includes('pacchetto') || n.includes('confezione') || n.includes('pacco') || n.includes('συσκευασία') || n.includes('πακέτο') || n.includes('pack') || n.includes('komplet') || n.includes('súprava') ||
+            n.includes('mix') || n.includes('μιξ') || n.includes('miješani') || n.includes('směs') || n.includes('vegyes') || n.includes('misto') ||
+            n.includes('sada') || n.includes('set') || n.includes('σετ') || n.includes('zestaw') || n.includes('starter')) {
           toFetch.add(JSON.stringify({ storeCode: cart.storeCode, productId: item.productId }));
         }
       }
