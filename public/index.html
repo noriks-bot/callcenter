@@ -3046,7 +3046,9 @@
 
             document.getElementById('statCarts').textContent = fc.length;
             document.getElementById('statValue').textContent = sym + Math.round(totalValue).toLocaleString();
-            document.getElementById('statPending').textContent = fp.length;
+            // Count only actual pending/on-hold orders for stat card (not cancelled/failed)
+            const actualPending = fp.filter(p => p.orderStatus === 'pending' || p.orderStatus === 'on-hold');
+            document.getElementById('statPending').textContent = actualPending.length;
             document.getElementById('statSms').textContent = smsToday;
         }
 
