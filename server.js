@@ -892,25 +892,27 @@ async function createOrderFromCart(input) {
   if (!config) return { error: 'Invalid store: ' + storeCode };
 
   let lineItems = [];
+    // Separate real products from custom (QB/Upsell/Komplet) items
+  const feeLines = [];
   if (items.length > 0) {
-    lineItems = items.map(item => {
+    lineItems = [];
+    for (const item of items) {
       const qty = parseInt(item.quantity) || 1;
-      const li = {};
       if (item.productId) {
-        li.product_id = parseInt(item.productId);
+        const li = { product_id: parseInt(item.productId), quantity: qty };
         if (item.variationId) li.variation_id = parseInt(item.variationId);
+        if (item.price !== undefined) {
+          li.subtotal = String(item.price * qty);
+          li.total = String(item.price * qty);
+        }
+        lineItems.push(li);
       } else {
-        // QB/Upsell/Komplet items - use name as custom line item
-        li.name = item.name || item.productTitle || 'Custom item';
-        li.product_id = 0;
+        // Custom items go as fee_lines (WC doesn't accept product_id=0)
+        const title = (item.productTitle || 'Custom') + ': ' + (item.name || '');
+        const total = item.price !== undefined ? String(item.price * qty) : '0';
+        feeLines.push({ name: title, total: total, tax_status: 'none' });
       }
-      li.quantity = qty;
-      if (item.price !== undefined) {
-        li.subtotal = String(item.price * qty);
-        li.total = String(item.price * qty);
-      }
-      return li;
-    });
+    }
   } else {
     lineItems = (cart?.cartContents || []).map(item => {
       const li = { product_id: item.productId, quantity: item.quantity };
@@ -919,7 +921,7 @@ async function createOrderFromCart(input) {
     });
   }
 
-  if (lineItems.length === 0) return { error: 'No items in order' };
+  if (lineItems.length === 0 && feeLines.length === 0) return { error: 'No items in order' };
 
   const firstName = customerData.firstName || cart?.firstName || '';
   const lastName = customerData.lastName || cart?.lastName || '';
@@ -935,7 +937,8 @@ async function createOrderFromCart(input) {
     set_paid: false, status: 'processing',
     billing: { first_name: firstName, last_name: lastName, email, phone, address_1: address, city, postcode, country: countryCode },
     shipping: { first_name: firstName, last_name: lastName, address_1: address, city, postcode, country: countryCode },
-    line_items: lineItems,
+    line_items: lineItems.length > 0 ? lineItems : undefined,
+    fee_lines: feeLines.length > 0 ? feeLines : undefined,
     meta_data: [
       { key: '_call_center', value: 'yes' }, { key: '_call_center_agent', value: agentName },
       { key: '_call_center_date', value: new Date().toISOString() },
