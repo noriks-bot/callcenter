@@ -2041,7 +2041,10 @@
                 </table>
             </div>
             <div class="table-card" style="margin-bottom:16px;">
-                <div style="padding:16px 16px 0;"><h3 style="margin:0 0 12px;font-size:15px;font-weight:600;">Daily Breakdown</h3></div>
+                <div style="padding:16px 16px 0;">
+                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;">Daily Breakdown</h3>
+                    <div id="statsCountryTabs" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;"></div>
+                </div>
                 <table class="data-table">
                     <thead><tr><th>Date</th><th>Leads</th><th>Calls</th><th>Conversions</th><th>Conv. Rate</th></tr></thead>
                     <tbody id="statsDailyBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</td></tr></tbody>
@@ -2432,7 +2435,7 @@
                         loadAgents();
                     } else if (currentTab === 'statistics') {
                         showSpecialView('statisticsContent');
-                        loadInlineStats();
+                        renderStatsCountryTabs(); loadInlineStats();
                     }
                 }
             });
@@ -8227,9 +8230,33 @@ function renderCartsTable(data, totalItems, totalPages) {
         // ===== INLINE STATISTICS =====
         
         
+        let statsCountryFilter = 'all';
+
+        function renderStatsCountryTabs() {
+            const container = document.getElementById('statsCountryTabs');
+            if (!container) return;
+            const allowedStores = (hasAllCountries || isAdmin)
+                ? stores
+                : stores.filter(s => userCountries.includes(s.code));
+            
+            let tabsHtml = '<button class="country-tab' + (statsCountryFilter === 'all' ? ' active' : '') + '" data-statsstore="all" style="padding:6px 14px;border-radius:8px;border:1px solid var(--card-border);background:' + (statsCountryFilter === 'all' ? 'var(--accent-blue)' : 'var(--card-bg)') + ';color:' + (statsCountryFilter === 'all' ? 'white' : 'var(--text-primary)') + ';cursor:pointer;font-size:13px;font-weight:500;">All</button>';
+            for (const s of allowedStores) {
+                const active = statsCountryFilter === s.code;
+                tabsHtml += '<button class="country-tab' + (active ? ' active' : '') + '" data-statsstore="' + s.code + '" style="padding:6px 14px;border-radius:8px;border:1px solid var(--card-border);background:' + (active ? 'var(--accent-blue)' : 'var(--card-bg)') + ';color:' + (active ? 'white' : 'var(--text-primary)') + ';cursor:pointer;font-size:13px;font-weight:500;">' + s.flag + ' ' + s.name + '</button>';
+            }
+            container.innerHTML = tabsHtml;
+            container.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    statsCountryFilter = btn.dataset.statsstore;
+                    renderStatsCountryTabs();
+                    loadInlineStats();
+                });
+            });
+        }
+
         async function loadInlineStats() {
             const days = document.getElementById('statsPeriodSelect')?.value || '30';
-            const countriesParam = (isAdmin || hasAllCountries) ? 'all' : userCountries.join(',');
+            const countriesParam = statsCountryFilter !== 'all' ? statsCountryFilter : ((isAdmin || hasAllCountries) ? 'all' : userCountries.join(','));
             
             try {
                 const resp = await fetch('/api/statistics?days=' + days + '&countries=' + countriesParam);
