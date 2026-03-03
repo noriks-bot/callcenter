@@ -9059,11 +9059,7 @@
                 const data = await resp.json();
                 if (!data.success) throw new Error(data.error || 'Failed');
                 
-                document.getElementById('statsLeads').textContent = data.totalLeads;
-                document.getElementById('statsOrders').textContent = data.totalOrders;
-                document.getElementById('statsCalls').textContent = data.totalCalls;
-                const rate = data.totalLeads > 0 ? (data.totalOrders / data.totalLeads * 100).toFixed(1) : '0';
-                document.getElementById('statsConvRate').textContent = rate + '%';
+                // Stats cards removed - skip
                 
                 // Country table
                 document.getElementById('statsCountryBody').innerHTML = Object.entries(data.countryStats).map(([code, s]) =>
