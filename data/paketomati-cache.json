@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-02T22:15:45.317Z",
+  "generated_at": "2026-03-03T06:32:39.527Z",
   "orders": [
     {
       "id": "mk_5351/2026",
@@ -285,40 +285,6 @@
           "name": "NORIKS bokserice",
           "quantity": 1,
           "price": 670
-        }
-      ]
-    },
-    {
-      "id": "mk_4998/2026",
-      "orderNumber": "4998/2026",
-      "customer": {
-        "name": "Robert Boldi",
-        "email": "roberto870@seznam.cz",
-        "phone": "770 145 630"
-      },
-      "address": {
-        "street": "Ruska, 425/14",
-        "city": "Praha",
-        "postcode": "110 00",
-        "country": "Czech Republic"
-      },
-      "deliveryService": "EXPEDICO CZ NORIKS",
-      "trackingCode": "2169546242015",
-      "trackingLink": "https://expedico.eu/tracking?code=2169546242015",
-      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "orderTotal": 1389,
-      "currency": "CZK",
-      "createdAt": "2026-02-09+02:00",
-      "shippedAt": "2026-02-25+02:00",
-      "status": "not_called",
-      "notes": "",
-      "storeCode": "cz",
-      "items": [
-        {
-          "name": "NORIKS bokserice",
-          "quantity": 1,
-          "price": 1320
         }
       ]
     }

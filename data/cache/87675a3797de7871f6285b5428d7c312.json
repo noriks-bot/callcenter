@@ -1,5 +1,85 @@
 [
   {
+    "id": "gr_buyer_18e8631bdbc43594b672aa8f91d9bf3f",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6482,
+    "customerName": "Narine Ampartsoumian",
+    "email": "narine7778@yahoo.gr",
+    "phone": "6#44254329",
+    "location": "Thessaloniki, GR",
+    "totalSpent": 34.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-21T06:04:28",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | AirFlow Modal: Μαύρο - XL, Μαύρο - XL, Μαύρο - XL",
+        "quantity": 1,
+        "total": 31.99
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_a2a1ee64d36e940ddda7002445d800df",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5741,
+    "customerName": "Matej Kligl",
+    "email": "mata.kligl@gmail.com",
+    "phone": "0976627170",
+    "location": "Slatina",
+    "totalSpent": 67.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-21T05:26:10",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Crna - 2XL, Crna - 2XL, Crna - 2XL, Crna - 2XL, Crna - 2XL, Crna - 2XL, Crna - 2XL",
+        "quantity": 1,
+        "total": 64.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_7b36d7aa7a8916b7757bce2aca189858",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6480,
+    "customerName": "ΔΗΜΗΤΡΗΣ ΔΗΜΗΤΡΙΟΥ",
+    "email": "dimitriou_dim88@hotmail.com",
+    "phone": "+306945188880",
+    "location": "ΚΑΡΛΟΒΑΣΙ (Καρλοβασίων Σάμου), GR",
+    "totalSpent": 198.97,
+    "currency": "EUR",
+    "registeredAt": "2026-02-20T23:29:25",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | AirFlow Modal: Μαύρο - XL, Κόκκινο - XL, Μαύρο - XL",
+        "quantity": 2,
+        "total": 63.98
+      },
+      {
+        "name": "Λευκό μπλουζάκια – συσκευασία 9 τεμ - XL",
+        "quantity": 1,
+        "total": 134.99
+      }
+    ]
+  },
+  {
     "id": "gr_buyer_d4d450270d126bfd01f29bcf36be58c6",
     "storeCode": "gr",
     "storeName": "Greece",

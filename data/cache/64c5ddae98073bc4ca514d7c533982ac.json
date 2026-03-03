@@ -1,5 +1,7 @@
 {
   "emails": [
+    "test@gmail.com",
+    "s.ioannidou@hotmail.gr",
     "p.firtinidis@gmail.com",
     "eliaspapadopoulos032@gmail.com",
     "kanakaris.makis@yahoo.com",
@@ -58,11 +60,13 @@
     "xalkig@gmail.com",
     "lefkonkos@hotmail.com",
     "thanasikementzopolos@gmail.com",
-    "gianniskobin@hotmail.com",
-    "peripap1979@gmail.com",
-    "alexiouthanasis@yahoo.com"
+    "gianniskobin@hotmail.com"
   ],
   "phones": [
+    "3863121111",
+    "863121111",
+    "6944963827",
+    "944963827",
     "306976886828",
     "976886828",
     "6946631290",
@@ -180,10 +184,6 @@
     "6989861303",
     "989861303",
     "302631024837",
-    "631024837",
-    "6980660413",
-    "980660413",
-    "306932372196",
-    "932372196"
+    "631024837"
   ]
 }

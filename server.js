@@ -2164,18 +2164,37 @@ app.get('/api/statistics', async (req, res) => {
     const countriesParam = req.query.countries || 'all';
     const allowedCountries = countriesParam === 'all' ? null : countriesParam.split(',');
     
-    // Get carts and pending orders from cache
+    // Get carts from cache
     let allCarts = await fetchAbandonedCarts();
+    if (allowedCountries) allCarts = allCarts.filter(c => allowedCountries.includes(c.storeCode));
     
-    // Filter by country
-    if (allowedCountries) {
-      allCarts = allCarts.filter(c => allowedCountries.includes(c.storeCode));
+    // Get call data (status tracking) for conversions
+    const callData = loadCallData();
+    
+    // Build conversions list with dates and store codes
+    const conversions = [];
+    for (const [id, data] of Object.entries(callData)) {
+      if (data.callStatus !== 'converted') continue;
+      // Extract store code from id (e.g. "gr_914" -> "gr", "cz_cart_123" -> "cz")
+      const sc = id.split('_')[0];
+      if (allowedCountries && !allowedCountries.includes(sc)) continue;
+      conversions.push({
+        id, storeCode: sc,
+        date: (data.lastUpdated || '').slice(0, 10),
+        orderId: data.orderId
+      });
     }
     
-    // Get call logs for conversions
-    let logs = loadCallLogs();
-    if (allowedCountries) {
-      logs = logs.filter(l => allowedCountries.includes(l.storeCode));
+    // Count all status changes as "calls" (any interaction)
+    const allCalls = [];
+    for (const [id, data] of Object.entries(callData)) {
+      if (!data.callStatus || data.callStatus === 'not_called') continue;
+      const sc = id.split('_')[0];
+      if (allowedCountries && !allowedCountries.includes(sc)) continue;
+      allCalls.push({
+        id, storeCode: sc,
+        date: (data.lastUpdated || '').slice(0, 10)
+      });
     }
     
     // Build daily stats for last N days
@@ -2183,28 +2202,15 @@ app.get('/api/statistics', async (req, res) => {
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(Date.now() - i * 86400000);
       const dateStr = date.toISOString().slice(0, 10);
-      const dayStart = dateStr + 'T00:00:00';
-      const dayEnd = dateStr + 'T23:59:59';
       
-      const dayCarts = allCarts.filter(c => {
-        const d = (c.abandonedAt || '').slice(0, 10);
-        return d === dateStr;
-      });
-      
-      const dayConversions = logs.filter(l => {
-        const d = (l.createdAt || '').slice(0, 10);
-        return d === dateStr && l.status === 'converted';
-      });
-      
-      const dayCalls = logs.filter(l => {
-        const d = (l.createdAt || '').slice(0, 10);
-        return d === dateStr;
-      });
+      const dayCarts = allCarts.filter(c => (c.abandonedAt || '').slice(0, 10) === dateStr);
+      const dayConversions = conversions.filter(c => c.date === dateStr);
+      const dayCalls = allCalls.filter(c => c.date === dateStr);
       
       dailyStats.push({
         date: dateStr,
         leads: dayCarts.length,
-        conversions: dayConversions.length,
+        orders: dayConversions.length,
         calls: dayCalls.length,
         conversionRate: dayCarts.length > 0 ? Math.round(dayConversions.length / dayCarts.length * 1000) / 10 : 0
       });
@@ -2216,12 +2222,14 @@ app.get('/api/statistics', async (req, res) => {
     for (const sc of (Array.isArray(storeList) ? storeList : Object.keys(stores))) {
       if (!stores[sc]) continue;
       const storeCarts = allCarts.filter(c => c.storeCode === sc);
-      const storeConversions = logs.filter(l => l.storeCode === sc && l.status === 'converted');
+      const storeConversions = conversions.filter(c => c.storeCode === sc);
+      const storeCalls = allCalls.filter(c => c.storeCode === sc);
       countryStats[sc] = {
         flag: stores[sc].flag,
         name: stores[sc].name,
         leads: storeCarts.length,
-        conversions: storeConversions.length,
+        orders: storeConversions.length,
+        calls: storeCalls.length,
         conversionRate: storeCarts.length > 0 ? Math.round(storeConversions.length / storeCarts.length * 1000) / 10 : 0
       };
     }
@@ -2230,8 +2238,8 @@ app.get('/api/statistics', async (req, res) => {
       success: true,
       period: days + ' days',
       totalLeads: allCarts.length,
-      totalConversions: logs.filter(l => l.status === 'converted').length,
-      totalCalls: logs.length,
+      totalOrders: conversions.length,
+      totalCalls: allCalls.length,
       dailyStats,
       countryStats
     });
