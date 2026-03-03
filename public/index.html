@@ -2777,7 +2777,7 @@
             });
 
             document.getElementById('main').style.display = 'block';
-            document.querySelector('.stats-grid').style.display = 'grid';
+            const sg = document.querySelector('.stats-grid'); if (sg) sg.style.display = 'grid';
             document.querySelector('.country-tabs').style.display = 'flex';
             document.getElementById('contentTabs').style.display = 'flex';
             document.querySelector('.content').style.display = 'block';
