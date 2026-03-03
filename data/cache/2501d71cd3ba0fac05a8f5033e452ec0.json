@@ -1,0 +1,1142 @@
+[
+  {
+    "id": "it_order_5840",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5840,
+    "customerName": "Stefano Rusticelli",
+    "email": "srusticelli@gmail.com",
+    "phone": "347 872 9077",
+    "location": "San Giovanni In Persiceto, IT",
+    "orderStatus": "failed",
+    "orderTotal": 52.98,
+    "currency": "EUR",
+    "createdAt": "2026-03-01T20:26:25",
+    "items": [
+      {
+        "name": "Noriks | AirFlow Modal: Nero - 2XL, Blu - 2XL, Grigio - 2XL, Verde - 2XL, Rosso - 2XL, Blu - 2XL, Nero - 2XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "it_order_5824",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5824,
+    "customerName": "test IT Test IT",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "3232",
+    "location": "Bologna, IT",
+    "orderStatus": "cancelled",
+    "orderTotal": 27.98,
+    "currency": "EUR",
+    "createdAt": "2026-02-27T07:41:40",
+    "items": [
+      {
+        "name": "Maglietta grigia - S",
+        "quantity": 1,
+        "total": 24.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "it_order_5818",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5818,
+    "customerName": "Luciano FRATTINI",
+    "email": "luciano.frattini49@gmail.com",
+    "phone": "3293937540",
+    "location": "Lodi, IT",
+    "orderStatus": "cancelled",
+    "orderTotal": 72.97,
+    "currency": "EUR",
+    "createdAt": "2026-02-24T19:42:54",
+    "items": [
+      {
+        "name": "NORIKS | Pacchetto starter: Maglietta: Grigio - L, Boxer: Grigio - L",
+        "quantity": 1,
+        "total": 19.99
+      },
+      {
+        "name": "NORIKS | Maglietta: Nero - XL, Nero - L, Nero - XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "it_order_5817",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5817,
+    "customerName": "Luciano FRATTINI",
+    "email": "luciano.frattini49@gmail.com",
+    "phone": "3293937540",
+    "location": "Lodi, IT",
+    "orderStatus": "cancelled",
+    "orderTotal": 22.98,
+    "currency": "EUR",
+    "createdAt": "2026-02-24T19:14:38",
+    "items": [
+      {
+        "name": "NORIKS | Pacchetto starter: Maglietta: Grigio - L, Boxer: Grigio - L",
+        "quantity": 1,
+        "total": 19.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_3610",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 3610,
+    "customerName": "Krzysztof Leśnowski",
+    "email": "krzysztof.lesniowski@onet.pl",
+    "phone": "+48506175836",
+    "location": "Sułkowice, PL",
+    "orderStatus": "failed",
+    "orderTotal": 100.99,
+    "currency": "PLN",
+    "createdAt": "2026-02-24T18:31:39",
+    "items": [
+      {
+        "name": "Noriks | AirFlow Modal: Zielony - L, Czarny - L, Zielony - L",
+        "quantity": 1,
+        "total": 89
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "it_order_5810",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5810,
+    "customerName": "test test",
+    "email": "tedt@net.hr",
+    "phone": "111111",
+    "location": "test, IT",
+    "orderStatus": "cancelled",
+    "orderTotal": 19.99,
+    "currency": "EUR",
+    "createdAt": "2026-02-23T19:38:23",
+    "items": [
+      {
+        "name": "NORIKS | Maglietta",
+        "quantity": 1,
+        "total": 19.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hu_order_5603",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "orderId": 5603,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "3232",
+    "location": "budakezi, HU",
+    "orderStatus": "cancelled",
+    "orderTotal": 35,
+    "currency": "HUF",
+    "createdAt": "2026-02-23T08:46:15",
+    "items": [
+      {
+        "name": "Noriks | AirFlow Modal: Crna - S, Crna - S, Crna - S",
+        "quantity": 1,
+        "total": 32
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "gr_order_6446",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6446,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "306941601111",
+    "location": "Αττική, GR",
+    "orderStatus": "cancelled",
+    "orderTotal": 19.98,
+    "currency": "EUR",
+    "createdAt": "2026-02-16T09:27:25",
+    "items": [
+      {
+        "name": "Σετ εκκίνησης | 2× μπόξερ: Μπόξερ 1: Μαύρο - S, Μπόξερ 2 2: Μαύρο - S",
+        "quantity": 1,
+        "total": 16.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "gr_order_6445",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6445,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "306941601111",
+    "location": "Αττική",
+    "orderStatus": "cancelled",
+    "orderTotal": 52.98,
+    "currency": "EUR",
+    "createdAt": "2026-02-16T09:00:27",
+    "items": [
+      {
+        "name": "Αστικό-γήινο – συσκευασία 3 τεμ - S",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "gr_order_6444",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6444,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "306941601111",
+    "location": "Αττική",
+    "orderStatus": "cancelled",
+    "orderTotal": 22.98,
+    "currency": "EUR",
+    "createdAt": "2026-02-16T08:57:28",
+    "items": [
+      {
+        "name": "NORIKS | Σετ εκκίνησης: Μπλούζα: Μαύρο - S, Μπόξερ: Μαύρο - S",
+        "quantity": 1,
+        "total": 19.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_3601",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 3601,
+    "customerName": "Jolanta Staworowska",
+    "email": "jolanta.staworowska@gmail.com",
+    "phone": "693-456-875",
+    "location": "Legnica, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 66.99,
+    "currency": "PLN",
+    "createdAt": "2026-02-07T10:10:56",
+    "items": [
+      {
+        "name": "Noriks | Pakiet startowy: Bokserki 1: Czarny - 2XL, Bokserki 2: Szary - 2XL",
+        "quantity": 1,
+        "total": 55
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_5561",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5561,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "3232",
+    "location": "Zagreb",
+    "orderStatus": "cancelled",
+    "orderTotal": 193.81,
+    "currency": "EUR",
+    "createdAt": "2026-02-07T10:04:38",
+    "items": [
+      {
+        "name": "Crne bokserice 15-paket - S",
+        "quantity": 1,
+        "total": 89.85
+      },
+      {
+        "name": "Crne bokserice 10-paket - S",
+        "quantity": 1,
+        "total": 64.99
+      },
+      {
+        "name": "Crne bokserice 5-paket - S",
+        "quantity": 1,
+        "total": 38.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_3595",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 3595,
+    "customerName": "Małgorzata Wieczorek",
+    "email": "gosiuniawie57@o2.pl",
+    "phone": "609 733 726",
+    "location": "Damasławek, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 181.99,
+    "currency": "PLN",
+    "createdAt": "2026-02-04T10:41:34",
+    "items": [
+      {
+        "name": "Noriks | Koszulki: Czarny - 3XL, Granatowy - 3XL, Czarny - 3XL",
+        "quantity": 1,
+        "total": 170
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "cz_order_5692",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 5692,
+    "customerName": "Martin Liska",
+    "email": "liskam@email.cz",
+    "phone": "+420721012807",
+    "location": "Plzeň, CZ",
+    "orderStatus": "cancelled",
+    "orderTotal": 1034,
+    "currency": "CZK",
+    "createdAt": "2026-01-31T04:28:33",
+    "items": [
+      {
+        "name": "NORIKS | Tričko: Tmavě modrá - 4XL, Šedá - 4XL, Zelená - 4XL",
+        "quantity": 1,
+        "total": 965
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_4230",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 4230,
+    "customerName": "Ljiljana Jakšeković",
+    "email": "lsekacic@gmail.com",
+    "phone": "0996598473",
+    "location": "Bjelovar",
+    "orderStatus": "cancelled",
+    "orderTotal": 107.93,
+    "currency": "EUR",
+    "createdAt": "2026-01-09T08:21:53",
+    "items": [
+      {
+        "name": "Komplet bokseric – 8+7 Gratis - 2XL",
+        "quantity": 1,
+        "total": 107.93
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_4199",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 4199,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "3232",
+    "location": "Zagreb",
+    "orderStatus": "cancelled",
+    "orderTotal": 78.98,
+    "currency": "EUR",
+    "createdAt": "2026-01-06T07:44:45",
+    "items": [
+      {
+        "name": "Urbano-Zemljani 3-Paket - S",
+        "quantity": 1,
+        "total": 28.99
+      },
+      {
+        "name": "NORIKS komplet: 2 majici + 5 bokseric GRATIS",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_3915",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 3915,
+    "customerName": "Marijo Andrijevic",
+    "email": "andrijevicmarijo@gmail.com",
+    "phone": "0998807275",
+    "location": "Udbina",
+    "orderStatus": "cancelled",
+    "orderTotal": 41.96,
+    "currency": "EUR",
+    "createdAt": "2025-12-16T21:05:48",
+    "items": [
+      {
+        "name": "Noriks AirFlow Modal: Plava - S, Siva - S, Plava - S, Siva - S, Plava - S",
+        "quantity": 1,
+        "total": 38.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_3899",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 3899,
+    "customerName": "Mario Curic",
+    "email": "zoom-cackle-shaded@duck.com",
+    "phone": "0976837823",
+    "location": "Dubrovnik",
+    "orderStatus": "failed",
+    "orderTotal": 47.96,
+    "currency": "EUR",
+    "createdAt": "2025-12-16T11:37:19",
+    "items": [
+      {
+        "name": "Komplet bokseric – 3+1 Gratis - XL",
+        "quantity": 1,
+        "total": 44.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_3757",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 3757,
+    "customerName": "Joze Drviš",
+    "email": "j.drvis@gmail.com",
+    "phone": "0992912981",
+    "location": "Makarska",
+    "orderStatus": "cancelled",
+    "orderTotal": 82.95,
+    "currency": "EUR",
+    "createdAt": "2025-12-11T21:32:53",
+    "items": [
+      {
+        "name": "Složi 2-paket: Crna Majica - M, Bijela Majica - M",
+        "quantity": 1,
+        "total": 37.98
+      },
+      {
+        "name": "Komplet crnih bokseric – 3+1 Gratis - L",
+        "quantity": 1,
+        "total": 44.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_3755",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 3755,
+    "customerName": "Jasmina Franolic Karabaić",
+    "email": "jazy0608@gmail.com",
+    "phone": "0912526777",
+    "location": "Punat",
+    "orderStatus": "cancelled",
+    "orderTotal": 54.95,
+    "currency": "EUR",
+    "createdAt": "2025-12-11T20:20:31",
+    "items": [
+      {
+        "name": "NORIKS bokserice: Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL",
+        "quantity": 1,
+        "total": 51.96
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_3753",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 3753,
+    "customerName": "Ivica Ćuk",
+    "email": "ivicacukri3@gmail.com",
+    "phone": "+385919215486",
+    "location": "Hrvatska",
+    "orderStatus": "cancelled",
+    "orderTotal": 54.95,
+    "currency": "EUR",
+    "createdAt": "2025-12-11T20:14:05",
+    "items": [
+      {
+        "name": "NORIKS bokserice: Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL, Crna - 4XL",
+        "quantity": 1,
+        "total": 51.96
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_3402",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 3402,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "3232",
+    "location": "Zagreb",
+    "orderStatus": "failed",
+    "orderTotal": 52.98,
+    "currency": "EUR",
+    "createdAt": "2025-11-27T08:32:52",
+    "items": [
+      {
+        "name": "NORIKS komplet: 2 majici + 5 bokseric GRATIS",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_2528",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 2528,
+    "customerName": "Paweł Wróbel",
+    "email": "wojda1971@o2.pl",
+    "phone": "500 059 022",
+    "location": "Werbkowice, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 176.98,
+    "currency": "PLN",
+    "createdAt": "2025-10-21T14:11:56",
+    "items": [
+      {
+        "name": "2+1 GRATIS koszulka: biała koszulka - 3XL, biała koszulka - 3XL, biała koszulka - 3XL",
+        "quantity": 1,
+        "total": 164.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_2523",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 2523,
+    "customerName": "Katarzyna Sosnowska",
+    "email": "sosnowska_katarzyna@op.pl",
+    "phone": "+48698271903",
+    "location": "Sosnowiec, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 329.98,
+    "currency": "PLN",
+    "createdAt": "2025-10-02T21:00:34",
+    "items": [
+      {
+        "name": "2+2 GRATIS koszulka: czarna koszulka - 2XL, biała koszulka - 2XL, szara koszulka - 2XL, biała koszulka - 2XL",
+        "quantity": 1,
+        "total": 164.99
+      },
+      {
+        "name": "2+2 GRATIS koszulka: granatowa koszulka - 2XL, beżowa koszulka - 2XL, brązowa koszulka - 2XL, zielona koszulka - 2XL",
+        "quantity": 1,
+        "total": 164.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "sk_order_2546",
+    "storeCode": "sk",
+    "storeName": "Slovakia",
+    "storeFlag": "🇸🇰",
+    "orderId": 2546,
+    "customerName": "Ondrej Vasickanin",
+    "email": "ondrej.vasickanin@gmail.com",
+    "phone": "+421908994293",
+    "location": "Bratislava, SK",
+    "orderStatus": "cancelled",
+    "orderTotal": 40.97,
+    "currency": "EUR",
+    "createdAt": "2025-09-24T15:22:51",
+    "items": [
+      {
+        "name": "Poskladajte 2-balík: Jedno čierne tričko - XL, Jedno zelené tričko - L",
+        "quantity": 1,
+        "total": 37.98
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_2506",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 2506,
+    "customerName": "Paweł Sop",
+    "email": "sopal666@wp.pl",
+    "phone": "502358939",
+    "location": "Bolesławice, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 136.97,
+    "currency": "PLN",
+    "createdAt": "2025-09-14T11:13:57",
+    "items": [
+      {
+        "name": "Jedna czarna koszulka - 2XL",
+        "quantity": 1,
+        "total": 84.99
+      },
+      {
+        "name": "Skarpetki ze 100% bawełny, opakowanie po 5. - 43-46, Czarny",
+        "quantity": 1,
+        "total": 39.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_2496",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 2496,
+    "customerName": "Karolina Ciulkin",
+    "email": "karolinadrab1@gmail.com",
+    "phone": "+48664742783",
+    "location": "Rajec Poduchowny, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 136.97,
+    "currency": "PLN",
+    "createdAt": "2025-09-11T08:38:30",
+    "items": [
+      {
+        "name": "Jedna czarna koszulka - 2XL",
+        "quantity": 1,
+        "total": 84.99
+      },
+      {
+        "name": "Skarpetki ze 100% bawełny, opakowanie po 5. - 39-42, Czarny",
+        "quantity": 1,
+        "total": 39.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "cz_order_2454",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 2454,
+    "customerName": "Ondřej Tulej",
+    "email": "tulej.ondrej@seznam.cz",
+    "phone": "603289352",
+    "location": "Čelákovice, CZ",
+    "orderStatus": "cancelled",
+    "orderTotal": 559,
+    "currency": "CZK",
+    "createdAt": "2025-09-07T06:31:48",
+    "items": [
+      {
+        "name": "Jedno černé tričko - 3XL",
+        "quantity": 1,
+        "total": 490
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_2462",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 2462,
+    "customerName": "Krystyna Dabrowska",
+    "email": "krystynabyczek30@wp.pl",
+    "phone": "530 739 337",
+    "location": "Libusza, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 242.98,
+    "currency": "PLN",
+    "createdAt": "2025-09-06T21:55:26",
+    "items": [
+      {
+        "name": "Złóż 3-pakiet: granatowa koszulka - 2XL, czarna koszulka - 2XL, czarna koszulka - 2XL",
+        "quantity": 1,
+        "total": 230.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "sk_order_2434",
+    "storeCode": "sk",
+    "storeName": "Slovakia",
+    "storeFlag": "🇸🇰",
+    "orderId": 2434,
+    "customerName": "Vlastimil Šiška",
+    "email": "vlastimil.siska@gmail.com",
+    "phone": "0905380152",
+    "location": "Topoľčany, SK",
+    "orderStatus": "cancelled",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-09-06T14:12:40",
+    "items": [
+      {
+        "name": "Poskladajte 3-balík: Jedno zelené tričko - 2XL, Jedno zelené tričko - 2XL, Jedno béžové tričko - 2XL",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "gr_order_2456",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 2456,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "306941601111",
+    "location": "Αττική, GR",
+    "orderStatus": "cancelled",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-09-05T08:54:16",
+    "items": [
+      {
+        "name": "Αστικό-Γήινο 3-πακέτο - S",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_2502",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 2502,
+    "customerName": "test Test",
+    "email": "dejan.luznic@gmail.com",
+    "phone": "091112222333",
+    "location": "Zagreb",
+    "orderStatus": "failed",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-09-05T08:51:50",
+    "items": [
+      {
+        "name": "3-Paket Crnih Majica - S",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_2432",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 2432,
+    "customerName": "Marcin Świerczyński",
+    "email": "piceasp@wp.pl",
+    "phone": "+48506100670",
+    "location": "Zalesie Borowe, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 242.98,
+    "currency": "PLN",
+    "createdAt": "2025-09-02T20:22:46",
+    "items": [
+      {
+        "name": "Złóż 3-pakiet: zielona koszulka - 3XL, szara koszulka - 3XL, granatowa koszulka - 3XL",
+        "quantity": 1,
+        "total": 230.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "pl_order_2430",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 2430,
+    "customerName": "Stanisław Dembski",
+    "email": "staszek.dembski@gmail.com",
+    "phone": "+48501488436",
+    "location": "Warszawa, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 136.97,
+    "currency": "PLN",
+    "createdAt": "2025-09-02T14:59:10",
+    "items": [
+      {
+        "name": "Jedna granatowa koszulka - 2XL",
+        "quantity": 1,
+        "total": 84.99
+      },
+      {
+        "name": "Skarpetki ze 100% bawełny, opakowanie po 5. - 43-46, Biały",
+        "quantity": 1,
+        "total": 39.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "cz_order_2436",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 2436,
+    "customerName": "Jiří Špak",
+    "email": "jiri.spak@volny.cz",
+    "phone": "+420 731 125 144",
+    "location": "Bečov Nad Teplou, CZ",
+    "orderStatus": "cancelled",
+    "orderTotal": 1049,
+    "currency": "CZK",
+    "createdAt": "2025-09-02T13:59:45",
+    "items": [
+      {
+        "name": "Jedno hnědé tričko - 2XL",
+        "quantity": 1,
+        "total": 490
+      },
+      {
+        "name": "Jedno tmavomodré tričko - 3XL",
+        "quantity": 1,
+        "total": 490
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_2286",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 2286,
+    "customerName": "Jadranka Ropić",
+    "email": "ninogavric@gmail.com",
+    "phone": "+385 95 855 1530",
+    "location": "Slavonski Brod",
+    "orderStatus": "cancelled",
+    "orderTotal": 101.94,
+    "currency": "EUR",
+    "createdAt": "2025-08-23T05:38:06",
+    "items": [
+      {
+        "name": "Složi 6-paket: Crna Majica - 3XL, Tamnoplava Majica - 3XL, Tamnoplava Majica - 3XL, Siva Majica - 3XL, Crna Majica - 3XL, Crna Majica - 3XL",
+        "quantity": 1,
+        "total": 101.94
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_2215",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 2215,
+    "customerName": "Ante Šipić",
+    "email": "asipicsokol@gmail.com",
+    "phone": "0981681870",
+    "location": "Trilj",
+    "orderStatus": "cancelled",
+    "orderTotal": 151.13,
+    "currency": "EUR",
+    "createdAt": "2025-08-20T11:44:19",
+    "items": [
+      {
+        "name": "Uštedite do 60% s paketima - XL",
+        "quantity": 12,
+        "total": 151.13
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_2168",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 2168,
+    "customerName": "Borjan Suzić",
+    "email": "bsuzic@yahoo.com",
+    "phone": "0992247371",
+    "location": "Matulji",
+    "orderStatus": "cancelled",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-08-17T15:41:01",
+    "items": [
+      {
+        "name": "Monokromni 3-Paket - L",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_2019",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 2019,
+    "customerName": "Darko Kolarić",
+    "email": "darkokolaric14@gmail.com",
+    "phone": "098 176 0049",
+    "location": "Mursko Središće",
+    "orderStatus": "cancelled",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-08-12T07:36:55",
+    "items": [
+      {
+        "name": "Monokromni 3-Paket - S",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_1969",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 1969,
+    "customerName": "Tomislav Sertić",
+    "email": "serto1982@gmail.com",
+    "phone": "0915276689",
+    "location": "Donji Miholjac",
+    "orderStatus": "cancelled",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-08-10T13:01:54",
+    "items": [
+      {
+        "name": "3-Paket Crnih Majica - 3XL",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_1773",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 1773,
+    "customerName": "Emil Smeraldo",
+    "email": "kostrena2005@yahoo.com",
+    "phone": "0989358220",
+    "location": "Kostrena",
+    "orderStatus": "cancelled",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-08-03T21:53:25",
+    "items": [
+      {
+        "name": "Ponoćni Mix 3-Paket - 3XL",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_1704",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 1704,
+    "customerName": "Damir Špiljak",
+    "email": "damirspiljak1958@gmail.com",
+    "phone": "+385993409080",
+    "location": "Hum na Sutli",
+    "orderStatus": "cancelled",
+    "orderTotal": 116.93,
+    "currency": "EUR",
+    "createdAt": "2025-07-31T18:05:17",
+    "items": [
+      {
+        "name": "Zemljani Tonovi 6-Paket - 2XL",
+        "quantity": 1,
+        "total": 107.94
+      },
+      {
+        "name": "Čarape od 100% pamuka, pakiranje od 5 - 43-46, Crna",
+        "quantity": 1,
+        "total": 8.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_1614",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 1614,
+    "customerName": "želimir golić",
+    "email": "zeljko.zevemail@gmail.com",
+    "phone": "+38598594727",
+    "location": "ZAGREB-SUSEDGRAD",
+    "orderStatus": "failed",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-07-28T05:33:24",
+    "items": [
+      {
+        "name": "3-Paket Crnih Majica - XL",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_1613",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 1613,
+    "customerName": "želimir golić",
+    "email": "zeljko.zevemail@gmail.com",
+    "phone": "+38598594727",
+    "location": "ZAGREB-SUSEDGRAD",
+    "orderStatus": "failed",
+    "orderTotal": 107.94,
+    "currency": "EUR",
+    "createdAt": "2025-07-28T05:27:21",
+    "items": [
+      {
+        "name": "3-Paket Bijelih Majica - XL",
+        "quantity": 1,
+        "total": 53.97
+      },
+      {
+        "name": "3-Paket Crnih Majica - XL",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_1612",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 1612,
+    "customerName": "želimir golić",
+    "email": "zeljko.zevemail@gmail.com",
+    "phone": "+38598594727",
+    "location": "ZAGREB-SUSEDGRAD",
+    "orderStatus": "failed",
+    "orderTotal": 56.96,
+    "currency": "EUR",
+    "createdAt": "2025-07-28T04:56:55",
+    "items": [
+      {
+        "name": "3-Paket Bijelih Majica - XL",
+        "quantity": 1,
+        "total": 53.97
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  }
+]

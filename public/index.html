@@ -23,6 +23,11 @@
             background: var(--content-bg);
         }
 
+        
+        .stats-period-btn { padding:5px 12px; border:none; border-radius:6px; background:transparent; color:var(--text-muted); font-size:12px; font-weight:500; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+        .stats-period-btn:hover { background:var(--bg-main); color:var(--text-primary); }
+        .stats-period-btn.active { background:#6366f1; color:#fff; font-weight:600; }
+
         /* Toggle Switch */
         .toggle-switch {
             position: relative;
@@ -2214,15 +2219,23 @@
             <h2 class="page-title-large"><i class="fas fa-chart-bar" style="margin-right:8px;color:var(--accent-blue);"></i>Statistics</h2>
         </div>
         <div style="padding:0 16px;">
-            <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;">
-                <select id="statsPeriodSelect" style="padding:8px 12px;border-radius:var(--radius-md);border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-primary);font-size:14px;">
-                    <option value="7">Last 7 days</option>
-                    <option value="14">Last 14 days</option>
-                    <option value="30" selected>Last 30 days</option>
-                    <option value="60">Last 60 days</option>
-                    <option value="90">Last 90 days</option>
-                </select>
-                <button class="btn btn-save" onclick="loadInlineStats()" style="padding:8px 16px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <div style="display:flex;align-items:center;gap:0;margin-bottom:16px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:6px 8px;flex-wrap:wrap;">
+                <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-right:8px;">Period</span>
+                <div id="statsPeriodBtns" style="display:flex;gap:2px;margin-right:16px;">
+                    <button class="stats-period-btn active" data-period="today" onclick="setStatsPeriod('today',this)">Today</button>
+                    <button class="stats-period-btn" data-period="yesterday" onclick="setStatsPeriod('yesterday',this)">Yesterday</button>
+                    <button class="stats-period-btn" data-period="7" onclick="setStatsPeriod('7',this)">7D</button>
+                    <button class="stats-period-btn" data-period="14" onclick="setStatsPeriod('14',this)">14D</button>
+                    <button class="stats-period-btn" data-period="30" onclick="setStatsPeriod('30',this)">30D</button>
+                    <button class="stats-period-btn" data-period="thisMonth" onclick="setStatsPeriod('thisMonth',this)">This Month</button>
+                    <button class="stats-period-btn" data-period="lastMonth" onclick="setStatsPeriod('lastMonth',this)">Last Month</button>
+                    <button class="stats-period-btn" data-period="365" onclick="setStatsPeriod('365',this)">Year</button>
+                </div>
+                <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-right:8px;">Range</span>
+                <input type="date" id="statsDateFrom" style="padding:6px 10px;border:1px solid var(--card-border);border-radius:6px;background:var(--bg-main);color:var(--text-primary);font-size:13px;">
+                <span style="margin:0 6px;color:var(--text-muted);">→</span>
+                <input type="date" id="statsDateTo" style="padding:6px 10px;border:1px solid var(--card-border);border-radius:6px;background:var(--bg-main);color:var(--text-primary);font-size:13px;">
+                <button class="btn btn-save" onclick="applyStatsRange()" style="padding:6px 16px;margin-left:12px;font-size:13px;font-weight:600;">Apply</button>
             </div>
             <div class="stats-grid" style="display:grid;margin-bottom:16px;">
                 <div class="stat-card">
@@ -9054,11 +9067,12 @@
         }
 
         async function loadInlineStats() {
-            const days = document.getElementById('statsPeriodSelect')?.value || '30';
             const countriesParam = statsCountryFilter !== 'all' ? statsCountryFilter : ((isAdmin || hasAllCountries) ? 'all' : userCountries.join(','));
             
             try {
-                const resp = await fetch('/api/statistics?days=' + days + '&countries=' + countriesParam);
+                const from = statsDateFrom || new Date().toISOString().slice(0, 10);
+                const to = statsDateTo || from;
+                const resp = await fetch('/api/statistics?from=' + from + '&to=' + to + '&countries=' + countriesParam);
                 const data = await resp.json();
                 if (!data.success) throw new Error(data.error || 'Failed');
                 
@@ -9084,7 +9098,54 @@
             }
         }
         
-        document.getElementById('statsPeriodSelect')?.addEventListener('change', loadInlineStats);
+        let statsPeriodMode = 'today';
+        let statsDateFrom = null, statsDateTo = null;
+
+        function setStatsPeriod(period, btn) {
+            statsPeriodMode = period;
+            document.querySelectorAll('.stats-period-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            
+            const now = new Date();
+            const today = now.toISOString().slice(0, 10);
+            
+            if (period === 'today') {
+                statsDateFrom = today; statsDateTo = today;
+            } else if (period === 'yesterday') {
+                const y = new Date(now - 86400000).toISOString().slice(0, 10);
+                statsDateFrom = y; statsDateTo = y;
+            } else if (period === 'thisMonth') {
+                statsDateFrom = today.slice(0, 8) + '01'; statsDateTo = today;
+            } else if (period === 'lastMonth') {
+                const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                const lmEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+                statsDateFrom = lm.toISOString().slice(0, 10); statsDateTo = lmEnd.toISOString().slice(0, 10);
+            } else {
+                const d = parseInt(period) || 30;
+                statsDateFrom = new Date(now - d * 86400000).toISOString().slice(0, 10); statsDateTo = today;
+            }
+            
+            document.getElementById('statsDateFrom').value = statsDateFrom;
+            document.getElementById('statsDateTo').value = statsDateTo;
+            loadInlineStats();
+        }
+
+        function applyStatsRange() {
+            statsDateFrom = document.getElementById('statsDateFrom').value;
+            statsDateTo = document.getElementById('statsDateTo').value;
+            if (!statsDateFrom || !statsDateTo) { showToast('Izberi oba datuma', 'error'); return; }
+            document.querySelectorAll('.stats-period-btn').forEach(b => b.classList.remove('active'));
+            statsPeriodMode = 'custom';
+            loadInlineStats();
+        }
+
+        // Init with today
+        (function() {
+            const today = new Date().toISOString().slice(0, 10);
+            statsDateFrom = today; statsDateTo = today;
+            document.getElementById('statsDateFrom').value = today;
+            document.getElementById('statsDateTo').value = today;
+        })();
 
         init();
     </script>

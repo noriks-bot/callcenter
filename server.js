@@ -2160,9 +2160,15 @@ app.get('/api/pending-orders-count', async (req, res) => {
 // ========== FIX 6: Statistics API ==========
 app.get('/api/statistics', async (req, res) => {
   try {
-    const days = parseInt(req.query.days) || 30;
     const countriesParam = req.query.countries || 'all';
     const allowedCountries = countriesParam === 'all' ? null : countriesParam.split(',');
+    
+    // Date range support
+    const today = new Date().toISOString().slice(0, 10);
+    const fromDate = req.query.from || today;
+    const toDate = req.query.to || today;
+    // Calculate days between from and to
+    const days = Math.max(1, Math.ceil((new Date(toDate + 'T23:59:59') - new Date(fromDate + 'T00:00:00')) / 86400000) + 1);
     
     // Get carts from cache
     let allCarts = await fetchAbandonedCarts();
@@ -2199,8 +2205,9 @@ app.get('/api/statistics', async (req, res) => {
     
     // Build daily stats for last N days
     const dailyStats = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(Date.now() - i * 86400000);
+    const startDate = new Date(fromDate + 'T00:00:00');
+    for (let i = 0; i < days; i++) {
+      const date = new Date(startDate.getTime() + i * 86400000);
       const dateStr = date.toISOString().slice(0, 10);
       
       const dayCarts = allCarts.filter(c => (c.abandonedAt || '').slice(0, 10) === dateStr);
