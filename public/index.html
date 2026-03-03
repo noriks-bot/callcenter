@@ -2242,7 +2242,7 @@
             <div class="table-card" style="margin-bottom:16px;">
                 <div style="padding:16px 16px 0;"><h3 style="margin:0 0 12px;font-size:15px;font-weight:600;">Performance by Country</h3></div>
                 <table class="data-table">
-                    <thead><tr><th>Country</th><th>Leads</th><th>Orders</th><th>Calls</th><th>Conv. Rate</th></tr></thead>
+                    <thead><tr><th>Country</th><th>Leads</th><th>Orders</th><th>Conv. Rate</th></tr></thead>
                     <tbody id="statsCountryBody"><tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</td></tr></tbody>
                 </table>
             </div>
@@ -2252,7 +2252,7 @@
                     <div id="statsCountryTabs" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;"></div>
                 </div>
                 <table class="data-table">
-                    <thead><tr><th>Date</th><th>Leads</th><th>Calls</th><th>Orders</th><th>Conv. Rate</th></tr></thead>
+                    <thead><tr><th>Date</th><th>Leads</th><th>Orders</th><th>Conv. Rate</th></tr></thead>
                     <tbody id="statsDailyBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</td></tr></tbody>
                 </table>
             </div>
@@ -9067,12 +9067,12 @@
                 
                 // Country table
                 document.getElementById('statsCountryBody').innerHTML = Object.entries(data.countryStats).map(([code, s]) =>
-                    '<tr><td>' + s.flag + ' ' + s.name + '</td><td>' + s.leads + '</td><td><strong>' + s.orders + '</strong></td><td>' + s.calls + '</td><td><span class="status-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">' + s.conversionRate + '%</span></td></tr>'
+                    '<tr><td>' + s.flag + ' ' + s.name + '</td><td>' + s.leads + '</td><td><strong>' + s.orders + '</strong></td><td><span class="status-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">' + s.conversionRate + '%</span></td></tr>'
                 ).join('');
                 
                 // Daily table
                 document.getElementById('statsDailyBody').innerHTML = data.dailyStats.slice().reverse().map(d =>
-                    '<tr><td>' + d.date + '</td><td>' + d.leads + '</td><td>' + d.calls + '</td><td><strong style="color:#22c55e;">' + d.orders + '</strong></td><td><span class="status-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">' + d.conversionRate + '%</span></td></tr>'
+                    '<tr><td>' + d.date + '</td><td>' + d.leads + '</td><td><strong style="color:#22c55e;">' + d.orders + '</strong></td><td><span class="status-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">' + d.conversionRate + '%</span></td></tr>'
                 ).join('');
                 
             } catch (e) {
