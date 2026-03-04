@@ -4627,7 +4627,7 @@
         let selectedProduct = null;
         let selectedVariation = null;
 
-        document.getElementById('productSearchInput').addEventListener('input', function(e) {
+        if (document.getElementById('productSearchInput')) document.getElementById('productSearchInput').addEventListener('input', function(e) {
             const query = e.target.value.trim();
             clearTimeout(searchTimeout);
 
@@ -4643,7 +4643,7 @@
             }, 300);
         });
 
-        document.getElementById('productSearchInput').addEventListener('focus', function() {
+        if (document.getElementById('productSearchInput')) document.getElementById('productSearchInput').addEventListener('focus', function() {
             const results = document.getElementById('productSearchResults');
             if (results.children.length > 0 && this.value.length >= 2) {
                 results.classList.add('open');
@@ -4653,7 +4653,7 @@
         // Close search results when clicking outside
         document.addEventListener('click', function(e) {
             const container = document.querySelector('.product-search-container');
-            if (!container.contains(e.target)) {
+            if (container && !container.contains(e.target)) {
                 document.getElementById('productSearchResults').classList.remove('open');
             }
         });
