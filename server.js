@@ -2159,33 +2159,45 @@ app.get('/api/pending-orders-count', async (req, res) => {
 
 // ========== FIX 6: Statistics API ==========
 // Enrich converted orders with WC order details (customer, items, total)
+// Cache for converted order details (WC API calls are expensive)
+const convertedOrderCache = {};
+const CONVERTED_CACHE_TTL = 5 * 60 * 1000; // 5 min
+
 async function enrichConvertedOrders(conversions) {
-  const enriched = [];
-  for (const conv of conversions) {
-    if (!conv.orderId || !conv.storeCode || !stores[conv.storeCode]) {
-      enriched.push(conv);
-      continue;
-    }
-    try {
-      const order = await wcApiRequest(conv.storeCode, 'orders/' + conv.orderId);
-      if (order && !order.error) {
-        const b = order.billing || {};
-        conv.customerName = ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown';
-        conv.email = b.email || '';
-        conv.phone = b.phone || '';
-        conv.total = order.total || '0';
-        conv.currency = order.currency || 'EUR';
-        conv.status = order.status || '';
-        conv.items = (order.line_items || []).map(li => ({
-          name: li.name || '',
-          quantity: li.quantity || 1,
-          total: li.total || '0'
-        }));
-      }
-    } catch (e) { /* skip enrichment on error */ }
-    enriched.push(conv);
+  const now = Date.now();
+  const toFetch = conversions.filter(c => {
+    if (!c.orderId || !c.storeCode || !stores[c.storeCode]) return false;
+    const cached = convertedOrderCache[c.storeCode + '_' + c.orderId];
+    return !cached || (now - cached.ts > CONVERTED_CACHE_TTL);
+  });
+
+  // Fetch missing orders in parallel (batch)
+  if (toFetch.length > 0) {
+    await Promise.allSettled(toFetch.map(async (conv) => {
+      const key = conv.storeCode + '_' + conv.orderId;
+      try {
+        const order = await wcApiRequest(conv.storeCode, 'orders/' + conv.orderId);
+        if (order && !order.error) {
+          const b = order.billing || {};
+          convertedOrderCache[key] = {
+            ts: now,
+            customerName: ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown',
+            email: b.email || '', phone: b.phone || '',
+            total: order.total || '0', currency: order.currency || 'EUR',
+            status: order.status || '',
+            items: (order.line_items || []).map(li => ({ name: li.name || '', quantity: li.quantity || 1, total: li.total || '0' }))
+          };
+        }
+      } catch (e) { /* skip */ }
+    }));
   }
-  return enriched;
+
+  // Apply cached data to all conversions
+  return conversions.map(conv => {
+    const cached = convertedOrderCache[conv.storeCode + '_' + conv.orderId];
+    if (cached) Object.assign(conv, { customerName: cached.customerName, email: cached.email, phone: cached.phone, total: cached.total, currency: cached.currency, status: cached.status, items: cached.items });
+    return conv;
+  });
 }
 
 app.get('/api/statistics', async (req, res) => {
