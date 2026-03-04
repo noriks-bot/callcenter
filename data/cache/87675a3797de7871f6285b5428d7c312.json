@@ -1,5 +1,30 @@
 [
   {
+    "id": "it_buyer_18e26f059cfe383b6ac27b97055e3609",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5805,
+    "customerName": "Cristian Crobu",
+    "email": "cristian484@tiscali.it",
+    "phone": "3938854920",
+    "location": "Elmas CA., IT",
+    "totalSpent": 96.99,
+    "currency": "EUR",
+    "registeredAt": "2026-02-22T09:06:58",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Maglietta: Verde - 3XL, Verde - 3XL, Blu scuro - 3XL, Blu scuro - 3XL, Marrone - 3XL, Marrone - 3XL",
+        "quantity": 1,
+        "total": 96.99
+      }
+    ]
+  },
+  {
     "id": "pl_buyer_4b37af0d330e1d13ea6c04a0b04562f0",
     "storeCode": "pl",
     "storeName": "Poland",
