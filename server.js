@@ -2228,7 +2228,7 @@ app.get('/api/statistics', async (req, res) => {
     const days = Math.max(1, Math.round((new Date(toDate + 'T12:00:00') - new Date(fromDate + 'T12:00:00')) / 86400000) + 1);
     
     // Get carts from cache, filtered by date range
-    let allCarts = await fetchAbandonedCarts();
+    let allCarts = (await fetchAbandonedCarts()).filter(c => !c.id.startsWith("hr_test_99"));
     if (allowedCountries) allCarts = allCarts.filter(c => allowedCountries.includes(c.storeCode));
     allCarts = allCarts.filter(c => {
       const d = (c.abandonedAt || '').slice(0, 10);
