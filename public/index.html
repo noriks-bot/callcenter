@@ -3840,9 +3840,9 @@
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
 
-            document.getElementById('productSearchInput').value = '';
-            document.getElementById('productSearchResults').classList.remove('open');
-            document.getElementById('productSearchResults').innerHTML = '';
+            const _psi = document.getElementById('productSearchInput'); if (_psi) _psi.value = '';
+            const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
+            if (_psr) _psr.innerHTML = '';
             document.getElementById('variationSelector').style.display = 'none';
             selectedProduct = null;
             selectedVariation = null;
@@ -4167,10 +4167,9 @@
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
 
-            // Reset product search
-            document.getElementById('productSearchInput').value = '';
-            document.getElementById('productSearchResults').classList.remove('open');
-            document.getElementById('productSearchResults').innerHTML = '';
+            // Reset product search (if exists)
+            const psi = document.getElementById('productSearchInput'); if (psi) psi.value = '';
+            const psr = document.getElementById('productSearchResults'); if (psr) { psr.classList.remove('open'); psr.innerHTML = ''; }
             document.getElementById('variationSelector').style.display = 'none';
             selectedProduct = null;
             selectedVariation = null;
@@ -4210,9 +4209,9 @@
             document.getElementById('freeShippingToggle').classList.remove('active');
 
             // Reset product search
-            document.getElementById('productSearchInput').value = '';
-            document.getElementById('productSearchResults').classList.remove('open');
-            document.getElementById('productSearchResults').innerHTML = '';
+            const _psi = document.getElementById('productSearchInput'); if (_psi) _psi.value = '';
+            const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
+            if (_psr) _psr.innerHTML = '';
             document.getElementById('variationSelector').style.display = 'none';
             selectedProduct = null;
             selectedVariation = null;
@@ -4632,7 +4631,7 @@
             clearTimeout(searchTimeout);
 
             if (query.length < 2) {
-                document.getElementById('productSearchResults').classList.remove('open');
+                const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
                 return;
             }
 
@@ -4654,7 +4653,7 @@
         document.addEventListener('click', function(e) {
             const container = document.querySelector('.product-search-container');
             if (container && !container.contains(e.target)) {
-                document.getElementById('productSearchResults').classList.remove('open');
+                const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
             }
         });
 
@@ -4709,8 +4708,8 @@
         }
 
         function selectProduct(product) {
-            document.getElementById('productSearchResults').classList.remove('open');
-            document.getElementById('productSearchInput').value = '';
+            const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
+            const _psi = document.getElementById('productSearchInput'); if (_psi) _psi.value = '';
 
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
 
