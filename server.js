@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
+app.set('etag', false);
 const PORT = process.env.PORT || 3087;
 
 app.use(cors());
@@ -125,7 +126,7 @@ async function warmRAM() {
       // Enrich "Product #XXXX" with real names from WooCommerce
       await enrichCartProductNames(cartsRes.value);
       await enrichBundleContents(cartsRes.value);
-      dbWrite('carts', cartsRes.value);
+      dbWriteCartsPreserveTest(cartsRes.value);
     }
     if (pendingRes.status === 'fulfilled' && pendingRes.value.length > 0) {
       dbWrite('pending', pendingRes.value);
@@ -365,6 +366,18 @@ async function enrichCartProductNames(carts) {
 }
 
 
+
+// Preserve test carts (hr_test_99*) across refreshes
+function dbWriteCartsPreserveTest(carts) {
+  const existing = dbReadData("carts");
+  const testCarts = existing.filter(c => c.id && c.id.startsWith("hr_test_99"));
+  if (testCarts.length > 0) {
+    const realIds = new Set(carts.map(c => c.id));
+    const toKeep = testCarts.filter(c => !realIds.has(c.id));
+    carts = [...toKeep, ...carts];
+  }
+  dbWrite("carts", carts);
+}
 // Apply product name cache to carts at read time (instant, no API calls)
 function enrichCartsFromCache(carts) {
   const cache = getProductNameCache();
@@ -908,6 +921,7 @@ async function createOrderFromCart(input) {
   if (!config) return { error: 'Invalid store: ' + storeCode };
 
   let lineItems = [];
+    // Separate real products from custom (QB/Upsell/Komplet) items
   const feeLines = [];
   if (items.length > 0) {
     lineItems = [];
@@ -976,7 +990,7 @@ async function createOrderFromCart(input) {
   const countryCode = storeCountryCodes[storeCode] || storeCode.toUpperCase();
 
   const orderData = {
-    payment_method: 'cod', payment_method_title: 'Cash on Delivery',
+    payment_method: 'cod', payment_method_title: 'Cash on Delivery', created_via: 'CALLCENTER',
     set_paid: false, status: 'processing',
     billing: { first_name: firstName, last_name: lastName, email, phone, address_1: address, city, postcode, country: countryCode },
     shipping: { first_name: firstName, last_name: lastName, address_1: address, city, postcode, country: countryCode },
@@ -986,7 +1000,10 @@ async function createOrderFromCart(input) {
       { key: '_call_center', value: 'yes' }, { key: '_call_center_agent', value: agentName },
       { key: '_call_center_date', value: new Date().toISOString() },
       { key: '_abandoned_cart_id', value: String(cart?.cartDbId || cartId) },
-      { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' }
+      { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' },
+      { key: '_wc_order_attribution_source_type', value: 'referral' },
+      { key: '_wc_order_attribution_utm_source', value: 'callcenter' },
+      { key: '_wc_order_attribution_device_type', value: 'Desktop' }
     ],
     customer_note: (input.notes ? input.notes + ' \u2014 ' : '') + `Order created via Call Center by ${agentName}`
   };
@@ -1861,7 +1878,7 @@ app.get('/api/force-refresh', async (req, res) => {
   try {
     const results = await Promise.allSettled([
       fetchAbandonedCarts().then(async carts => {
-        if (carts && carts.length > 0) { await enrichCartProductNames(carts); await enrichBundleContents(carts); dbWrite('carts', carts); }
+        if (carts && carts.length > 0) { await enrichCartProductNames(carts); await enrichBundleContents(carts); dbWriteCartsPreserveTest(carts); }
         return (carts || []).length;
       }),
       fetchPendingOrders().then(orders => {
@@ -2155,7 +2172,7 @@ function startBackgroundRefresh() {
         if (carts && carts.length > 0) {
           await enrichCartProductNames(carts);
           await enrichBundleContents(carts);
-          dbWrite('carts', carts);
+          dbWriteCartsPreserveTest(carts);
         }
         console.log('[Cron] ✓ Carts:', (carts || []).length);
       }),
@@ -2210,6 +2227,48 @@ app.get('/api/pending-orders-count', async (req, res) => {
 });
 
 // ========== FIX 6: Statistics API ==========
+// Enrich converted orders with WC order details (customer, items, total)
+// Cache for converted order details (WC API calls are expensive)
+const convertedOrderCache = {};
+const CONVERTED_CACHE_TTL = 5 * 60 * 1000; // 5 min
+
+async function enrichConvertedOrders(conversions) {
+  const now = Date.now();
+  const toFetch = conversions.filter(c => {
+    if (!c.orderId || !c.storeCode || !stores[c.storeCode]) return false;
+    const cached = convertedOrderCache[c.storeCode + '_' + c.orderId];
+    return !cached || (now - cached.ts > CONVERTED_CACHE_TTL);
+  });
+
+  // Fetch missing orders in parallel (batch)
+  if (toFetch.length > 0) {
+    await Promise.allSettled(toFetch.map(async (conv) => {
+      const key = conv.storeCode + '_' + conv.orderId;
+      try {
+        const order = await wcApiRequest(conv.storeCode, 'orders/' + conv.orderId);
+        if (order && !order.error) {
+          const b = order.billing || {};
+          convertedOrderCache[key] = {
+            ts: now,
+            customerName: ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown',
+            email: b.email || '', phone: b.phone || '',
+            total: order.total || '0', currency: order.currency || 'EUR',
+            status: order.status || '',
+            items: (order.line_items || []).map(li => ({ name: li.name || '', quantity: li.quantity || 1, total: li.total || '0' }))
+          };
+        }
+      } catch (e) { /* skip */ }
+    }));
+  }
+
+  // Apply cached data to all conversions
+  return conversions.map(conv => {
+    const cached = convertedOrderCache[conv.storeCode + '_' + conv.orderId];
+    if (cached) Object.assign(conv, { customerName: cached.customerName, email: cached.email, phone: cached.phone, total: cached.total, currency: cached.currency, status: cached.status, items: cached.items });
+    return conv;
+  });
+}
+
 app.get('/api/statistics', async (req, res) => {
   try {
     const countriesParam = req.query.countries || 'all';
@@ -2226,7 +2285,7 @@ app.get('/api/statistics', async (req, res) => {
     const days = Math.max(1, Math.round((new Date(toDate + 'T12:00:00') - new Date(fromDate + 'T12:00:00')) / 86400000) + 1);
     
     // Get carts from cache, filtered by date range
-    let allCarts = await fetchAbandonedCarts();
+    let allCarts = (await fetchAbandonedCarts()).filter(c => !c.id.startsWith("hr_test_99"));
     if (allowedCountries) allCarts = allCarts.filter(c => allowedCountries.includes(c.storeCode));
     allCarts = allCarts.filter(c => {
       const d = (c.abandonedAt || '').slice(0, 10);
@@ -2245,10 +2304,18 @@ app.get('/api/statistics', async (req, res) => {
       if (allowedCountries && !allowedCountries.includes(sc)) continue;
       const convDate = (data.lastUpdated || '').slice(0, 10);
       if (convDate < fromDate || convDate > toDate) continue;
+      const agentMatch = (data.notes || '').match(/created by (\w+)/);
+      const agent = agentMatch ? agentMatch[1] : 'Unknown';
+      const storeInfo = stores[sc] || {};
       conversions.push({
         id, storeCode: sc,
         date: convDate,
-        orderId: data.orderId
+        orderId: data.orderId,
+        agent,
+        storeName: storeInfo.name || sc.toUpperCase(),
+        storeFlag: storeInfo.flag || '',
+        notes: data.notes || '',
+        time: data.lastUpdated || ''
       });
     }
     
@@ -2280,7 +2347,7 @@ app.get('/api/statistics', async (req, res) => {
       dailyStats.push({
         date: dateStr,
         leads: dayCarts.length,
-        conversions: dayConversions.length,
+        conversions: dayConversions.length, orders: dayConversions.length,
         calls: dayCalls.length,
         conversionRate: dayCarts.length > 0 ? Math.round(dayConversions.length / dayCarts.length * 1000) / 10 : 0
       });
@@ -2298,7 +2365,7 @@ app.get('/api/statistics', async (req, res) => {
         flag: stores[sc].flag,
         name: stores[sc].name,
         leads: storeCarts.length,
-        conversions: storeConversions.length,
+        conversions: storeConversions.length, orders: storeConversions.length,
         calls: storeCalls.length,
         conversionRate: storeCarts.length > 0 ? Math.round(storeConversions.length / storeCarts.length * 1000) / 10 : 0
       };
@@ -2312,7 +2379,8 @@ app.get('/api/statistics', async (req, res) => {
       totalOrders: conversions.length,
       totalCalls: allCalls.length,
       dailyStats,
-      countryStats
+      countryStats,
+      convertedOrders: await enrichConvertedOrders(conversions.sort((a, b) => b.time.localeCompare(a.time)))
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
