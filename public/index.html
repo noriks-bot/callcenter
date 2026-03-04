@@ -8895,7 +8895,7 @@
 
         async function pollForNewItems() {
             try {
-                const userId = currentUser?.id || 'default';
+                const userId = user?.id || 'default';
                 const res = await fetch(`/api/poll-new&userId=${userId}`);
                 const data = await res.json();
 
@@ -8965,7 +8965,7 @@
 
         async function markCurrentItemsSeen() {
             try {
-                const userId = currentUser?.id || 'default';
+                const userId = user?.id || 'default';
                 const [cartsRes, paketRes] = await Promise.all([
                     fetch('/api/abandoned-carts'),
                     fetch('/api/paketomati&filter=all')
@@ -8984,7 +8984,7 @@
 
         async function markItemsSeen(cartIds, paketomatIds) {
             try {
-                const userId = currentUser?.id || 'default';
+                const userId = user?.id || 'default';
                 await fetch('/api/mark-seen', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
