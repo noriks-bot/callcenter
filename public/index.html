@@ -2509,7 +2509,24 @@
         let sortColumn = 'abandonedAt';
         let sortDirection = 'desc';
 
-        const SHIPPING_COST = 5.00;
+        const STORE_SHIPPING = {
+            hr: { cost: 2.99, freeMin: 70, currency: 'EUR' },
+            cz: { cost: 69, freeMin: 1700, currency: 'CZK' },
+            pl: { cost: 11.99, freeMin: 300, currency: 'PLN' },
+            gr: { cost: 2.99, freeMin: 70, currency: 'EUR' },
+            sk: { cost: 2.99, freeMin: 70, currency: 'EUR' },
+            it: { cost: 2.99, freeMin: 70, currency: 'EUR' },
+            hu: { cost: 800, freeMin: 25000, currency: 'HUF' }
+        };
+        function getShippingCost() {
+            const s = STORE_SHIPPING[currentOrderStoreCode] || { cost: 2.99 };
+            return s.cost;
+        }
+        function getFreeShippingMin() {
+            const s = STORE_SHIPPING[currentOrderStoreCode] || { freeMin: 70 };
+            return s.freeMin;
+        }
+        const SHIPPING_COST = 2.99; // fallback, but getShippingCost() is used
 
         // SMS Templates
         const smsTemplates = {
@@ -4848,7 +4865,10 @@
                       '<span>' + sym + (item.editPrice * item.editQty).toFixed(2) + '</span></div>';
                 }).join('');
             }
-            const shipping = freeShipping ? 0 : SHIPPING_COST;
+            const shippingRate = getShippingCost();
+            const subtotal_for_free = getFreeShippingMin();
+            const autoFree = subtotal >= subtotal_for_free;
+            const shipping = (freeShipping || autoFree) ? 0 : shippingRate;
             const total = subtotal + shipping;
 
             document.getElementById('orderSubtotal').textContent = sym + subtotal.toFixed(2);
