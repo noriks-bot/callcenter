@@ -2261,8 +2261,8 @@
                     <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;"><i class="fas fa-check-circle" style="color:var(--accent-green);margin-right:6px;"></i>Converted Orders</h3>
                 </div>
                 <table class="data-table">
-                    <thead><tr><th>Date</th><th>Order ID</th><th>Country</th><th>Lead ID</th><th>Agent</th></tr></thead>
-                    <tbody id="statsConvertedBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</td></tr></tbody>
+                    <thead><tr><th>Date</th><th>Order</th><th>Customer</th><th>Country</th><th>Items</th><th>Total</th><th>Agent</th><th>Status</th></tr></thead>
+                    <tbody id="statsConvertedBody"><tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -9085,10 +9085,25 @@
                 var coEl = document.getElementById('statsConvertedBody');
                 if (coEl) {
                     if (co.length === 0) {
-                        coEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">No converted orders in this period</td></tr>';
+                        coEl.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">No converted orders in this period</td></tr>';
                     } else {
                         coEl.innerHTML = co.map(function(c) {
-                            return '<tr><td>' + c.date + '</td><td><strong>#' + (c.orderId || '-') + '</strong></td><td>' + (c.storeFlag || '') + ' ' + (c.storeName || c.storeCode) + '</td><td style="font-family:monospace;font-size:12px;color:var(--text-muted);">' + c.id + '</td><td><span class="status-badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;">' + c.agent + '</span></td></tr>';
+                            var sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[c.currency] || '€';
+                            var itemsHtml = (c.items || []).map(function(it) {
+                                return '<div style="font-size:12px;line-height:1.4;"><span style="color:var(--text-primary);">' + it.quantity + 'x</span> ' + it.name + '</div>';
+                            }).join('');
+                            if (!itemsHtml) itemsHtml = '<span style="color:var(--text-muted);">-</span>';
+                            var statusMap = {processing:'🔄',completed:'✅',pending:'⏳','on-hold':'⏸️',cancelled:'❌',refunded:'↩️'};
+                            var statusIcon = statusMap[c.status] || '❓';
+                            return '<tr style="background:linear-gradient(90deg, rgba(34,197,94,0.05) 0%, transparent 100%);">' +
+                                '<td>' + c.date + '</td>' +
+                                '<td><strong style="color:var(--accent-green);">#' + (c.orderId || '-') + '</strong></td>' +
+                                '<td><div><div style="font-weight:600;">' + (c.customerName || '-') + '</div><div style="font-size:11px;color:var(--text-muted);">' + (c.email || '') + '</div>' + (c.phone ? '<div style="font-size:11px;color:var(--text-muted);">' + c.phone + '</div>' : '') + '</div></td>' +
+                                '<td>' + (c.storeFlag || '') + ' ' + (c.storeName || '') + '</td>' +
+                                '<td style="max-width:200px;">' + itemsHtml + '</td>' +
+                                '<td><strong>' + sym + parseFloat(c.total || 0).toFixed(2) + '</strong></td>' +
+                                '<td><span class="status-badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;">' + c.agent + '</span></td>' +
+                                '<td>' + statusIcon + ' ' + (c.status || '-') + '</td></tr>';
                         }).join('');
                     }
                 }

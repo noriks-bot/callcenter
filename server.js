@@ -2158,6 +2158,36 @@ app.get('/api/pending-orders-count', async (req, res) => {
 });
 
 // ========== FIX 6: Statistics API ==========
+// Enrich converted orders with WC order details (customer, items, total)
+async function enrichConvertedOrders(conversions) {
+  const enriched = [];
+  for (const conv of conversions) {
+    if (!conv.orderId || !conv.storeCode || !stores[conv.storeCode]) {
+      enriched.push(conv);
+      continue;
+    }
+    try {
+      const order = await wcApiRequest(conv.storeCode, 'orders/' + conv.orderId);
+      if (order && !order.error) {
+        const b = order.billing || {};
+        conv.customerName = ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown';
+        conv.email = b.email || '';
+        conv.phone = b.phone || '';
+        conv.total = order.total || '0';
+        conv.currency = order.currency || 'EUR';
+        conv.status = order.status || '';
+        conv.items = (order.line_items || []).map(li => ({
+          name: li.name || '',
+          quantity: li.quantity || 1,
+          total: li.total || '0'
+        }));
+      }
+    } catch (e) { /* skip enrichment on error */ }
+    enriched.push(conv);
+  }
+  return enriched;
+}
+
 app.get('/api/statistics', async (req, res) => {
   try {
     const countriesParam = req.query.countries || 'all';
@@ -2193,7 +2223,6 @@ app.get('/api/statistics', async (req, res) => {
       if (allowedCountries && !allowedCountries.includes(sc)) continue;
       const convDate = (data.lastUpdated || '').slice(0, 10);
       if (convDate < fromDate || convDate > toDate) continue;
-      // Extract agent name from notes "Order #XXXX created by AGENT"
       const agentMatch = (data.notes || '').match(/created by (\w+)/);
       const agent = agentMatch ? agentMatch[1] : 'Unknown';
       const storeInfo = stores[sc] || {};
@@ -2270,7 +2299,7 @@ app.get('/api/statistics', async (req, res) => {
       totalCalls: allCalls.length,
       dailyStats,
       countryStats,
-      convertedOrders: conversions.sort((a, b) => b.time.localeCompare(a.time))
+      convertedOrders: await enrichConvertedOrders(conversions.sort((a, b) => b.time.localeCompare(a.time)))
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
