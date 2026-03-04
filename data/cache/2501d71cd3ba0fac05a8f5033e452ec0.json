@@ -1,5 +1,29 @@
 [
   {
+    "id": "hr_order_5848",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5848,
+    "customerName": "TEST TEST",
+    "email": "test@test.com",
+    "phone": "+385921239876",
+    "location": "Čakovec, HR",
+    "orderStatus": "cancelled",
+    "orderTotal": 98.98,
+    "currency": "EUR",
+    "createdAt": "2026-03-04T10:53:31",
+    "items": [
+      {
+        "name": "Crne bokserice 15-paket",
+        "quantity": 1,
+        "total": 89.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
     "id": "hu_order_5649",
     "storeCode": "hu",
     "storeName": "Hungary",

@@ -2763,7 +2763,6 @@
             let filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : [...buyers];
 
             // Filter out converted carts
-            filteredCarts = filteredCarts.filter(c => c.converted !== true);
 
             // Apply 30-day cutoff (same as renderTable)
             filteredCarts = filteredCarts.filter(c => {
@@ -3236,7 +3235,7 @@
             const filteredBuyers = shouldFilter ? buyers.filter(b => userCountries.includes(b.storeCode)) : buyers;
 
             // Filter out converted carts
-            filteredCarts = filteredCarts.filter(c => c.converted !== true);
+            // Converted carts kept visible
 
             // Update nav sidebar counts (guard against missing elements)
             const navCarts = document.getElementById('navCarts');
@@ -3330,10 +3329,7 @@
             
             let data = dataTab === 'carts' ? [...carts] : dataTab === 'pending' ? [...pending] : [...buyers];
 
-            // Filter out converted carts - they should not appear in abandoned carts list
-            if (dataTab === 'carts') {
-                data = data.filter(d => d.converted !== true);
-            }
+            // Converted carts stay visible (green row with disabled actions)
 
             // Filter out orders older than 30 days for abandoned carts and pending orders
             if (dataTab === 'carts' || dataTab === 'pending') {
@@ -3718,7 +3714,7 @@
                     <tbody>
                         ${data.map(c => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[c.currency] || '€';
-                            const isConverted = c.converted === true;
+                            const isConverted = c.converted === true || c.callStatus === 'converted';
                             const rowStyle = isConverted ? 'background: linear-gradient(90deg, #d4edda 0%, #f8f9fa 100%); opacity: 0.85;' : '';
                             const convertedBadge = isConverted ? '<span style="background:#28a745;color:white;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:6px;">KUPIL ✓</span>' : '';
                             return `<tr style="${rowStyle}">
