@@ -865,7 +865,7 @@
             </button>
             <button class="content-tab" data-content="buyers">
                 <i class="fas fa-user"></i>
-                <span>Enkratni kupci</span>
+                <span>One-time Buyers</span>
                 <span class="count" id="contentCount-buyers">0</span>
             </button>
             <button class="content-tab" data-content="paketomati">
@@ -875,13 +875,13 @@
             </button>
             <button class="content-tab" data-content="urgent">
                 <i class="fas fa-exclamation-triangle"></i>
-                <span>Nujno</span>
+                <span>Urgent</span>
                 <span class="count" id="contentCount-urgent">0</span>
             </button>
         </div>
 
         <div class="content">
-            <!-- Urgent Add Button Bar (shown only for Nujno tab) -->
+            <!-- Urgent Add Button Bar (shown only for Urgent tab) -->
             <div id="urgentActionBar" style="display:none;margin-top:16px;margin-bottom:12px;">
                 <button class="btn btn-save" id="addUrgentBtn" style="padding:10px 20px;font-size:14px;" onclick="showAddUrgentModal()">
                     <i class="fas fa-plus"></i> Dodaj nujni lead
@@ -904,14 +904,14 @@
                 </select>
                 <select class="filter-select" id="buyerDaysFilter" style="max-width:200px;display:none;">
                     <option value="">All Time</option>
-                    <option value="10-20">10-20 dni</option>
-                    <option value="20-30">20-30 dni</option>
-                    <option value="40-60">40-60 dni</option>
-                    <option value="60+">60+ dni</option>
+                    <option value="10-20">10-20 days</option>
+                    <option value="20-30">20-30 days</option>
+                    <option value="40-60">40-60 days</option>
+                    <option value="60+">60+ days</option>
                 </select>
                 <select class="filter-select" id="paketomatiStatusFilter" style="max-width:250px;display:none;">
                     <option value="">Vsi statusi</option>
-                    <option value="not_called">⚪ Ni klicano</option>
+                    <option value="not_called">⚪ Ni called</option>
                     <option value="called">📞 Klicano</option>
                     <option value="sms_sent">💬 SMS poslan</option>
                     <option value="pickup_reminded">🔔 Opomnik poslan</option>
@@ -977,20 +977,20 @@
     <div class="modal-bg" id="orderModal">
         <div class="modal wide">
             <div class="modal-header">
-                <div class="modal-title">🛒 Ustvari naročilo</div>
+                <div class="modal-title">🛒 Create Order</div>
                 <button class="modal-close" onclick="closeModal('orderModal')">×</button>
             </div>
             <div class="modal-body" id="orderModalBody">
                 <!-- Customer Info -->
-                <h4 style="margin-bottom:12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Podatki stranke</h4>
+                <h4 style="margin-bottom:12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Customer Info</h4>
                 <div class="customer-info-card">
                     <div class="customer-info-row">
                         <div class="customer-info-field">
-                            <label>Ime</label>
+                            <label>First Name</label>
                             <input type="text" id="orderFirstName" placeholder="Ime">
                         </div>
                         <div class="customer-info-field">
-                            <label>Priimek</label>
+                            <label>Last Name</label>
                             <input type="text" id="orderLastName" placeholder="Priimek">
                         </div>
                     </div>
@@ -1000,40 +1000,40 @@
                             <input type="email" id="orderEmail" placeholder="email@example.com">
                         </div>
                         <div class="customer-info-field">
-                            <label>Telefon</label>
+                            <label>Phone</label>
                             <input type="tel" id="orderPhone" placeholder="+386...">
                         </div>
                     </div>
                     <div class="customer-info-row">
                         <div class="customer-info-field">
-                            <label>Naslov</label>
+                            <label>Address</label>
                             <input type="text" id="orderAddress" placeholder="Ulica in številka">
                         </div>
                     </div>
                     <div class="customer-info-row">
                         <div class="customer-info-field">
-                            <label>Mesto</label>
+                            <label>City</label>
                             <input type="text" id="orderCity" placeholder="Mesto">
                         </div>
                         <div class="customer-info-field">
-                            <label>Poštna</label>
+                            <label>ZIP</label>
                             <input type="text" id="orderPostcode" placeholder="1000">
                         </div>
                     </div>
                 </div>
 
                 <!-- Cart Contents -->
-                <h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">📦 Vsebina košarice</h4>
+                <h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">📦 Cart Contents</h4>
                 <div class="order-items" id="orderItems">
                     <!-- Items will be rendered here -->
                 </div>
 
                 <!-- Notes -->
-                <h4 style="margin:20px 0 8px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Opombe</h4>
-                <textarea id="orderNotes" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-md);background:var(--bg-main);color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;" placeholder="Opombe za naročilo..."></textarea>
+                <h4 style="margin:20px 0 8px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Notes</h4>
+                <textarea id="orderNotes" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-md);background:var(--bg-main);color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;" placeholder="Order notes..."></textarea>
                 <!-- Products -->
                 <div style="border:1.5px solid var(--card-border);border-radius:12px;padding:16px;margin:20px 0 12px;background:var(--bg-main);">
-                <h4 style="margin:0 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">🛒 Dodaj izdelke</h4>
+                <h4 style="margin:0 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">🛒 Add Products</h4>
 
                 <!-- Quick Product Builder -->
                 <div class="quick-builder">
@@ -1047,15 +1047,15 @@
                     </div>
                     <div class="qb-panel" id="qbPanel">
                         <div class="qb-row">
-                            <label>Količina:</label>
+                            <label>Quantity:</label>
                             <div id="qbQtyBtns"></div>
                         </div>
                         <div id="qbColorRows" style="margin:8px 0;"></div>
                         <div class="qb-row">
-                            <label>Cena/kos:</label>
+                            <label>Price/pc:</label>
                             <input type="number" step="0.01" min="0" class="qb-price-input" id="qbPrice" value="9.99">
                         </div>
-                        <button class="qb-add-btn" id="qbAddBtn" onclick="qbAddToOrder()"><i class="fas fa-plus"></i> Dodaj v naročilo</button>
+                        <button class="qb-add-btn" id="qbAddBtn" onclick="qbAddToOrder()"><i class="fas fa-plus"></i> Add to Order</button>
                     </div>
                 </div>
 
@@ -1068,10 +1068,10 @@
                     <div style="font-weight:600;font-size:12px;color:var(--text-muted);margin-bottom:6px;">👕 Majice (<span id="kompletMajQty"></span>x)</div>
                     <div id="kompletMajRows" style="margin-bottom:12px;"></div>
                     <div class="qb-row">
-                        <label>Cena kompleta:</label>
+                        <label>Bundle price:</label>
                         <input type="number" step="0.01" min="0" class="qb-price-input" id="kompletPrice" value="0">
                     </div>
-                    <button class="qb-add-btn" onclick="kompletAdd()" style="margin-top:12px;padding:14px 20px;font-size:15px;font-weight:700;width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;cursor:pointer;"><i class="fas fa-cart-plus"></i> Dodaj komplet v košarico</button>
+                    <button class="qb-add-btn" onclick="kompletAdd()" style="margin-top:12px;padding:14px 20px;font-size:15px;font-weight:700;width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;cursor:pointer;"><i class="fas fa-cart-plus"></i> Add Bundle to Cart</button>
                 </div>
 
                 <!-- Variation Selector (shown when selecting a variable product) -->
@@ -1088,10 +1088,10 @@
                         <!-- Options will be rendered here -->
                     </div>
                     <div class="variation-qty-row">
-                        <label style="font-size:13px;color:var(--text-muted);">Količina:</label>
+                        <label style="font-size:13px;color:var(--text-muted);">Quantity:</label>
                         <input type="number" min="1" value="1" id="variationQty">
                         <button class="btn btn-save" style="flex:1;" onclick="addSelectedVariation()">
-                            <i class="fas fa-plus"></i> Dodaj v naročilo
+                            <i class="fas fa-plus"></i> Add to Order
                         </button>
                         <button class="btn btn-cancel" style="flex:0;padding:12px;" onclick="cancelVariationSelection()">
                             <i class="fas fa-times"></i>
@@ -1104,7 +1104,7 @@
                 <!-- Options -->
                 <!-- Upsell Section -->
                 <div class="upsell-section">
-                    <div class="upsell-title">⚡ Hitri upsell</div>
+                    <div class="upsell-title">⚡ Quick Upsell</div>
                     <div class="upsell-grid">
                         <div class="upsell-card" onclick="upsellClick('majice',1,this)">
                             <div class="upsell-icon">👕</div>
@@ -1169,52 +1169,52 @@
                     </div>
                     <div class="upsell-config" id="upsellConfig">
                         <div id="upsellColorRows" style="margin:8px 0;"></div>
-                        <button class="qb-add-btn" onclick="upsellAdd()" style="margin-top:12px;padding:14px 20px;font-size:15px;font-weight:700;width:100%;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;cursor:pointer;position:sticky;bottom:0;z-index:5;box-shadow:0 -2px 10px rgba(0,0,0,0.1);"><i class="fas fa-cart-plus"></i> Dodaj v košarico</button>
+                        <button class="qb-add-btn" onclick="upsellAdd()" style="margin-top:12px;padding:14px 20px;font-size:15px;font-weight:700;width:100%;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;cursor:pointer;position:sticky;bottom:0;z-index:5;box-shadow:0 -2px 10px rgba(0,0,0,0.1);"><i class="fas fa-cart-plus"></i> Add to Cart</button>
                     </div>
                 </div>
                 </div>
 
                 <div class="toggle-row">
-                    <span class="toggle-label">🚚 Brezplačna dostava</span>
+                    <span class="toggle-label">🚚 Free Shipping</span>
                     <div class="toggle" id="freeShippingToggle" onclick="toggleFreeShipping()"></div>
                 </div>
 
                 <!-- Discount Buttons -->
                 <div class="discount-buttons-row" id="discountButtonsRow">
-                    <span class="discount-label">🏷️ Popust:</span>
+                    <span class="discount-label">🏷️ Discount:</span>
                     <button class="discount-btn" onclick="applyDiscount(10)">-10%</button>
                     <button class="discount-btn" onclick="applyDiscount(20)">-20%</button>
                     <button class="discount-btn" onclick="applyDiscount(30)">-30%</button>
                     <button class="discount-btn" onclick="applyDiscount(40)">-40%</button>
                     <button class="discount-btn" onclick="applyDiscount(50)">-50%</button>
-                    <button class="discount-btn active" onclick="applyDiscount(0)" id="discountBtnNone">Brez</button>
+                    <button class="discount-btn active" onclick="applyDiscount(0)" id="discountBtnNone">None</button>
                 </div>
 
                 <!-- Summary -->
                 <div class="order-summary">
                     <div id="orderSummaryItems" style="margin-bottom:4px;"></div>
                     <div class="order-summary-row" style="border-top:1px solid var(--card-border);padding-top:6px;margin-top:4px;">
-                        <span style="font-weight:600;">Izdelki skupaj</span>
+                        <span style="font-weight:600;">Subtotal</span>
                         <span id="orderSubtotal" style="font-weight:600;">€0.00</span>
                     </div>
                     <div class="order-summary-row" id="shippingRow">
-                        <span>Dostava</span>
+                        <span>Shipping</span>
                         <span id="orderShipping">€5.00</span>
                     </div>
                     <div class="order-summary-row">
-                        <span>SKUPAJ</span>
+                        <span>TOTAL</span>
                         <span id="orderTotal">€0.00</span>
                     </div>
                 </div>
 
                 <p style="font-size:12px;color:var(--text-muted);margin-top:16px;">
-                    <i class="fas fa-info-circle"></i> Naročilo bo ustvarjeno s statusom "Processing" in meta oznako "_call_center".
+                    <i class="fas fa-info-circle"></i> Order will be created with "Processing" status and "_call_center" meta tag.
                 </p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal('orderModal')">Prekliči</button>
+                <button class="btn btn-cancel" onclick="closeModal('orderModal')">Cancel</button>
                 <button class="btn btn-success" onclick="confirmCreateOrder()" id="createOrderBtn">
-                    <i class="fas fa-check"></i> Ustvari naročilo
+                    <i class="fas fa-check"></i> Create Order
                 </button>
             </div>
         </div>
@@ -1224,7 +1224,7 @@
     <div class="modal-bg" id="smsModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">📱 Pošlji SMS</div>
+                <div class="modal-title">📱 Send SMS</div>
                 <button class="modal-close" onclick="closeModal('smsModal')">×</button>
             </div>
             <div class="modal-body">
@@ -1239,7 +1239,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Predloga (avtomatski prevod za državo)</label>
+                    <label class="form-label">Template (avtomatski prevod za državo)</label>
                     <select class="form-select" id="smsTemplate" onchange="applySmsTemplate()">
                         <option value="">-- Izberi predlogo --</option>
                         <!-- Dynamically populated -->
@@ -1247,7 +1247,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Sporočilo</label>
+                    <label class="form-label">Message</label>
                     <textarea class="form-textarea" id="smsMessage" placeholder="Vnesite sporočilo..." oninput="updateCharCount()"></textarea>
                     <div class="char-count" id="smsCharCount">0 / 160 znakov</div>
                 </div>
@@ -1258,7 +1258,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal('smsModal')">Prekliči</button>
+                <button class="btn btn-cancel" onclick="closeModal('smsModal')">Cancel</button>
                 <button class="btn btn-save" onclick="queueSms()" id="sendSmsBtn" disabled title="SMS pošilja samo Dejan ročno">
                     <i class="fas fa-clock"></i> Dodaj v čakalno vrsto
                 </button>
@@ -1270,7 +1270,7 @@
     <div class="modal-bg" id="smsEditModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">📱 Pošlji SMS</div>
+                <div class="modal-title">📱 Send SMS</div>
                 <button class="modal-close" onclick="closeModal('smsEditModal')">×</button>
             </div>
             <div class="modal-body">
@@ -1285,7 +1285,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Telefonska številka</label>
+                    <label class="form-label">Phone number</label>
                     <input type="tel" class="form-input" id="smsEditPhone" placeholder="+38598xxxxxxx ali 098xxxxxxx">
                     <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
                         <i class="fas fa-info-circle"></i> Podprti formati: +38598xxx, 38598xxx, 098xxx (sistem avtomatsko formatira)
@@ -1293,16 +1293,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Sporočilo (samo za branje)</label>
+                    <label class="form-label">Message (samo za branje)</label>
                     <textarea class="form-textarea" id="smsEditMessage" readonly style="background:var(--content-bg);cursor:not-allowed;"></textarea>
                 </div>
 
                 <input type="hidden" id="smsEditId">
             </div>
             <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal('smsEditModal')">Prekliči</button>
+                <button class="btn btn-cancel" onclick="closeModal('smsEditModal')">Cancel</button>
                 <button class="btn btn-save" onclick="confirmSendSms()" style="background:var(--accent-green);">
-                    <i class="fas fa-paper-plane"></i> Pošlji
+                    <i class="fas fa-paper-plane"></i> Send
                 </button>
             </div>
         </div>
@@ -1416,10 +1416,10 @@
                         <thead>
                             <tr>
                                 <th style="width: 80px;">ON/OFF</th>
-                                <th>Ime</th>
+                                <th>Name</th>
                                 <th>Trgovina</th>
                                 <th>Tip</th>
-                                <th>Predloga</th>
+                                <th>Template</th>
                                 <th title="Zamik pošiljanja / Max starost">Zamik / Max</th>
                                 <th>V vrsti</th>
                                 <th>Akcije</th>
@@ -1525,9 +1525,9 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeAutomationModal()">Prekliči</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAutomationModal()">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="saveAutomation()">
-                    <i class="fas fa-check"></i> Shrani
+                    <i class="fas fa-check"></i> Save
                 </button>
             </div>
         </div>
@@ -1566,7 +1566,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Ime predloge</label>
-                        <input type="text" id="templateName" class="form-input" placeholder="npr. Opuščena košarica" required>
+                        <input type="text" id="templateName" class="form-input" placeholder="npr. Abandoned cart" required>
                     </div>
 
                     <!-- Translations for all countries -->
@@ -1583,7 +1583,7 @@
                                     <span>🇭🇷</span>
                                     <strong style="font-size:13px;">Hrvaška (HR)</strong>
                                 </div>
-                                <textarea id="templateMsg_hr" class="form-input" rows="2" placeholder="Sporočilo v hrvaščini..." style="resize:vertical;"></textarea>
+                                <textarea id="templateMsg_hr" class="form-input" rows="2" placeholder="Message v hrvaščini..." style="resize:vertical;"></textarea>
                             </div>
                             <!-- CZ -->
                             <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
@@ -1591,7 +1591,7 @@
                                     <span>🇨🇿</span>
                                     <strong style="font-size:13px;">Češka (CZ)</strong>
                                 </div>
-                                <textarea id="templateMsg_cz" class="form-input" rows="2" placeholder="Sporočilo v češčini..." style="resize:vertical;"></textarea>
+                                <textarea id="templateMsg_cz" class="form-input" rows="2" placeholder="Message v češčini..." style="resize:vertical;"></textarea>
                             </div>
                             <!-- PL -->
                             <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
@@ -1599,7 +1599,7 @@
                                     <span>🇵🇱</span>
                                     <strong style="font-size:13px;">Poljska (PL)</strong>
                                 </div>
-                                <textarea id="templateMsg_pl" class="form-input" rows="2" placeholder="Sporočilo v poljščini..." style="resize:vertical;"></textarea>
+                                <textarea id="templateMsg_pl" class="form-input" rows="2" placeholder="Message v poljščini..." style="resize:vertical;"></textarea>
                             </div>
                             <!-- SK -->
                             <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
@@ -1607,7 +1607,7 @@
                                     <span>🇸🇰</span>
                                     <strong style="font-size:13px;">Slovaška (SK)</strong>
                                 </div>
-                                <textarea id="templateMsg_sk" class="form-input" rows="2" placeholder="Sporočilo v slovaščini..." style="resize:vertical;"></textarea>
+                                <textarea id="templateMsg_sk" class="form-input" rows="2" placeholder="Message v slovaščini..." style="resize:vertical;"></textarea>
                             </div>
                             <!-- HU -->
                             <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
@@ -1615,7 +1615,7 @@
                                     <span>🇭🇺</span>
                                     <strong style="font-size:13px;">Madžarska (HU)</strong>
                                 </div>
-                                <textarea id="templateMsg_hu" class="form-input" rows="2" placeholder="Sporočilo v madžarščini..." style="resize:vertical;"></textarea>
+                                <textarea id="templateMsg_hu" class="form-input" rows="2" placeholder="Message v madžarščini..." style="resize:vertical;"></textarea>
                             </div>
                             <!-- GR -->
                             <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
@@ -1623,7 +1623,7 @@
                                     <span>🇬🇷</span>
                                     <strong style="font-size:13px;">Grčija (GR)</strong>
                                 </div>
-                                <textarea id="templateMsg_gr" class="form-input" rows="2" placeholder="Sporočilo v grščini..." style="resize:vertical;"></textarea>
+                                <textarea id="templateMsg_gr" class="form-input" rows="2" placeholder="Message v grščini..." style="resize:vertical;"></textarea>
                             </div>
                             <!-- IT -->
                             <div style="background:var(--content-bg);padding:12px;border-radius:8px;">
@@ -1631,7 +1631,7 @@
                                     <span>🇮🇹</span>
                                     <strong style="font-size:13px;">Italija (IT)</strong>
                                 </div>
-                                <textarea id="templateMsg_it" class="form-input" rows="2" placeholder="Sporočilo v italijanščini..." style="resize:vertical;"></textarea>
+                                <textarea id="templateMsg_it" class="form-input" rows="2" placeholder="Message v italijanščini..." style="resize:vertical;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -1639,9 +1639,9 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeTemplateModal()">Prekliči</button>
+                <button type="button" class="btn btn-secondary" onclick="closeTemplateModal()">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="saveTemplate()">
-                    <i class="fas fa-check"></i> Shrani
+                    <i class="fas fa-check"></i> Save
                 </button>
             </div>
         </div>
@@ -1659,7 +1659,7 @@
         <div class="table-card" style="margin-bottom:20px;border:2px solid var(--accent-purple);border-color:#a855f7;">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);background:rgba(168,85,247,0.1);">
                 <h3 style="margin:0 0 4px 0;">🧪 Test SMS iz predloge</h3>
-                <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji testni SMS na svoj telefon - vidiš točno kar bo stranka prejela</p>
+                <p style="margin:0;color:var(--text-muted);font-size:13px;">Send testni SMS na svoj telefon - vidiš točno kar bo stranka prejela</p>
             </div>
             <div style="padding:20px;">
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -1681,11 +1681,11 @@
                         </select>
                     </div>
                     <div class="form-group" style="margin:0;">
-                        <label class="form-label">Predloga</label>
+                        <label class="form-label">Template</label>
                         <select class="form-select" id="testSmsTemplate" onchange="loadTestTemplatePreview()">
                             <option value="">-- Izberi predlogo --</option>
-                            <option value="abandoned_cart_1">🛒 Zapuščena košarica 1 (opomnik)</option>
-                            <option value="abandoned_cart_2">🎁 Zapuščena košarica 2 (20% popust)</option>
+                            <option value="abandoned_cart_1">🛒 Zapuščena košarica 1 (reminder)</option>
+                            <option value="abandoned_cart_2">🎁 Abandoned cart 2 (20% discount)</option>
                             <option value="winback_1">💙 Povratek kupca 1 (generičen)</option>
                         </select>
                     </div>
@@ -1728,7 +1728,7 @@
 
                 <div style="display:flex;gap:12px;align-items:center;">
                     <button class="btn" onclick="sendTestSms()" style="background:#a855f7;color:white;">
-                        <i class="fas fa-paper-plane"></i> Pošlji testni SMS
+                        <i class="fas fa-paper-plane"></i> Send testni SMS
                     </button>
                     <span id="testSmsStatus" style="font-size:13px;"></span>
                 </div>
@@ -1739,12 +1739,12 @@
         <div class="table-card" style="margin-bottom:20px;border:2px solid var(--accent-green);">
             <div style="padding:20px;border-bottom:1px solid var(--card-border);background:rgba(34,197,94,0.1);">
                 <h3 style="margin:0 0 4px 0;">📱 Ročno pošiljanje SMS</h3>
-                <p style="margin:0;color:var(--text-muted);font-size:13px;">Pošlji poljuben SMS na poljubno številko</p>
+                <p style="margin:0;color:var(--text-muted);font-size:13px;">Send poljuben SMS na poljubno številko</p>
             </div>
             <div style="padding:20px;">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
                     <div class="form-group" style="margin:0;">
-                        <label class="form-label">Telefonska številka</label>
+                        <label class="form-label">Phone number</label>
                         <input type="tel" class="form-input" id="manualSmsPhone" placeholder="+38598xxxxxxx ali 098xxxxxxx">
                         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
                             Podprti formati: +385xxx, 385xxx, 098xxx
@@ -1765,7 +1765,7 @@
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:16px;">
-                    <label class="form-label">Sporočilo</label>
+                    <label class="form-label">Message</label>
                     <textarea class="form-textarea" id="manualSmsMessage" placeholder="Vpiši sporočilo..." style="min-height:80px;" oninput="updateManualSmsCharCount()"></textarea>
                     <div style="display:flex;justify-content:space-between;margin-top:4px;">
                         <span class="char-count" id="manualSmsCharCount">0 / 160 znakov</span>
@@ -1774,7 +1774,7 @@
                 </div>
                 <div style="display:flex;gap:12px;align-items:center;">
                     <button class="btn btn-save" onclick="sendManualSms()" style="background:var(--accent-green);">
-                        <i class="fas fa-paper-plane"></i> Pošlji SMS
+                        <i class="fas fa-paper-plane"></i> Send SMS
                     </button>
                     <span id="manualSmsStatus" style="font-size:13px;"></span>
                 </div>
@@ -1906,7 +1906,7 @@
                 <!-- Category Filter -->
                 <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
                     <button class="content-tab active" data-category="all" onclick="filterTemplatesByCategory('all', this)">
-                        📋 Vse
+                        📋 All
                     </button>
                     <button class="content-tab" data-category="abandoned" onclick="filterTemplatesByCategory('abandoned', this)">
                         🛒 Abandoned
@@ -1929,10 +1929,10 @@
 
             <!-- Sample Variables for Preview -->
             <div class="table-card" style="padding:12px 16px;">
-                <h3 style="margin-bottom:8px;font-size:14px;">🔍 Testni podatki za predogled</h3>
+                <h3 style="margin-bottom:8px;font-size:14px;">🔍 Test data for preview</h3>
                 <div style="display:flex;gap:12px;flex-wrap:wrap;">
                     <div style="flex:1;min-width:120px;">
-                        <label style="font-size:11px;color:var(--text-muted);">Ime</label>
+                        <label style="font-size:11px;color:var(--text-muted);">Name</label>
                         <input type="text" class="form-input" id="sampleName" value="Marko" style="padding:8px;">
                     </div>
                     <div style="flex:1;min-width:120px;">
@@ -1965,7 +1965,7 @@
                             <i class="fas fa-filter" style="color:var(--accent-blue);"></i> Filter nastavitve
                         </h3>
                         <p style="color:var(--text-muted);font-size:12px;margin:0;">
-                            Nastavi koliko dni mora miniti od prvega nakupa, preden se kupec prikaže v tabeli "Enkratni kupci".
+                            Nastavi koliko dni mora miniti od prvega nakupa, preden se kupec prikaže v tabeli "One-time Buyers".
                         </p>
                     </div>
                 </div>
@@ -1983,7 +1983,7 @@
 
                 <div style="display:flex;gap:12px;align-items:center;padding-top:12px;border-top:1px solid var(--card-border);">
                     <button class="btn btn-save" onclick="saveBuyersSettings()" style="padding:10px 20px;">
-                        <i class="fas fa-save"></i> Shrani nastavitve
+                        <i class="fas fa-save"></i> Save nastavitve
                     </button>
                     <span id="buyersSettingsStatus" style="font-size:12px;color:var(--text-muted);"></span>
                 </div>
@@ -2053,7 +2053,7 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">Telefonska številka *</label>
+                    <label class="form-label">Phone number *</label>
                     <input type="tel" class="form-input" id="urgentPhone" placeholder="+386 40 xxx xxx">
                 </div>
                 <div class="form-group">
@@ -2062,7 +2062,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeAddUrgentModal()">Prekliči</button>
+                <button class="btn btn-cancel" onclick="closeAddUrgentModal()">Cancel</button>
                 <button class="btn btn-save" onclick="saveUrgentLead()">
                     <i class="fas fa-plus"></i> Dodaj
                 </button>
@@ -2139,9 +2139,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal('callLogModal')">Prekliči</button>
+                <button class="btn btn-cancel" onclick="closeModal('callLogModal')">Cancel</button>
                 <button class="btn btn-save" onclick="saveCallLog()">
-                    <i class="fas fa-save"></i> Shrani klic
+                    <i class="fas fa-save"></i> Save klic
                 </button>
             </div>
         </div>
@@ -2168,7 +2168,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="cancelQuickCallback()">Prekliči</button>
+                <button class="btn btn-cancel" onclick="cancelQuickCallback()">Cancel</button>
                 <button class="btn btn-save" onclick="confirmQuickCallback()">
                     <i class="fas fa-bell"></i> Dodaj v Follow-ups
                 </button>
@@ -2193,7 +2193,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Password *</label>
-                    <input type="password" class="form-input" id="agentPassword" placeholder="Geslo za prijavo">
+                    <input type="password" class="form-input" id="agentPassword" placeholder="Password za prijavo">
                     <small style="color:var(--text-muted);font-size:12px;" id="passwordHint">Pusti prazno za ohranitev obstoječega (pri urejanju)</small>
                 </div>
 
@@ -2221,9 +2221,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeModal('agentModal')">Prekliči</button>
+                <button class="btn btn-cancel" onclick="closeModal('agentModal')">Cancel</button>
                 <button class="btn btn-save" onclick="saveAgent()">
-                    <i class="fas fa-save"></i> Shrani
+                    <i class="fas fa-save"></i> Save
                 </button>
             </div>
         </div>
@@ -2531,10 +2531,10 @@
         // SMS Templates
         const smsTemplates = {
             reminder: {
-                text: 'Pozdravljeni {ime}! Vaša košarica z {produkt} vas še vedno čaka. Dokončajte nakup: {link}'
+                text: 'Hello {ime}! Vaša košarica z {produkt} vas še vedno čaka. Dokončajte nakup: {link}'
             },
             discount: {
-                text: 'Pozdravljeni {ime}! Samo za vas: 10% popust na {produkt}! Koda: SAVE10. Nakup: {link}'
+                text: 'Hello {ime}! Samo za vas: 10% popust na {produkt}! Koda: SAVE10. Nakup: {link}'
             },
             lastchance: {
                 text: '{ime}, zadnja priložnost! {produkt} bo kmalu razprodan. Ne zamudite: {link}'
@@ -2621,7 +2621,7 @@
                     leads: 'Leads',
                     carts: 'Abandoned Carts',
                     pending: 'Pending Orders',
-                    buyers: 'Enkratni kupci',
+                    buyers: 'One-time Buyers',
                     paketomati: 'Paketomati',
                     'sms-automation': 'SMS Automation',
                     'sms-dashboard': 'SMS Dashboard',
@@ -2717,9 +2717,9 @@
                     const titles = {
                         carts: 'Abandoned Carts',
                         pending: 'Pending Orders',
-                        buyers: 'Enkratni kupci',
+                        buyers: 'One-time Buyers',
                         paketomati: 'Paketomati',
-                        urgent: 'Nujno'
+                        urgent: 'Urgent'
                     };
                     document.getElementById('pageTitle').textContent = titles[newTab] || newTab;
 
@@ -3112,7 +3112,7 @@
                 buyers = cacheResult.data.buyers;
                 console.log('[Data] ✓ Buyers retry success:', buyers.length);
                 globalLoadingStatus.buyersError = null;
-                showToast(`✓ Enkratni kupci naloženi: ${buyers.length}`);
+                showToast(`✓ One-time Buyers naloženi: ${buyers.length}`);
             } else {
                 // Fallback to direct API
                 const buyersResult = await apiFetch('/api/one-time-buyers', {
@@ -3125,7 +3125,7 @@
                     buyers = Array.isArray(buyersResult.data) ? buyersResult.data : [];
                     console.log('[Data] ✓ Buyers retry success:', buyers.length);
                     globalLoadingStatus.buyersError = null;
-                    showToast(`✓ Enkratni kupci naloženi: ${buyers.length}`);
+                    showToast(`✓ One-time Buyers naloženi: ${buyers.length}`);
                 } else {
                     console.error('[Data] ✗ Buyers retry failed:', buyersResult.error);
                     buyers = [];
@@ -3403,9 +3403,9 @@
 
             if (!totalItems) {
                 const emptyMessages = {
-                    'carts': '<div class="empty"><i class="fas fa-shopping-cart"></i><p>Ni zapuščenih košaric</p><small style="color:var(--text-muted);">Vse košarice so bile pretvorjene ali filtrirane</small></div>',
-                    'pending': '<div class="empty"><i class="fas fa-clock"></i><p>Ni čakajočih naročil</p><small style="color:var(--text-muted);">Vsa naročila so bila obdelana</small></div>',
-                    'buyers': '<div class="empty"><i class="fas fa-user"></i><p>Ni enkratnih kupcev</p><small style="color:var(--text-muted);">Trenutno ni kupcev z natanko 1 naročilom ki ustrezajo filtru</small></div>',
+                    'carts': '<div class="empty"><i class="fas fa-shopping-cart"></i><p>No abandoned carts</p><small style="color:var(--text-muted);">All carts have been converted or filtered</small></div>',
+                    'pending': '<div class="empty"><i class="fas fa-clock"></i><p>No pending orders</p><small style="color:var(--text-muted);">Vsa naročila so bila obdelana</small></div>',
+                    'buyers': '<div class="empty"><i class="fas fa-user"></i><p>No one-time buyers</p><small style="color:var(--text-muted);">Trenutno ni kupcev z natanko 1 naročilom ki ustrezajo filtru</small></div>',
                     'urgent': '<div class="empty"><i class="fas fa-phone-slash"></i><p>Ni nujnih leadov</p><small style="color:var(--text-muted);">Klikni + Dodaj za vnos novega leada</small></div>'
                 };
                 container.innerHTML = emptyMessages[dataTab] || '<div class="empty"><i class="fas fa-inbox"></i><p>Ni podatkov za prikaz</p></div>';
@@ -4231,7 +4231,7 @@
             const container = document.getElementById('orderItems');
 
             if (orderItems.length === 0) {
-                container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-box-open"></i><p>Ni izdelkov - uporabi iskanje zgoraj</p></div>';
+                container.innerHTML = '<div class="empty" style="padding:20px;"><i class="fas fa-box-open"></i><p>No items - use the buttons above to add products</p></div>';
                 updateOrderTotals();
                 return;
             }
@@ -4244,11 +4244,11 @@
                     </div>
                     <div class="order-item-controls">
                         <div>
-                            <label>Količina</label>
+                            <label>Qty</label>
                             <input type="number" min="1" value="${item.editQty}" onchange="updateItemQty(${i}, this.value)">
                         </div>
                         <div>
-                            <label>Cena (${sym})</label>
+                            <label>Price (${sym})</label>
                             <input type="number" step="0.01" min="0" value="${item.editPrice.toFixed(2)}" onchange="updateItemPrice(${i}, this.value)">
                         </div>
                     </div>
@@ -4281,11 +4281,11 @@
 
         function renderUpsellConfig() {
             const container = document.getElementById('upsellColorRows');
-            const colorOpts = '<option value="">-- Barva --</option>' + getColorsForType(upsellType, currentOrderStoreCode).map(c =>
+            const colorOpts = '<option value="">-- Color --</option>' + getColorsForType(upsellType, currentOrderStoreCode).map(c =>
                 '<option value="' + c.name + '">' + c.name + '</option>'
             ).join('');
-            const sizeOpts = '<option value="">-- Vel. --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
-            let rows = '<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);font-weight:500;">Barva</span><span style="width:80px;font-size:11px;color:var(--text-muted);font-weight:500;">Velikost</span></div>';
+            const sizeOpts = '<option value="">-- Size --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+            let rows = '<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);font-weight:500;">Color</span><span style="width:80px;font-size:11px;color:var(--text-muted);font-weight:500;">Size</span></div>';
             for (let i = 0; i < upsellQty; i++) {
                 rows += '<div class="qb-color-row" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
                     '<span class="qb-piece-label" style="width:24px;text-align:right;">' + (i+1) + '.</span>' +
@@ -4337,7 +4337,7 @@
             document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('discountBtnNone').classList.add('active');
             renderOrderItems();
-            showToast('✓ Upsell: ' + typeNames[upsellType] + ' (' + upsellQty + ') dodano');
+            showToast('✓ Upsell: ' + typeNames[upsellType] + ' (' + upsellQty + ') added');
             // Close
             upsellCard = null; upsellType = null;
             document.getElementById('upsellConfig').classList.remove('visible');
@@ -4421,11 +4421,11 @@
             const sc = currentOrderStoreCode;
             const boxColors = getColorsForType('bokserice', sc);
             const majColors = getColorsForType('majice', sc);
-            const sizeOpts = '<option value="">-- Vel. --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
-            const boxColorOpts = '<option value="">-- Barva --</option>' + boxColors.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
-            const majColorOpts = '<option value="">-- Barva --</option>' + majColors.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
+            const sizeOpts = '<option value="">-- Size --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+            const boxColorOpts = '<option value="">-- Color --</option>' + boxColors.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
+            const majColorOpts = '<option value="">-- Color --</option>' + majColors.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
 
-            let boxRows = '<div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);">Barva</span><span style="width:80px;font-size:11px;color:var(--text-muted);">Velikost</span></div>';
+            let boxRows = '<div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);">Color</span><span style="width:80px;font-size:11px;color:var(--text-muted);">Size</span></div>';
             for (let i = 0; i < cfg.box; i++) {
                 boxRows += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
                     '<span style="width:24px;text-align:right;font-size:12px;color:var(--text-muted);">' + (i+1) + '.</span>' +
@@ -4435,7 +4435,7 @@
             }
             document.getElementById('kompletBoxRows').innerHTML = boxRows;
 
-            let majRows = '<div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);">Barva</span><span style="width:80px;font-size:11px;color:var(--text-muted);">Velikost</span></div>';
+            let majRows = '<div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);">Color</span><span style="width:80px;font-size:11px;color:var(--text-muted);">Size</span></div>';
             for (let i = 0; i < cfg.maj; i++) {
                 majRows += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
                     '<span style="width:24px;text-align:right;font-size:12px;color:var(--text-muted);">' + (i+1) + '.</span>' +
@@ -4535,9 +4535,9 @@
             const colorOpts = getColorsForType(currentQBType || 'majice', currentOrderStoreCode).map(c => {
                 return '<option value="' + c.name + '">' + c.name + '</option>';
             }).join('');
-            const qbColorOptsWithEmpty = '<option value="">-- Barva --</option>' + colorOpts;
-            const sizeOpts = '<option value="">-- Vel. --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
-            let rows = '<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);font-weight:500;">Barva</span><span style="width:80px;font-size:11px;color:var(--text-muted);font-weight:500;">Velikost</span></div>';
+            const qbColorOptsWithEmpty = '<option value="">-- Color --</option>' + colorOpts;
+            const sizeOpts = '<option value="">-- Size --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+            let rows = '<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);font-weight:500;">Color</span><span style="width:80px;font-size:11px;color:var(--text-muted);font-weight:500;">Size</span></div>';
             for (let i = 0; i < qbQty; i++) {
                 rows += '<div class="qb-color-row" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
                     '<span class="qb-piece-label" style="width:24px;text-align:right;">' + (i+1) + '.</span>' +
@@ -4599,7 +4599,7 @@
             document.getElementById('discountBtnNone').classList.add('active');
             
             renderOrderItems();
-            showToast('✓ ' + title + ' dodano');
+            showToast('✓ ' + title + ' added');
             
             // Close panel
             qbType = null;
@@ -4821,7 +4821,7 @@
             }
 
             renderOrderItems();
-            showToast(`✓ ${product.name} dodano`, false, 'info');
+            showToast(`✓ ${product.name} added`, false, 'info');
         }
 
         let currentDiscount = 0;
@@ -4872,20 +4872,20 @@
             const total = subtotal + shipping;
 
             document.getElementById('orderSubtotal').textContent = sym + subtotal.toFixed(2);
-            document.getElementById('orderShipping').textContent = freeShipping ? 'BREZPLAČNO' : sym + shipping.toFixed(2);
+            document.getElementById('orderShipping').textContent = freeShipping ? 'FREE' : sym + shipping.toFixed(2);
             document.getElementById('shippingRow').classList.toggle('free-shipping', freeShipping);
             document.getElementById('orderTotal').textContent = sym + total.toFixed(2);
         }
 
         async function confirmCreateOrder() {
             if (!orderCartId || orderItems.length === 0) {
-                showToast('Dodajte vsaj en izdelek', true);
+                showToast('Add at least one product', true);
                 return;
             }
 
             const btn = document.getElementById('createOrderBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ustvarjam...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
 
             // Gather edited data
             const orderData = {
@@ -4936,7 +4936,7 @@
             }
 
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-check"></i> Ustvari naročilo';
+            btn.innerHTML = '<i class="fas fa-check"></i> Create Order';
         }
 
         // SMS Modal
@@ -5130,7 +5130,7 @@
                     localStorage.setItem(lastRunKey, now.toString());
 
                     if (result.success && result.totalQueued > 0) {
-                        showToast(`🤖 Auto-check: ${result.totalQueued} SMS dodano v vrsto`);
+                        showToast(`🤖 Auto-check: ${result.totalQueued} SMS added v vrsto`);
                         loadSmsAutomations(); // Refresh to show updated counts
                     }
 
@@ -5216,7 +5216,7 @@
                             <button class="btn btn-sm btn-secondary" onclick="editTemplate('${escapeHtml(t.id)}')" title="Uredi">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteTemplate('${escapeHtml(t.id)}')" title="Izbriši">
+                            <button class="btn btn-sm btn-danger" onclick="deleteTemplate('${escapeHtml(t.id)}')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -5299,7 +5299,7 @@
                 const result = await res.json();
 
                 if (result.success) {
-                    showToast('Predloga shranjena!');
+                    showToast('Template shranjena!');
                     closeTemplateModal();
                     loadAllTemplates();
                 } else {
@@ -5322,7 +5322,7 @@
                 const result = await res.json();
 
                 if (result.success) {
-                    showToast('Predloga izbrisana');
+                    showToast('Template izbrisana');
                     loadAllTemplates();
                 } else {
                     showToast(result.error || 'Napaka pri brisanju', true);
@@ -5441,7 +5441,7 @@
                         <button class="btn btn-sm btn-secondary" onclick="resetAutomationQueue('${a.id}')" title="Reset evidenco (omogoči ponovno pošiljanje)">
                             <i class="fas fa-redo"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteAutomation('${a.id}')" title="Izbriši">
+                        <button class="btn btn-sm btn-danger" onclick="deleteAutomation('${a.id}')" title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -5469,7 +5469,7 @@
                 const previewHtml = `
                     <div style="padding: 20px;">
                         <h4 style="margin: 0 0 12px; font-size: 14px; color: var(--text-muted);">
-                            <i class="fas fa-envelope"></i> Predloga: ${escapeHtml(template.name)}
+                            <i class="fas fa-envelope"></i> Template: ${escapeHtml(template.name)}
                         </h4>
                         <div style="padding: 16px; background: var(--content-bg); border-radius: 8px; border: 1px solid var(--card-border); font-size: 13px; line-height: 1.6; white-space: pre-wrap;">
                             ${escapeHtml(template.message)}
@@ -5481,7 +5481,7 @@
                 `;
                 showTemplatePreviewModal(previewHtml);
             } else {
-                showToast('Predloga ni najdena', true);
+                showToast('Template ni najdena', true);
             }
         }
 
@@ -5813,8 +5813,8 @@
                             <thead>
                                 <tr>
                                     <th>Datum</th>
-                                    <th>Prejemnik</th>
-                                    <th>Sporočilo</th>
+                                    <th>Recipient</th>
+                                    <th>Message</th>
                                     <th>Država</th>
                                     <th>Akcije</th>
                                 </tr>
@@ -5834,7 +5834,7 @@
                                             </td>
                                             <td>${store?.flag || '🌍'} ${(sms.storeCode || '').toUpperCase()}</td>
                                             <td style="white-space:nowrap;">
-                                                <button class="action-btn order" onclick="openSmsEditModal('${sms.id}', '${escAttr(sms.recipient || '')}', '${escAttr(sms.message || '')}', '${escAttr(sms.customerName || 'Unknown')}')" title="Pošlji SMS" style="background:var(--accent-green);color:white;">
+                                                <button class="action-btn order" onclick="openSmsEditModal('${sms.id}', '${escAttr(sms.recipient || '')}', '${escAttr(sms.message || '')}', '${escAttr(sms.customerName || 'Unknown')}')" title="Send SMS" style="background:var(--accent-green);color:white;">
                                                     <i class="fas fa-paper-plane"></i>
                                                 </button>
                                                 <button class="action-btn" onclick="removeFromQueueApi('${sms.id}')" title="Odstrani">
@@ -5849,7 +5849,7 @@
                     </div>
                     <div style="margin-top:16px;padding:12px;background:rgba(34,197,94,0.1);border:1px solid var(--accent-green);border-radius:8px;">
                         <i class="fas fa-info-circle" style="color:var(--accent-green);"></i>
-                        <strong style="color:var(--accent-green);">Pošlji SMS:</strong> Klikni zeleni gumb <i class="fas fa-paper-plane"></i> za pošiljanje SMS-a preko MetaKocka.
+                        <strong style="color:var(--accent-green);">Send SMS:</strong> Klikni zeleni gumb <i class="fas fa-paper-plane"></i> za pošiljanje SMS-a preko MetaKocka.
                     </div>
                 `;
             } catch (e) {
@@ -5880,11 +5880,11 @@
             // Basic validation - at least 7 digits
             const digitsOnly = editedPhone.replace(/[^0-9]/g, '');
             if (digitsOnly.length < 7) {
-                showToast('❌ Telefonska številka je prekratka (min. 7 številk)', true);
+                showToast('❌ Phone number je prekratka (min. 7 številk)', true);
                 return;
             }
             if (digitsOnly.length > 15) {
-                showToast('❌ Telefonska številka je predolga (max. 15 številk)', true);
+                showToast('❌ Phone number je predolga (max. 15 številk)', true);
                 return;
             }
 
@@ -5984,7 +5984,7 @@
 
             const digitsOnly = phone.replace(/[^0-9]/g, '');
             if (digitsOnly.length < 7) {
-                showToast('❌ Telefonska številka je prekratka (min. 7 številk)', true);
+                showToast('❌ Phone number je prekratka (min. 7 številk)', true);
                 return;
             }
 
@@ -5993,7 +5993,7 @@
                 return;
             }
 
-            if (!confirm(`📱 Pošlji SMS?\n\nŠtevilka: ${phone}\nDržava: ${country.toUpperCase()}\nSporočilo: ${message.substring(0, 50)}...`)) {
+            if (!confirm(`📱 Send SMS?\n\nŠtevilka: ${phone}\nDržava: ${country.toUpperCase()}\nMessage: ${message.substring(0, 50)}...`)) {
                 return;
             }
 
@@ -6083,7 +6083,7 @@
             console.log('[TestSMS] Message:', message);
 
             if (!message) {
-                preview.innerHTML = `<span style="color:var(--accent-red);">Predloga ni najdena (key=${templateKey}, country=${country}, templates=${templateList.length})</span>`;
+                preview.innerHTML = `<span style="color:var(--accent-red);">Template ni najdena (key=${templateKey}, country=${country}, templates=${templateList.length})</span>`;
                 return;
             }
 
@@ -6136,7 +6136,7 @@
                 return;
             }
 
-            if (!confirm(`🧪 Pošlji TESTNI SMS?\n\nŠtevilka: ${phone} (${phoneCountry.toUpperCase()})\nPredloga: ${templateKey}\nJezik: ${templateCountry.toUpperCase()}\n\n${message.substring(0, 100)}...`)) {
+            if (!confirm(`🧪 Send TESTNI SMS?\n\nŠtevilka: ${phone} (${phoneCountry.toUpperCase()})\nTemplate: ${templateKey}\nJezik: ${templateCountry.toUpperCase()}\n\n${message.substring(0, 100)}...`)) {
                 return;
             }
 
@@ -6209,8 +6209,8 @@
                 <table class="data-table">
                     <thead><tr>
                         <th>Datum/Čas</th>
-                        <th>Prejemnik</th>
-                        <th>Sporočilo</th>
+                        <th>Recipient</th>
+                        <th>Message</th>
                         <th>Država</th>
                         <th>Status</th>
                         <th>Akcije</th>
@@ -6265,7 +6265,7 @@
                 return;
             }
 
-            const headers = ['Datum', 'Prejemnik', 'Telefon', 'Sporočilo', 'Država', 'Status'];
+            const headers = ['Datum', 'Recipient', 'Telefon', 'Message', 'Država', 'Status'];
             const rows = smsLog.map(s => [
                 new Date(s.date).toLocaleString('sl-SI'),
                 s.customerName,
@@ -6357,21 +6357,21 @@
         function copyTemplateToClipboard() {
             const message = document.getElementById('previewMessage').textContent;
             navigator.clipboard.writeText(message).then(() => {
-                showToast('📋 Sporočilo kopirano!', false, 'info');
+                showToast('📋 Message kopirano!', false, 'info');
             });
         }
 
         function getTemplateOptions() {
             if (!smsTemplatesData?.templates) {
                 return `
-                    <option value="abandoned_cart">🛒 Opuščena košarica</option>
+                    <option value="abandoned_cart">🛒 Abandoned cart</option>
                     <option value="winback">💙 Povratek kupca</option>
                     <option value="last_chance">⏰ Zadnja prilika</option>
                 `;
             }
 
             const templateNames = {
-                'abandoned_cart': '🛒 Opuščena košarica',
+                'abandoned_cart': '🛒 Abandoned cart',
                 'winback': '💙 Povratek kupca',
                 'last_chance': '⏰ Zadnja prilika'
             };
@@ -6674,8 +6674,8 @@
                             <thead>
                                 <tr>
                                     <th>Datum</th>
-                                    <th>Prejemnik</th>
-                                    <th>Sporočilo</th>
+                                    <th>Recipient</th>
+                                    <th>Message</th>
                                     <th>Država</th>
                                     <th>Akcije</th>
                                 </tr>
@@ -6698,7 +6698,7 @@
                                             <td style="white-space:nowrap;">
                                                 <button class="action-btn"
                                                         onclick="openSmsEditModal('${sms.id}', '${escAttr(sms.recipient || '')}', '${escAttr(sms.message || '')}', '${escAttr(sms.customerName || 'Unknown')}')"
-                                                        title="${hasProvider ? 'Pošlji SMS' : 'Provider ni nastavljen'}"
+                                                        title="${hasProvider ? 'Send SMS' : 'Provider ni nastavljen'}"
                                                         style="${hasProvider ? 'background:var(--accent-green);color:white;' : 'opacity:0.5;'}"
                                                         ${!hasProvider ? 'disabled' : ''}>
                                                     <i class="fas fa-paper-plane"></i>
@@ -6715,7 +6715,7 @@
                     </div>
                     <div style="margin-top:16px;padding:12px;background:rgba(34,197,94,0.1);border:1px solid var(--accent-green);border-radius:8px;">
                         <i class="fas fa-info-circle" style="color:var(--accent-green);"></i>
-                        <strong style="color:var(--accent-green);">Pošlji SMS:</strong> Klikni zeleni gumb <i class="fas fa-paper-plane"></i> za pošiljanje SMS-a preko MetaKocka.
+                        <strong style="color:var(--accent-green);">Send SMS:</strong> Klikni zeleni gumb <i class="fas fa-paper-plane"></i> za pošiljanje SMS-a preko MetaKocka.
                     </div>
                 `;
             } catch (e) {
@@ -7874,7 +7874,7 @@
                             <th>Vrednost</th>
                             <th>Callback</th>
                             <th>Agent</th>
-                            <th>Opombe</th>
+                            <th>Notes</th>
                             <th style="text-align:right;">Akcije</th>
                         </tr></thead>
                         <tbody>
@@ -8129,7 +8129,7 @@
                 const data = await res.json();
                 console.log('[BuyersSettings] Save response:', data);
                 if (data.success) {
-                    showToast('Nastavitve shranjene! (' + minDays + ' dni) Osvežujem podatke...');
+                    showToast('Settings shranjene! (' + minDays + ' dni) Osvežujem podatke...');
                     // Clear cache and reload buyers data with new settings
                     await fetch('/api/clear-cache');
                     await fetch('/api/refresh-buyers-cache');
@@ -8221,8 +8221,8 @@
                     notified: 'var(--accent-green)'
                 };
                 const statusLabels = {
-                    not_called: 'Ni poklicano',
-                    called: 'Poklicano',
+                    not_called: 'Ni pocalled',
+                    called: 'Pocalled',
                     notified: 'Obveščeno'
                 };
 
@@ -8258,8 +8258,8 @@
                         <td><strong>${order.orderTotal.toFixed(2)} ${order.currency}</strong></td>
                         <td>
                             <select onchange="updatePaketomatStatus('${order.id}', this.value)" style="background:var(--card-border);border:1px solid var(--card-border);border-radius:4px;padding:4px 8px;color:${statusColors[order.status]};cursor:pointer;">
-                                <option value="not_called" ${order.status === 'not_called' ? 'selected' : ''}>Ni poklicano</option>
-                                <option value="called" ${order.status === 'called' ? 'selected' : ''}>Poklicano</option>
+                                <option value="not_called" ${order.status === 'not_called' ? 'selected' : ''}>Ni pocalled</option>
+                                <option value="called" ${order.status === 'called' ? 'selected' : ''}>Pocalled</option>
                                 <option value="notified" ${order.status === 'notified' ? 'selected' : ''}>Obveščeno</option>
                             </select>
                         </td>
@@ -8269,11 +8269,11 @@
                                     <button onclick="callCustomer('${order.phone}')" class="action-btn-mini" title="Pokliči">
                                         <i class="fas fa-phone"></i>
                                     </button>
-                                    <button onclick="openSmsModal('${order.id}', '${escAttr(order.phone)}', '${escAttr(order.customerName)}', 'paketomat')" class="action-btn-mini" title="Pošlji SMS">
+                                    <button onclick="openSmsModal('${order.id}', '${escAttr(order.phone)}', '${escAttr(order.customerName)}', 'paketomat')" class="action-btn-mini" title="Send SMS">
                                         <i class="fas fa-sms"></i>
                                     </button>
                                 ` : ''}
-                                <button onclick="showPaketomatNotes('${order.id}', '${escAttr(order.notes || '')}')" class="action-btn-mini" title="Opombe">
+                                <button onclick="showPaketomatNotes('${order.id}', '${escAttr(order.notes || '')}')" class="action-btn-mini" title="Notes">
                                     <i class="fas fa-sticky-note"></i>
                                 </button>
                             </div>
@@ -8323,15 +8323,15 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width:500px;">
                     <div class="modal-header">
-                        <h3>📝 Opombe</h3>
+                        <h3>📝 Notes</h3>
                         <button class="modal-close" onclick="document.getElementById('paketomatNotesModal').remove()">×</button>
                     </div>
                     <div class="modal-body">
                         <textarea id="paketomatNotesText" rows="5" style="width:100%;background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px;color:var(--text-primary);resize:vertical;">${currentNotes}</textarea>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-cancel" onclick="document.getElementById('paketomatNotesModal').remove()">Prekliči</button>
-                        <button class="btn btn-save" onclick="savePaketomatNotes('${orderId}')">Shrani</button>
+                        <button class="btn btn-cancel" onclick="document.getElementById('paketomatNotesModal').remove()">Cancel</button>
+                        <button class="btn btn-save" onclick="savePaketomatNotes('${orderId}')">Save</button>
                     </div>
                 </div>
             `;
@@ -8351,7 +8351,7 @@
 
                 if (order) order.notes = notes;
                 document.getElementById('paketomatNotesModal').remove();
-                showToast('Opombe shranjene');
+                showToast('Notes saved');
             } catch (e) {
                 showToast('Napaka pri shranjevanju', 'error');
             }
@@ -8395,7 +8395,7 @@
 
                 if (order) order.notes = notes;
                 inputEl.classList.toggle('has-notes', !!notes);
-                showToast('✓ Opombe shranjene');
+                showToast('✓ Notes saved');
             } catch (e) {
                 showToast('Napaka pri shranjevanju', 'error');
             }
@@ -8566,7 +8566,7 @@
                                 </td>
                                 <td>
                                     <select class="inline-status-select" data-id="${order.id}" onchange="updatePaketomatStatusFromSelect(this)">
-                                        <option value="not_called" ${order.status==='not_called'?'selected':''}>⚪ Ni klicano</option>
+                                        <option value="not_called" ${order.status==='not_called'?'selected':''}>⚪ Ni called</option>
                                         <option value="called" ${order.status==='called'?'selected':''}>📞 Klicano</option>
                                         <option value="sms_sent" ${order.status==='sms_sent'?'selected':''}>💬 SMS poslan</option>
                                         <option value="pickup_reminded" ${order.status==='pickup_reminded'?'selected':''}>🔔 Opomnik poslan</option>
@@ -8670,12 +8670,12 @@
                                                value="${lead.resolution ? esc(lead.resolution) : ''}"
                                                placeholder="Kako rešeno..."
                                                onkeypress="if(event.key==='Enter'){saveUrgentResolution(${idx}, this.value)}">
-                                        <button class="inline-notes-save" onclick="saveUrgentResolution(${idx}, this.previousElementSibling.value)" title="Shrani">💾</button>
+                                        <button class="inline-notes-save" onclick="saveUrgentResolution(${idx}, this.previousElementSibling.value)" title="Save">💾</button>
                                     </div>
                                 </td>
                                 <td>
                                     <button class="action-btn" onclick="editUrgentLead(${idx})" title="Uredi"><i class="fas fa-edit"></i></button>
-                                    <button class="action-btn" onclick="deleteUrgentLead(${idx})" title="Izbriši"><i class="fas fa-trash"></i></button>
+                                    <button class="action-btn" onclick="deleteUrgentLead(${idx})" title="Delete"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
                         `).join('')}
@@ -8797,7 +8797,7 @@
             });
             saveUrgentLeads();
             renderUrgentTableInline();
-            showToast('Označeno kot poklicano');
+            showToast('Označeno kot pocalled');
         }
         
         function deleteSelectedUrgent() {
@@ -8914,7 +8914,7 @@
                     if (notificationSettings.desktopEnabled && Notification.permission === 'granted') {
                         if (data.newCarts.length > 0) {
                             const cart = data.newCarts[0];
-                            const notif = new Notification('🛒 Nova zapuščena košarica!', {
+                            const notif = new Notification('🛒 Nova abandoned cart!', {
                                 body: `${cart.customerName} - ${cart.cartValue.toFixed(2)} ${cart.currency}`,
                                 icon: '/favicon.ico',
                                 tag: 'cart-' + cart.id
