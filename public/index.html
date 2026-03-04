@@ -1041,6 +1041,7 @@
                         <button class="quick-builder-btn" onclick="toggleQB('bokserice')"><i class="fas fa-plus"></i> Bokserice</button>
                         <button class="quick-builder-btn" onclick="toggleQB('majice')"><i class="fas fa-plus"></i> Majice</button>
                         <button class="quick-builder-btn" onclick="toggleQB('nogavice')"><i class="fas fa-plus"></i> Nogavice</button>
+                        <button class="quick-builder-btn" onclick="toggleKompletPicker()"><i class="fas fa-plus"></i> Kompleti</button>
                     </div>
                     <div class="qb-panel" id="qbPanel">
                         <div class="qb-row">
@@ -1056,7 +1057,28 @@
                     </div>
                 </div>
 
-                <!-- Komplet Panel -->
+                
+                <!-- Komplet Picker -->
+                <div class="qb-panel" id="kompletPickerPanel" style="border:1.5px solid #6366f1;">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="upsell-card" onclick="toggleKomplet('2+5')" style="flex:1;min-width:80px;">
+                            <div class="upsell-icon">📦</div>
+                            <div class="upsell-label">🤩2+👕5</div>
+                            <div class="upsell-sub">€64.83</div>
+                        </button>
+                        <button class="upsell-card" onclick="toggleKomplet('4+10')" style="flex:1;min-width:80px;">
+                            <div class="upsell-icon">📦</div>
+                            <div class="upsell-label">🤩4+👕10</div>
+                            <div class="upsell-sub">€169.86</div>
+                        </button>
+                        <button class="upsell-card" onclick="toggleKomplet('5+5')" style="flex:1;min-width:80px;">
+                            <div class="upsell-icon">📦</div>
+                            <div class="upsell-label">🤩5+👕5</div>
+                            <div class="upsell-sub">€114.90</div>
+                        </button>
+                    </div>
+                </div>
+<!-- Komplet Panel -->
                 <div class="qb-panel" id="kompletPanel" style="border:2px solid #6366f1;">
                     <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:#6366f1;">📦 Komplet: <span id="kompletTitle"></span></div>
                     <div style="font-weight:600;font-size:12px;color:var(--text-muted);margin-bottom:6px;">🩲 Bokserice (<span id="kompletBoxQty"></span>x)</div>
@@ -1161,21 +1183,6 @@
                             <div class="upsell-icon">🧦🧦🧦</div>
                             <div class="upsell-label">10 parov</div>
                             <div class="upsell-sub">€39.99</div>
-                        </div>
-                        <div class="upsell-card" onclick="toggleKomplet('2+5')">
-                            <div class="upsell-icon">📦</div>
-                            <div class="upsell-label">🩲2+👕5</div>
-                            <div class="upsell-sub">€64.83</div>
-                        </div>
-                        <div class="upsell-card" onclick="toggleKomplet('4+10')">
-                            <div class="upsell-icon">📦</div>
-                            <div class="upsell-label">🩲4+👕10</div>
-                            <div class="upsell-sub">€169.86</div>
-                        </div>
-                        <div class="upsell-card" onclick="toggleKomplet('5+5')">
-                            <div class="upsell-icon">📦</div>
-                            <div class="upsell-label">🩲5+👕5</div>
-                            <div class="upsell-sub">€114.90</div>
                         </div>
                     </div>
                     <div class="upsell-config" id="upsellConfig">
@@ -4387,6 +4394,26 @@
             '5+5': { box: 5, maj: 5, label: '5 bokseric + 5 majic', defaultPrice: 114.90 }
         };
         let currentKomplet = null;
+
+        function toggleKompletPicker() {
+            const panel = document.getElementById('kompletPickerPanel');
+            const qbPanel = document.getElementById('qbPanel');
+            // Close QB if open
+            if (qbPanel && qbPanel.classList.contains('visible')) { qbPanel.classList.remove('visible'); qbType = null; }
+            // Close upsell config
+            const uc = document.getElementById('upsellConfig'); if (uc) uc.classList.remove('visible');
+            
+            document.querySelectorAll('.quick-builder-btn').forEach(b => { b.classList.remove('active'); const ic = b.querySelector('i.fas'); if (ic) { ic.classList.remove('fa-minus'); ic.classList.add('fa-plus'); } });
+            
+            if (panel.classList.contains('visible')) {
+                panel.classList.remove('visible');
+                return;
+            }
+            event.target.closest('.quick-builder-btn').classList.add('active');
+            const ic = event.target.closest('.quick-builder-btn').querySelector('i.fas');
+            if (ic) { ic.classList.remove('fa-plus'); ic.classList.add('fa-minus'); }
+            panel.classList.add('visible');
+        }
 
         function toggleKomplet(type) {
             const panel = document.getElementById('kompletPanel');
