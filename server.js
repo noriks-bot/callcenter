@@ -2163,16 +2163,23 @@ app.get('/api/statistics', async (req, res) => {
     const countriesParam = req.query.countries || 'all';
     const allowedCountries = countriesParam === 'all' ? null : countriesParam.split(',');
     
-    // Date range support
+    // Date range support — accept from/to OR days param
     const today = new Date().toISOString().slice(0, 10);
-    const fromDate = req.query.from || today;
-    const toDate = req.query.to || today;
-    // Calculate days between from and to
+    let fromDate = req.query.from;
+    let toDate = req.query.to || today;
+    if (!fromDate) {
+      const daysBack = parseInt(req.query.days) || 30;
+      fromDate = new Date(Date.now() - (daysBack - 1) * 86400000).toISOString().slice(0, 10);
+    }
     const days = Math.max(1, Math.ceil((new Date(toDate + 'T23:59:59') - new Date(fromDate + 'T00:00:00')) / 86400000) + 1);
     
-    // Get carts from cache
+    // Get carts from cache, filtered by date range
     let allCarts = await fetchAbandonedCarts();
     if (allowedCountries) allCarts = allCarts.filter(c => allowedCountries.includes(c.storeCode));
+    allCarts = allCarts.filter(c => {
+      const d = (c.abandonedAt || '').slice(0, 10);
+      return d >= fromDate && d <= toDate;
+    });
     
     // Get call data (status tracking) for conversions
     const callData = loadCallData();
@@ -2184,9 +2191,11 @@ app.get('/api/statistics', async (req, res) => {
       // Extract store code from id (e.g. "gr_914" -> "gr", "cz_cart_123" -> "cz")
       const sc = id.split('_')[0];
       if (allowedCountries && !allowedCountries.includes(sc)) continue;
+      const convDate = (data.lastUpdated || '').slice(0, 10);
+      if (convDate < fromDate || convDate > toDate) continue;
       conversions.push({
         id, storeCode: sc,
-        date: (data.lastUpdated || '').slice(0, 10),
+        date: convDate,
         orderId: data.orderId
       });
     }
@@ -2197,9 +2206,11 @@ app.get('/api/statistics', async (req, res) => {
       if (!data.callStatus || data.callStatus === 'not_called') continue;
       const sc = id.split('_')[0];
       if (allowedCountries && !allowedCountries.includes(sc)) continue;
+      const callDate = (data.lastUpdated || '').slice(0, 10);
+      if (callDate < fromDate || callDate > toDate) continue;
       allCalls.push({
         id, storeCode: sc,
-        date: (data.lastUpdated || '').slice(0, 10)
+        date: callDate
       });
     }
     
@@ -2217,7 +2228,7 @@ app.get('/api/statistics', async (req, res) => {
       dailyStats.push({
         date: dateStr,
         leads: dayCarts.length,
-        orders: dayConversions.length,
+        conversions: dayConversions.length,
         calls: dayCalls.length,
         conversionRate: dayCarts.length > 0 ? Math.round(dayConversions.length / dayCarts.length * 1000) / 10 : 0
       });
@@ -2235,7 +2246,7 @@ app.get('/api/statistics', async (req, res) => {
         flag: stores[sc].flag,
         name: stores[sc].name,
         leads: storeCarts.length,
-        orders: storeConversions.length,
+        conversions: storeConversions.length,
         calls: storeCalls.length,
         conversionRate: storeCarts.length > 0 ? Math.round(storeConversions.length / storeCarts.length * 1000) / 10 : 0
       };
@@ -2245,6 +2256,7 @@ app.get('/api/statistics', async (req, res) => {
       success: true,
       period: days + ' days',
       totalLeads: allCarts.length,
+      totalConversions: conversions.length,
       totalOrders: conversions.length,
       totalCalls: allCalls.length,
       dailyStats,

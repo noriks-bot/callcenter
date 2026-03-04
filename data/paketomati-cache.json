@@ -1,6 +1,152 @@
 {
-  "generated_at": "2026-03-03T06:45:21.349Z",
+  "generated_at": "2026-03-04T07:21:44.674Z",
   "orders": [
+    {
+      "id": "mk_5471/2026",
+      "orderNumber": "5471/2026",
+      "customer": {
+        "name": "Dragana Gomaz",
+        "email": "dragana.gomaz@t.ht.hr",
+        "phone": "+38598484284"
+      },
+      "address": {
+        "street": "Jurja Sizgorica, 3",
+        "city": "Zagreb",
+        "postcode": "10000",
+        "country": "Croatia"
+      },
+      "deliveryService": "NORIKS HR POŠTA",
+      "trackingCode": "LD523693017HR",
+      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD523693017HR",
+      "paketomatLocation": "Pošiljka predana u paketomat",
+      "lastDeliveryEvent": "Pošiljka predana u paketomat",
+      "orderTotal": 61.1,
+      "currency": "EUR",
+      "createdAt": "2026-03-03+02:00",
+      "shippedAt": "2026-03-03+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hr",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 87.29
+        }
+      ]
+    },
+    {
+      "id": "mk_5431/2026",
+      "orderNumber": "5431/2026",
+      "customer": {
+        "name": "Matija Jurković",
+        "email": "kafic.jumi@gmail.com",
+        "phone": "0992212886"
+      },
+      "address": {
+        "street": "Pizza Zakaj Ne, Lašćinska Cesta 111/111",
+        "city": "Grad Zagreb",
+        "postcode": "10000",
+        "country": "Croatia"
+      },
+      "deliveryService": "NORIKS HR POŠTA",
+      "trackingCode": "LD523309099HR",
+      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD523309099HR",
+      "paketomatLocation": "Pošiljka predana u paketomat",
+      "lastDeliveryEvent": "Pošiljka predana u paketomat",
+      "orderTotal": 86.99,
+      "currency": "EUR",
+      "createdAt": "2026-03-01+02:00",
+      "shippedAt": "2026-03-02+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hr",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 86.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5385/2026",
+      "orderNumber": "5385/2026",
+      "customer": {
+        "name": "Ivan Ilić",
+        "email": "ivan87ilic@gmail.com",
+        "phone": "099/220-2687"
+      },
+      "address": {
+        "street": "Zamlačka ulica, 28E",
+        "city": "Velika Mlaka",
+        "postcode": "10408",
+        "country": "Croatia"
+      },
+      "deliveryService": "NORIKS HR POŠTA",
+      "trackingCode": "LD523309010HR",
+      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD523309010HR",
+      "paketomatLocation": "Pošiljka predana u paketomat",
+      "lastDeliveryEvent": "Pošiljka predana u paketomat",
+      "orderTotal": 52.98,
+      "currency": "EUR",
+      "createdAt": "2026-02-28+02:00",
+      "shippedAt": "2026-03-02+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hr",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 49.99
+        },
+        {
+          "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5381/2026",
+      "orderNumber": "5381/2026",
+      "customer": {
+        "name": "Marko Vukas",
+        "email": "marko.vukas20@gmail.com",
+        "phone": "098826491"
+      },
+      "address": {
+        "street": "Široki Put 77, 77",
+        "city": "Vukovar",
+        "postcode": "32000",
+        "country": "Croatia"
+      },
+      "deliveryService": "NORIKS HR POŠTA",
+      "trackingCode": "LD523309054HR",
+      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD523309054HR",
+      "paketomatLocation": "Pošiljka predana u paketomat",
+      "lastDeliveryEvent": "Pošiljka predana u paketomat",
+      "orderTotal": 27.98,
+      "currency": "EUR",
+      "createdAt": "2026-02-27+02:00",
+      "shippedAt": "2026-03-02+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hr",
+      "items": [
+        {
+          "name": "Crna majica - M",
+          "quantity": 1,
+          "price": 24.99
+        },
+        {
+          "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
     {
       "id": "mk_5351/2026",
       "orderNumber": "5351/2026",
@@ -81,6 +227,40 @@
           "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
           "quantity": 1,
           "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5323/2026",
+      "orderNumber": "5323/2026",
+      "customer": {
+        "name": "Marian Pizur",
+        "email": "pizur131@seznam.cz",
+        "phone": "+420607598828"
+      },
+      "address": {
+        "street": "Staré Oldřůvky, 30",
+        "city": "Budišov nad Budišovkou",
+        "postcode": "747 87",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2171267104388",
+      "trackingLink": "https://expedico.eu/tracking?code=2171267104388",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 579,
+      "currency": "CZK",
+      "createdAt": "2026-02-25+02:00",
+      "shippedAt": "2026-02-26+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 510
         }
       ]
     },
@@ -251,6 +431,45 @@
           "name": "NORIKS bokserice",
           "quantity": 1,
           "price": 995
+        }
+      ]
+    },
+    {
+      "id": "mk_5160/2026",
+      "orderNumber": "5160/2026",
+      "customer": {
+        "name": "Miroslav Balint",
+        "email": "mba1@azet.sk",
+        "phone": "0907516202"
+      },
+      "address": {
+        "street": "Medzevská, 97/3",
+        "city": "Jasov",
+        "postcode": "044 23",
+        "country": "Slovakia"
+      },
+      "deliveryService": "EXPEDICO SK",
+      "trackingCode": "2171267104491",
+      "trackingLink": "https://expedico.eu/tracking?code=2171267104491",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 22.98,
+      "currency": "EUR",
+      "createdAt": "2026-02-20+02:00",
+      "shippedAt": "2026-02-26+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "sk",
+      "items": [
+        {
+          "name": "NORIKS | Starter paket",
+          "quantity": 1,
+          "price": 19.99
+        },
+        {
+          "name": "Štandardné: 2-5 dní - GLS",
+          "quantity": 1,
+          "price": 2.99
         }
       ]
     },
