@@ -3637,38 +3637,50 @@
 
         function renderModalItemName(item) {
             const rawName = item.name || 'Unknown';
-            // Check for "ProductName: variation1, variation2" format
+            
+            // Parse comma-separated "Color - Size" entries
+            let title = '';
+            let details = [];
+            
             const colonIdx = rawName.indexOf(': ');
             if (colonIdx > 0) {
                 const before = rawName.substring(0, colonIdx);
                 const after = rawName.substring(colonIdx + 2);
                 if (after.includes(' - ') || after.split(',').length > 1) {
-                    const parts = after.split(/,\s*/);
-                    let out = '<strong>' + esc(before) + '</strong>';
-                    for (const p of parts.slice(0, 6)) {
-                        const cleaned = p.replace(/^.+?\d*\s*:\s*/, '').trim();
-                        const dm = cleaned.match(/^(.+?)\s*-\s*(.+)$/);
-                        const dot = dm ? colorDot(dm[1].trim()) : '';
-                        out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + esc(cleaned) + '</div>';
-                    }
-                    if (parts.length > 6) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:4px;">+' + (parts.length - 6) + ' more</div>';
-                    return out;
+                    title = before;
+                    details = after.split(/,\s*/).map(p => p.replace(/^.+?\d*\s*:\s*/, '').trim());
                 }
             }
-            // Check for comma-separated variations
-            const parts = rawName.split(/,\s*/);
-            if (parts.length > 1 && parts.some(p => p.includes(' - '))) {
-                const pTitle = item.productTitle || '';
-                let out = '<strong>' + esc(pTitle || parts.length + ' kos') + '</strong>';
-                for (const p of parts.slice(0, 6)) {
-                    const cleaned = p.replace(/^.+?\d*\s*:\s*/, '').trim();
-                    const dm = cleaned.match(/^(.+?)\s*-\s*(.+)$/);
-                    const dot = dm ? colorDot(dm[1].trim()) : '';
-                    out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + esc(cleaned) + '</div>';
+            
+            if (!title && rawName.split(/,\s*/).length > 1) {
+                const parts = rawName.split(/,\s*/);
+                if (parts.some(p => p.includes(' - '))) {
+                    title = item.productTitle || '';
+                    details = parts.map(p => p.replace(/^.+?\d*\s*:\s*/, '').trim());
                 }
-                if (parts.length > 6) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:4px;">+' + (parts.length - 6) + ' more</div>';
+            }
+            
+            if (title && details.length > 0) {
+                // Group by color+size and count
+                const groups = {};
+                for (const d of details) {
+                    const key = d;
+                    groups[key] = (groups[key] || 0) + 1;
+                }
+                
+                let out = '<strong>' + esc(title) + ' (' + details.length + ' pcs)</strong>';
+                const entries = Object.entries(groups);
+                for (const [desc, count] of entries.slice(0, 8)) {
+                    const dm = desc.match(/^(.+?)\s*-\s*(.+)$/);
+                    const dot = dm ? colorDot(dm[1].trim()) : '';
+                    const displayName = dm ? dm[1].trim() : desc;
+                    const size = dm ? dm[2].trim() : '';
+                    out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + count + '× ' + esc(displayName) + (size ? ' (' + esc(size) + ')' : '') + '</div>';
+                }
+                if (entries.length > 8) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:4px;">+' + (entries.length - 8) + ' more</div>';
                 return out;
             }
+            
             // Plain name with optional bundle contents
             let out = '<strong>' + esc(rawName.length > 60 ? rawName.substring(0, 60) + '...' : rawName) + '</strong>';
             if (item.bundleContents && item.bundleContents.length > 0) {
@@ -3677,11 +3689,10 @@
                     const dot = colorDot(words[0]);
                     out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + esc(bc.qty + '× ' + bc.desc) + '</div>';
                 }
-            } else if (item.sku) {
-                out += '<div style="font-size:10px;color:var(--text-muted);">SKU: ' + esc(item.sku) + '</div>';
             }
             return out;
         }
+
 
         function renderCartsTable(data, totalItems, totalPages) {
             const getSortClass = (col) => sortColumn === col ? sortDirection : '';
