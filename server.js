@@ -125,7 +125,7 @@ async function warmRAM() {
       // Enrich "Product #XXXX" with real names from WooCommerce
       await enrichCartProductNames(cartsRes.value);
       await enrichBundleContents(cartsRes.value);
-      dbWriteCartsPreserveTest(cartsRes.value);
+      dbWrite('carts', cartsRes.value);
     }
     if (pendingRes.status === 'fulfilled' && pendingRes.value.length > 0) {
       dbWrite('pending', pendingRes.value);
@@ -365,18 +365,6 @@ async function enrichCartProductNames(carts) {
 }
 
 
-
-// Preserve test carts (hr_test_99*) across refreshes
-function dbWriteCartsPreserveTest(carts) {
-  const existing = dbReadData("carts");
-  const testCarts = existing.filter(c => c.id && c.id.startsWith("hr_test_99"));
-  if (testCarts.length > 0) {
-    const realIds = new Set(carts.map(c => c.id));
-    const toKeep = testCarts.filter(c => !realIds.has(c.id));
-    carts = [...toKeep, ...carts];
-  }
-  dbWrite("carts", carts);
-}
 // Apply product name cache to carts at read time (instant, no API calls)
 function enrichCartsFromCache(carts) {
   const cache = getProductNameCache();
@@ -556,19 +544,28 @@ async function getRecentOrderContacts(storeCode) {
   const cached = getCache(cacheKey, 300);
   if (cached) return cached;
 
-  const contacts = { emails: [], phones: [] };
+  const contacts = { emails: [], phones: [], orderTotals: {} };
   const orders = await wcApiRequest(storeCode, 'orders', {
     status: 'processing,completed', per_page: 100,
     after: new Date(Date.now() - 7 * 86400000).toISOString()
   });
   if (Array.isArray(orders)) {
     for (const order of orders) {
-      if (order.billing?.email) contacts.emails.push(order.billing.email.toLowerCase());
+      const orderTotal = parseFloat(order.total) || 0;
+      if (order.billing?.email) {
+        const email = order.billing.email.toLowerCase();
+        contacts.emails.push(email);
+        contacts.orderTotals[email] = orderTotal;
+      }
       if (order.billing?.phone) {
         const phone = order.billing.phone.replace(/[^0-9]/g, '');
         if (phone.length >= 7) {
           contacts.phones.push(phone);
-          if (phone.length > 9) contacts.phones.push(phone.slice(-9));
+          contacts.orderTotals[phone] = orderTotal;
+          if (phone.length > 9) {
+            contacts.phones.push(phone.slice(-9));
+            contacts.orderTotals[phone.slice(-9)] = orderTotal;
+          }
         }
       }
     }
@@ -607,7 +604,7 @@ async function fetchAbandonedCarts() {
       const carts = response.data;
       if (!Array.isArray(carts)) return;
 
-      const storeContacts = orderContacts[storeCode] || { emails: [], phones: [] };
+      const storeContacts = orderContacts[storeCode] || { emails: [], phones: [], orderTotals: {} };
 
       for (const cart of carts) {
         if (!cart || typeof cart !== 'object') continue;
@@ -620,8 +617,15 @@ async function fetchAbandonedCarts() {
         const cartPhoneLast9 = cartPhone.length > 9 ? cartPhone.slice(-9) : cartPhone;
 
         let isConverted = false;
-        if (cartEmail && storeContacts.emails.includes(cartEmail)) isConverted = true;
-        if (!isConverted && cartPhone && (storeContacts.phones.includes(cartPhone) || storeContacts.phones.includes(cartPhoneLast9))) isConverted = true;
+        let matchedOrderTotal = null;
+        if (cartEmail && storeContacts.emails.includes(cartEmail)) {
+          isConverted = true;
+          matchedOrderTotal = storeContacts.orderTotals[cartEmail] || null;
+        }
+        if (!isConverted && cartPhone && (storeContacts.phones.includes(cartPhone) || storeContacts.phones.includes(cartPhoneLast9))) {
+          isConverted = true;
+          matchedOrderTotal = storeContacts.orderTotals[cartPhone] || storeContacts.orderTotals[cartPhoneLast9] || null;
+        }
 
         const cartId = `${storeCode}_${cart.id || 'unknown'}`;
         const savedData = callData[cartId] || {};
@@ -743,8 +747,8 @@ async function fetchAbandonedCarts() {
           currency: storeCurrencies[storeCode] || 'EUR',
           abandonedAt: cart.time || '', status: cart.order_status || '',
           callStatus: savedData.callStatus || 'not_called', notes: savedData.notes || '',
-          lastUpdated: savedData.lastUpdated || null, orderId: savedData.orderId || null,
-          converted: isConverted
+          lastUpdated: savedData.lastUpdated || null, orderId: savedData.orderId || null, orderTotal: savedData.orderTotal || null,
+          converted: isConverted, matchedOrderTotal: matchedOrderTotal || null
         });
       }
     } catch (err) {
@@ -904,7 +908,6 @@ async function createOrderFromCart(input) {
   if (!config) return { error: 'Invalid store: ' + storeCode };
 
   let lineItems = [];
-    // Separate real products from custom (QB/Upsell/Komplet) items
   const feeLines = [];
   if (items.length > 0) {
     lineItems = [];
@@ -919,22 +922,38 @@ async function createOrderFromCart(input) {
         }
         lineItems.push(li);
       } else {
-        // Custom/upsell items: each color-size combo becomes a separate line item
-        // Parse "Crna - L, Siva - XL" into individual entries
-        const nameParts = (item.name || '').split(/,\s*/).filter(Boolean);
-        const pricePerPiece = item.price !== undefined ? item.price : (QB_PRICES_SERVER[item.sku?.replace('UPSELL-','').toLowerCase()] || 9.99);
-        if (nameParts.length > 0 && nameParts[0].includes(' - ')) {
-          // Each part is "Color - Size" — add as fee_line with clean name
-          const perPiecePrice = (item.editPrice || item.price * qty) / nameParts.length;
-          for (const part of nameParts) {
-            const typeName = item.productTitle ? item.productTitle.split('(')[0].trim() : 'Item';
-            feeLines.push({ name: typeName + ': ' + part.trim(), total: String(perPiecePrice.toFixed(2)), tax_status: 'none' });
-          }
-        } else {
-          const title = (item.productTitle || 'Custom') + (item.name ? ': ' + item.name : '');
-          const total = item.price !== undefined ? String(item.price * qty) : '0';
-          feeLines.push({ name: title, total: total, tax_status: 'none' });
+        // Call Center custom items — create as proper line_items with CC SKUs + ORTO-style meta
+        const rawSku = (item.sku || '').toUpperCase();
+        const title = item.productTitle || item.name || 'Custom';
+        const details = item.name || '';
+        let ccSku = 'NORIKS-CC-CUSTOM';
+        if (rawSku.includes('BOX') || title.toLowerCase().includes('bokser') || title.toLowerCase().includes('boxer')) {
+          ccSku = 'NORIKS-CC-BOXERS';
+        } else if (rawSku.includes('SHIRT') || rawSku.includes('MAJ') || title.toLowerCase().includes('majic') || title.toLowerCase().includes('shirt')) {
+          ccSku = 'NORIKS-CC-SHIRTS';
+        } else if (rawSku.includes('SOCK') || rawSku.includes('NOG') || title.toLowerCase().includes('nogavic') || title.toLowerCase().includes('čarap') || title.toLowerCase().includes('sock')) {
+          ccSku = 'NORIKS-CC-SOCKS';
+        } else if (rawSku.includes('KOMPLET') || rawSku.includes('SET') || title.toLowerCase().includes('komplet') || title.toLowerCase().includes('set')) {
+          ccSku = 'NORIKS-CC-SETS';
         }
+        const totalStr = item.price !== undefined ? String(item.price * qty) : '0';
+        // Build ORTO-style meta_data: "1": "Barva - Vel", "2": "Barva - Vel", ...
+        const meta = [];
+        const pieces = details.split(/,\s*/);
+        pieces.forEach((piece, idx) => {
+          if (piece.trim()) meta.push({ key: String(idx + 1), value: piece.trim() });
+        });
+        meta.push({ key: '_bundle_pairs', value: String(pieces.length) });
+        meta.push({ key: '_cc_sku', value: ccSku });
+        meta.push({ key: '_cc_source', value: 'call_center' });
+        lineItems.push({
+          name: title + (details ? ': ' + details : ''),
+          quantity: qty,
+          subtotal: totalStr,
+          total: totalStr,
+          sku: ccSku,
+          meta_data: meta
+        });
       }
     }
   } else {
@@ -957,7 +976,7 @@ async function createOrderFromCart(input) {
   const countryCode = storeCountryCodes[storeCode] || storeCode.toUpperCase();
 
   const orderData = {
-    payment_method: 'cod', payment_method_title: 'Cash on Delivery', created_via: 'CALLCENTER',
+    payment_method: 'cod', payment_method_title: 'Cash on Delivery',
     set_paid: false, status: 'processing',
     billing: { first_name: firstName, last_name: lastName, email, phone, address_1: address, city, postcode, country: countryCode },
     shipping: { first_name: firstName, last_name: lastName, address_1: address, city, postcode, country: countryCode },
@@ -967,10 +986,7 @@ async function createOrderFromCart(input) {
       { key: '_call_center', value: 'yes' }, { key: '_call_center_agent', value: agentName },
       { key: '_call_center_date', value: new Date().toISOString() },
       { key: '_abandoned_cart_id', value: String(cart?.cartDbId || cartId) },
-      { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' },
-      { key: '_wc_order_attribution_source_type', value: 'referral' },
-      { key: '_wc_order_attribution_utm_source', value: 'callcenter' },
-      { key: '_wc_order_attribution_device_type', value: 'Desktop' }
+      { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' }
     ],
     customer_note: (input.notes ? input.notes + ' \u2014 ' : '') + `Order created via Call Center by ${agentName}`
   };
@@ -987,8 +1003,10 @@ async function createOrderFromCart(input) {
   callData[cartId] = {
     callStatus: 'converted',
     notes: (callData[cartId]?.notes || '') + `\nOrder #${result.id} created by ${agentName}`,
-    lastUpdated: new Date().toISOString(), orderId: result.id
+    lastUpdated: new Date().toISOString(), orderId: result.id,
+    orderTotal: parseFloat(result.total) || 0
   };
+  console.log('[Order] Saving call_data for cartId:', cartId, 'orderTotal:', result.total);
   saveCallData(callData);
   clearAllCache();
 
@@ -1528,9 +1546,16 @@ app.get('/api/stores', (req, res) => {
 // Create order
 app.post('/api/create-order', async (req, res) => {
   if (!req.body.cartId) return res.status(400).json({ error: 'Missing cartId' });
-  const result = await createOrderFromCart(req.body);
-  if (result.error) return res.status(400).json(result);
-  res.json(result);
+  try {
+    console.log('[Order] Creating order for cartId:', req.body.cartId);
+    const result = await createOrderFromCart(req.body);
+    console.log('[Order] Result:', JSON.stringify({ success: result.success, orderId: result.orderId, orderTotal: result.orderTotal, error: result.error }));
+    if (result.error) return res.status(400).json(result);
+    res.json(result);
+  } catch (e) {
+    console.error('[Order] EXCEPTION:', e.message, e.stack);
+    res.status(500).json({ error: 'Server error: ' + e.message });
+  }
 });
 
 // Update status
@@ -1836,7 +1861,7 @@ app.get('/api/force-refresh', async (req, res) => {
   try {
     const results = await Promise.allSettled([
       fetchAbandonedCarts().then(async carts => {
-        if (carts && carts.length > 0) { await enrichCartProductNames(carts); await enrichBundleContents(carts); dbWriteCartsPreserveTest(carts); }
+        if (carts && carts.length > 0) { await enrichCartProductNames(carts); await enrichBundleContents(carts); dbWrite('carts', carts); }
         return (carts || []).length;
       }),
       fetchPendingOrders().then(orders => {
@@ -2130,7 +2155,7 @@ function startBackgroundRefresh() {
         if (carts && carts.length > 0) {
           await enrichCartProductNames(carts);
           await enrichBundleContents(carts);
-          dbWriteCartsPreserveTest(carts);
+          dbWrite('carts', carts);
         }
         console.log('[Cron] ✓ Carts:', (carts || []).length);
       }),
@@ -2185,48 +2210,6 @@ app.get('/api/pending-orders-count', async (req, res) => {
 });
 
 // ========== FIX 6: Statistics API ==========
-// Enrich converted orders with WC order details (customer, items, total)
-// Cache for converted order details (WC API calls are expensive)
-const convertedOrderCache = {};
-const CONVERTED_CACHE_TTL = 5 * 60 * 1000; // 5 min
-
-async function enrichConvertedOrders(conversions) {
-  const now = Date.now();
-  const toFetch = conversions.filter(c => {
-    if (!c.orderId || !c.storeCode || !stores[c.storeCode]) return false;
-    const cached = convertedOrderCache[c.storeCode + '_' + c.orderId];
-    return !cached || (now - cached.ts > CONVERTED_CACHE_TTL);
-  });
-
-  // Fetch missing orders in parallel (batch)
-  if (toFetch.length > 0) {
-    await Promise.allSettled(toFetch.map(async (conv) => {
-      const key = conv.storeCode + '_' + conv.orderId;
-      try {
-        const order = await wcApiRequest(conv.storeCode, 'orders/' + conv.orderId);
-        if (order && !order.error) {
-          const b = order.billing || {};
-          convertedOrderCache[key] = {
-            ts: now,
-            customerName: ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown',
-            email: b.email || '', phone: b.phone || '',
-            total: order.total || '0', currency: order.currency || 'EUR',
-            status: order.status || '',
-            items: (order.line_items || []).map(li => ({ name: li.name || '', quantity: li.quantity || 1, total: li.total || '0' }))
-          };
-        }
-      } catch (e) { /* skip */ }
-    }));
-  }
-
-  // Apply cached data to all conversions
-  return conversions.map(conv => {
-    const cached = convertedOrderCache[conv.storeCode + '_' + conv.orderId];
-    if (cached) Object.assign(conv, { customerName: cached.customerName, email: cached.email, phone: cached.phone, total: cached.total, currency: cached.currency, status: cached.status, items: cached.items });
-    return conv;
-  });
-}
-
 app.get('/api/statistics', async (req, res) => {
   try {
     const countriesParam = req.query.countries || 'all';
@@ -2243,7 +2226,7 @@ app.get('/api/statistics', async (req, res) => {
     const days = Math.max(1, Math.round((new Date(toDate + 'T12:00:00') - new Date(fromDate + 'T12:00:00')) / 86400000) + 1);
     
     // Get carts from cache, filtered by date range
-    let allCarts = (await fetchAbandonedCarts()).filter(c => !c.id.startsWith("hr_test_99"));
+    let allCarts = await fetchAbandonedCarts();
     if (allowedCountries) allCarts = allCarts.filter(c => allowedCountries.includes(c.storeCode));
     allCarts = allCarts.filter(c => {
       const d = (c.abandonedAt || '').slice(0, 10);
@@ -2262,18 +2245,10 @@ app.get('/api/statistics', async (req, res) => {
       if (allowedCountries && !allowedCountries.includes(sc)) continue;
       const convDate = (data.lastUpdated || '').slice(0, 10);
       if (convDate < fromDate || convDate > toDate) continue;
-      const agentMatch = (data.notes || '').match(/created by (\w+)/);
-      const agent = agentMatch ? agentMatch[1] : 'Unknown';
-      const storeInfo = stores[sc] || {};
       conversions.push({
         id, storeCode: sc,
         date: convDate,
-        orderId: data.orderId,
-        agent,
-        storeName: storeInfo.name || sc.toUpperCase(),
-        storeFlag: storeInfo.flag || '',
-        notes: data.notes || '',
-        time: data.lastUpdated || ''
+        orderId: data.orderId
       });
     }
     
@@ -2305,7 +2280,7 @@ app.get('/api/statistics', async (req, res) => {
       dailyStats.push({
         date: dateStr,
         leads: dayCarts.length,
-        conversions: dayConversions.length, orders: dayConversions.length,
+        conversions: dayConversions.length,
         calls: dayCalls.length,
         conversionRate: dayCarts.length > 0 ? Math.round(dayConversions.length / dayCarts.length * 1000) / 10 : 0
       });
@@ -2323,7 +2298,7 @@ app.get('/api/statistics', async (req, res) => {
         flag: stores[sc].flag,
         name: stores[sc].name,
         leads: storeCarts.length,
-        conversions: storeConversions.length, orders: storeConversions.length,
+        conversions: storeConversions.length,
         calls: storeCalls.length,
         conversionRate: storeCarts.length > 0 ? Math.round(storeConversions.length / storeCarts.length * 1000) / 10 : 0
       };
@@ -2337,8 +2312,7 @@ app.get('/api/statistics', async (req, res) => {
       totalOrders: conversions.length,
       totalCalls: allCalls.length,
       dailyStats,
-      countryStats,
-      convertedOrders: await enrichConvertedOrders(conversions.sort((a, b) => b.time.localeCompare(a.time)))
+      countryStats
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
