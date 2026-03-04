@@ -125,7 +125,7 @@ async function warmRAM() {
       // Enrich "Product #XXXX" with real names from WooCommerce
       await enrichCartProductNames(cartsRes.value);
       await enrichBundleContents(cartsRes.value);
-      dbWrite('carts', cartsRes.value);
+      dbWriteCartsPreserveTest(cartsRes.value);
     }
     if (pendingRes.status === 'fulfilled' && pendingRes.value.length > 0) {
       dbWrite('pending', pendingRes.value);
@@ -365,6 +365,18 @@ async function enrichCartProductNames(carts) {
 }
 
 
+
+// Preserve test carts (hr_test_99*) across refreshes
+function dbWriteCartsPreserveTest(carts) {
+  const existing = dbReadData("carts");
+  const testCarts = existing.filter(c => c.id && c.id.startsWith("hr_test_99"));
+  if (testCarts.length > 0) {
+    const realIds = new Set(carts.map(c => c.id));
+    const toKeep = testCarts.filter(c => !realIds.has(c.id));
+    carts = [...toKeep, ...carts];
+  }
+  dbWrite("carts", carts);
+}
 // Apply product name cache to carts at read time (instant, no API calls)
 function enrichCartsFromCache(carts) {
   const cache = getProductNameCache();
@@ -1809,7 +1821,7 @@ app.get('/api/force-refresh', async (req, res) => {
   try {
     const results = await Promise.allSettled([
       fetchAbandonedCarts().then(async carts => {
-        if (carts && carts.length > 0) { await enrichCartProductNames(carts); await enrichBundleContents(carts); dbWrite('carts', carts); }
+        if (carts && carts.length > 0) { await enrichCartProductNames(carts); await enrichBundleContents(carts); dbWriteCartsPreserveTest(carts); }
         return (carts || []).length;
       }),
       fetchPendingOrders().then(orders => {
@@ -2103,7 +2115,7 @@ function startBackgroundRefresh() {
         if (carts && carts.length > 0) {
           await enrichCartProductNames(carts);
           await enrichBundleContents(carts);
-          dbWrite('carts', carts);
+          dbWriteCartsPreserveTest(carts);
         }
         console.log('[Cron] ✓ Carts:', (carts || []).length);
       }),
