@@ -945,7 +945,7 @@ async function createOrderFromCart(input) {
   const countryCode = storeCountryCodes[storeCode] || storeCode.toUpperCase();
 
   const orderData = {
-    payment_method: 'cod', payment_method_title: 'Cash on Delivery',
+    payment_method: 'cod', payment_method_title: 'Cash on Delivery', created_via: 'CALLCENTER',
     set_paid: false, status: 'processing',
     billing: { first_name: firstName, last_name: lastName, email, phone, address_1: address, city, postcode, country: countryCode },
     shipping: { first_name: firstName, last_name: lastName, address_1: address, city, postcode, country: countryCode },
