@@ -2228,7 +2228,7 @@ app.get('/api/statistics', async (req, res) => {
       dailyStats.push({
         date: dateStr,
         leads: dayCarts.length,
-        conversions: dayConversions.length,
+        conversions: dayConversions.length, orders: dayConversions.length,
         calls: dayCalls.length,
         conversionRate: dayCarts.length > 0 ? Math.round(dayConversions.length / dayCarts.length * 1000) / 10 : 0
       });
@@ -2246,7 +2246,7 @@ app.get('/api/statistics', async (req, res) => {
         flag: stores[sc].flag,
         name: stores[sc].name,
         leads: storeCarts.length,
-        conversions: storeConversions.length,
+        conversions: storeConversions.length, orders: storeConversions.length,
         calls: storeCalls.length,
         conversionRate: storeCarts.length > 0 ? Math.round(storeConversions.length / storeCarts.length * 1000) / 10 : 0
       };
