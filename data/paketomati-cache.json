@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-04T10:04:27.475Z",
+  "generated_at": "2026-03-04T10:09:21.925Z",
   "orders": [
     {
       "id": "mk_5471/2026",
@@ -188,45 +188,6 @@
           "name": "3-Paket Crnih Majica - 3XL",
           "quantity": 1,
           "price": 1205
-        }
-      ]
-    },
-    {
-      "id": "mk_5344/2026",
-      "orderNumber": "5344/2026",
-      "customer": {
-        "name": "Petar Fabijanić",
-        "email": "pero.fabijanic@gmail.com",
-        "phone": "0917342496"
-      },
-      "address": {
-        "street": "Lussijeva Ulica, 6",
-        "city": "Pula - Pola",
-        "postcode": "52100",
-        "country": "Croatia"
-      },
-      "deliveryService": "NORIKS HR POŠTA",
-      "trackingCode": "LD522341172HR",
-      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD522341172HR",
-      "paketomatLocation": "Pošiljka predana u paketomat",
-      "lastDeliveryEvent": "Pošiljka predana u paketomat",
-      "orderTotal": 47.98,
-      "currency": "EUR",
-      "createdAt": "2026-02-26+02:00",
-      "shippedAt": "2026-02-27+02:00",
-      "status": "not_called",
-      "notes": "",
-      "storeCode": "hr",
-      "items": [
-        {
-          "name": "NORIKS majica",
-          "quantity": 1,
-          "price": 44.99
-        },
-        {
-          "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
-          "quantity": 1,
-          "price": 2.99
         }
       ]
     },

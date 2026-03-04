@@ -3633,57 +3633,68 @@
 
         function renderModalItemName(item) {
             const rawName = item.name || 'Unknown';
+            const qty = item.quantity || 1;
+            const maxShow = 8;
+            let out = '';
             
-            // Parse comma-separated "Color - Size" entries
+            // Check if name has "ProductName: detail1, detail2" format
             let title = '';
-            let details = [];
-            
+            let detailStr = '';
             const colonIdx = rawName.indexOf(': ');
+            
             if (colonIdx > 0) {
-                const before = rawName.substring(0, colonIdx);
-                const after = rawName.substring(colonIdx + 2);
-                if (after.includes(' - ') || after.split(',').length > 1) {
-                    title = before;
-                    details = after.split(/,\s*/).map(p => p.replace(/^.+?\d*\s*:\s*/, '').trim());
+                const afterColon = rawName.substring(colonIdx + 2);
+                const beforeColon = rawName.substring(0, colonIdx);
+                if (afterColon.includes(' - ') || afterColon.split(',').length > 1) {
+                    const varCount = afterColon.split(',').length;
+                    title = beforeColon + (varCount > 1 ? ' (' + varCount + ' pcs)' : '');
+                    detailStr = afterColon;
                 }
             }
             
-            if (!title && rawName.split(/,\s*/).length > 1) {
+            if (!title && !detailStr) {
                 const parts = rawName.split(/,\s*/);
-                if (parts.some(p => p.includes(' - '))) {
-                    title = item.productTitle || '';
-                    details = parts.map(p => p.replace(/^.+?\d*\s*:\s*/, '').trim());
+                if (parts.length > 1 && parts.some(p => p.includes(' - '))) {
+                    const labels = parts.map(p => {
+                        const m = p.match(/^(.+?)\s*\d*\s*:\s*/);
+                        return m ? m[1].replace(/\s*\d+$/, '').trim() : null;
+                    }).filter(Boolean);
+                    if (labels.length > 0) {
+                        title = [...new Set(labels)].join(' + ');
+                    } else {
+                        const pTitle = item.productTitle || '';
+                        title = pTitle ? pTitle + ' (' + parts.length + ' pcs)' : parts.length + ' pcs';
+                    }
+                    detailStr = rawName;
                 }
             }
             
-            if (title && details.length > 0) {
-                // Group by color+size and count
-                const groups = {};
-                for (const d of details) {
-                    const key = d;
-                    groups[key] = (groups[key] || 0) + 1;
+            if (title && detailStr) {
+                out += '<div style="font-size:11px;font-weight:600;line-height:1.4;margin-bottom:1px;">' + (qty > 1 ? qty + '× ' : '') + esc(title) + '</div>';
+                const parts = detailStr.split(/,\s*/);
+                const bullets = parts.slice(0, maxShow);
+                const rest = parts.length - maxShow;
+                for (const p of bullets) {
+                    const cleaned = p.replace(/^.+?\d*\s*:\s*/, '').trim();
+                    const dashMatch = cleaned.match(/^(.+?)\s*-\s*(.+)$/);
+                    let dot = '';
+                    let text = cleaned;
+                    if (dashMatch) {
+                        dot = colorDot(dashMatch[1].trim());
+                        text = dashMatch[1].trim() + ' - ' + dashMatch[2].trim();
+                    }
+                    out += '<div style="font-size:10px;line-height:1.3;color:var(--text-secondary);padding-left:8px;">' + (dot ? dot : '• ') + esc(text) + '</div>';
                 }
-                
-                let out = '<strong>' + esc(title) + ' (' + details.length + ' pcs)</strong>';
-                const entries = Object.entries(groups);
-                for (const [desc, count] of entries.slice(0, 8)) {
-                    const dm = desc.match(/^(.+?)\s*-\s*(.+)$/);
-                    const dot = dm ? colorDot(dm[1].trim()) : '';
-                    const displayName = dm ? dm[1].trim() : desc;
-                    const size = dm ? dm[2].trim() : '';
-                    out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + count + '× ' + esc(displayName) + (size ? ' (' + esc(size) + ')' : '') + '</div>';
-                }
-                if (entries.length > 8) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:4px;">+' + (entries.length - 8) + ' more</div>';
-                return out;
-            }
-            
-            // Plain name with optional bundle contents
-            let out = '<strong>' + esc(rawName.length > 60 ? rawName.substring(0, 60) + '...' : rawName) + '</strong>';
-            if (item.bundleContents && item.bundleContents.length > 0) {
-                for (const bc of item.bundleContents) {
-                    const words = bc.desc.split(/\s+/);
-                    const dot = colorDot(words[0]);
-                    out += '<div style="font-size:10px;color:var(--text-secondary);padding-left:4px;">' + (dot || '• ') + esc(bc.qty + '× ' + bc.desc) + '</div>';
+                if (rest > 0) out += '<div style="font-size:10px;color:var(--text-muted);padding-left:8px;">+' + rest + ' more</div>';
+            } else {
+                const short = rawName.length > 50 ? rawName.substring(0, 50) + '...' : rawName;
+                out += '<div style="font-size:11px;font-weight:600;line-height:1.4;">' + (qty > 1 ? qty + '× ' : '') + esc(short) + '</div>';
+                if (item.bundleContents && item.bundleContents.length > 0) {
+                    for (const bc of item.bundleContents) {
+                        const words = bc.desc.split(/\s+/);
+                        const dot = colorDot(words[0]);
+                        out += '<div style="font-size:10px;line-height:1.3;color:var(--text-secondary);padding-left:8px;">' + (dot || '• ') + esc(bc.qty + '× ' + bc.desc) + '</div>';
+                    }
                 }
             }
             return out;
