@@ -919,10 +919,22 @@ async function createOrderFromCart(input) {
         }
         lineItems.push(li);
       } else {
-        // Custom items go as fee_lines (WC doesn't accept product_id=0)
-        const title = (item.productTitle || 'Custom') + ': ' + (item.name || '');
-        const total = item.price !== undefined ? String(item.price * qty) : '0';
-        feeLines.push({ name: title, total: total, tax_status: 'none' });
+        // Custom/upsell items: each color-size combo becomes a separate line item
+        // Parse "Crna - L, Siva - XL" into individual entries
+        const nameParts = (item.name || '').split(/,\s*/).filter(Boolean);
+        const pricePerPiece = item.price !== undefined ? item.price : (QB_PRICES_SERVER[item.sku?.replace('UPSELL-','').toLowerCase()] || 9.99);
+        if (nameParts.length > 0 && nameParts[0].includes(' - ')) {
+          // Each part is "Color - Size" — add as fee_line with clean name
+          const perPiecePrice = (item.editPrice || item.price * qty) / nameParts.length;
+          for (const part of nameParts) {
+            const typeName = item.productTitle ? item.productTitle.split('(')[0].trim() : 'Item';
+            feeLines.push({ name: typeName + ': ' + part.trim(), total: String(perPiecePrice.toFixed(2)), tax_status: 'none' });
+          }
+        } else {
+          const title = (item.productTitle || 'Custom') + (item.name ? ': ' + item.name : '');
+          const total = item.price !== undefined ? String(item.price * qty) : '0';
+          feeLines.push({ name: title, total: total, tax_status: 'none' });
+        }
       }
     }
   } else {
