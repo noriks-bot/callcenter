@@ -2171,7 +2171,7 @@ app.get('/api/statistics', async (req, res) => {
       const daysBack = parseInt(req.query.days) || 30;
       fromDate = new Date(Date.now() - (daysBack - 1) * 86400000).toISOString().slice(0, 10);
     }
-    const days = Math.max(1, Math.ceil((new Date(toDate + 'T23:59:59') - new Date(fromDate + 'T00:00:00')) / 86400000) + 1);
+    const days = Math.max(1, Math.round((new Date(toDate + 'T12:00:00') - new Date(fromDate + 'T12:00:00')) / 86400000) + 1);
     
     // Get carts from cache, filtered by date range
     let allCarts = await fetchAbandonedCarts();
