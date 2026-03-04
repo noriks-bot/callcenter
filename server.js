@@ -2193,10 +2193,19 @@ app.get('/api/statistics', async (req, res) => {
       if (allowedCountries && !allowedCountries.includes(sc)) continue;
       const convDate = (data.lastUpdated || '').slice(0, 10);
       if (convDate < fromDate || convDate > toDate) continue;
+      // Extract agent name from notes "Order #XXXX created by AGENT"
+      const agentMatch = (data.notes || '').match(/created by (\w+)/);
+      const agent = agentMatch ? agentMatch[1] : 'Unknown';
+      const storeInfo = stores[sc] || {};
       conversions.push({
         id, storeCode: sc,
         date: convDate,
-        orderId: data.orderId
+        orderId: data.orderId,
+        agent,
+        storeName: storeInfo.name || sc.toUpperCase(),
+        storeFlag: storeInfo.flag || '',
+        notes: data.notes || '',
+        time: data.lastUpdated || ''
       });
     }
     
@@ -2260,7 +2269,8 @@ app.get('/api/statistics', async (req, res) => {
       totalOrders: conversions.length,
       totalCalls: allCalls.length,
       dailyStats,
-      countryStats
+      countryStats,
+      convertedOrders: conversions.sort((a, b) => b.time.localeCompare(a.time))
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
