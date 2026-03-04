@@ -9063,12 +9063,12 @@
                 
                 // Country table
                 document.getElementById('statsCountryBody').innerHTML = Object.entries(data.countryStats).map(([code, s]) =>
-                    '<tr><td>' + s.flag + ' ' + s.name + '</td><td>' + s.leads + '</td><td><strong>' + s.orders + '</strong></td><td><span class="status-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">' + s.conversionRate + '%</span></td></tr>'
+                    '<tr><td>' + s.flag + ' ' + s.name + '</td><td>' + s.leads + '</td><td><strong>' + s.conversions + '</strong></td><td><span class="status-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">' + s.conversionRate + '%</span></td></tr>'
                 ).join('');
                 
                 // Daily table
                 document.getElementById('statsDailyBody').innerHTML = data.dailyStats.slice().reverse().map(d =>
-                    '<tr><td>' + d.date + '</td><td>' + d.leads + '</td><td><strong style="color:#22c55e;">' + d.orders + '</strong></td><td><span class="status-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">' + d.conversionRate + '%</span></td></tr>'
+                    '<tr><td>' + d.date + '</td><td>' + d.leads + '</td><td><strong style="color:#22c55e;">' + d.conversions + '</strong></td><td><span class="status-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">' + d.conversionRate + '%</span></td></tr>'
                 ).join('');
                 
             } catch (e) {
