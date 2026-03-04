@@ -685,12 +685,14 @@
         /* Quick Product Builder */
         .quick-builder { margin: 12px 0; }
         .quick-builder-btns { display: flex; gap: 6px; margin-bottom: 8px; }
-        .quick-builder-btn { padding: 6px 14px; border: 1px solid var(--card-border); border-radius: 20px; background: var(--card-bg); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
-        .quick-builder-btn:hover { border-color: #6366f1; color: #6366f1; }
-        .quick-builder-btn.active { border-color: #6366f1; background: #6366f1; color: #fff; }
-        .quick-builder-btn i { font-size: 11px; }
-        .qb-panel { display: none; background: var(--bg-main); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 14px; margin-top: 8px; }
+        .quick-builder-btn { padding: 8px 16px; border: 1.5px solid var(--card-border); border-radius: 10px; background: var(--card-bg); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px; position: relative; }
+        .quick-builder-btn:hover { border-color: #6366f1; color: #6366f1; background: rgba(99,102,241,0.04); transform: translateY(-1px); }
+        .quick-builder-btn.active { border-color: #6366f1; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,0.3); transform: translateY(-1px); }
+        .quick-builder-btn i { font-size: 11px; transition: transform 0.2s ease; }
+        .quick-builder-btn.active i { transform: rotate(90deg); }
+        .qb-panel { display: none; background: var(--bg-main); border: 1.5px solid #6366f1; border-radius: var(--radius-lg); padding: 14px; margin-top: 8px; animation: qbSlideIn 0.2s ease; }
         .qb-panel.visible { display: block; }
+        @keyframes qbSlideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .qb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .qb-row label { font-size: 12px; color: var(--text-muted); font-weight: 500; min-width: 60px; }
         .qb-size-btn, .qb-qty-btn { padding: 4px 10px; border: 1px solid var(--card-border); border-radius: 16px; background: var(--card-bg); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.12s; }
