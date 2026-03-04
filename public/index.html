@@ -4366,11 +4366,11 @@
             const qbPanel = document.getElementById('qbPanel');
             // Close QB if open
             if (qbPanel.classList.contains('visible')) { qbPanel.classList.remove('visible'); qbType = null; }
-            document.querySelectorAll('.quick-builder-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.quick-builder-btn').forEach(b => { b.classList.remove('active'); const ic = b.querySelector('i.fas'); if (ic) { ic.classList.remove('fa-minus'); ic.classList.add('fa-plus'); } });
 
             if (currentKomplet === type) { currentKomplet = null; panel.classList.remove('visible'); return; }
             currentKomplet = type;
-            event.target.closest('.quick-builder-btn').classList.add('active');
+            const activeBtn = event.target.closest('.quick-builder-btn'); activeBtn.classList.add('active'); const ic = activeBtn.querySelector('i.fas'); if (ic) { ic.classList.remove('fa-plus'); ic.classList.add('fa-minus'); }
             panel.classList.add('visible');
 
             const cfg = KOMPLET_CONFIGS[type];
