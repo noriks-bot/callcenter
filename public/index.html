@@ -1203,9 +1203,10 @@
 
                 <!-- Summary -->
                 <div class="order-summary">
-                    <div class="order-summary-row">
-                        <span>Izdelki</span>
-                        <span id="orderSubtotal">€0.00</span>
+                    <div id="orderSummaryItems" style="margin-bottom:4px;"></div>
+                    <div class="order-summary-row" style="border-top:1px solid var(--card-border);padding-top:6px;margin-top:4px;">
+                        <span style="font-weight:600;">Izdelki skupaj</span>
+                        <span id="orderSubtotal" style="font-weight:600;">€0.00</span>
                     </div>
                     <div class="order-summary-row" id="shippingRow">
                         <span>Dostava</span>
@@ -4847,6 +4848,17 @@
                 function updateOrderTotals() {
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart?.currency] || '€';
             const subtotal = orderItems.reduce((sum, item) => sum + (item.editPrice * item.editQty), 0);
+            // Render itemized summary
+            const summaryEl = document.getElementById('orderSummaryItems');
+            if (summaryEl) {
+                summaryEl.innerHTML = orderItems.map(item => {
+                    const name = (item.productTitle || item.name || 'Izdelek').replace(/<[^>]*>/g, '');
+                    const short = name.length > 40 ? name.slice(0, 38) + '…' : name;
+                    return '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);padding:2px 0;">' +
+                      '<span>' + short + ' x' + item.editQty + '</span>' +
+                      '<span>' + sym + (item.editPrice * item.editQty).toFixed(2) + '</span></div>';
+                }).join('');
+            }
             const shipping = freeShipping ? 0 : SHIPPING_COST;
             const total = subtotal + shipping;
 
