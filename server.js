@@ -955,7 +955,10 @@ async function createOrderFromCart(input) {
       { key: '_call_center', value: 'yes' }, { key: '_call_center_agent', value: agentName },
       { key: '_call_center_date', value: new Date().toISOString() },
       { key: '_abandoned_cart_id', value: String(cart?.cartDbId || cartId) },
-      { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' }
+      { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' },
+      { key: '_wc_order_attribution_source_type', value: 'referral' },
+      { key: '_wc_order_attribution_utm_source', value: 'callcenter' },
+      { key: '_wc_order_attribution_device_type', value: 'Desktop' }
     ],
     customer_note: (input.notes ? input.notes + ' \u2014 ' : '') + `Order created via Call Center by ${agentName}`
   };
