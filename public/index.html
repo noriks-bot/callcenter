@@ -673,10 +673,10 @@
         .upsell-section { margin: 16px 0 8px; }
         .upsell-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
         .upsell-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .upsell-card { padding: 10px; border: 1px solid var(--card-border); border-radius: var(--radius-md); background: var(--card-bg); cursor: pointer; text-align: center; transition: all 0.15s; }
+        .upsell-card { padding: 6px 8px; border: 1px solid var(--card-border); border-radius: var(--radius-md); background: var(--card-bg); cursor: pointer; text-align: center; transition: all 0.15s; }
         .upsell-card:hover { border-color: #6366f1; background: rgba(99,102,241,0.04); }
         .upsell-card.upsell-active { border-color: #6366f1; background: rgba(99,102,241,0.08); }
-        .upsell-card .upsell-icon { font-size: 18px; margin-bottom: 2px; }
+        .upsell-card .upsell-icon { font-size: 14px; margin-bottom: 1px; }
         .upsell-card .upsell-label { font-size: 11px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
         .upsell-card .upsell-sub { font-size: 10px; color: var(--text-muted); }
         .upsell-config { display: none; background: var(--bg-main); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 12px; margin-top: 8px; }
@@ -685,12 +685,14 @@
         /* Quick Product Builder */
         .quick-builder { margin: 12px 0; }
         .quick-builder-btns { display: flex; gap: 6px; margin-bottom: 8px; }
-        .quick-builder-btn { padding: 6px 14px; border: 1px solid var(--card-border); border-radius: 20px; background: var(--card-bg); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
-        .quick-builder-btn:hover { border-color: #6366f1; color: #6366f1; }
-        .quick-builder-btn.active { border-color: #6366f1; background: #6366f1; color: #fff; }
-        .quick-builder-btn i { font-size: 11px; }
-        .qb-panel { display: none; background: var(--bg-main); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 14px; margin-top: 8px; }
+        .quick-builder-btn { padding: 8px 16px; border: 1.5px solid var(--card-border); border-radius: 10px; background: var(--card-bg); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px; position: relative; }
+        .quick-builder-btn:hover { border-color: #6366f1; color: #6366f1; background: rgba(99,102,241,0.04); transform: translateY(-1px); }
+        .quick-builder-btn.active { border-color: #6366f1; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,0.3); transform: translateY(-1px); }
+        .quick-builder-btn i { font-size: 11px; transition: transform 0.2s ease; }
+        .quick-builder-btn.active i { transform: rotate(90deg); }
+        .qb-panel { display: none; background: var(--bg-main); border: 1.5px solid #6366f1; border-radius: var(--radius-lg); padding: 14px; margin-top: 8px; animation: qbSlideIn 0.2s ease; }
         .qb-panel.visible { display: block; }
+        @keyframes qbSlideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .qb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .qb-row label { font-size: 12px; color: var(--text-muted); font-weight: 500; min-width: 60px; }
         .qb-size-btn, .qb-qty-btn { padding: 4px 10px; border: 1px solid var(--card-border); border-radius: 16px; background: var(--card-bg); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.12s; }
@@ -1020,23 +1022,18 @@
                     </div>
                 </div>
 
+                <!-- Cart Contents -->
+                <h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">📦 Vsebina košarice</h4>
+                <div class="order-items" id="orderItems">
+                    <!-- Items will be rendered here -->
+                </div>
+
                 <!-- Notes -->
                 <h4 style="margin:20px 0 8px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Opombe</h4>
                 <textarea id="orderNotes" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-md);background:var(--bg-main);color:var(--text-primary);font-size:13px;font-family:inherit;resize:vertical;" placeholder="Opombe za naročilo..."></textarea>
                 <!-- Products -->
-                <h4 style="margin:20px 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Izdelki</h4>
-
-                <!-- Product Search -->
-                <div class="product-search-container">
-                    <i class="fas fa-search product-search-icon"></i>
-                    <input type="text" class="product-search-input" id="productSearchInput"
-                           placeholder="Išči produkte po imenu ali SKU..."
-                           autocomplete="off">
-                    <i class="fas fa-spinner fa-spin product-search-spinner" id="productSearchSpinner"></i>
-                    <div class="product-search-results" id="productSearchResults">
-                        <!-- Results will be rendered here -->
-                    </div>
-                </div>
+                <div style="border:1.5px solid var(--card-border);border-radius:12px;padding:16px;margin:20px 0 12px;background:var(--bg-main);">
+                <h4 style="margin:0 0 12px;color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">🛒 Dodaj izdelke</h4>
 
                 <!-- Quick Product Builder -->
                 <div class="quick-builder">
@@ -1044,10 +1041,6 @@
                         <button class="quick-builder-btn" onclick="toggleQB('bokserice')"><i class="fas fa-plus"></i> Bokserice</button>
                         <button class="quick-builder-btn" onclick="toggleQB('majice')"><i class="fas fa-plus"></i> Majice</button>
                         <button class="quick-builder-btn" onclick="toggleQB('nogavice')"><i class="fas fa-plus"></i> Nogavice</button>
-                        <span style="width:1px;height:24px;background:var(--card-border);margin:0 4px;"></span>
-                        <button class="quick-builder-btn" onclick="toggleKomplet('2+5')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:#6366f1;">🩲2+👕5</button>
-                        <button class="quick-builder-btn" onclick="toggleKomplet('4+10')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:#6366f1;">🩲4+👕10</button>
-                        <button class="quick-builder-btn" onclick="toggleKomplet('5+5')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:#6366f1;">🩲5+👕5</button>
                     </div>
                     <div class="qb-panel" id="qbPanel">
                         <div class="qb-row">
@@ -1102,9 +1095,7 @@
                     </div>
                 </div>
 
-                <div class="order-items" id="orderItems">
-                    <!-- Items will be rendered here -->
-                </div>
+
 
                 <!-- Options -->
                 <!-- Upsell Section -->
@@ -1151,11 +1142,47 @@
                             <div class="upsell-label">10 bokseric</div>
                             <div class="upsell-sub">€99.90</div>
                         </div>
+                        <div class="upsell-card" onclick="upsellClick('nogavice',1,this)">
+                            <div class="upsell-icon">🧦</div>
+                            <div class="upsell-label">1 par</div>
+                            <div class="upsell-sub">€5.99</div>
+                        </div>
+                        <div class="upsell-card" onclick="upsellClick('nogavice',3,this)">
+                            <div class="upsell-icon">🧦</div>
+                            <div class="upsell-label">3 pari</div>
+                            <div class="upsell-sub">€14.99</div>
+                        </div>
+                        <div class="upsell-card" onclick="upsellClick('nogavice',7,this)">
+                            <div class="upsell-icon">🧦🧦</div>
+                            <div class="upsell-label">7 parov</div>
+                            <div class="upsell-sub">€29.99</div>
+                        </div>
+                        <div class="upsell-card" onclick="upsellClick('nogavice',10,this)">
+                            <div class="upsell-icon">🧦🧦🧦</div>
+                            <div class="upsell-label">10 parov</div>
+                            <div class="upsell-sub">€39.99</div>
+                        </div>
+                        <div class="upsell-card" onclick="toggleKomplet('2+5')">
+                            <div class="upsell-icon">📦</div>
+                            <div class="upsell-label">🩲2+👕5</div>
+                            <div class="upsell-sub">€64.83</div>
+                        </div>
+                        <div class="upsell-card" onclick="toggleKomplet('4+10')">
+                            <div class="upsell-icon">📦</div>
+                            <div class="upsell-label">🩲4+👕10</div>
+                            <div class="upsell-sub">€169.86</div>
+                        </div>
+                        <div class="upsell-card" onclick="toggleKomplet('5+5')">
+                            <div class="upsell-icon">📦</div>
+                            <div class="upsell-label">🩲5+👕5</div>
+                            <div class="upsell-sub">€114.90</div>
+                        </div>
                     </div>
                     <div class="upsell-config" id="upsellConfig">
                         <div id="upsellColorRows" style="margin:8px 0;"></div>
                         <button class="qb-add-btn" onclick="upsellAdd()" style="margin-top:12px;padding:14px 20px;font-size:15px;font-weight:700;width:100%;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;cursor:pointer;position:sticky;bottom:0;z-index:5;box-shadow:0 -2px 10px rgba(0,0,0,0.1);"><i class="fas fa-cart-plus"></i> Dodaj v košarico</button>
                     </div>
+                </div>
                 </div>
 
                 <div class="toggle-row">
@@ -1176,9 +1203,10 @@
 
                 <!-- Summary -->
                 <div class="order-summary">
-                    <div class="order-summary-row">
-                        <span>Izdelki</span>
-                        <span id="orderSubtotal">€0.00</span>
+                    <div id="orderSummaryItems" style="margin-bottom:4px;"></div>
+                    <div class="order-summary-row" style="border-top:1px solid var(--card-border);padding-top:6px;margin-top:4px;">
+                        <span style="font-weight:600;">Izdelki skupaj</span>
+                        <span id="orderSubtotal" style="font-weight:600;">€0.00</span>
                     </div>
                     <div class="order-summary-row" id="shippingRow">
                         <span>Dostava</span>
@@ -3812,9 +3840,9 @@
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
 
-            document.getElementById('productSearchInput').value = '';
-            document.getElementById('productSearchResults').classList.remove('open');
-            document.getElementById('productSearchResults').innerHTML = '';
+            const _psi = document.getElementById('productSearchInput'); if (_psi) _psi.value = '';
+            const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
+            if (_psr) _psr.innerHTML = '';
             document.getElementById('variationSelector').style.display = 'none';
             selectedProduct = null;
             selectedVariation = null;
@@ -4139,10 +4167,9 @@
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
 
-            // Reset product search
-            document.getElementById('productSearchInput').value = '';
-            document.getElementById('productSearchResults').classList.remove('open');
-            document.getElementById('productSearchResults').innerHTML = '';
+            // Reset product search (if exists)
+            const psi = document.getElementById('productSearchInput'); if (psi) psi.value = '';
+            const psr = document.getElementById('productSearchResults'); if (psr) { psr.classList.remove('open'); psr.innerHTML = ''; }
             document.getElementById('variationSelector').style.display = 'none';
             selectedProduct = null;
             selectedVariation = null;
@@ -4182,9 +4209,9 @@
             document.getElementById('freeShippingToggle').classList.remove('active');
 
             // Reset product search
-            document.getElementById('productSearchInput').value = '';
-            document.getElementById('productSearchResults').classList.remove('open');
-            document.getElementById('productSearchResults').innerHTML = '';
+            const _psi = document.getElementById('productSearchInput'); if (_psi) _psi.value = '';
+            const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
+            if (_psr) _psr.innerHTML = '';
             document.getElementById('variationSelector').style.display = 'none';
             selectedProduct = null;
             selectedVariation = null;
@@ -4283,7 +4310,7 @@
                 }
             }
             const price = QB_PRICES[upsellType] || 9.99;
-            const typeNames = { bokserice: 'Bokserice', majice: 'Majice' };
+            const typeNames = { bokserice: 'Bokserice', majice: 'Majice', nogavice: 'Nogavice' };
             const colorParts = [];
             for (let i = 0; i < upsellQty; i++) {
                 const colorSel = document.getElementById('upsellColor_' + i);
@@ -4348,6 +4375,7 @@
                 const sc = STORE_PRODUCT_COLORS[storeCode];
                 if (type === 'majice' && sc.majice && sc.majice.length > 0) return sc.majice;
                 if (type === 'bokserice' && sc.bokserice && sc.bokserice.length > 0) return sc.bokserice;
+                if (type === 'nogavice' && sc.bokserice && sc.bokserice.length > 0) return sc.bokserice; // nogavice use same colors as bokserice
             }
             // No store match - use defaults (Slovenian)
             return QB_COLORS_DEFAULT;
@@ -4365,11 +4393,11 @@
             const qbPanel = document.getElementById('qbPanel');
             // Close QB if open
             if (qbPanel.classList.contains('visible')) { qbPanel.classList.remove('visible'); qbType = null; }
-            document.querySelectorAll('.quick-builder-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.quick-builder-btn').forEach(b => { b.classList.remove('active'); const ic = b.querySelector('i.fas'); if (ic) { ic.classList.remove('fa-minus'); ic.classList.add('fa-plus'); } });
 
             if (currentKomplet === type) { currentKomplet = null; panel.classList.remove('visible'); return; }
             currentKomplet = type;
-            event.target.closest('.quick-builder-btn').classList.add('active');
+            const activeBtn = event.target.closest('.quick-builder-btn'); activeBtn.classList.add('active'); const ic = activeBtn.querySelector('i.fas'); if (ic) { ic.classList.remove('fa-plus'); ic.classList.add('fa-minus'); }
             panel.classList.add('visible');
 
             const cfg = KOMPLET_CONFIGS[type];
@@ -4598,12 +4626,12 @@
         let selectedProduct = null;
         let selectedVariation = null;
 
-        document.getElementById('productSearchInput').addEventListener('input', function(e) {
+        if (document.getElementById('productSearchInput')) document.getElementById('productSearchInput').addEventListener('input', function(e) {
             const query = e.target.value.trim();
             clearTimeout(searchTimeout);
 
             if (query.length < 2) {
-                document.getElementById('productSearchResults').classList.remove('open');
+                const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
                 return;
             }
 
@@ -4614,7 +4642,7 @@
             }, 300);
         });
 
-        document.getElementById('productSearchInput').addEventListener('focus', function() {
+        if (document.getElementById('productSearchInput')) document.getElementById('productSearchInput').addEventListener('focus', function() {
             const results = document.getElementById('productSearchResults');
             if (results.children.length > 0 && this.value.length >= 2) {
                 results.classList.add('open');
@@ -4624,8 +4652,8 @@
         // Close search results when clicking outside
         document.addEventListener('click', function(e) {
             const container = document.querySelector('.product-search-container');
-            if (!container.contains(e.target)) {
-                document.getElementById('productSearchResults').classList.remove('open');
+            if (container && !container.contains(e.target)) {
+                const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
             }
         });
 
@@ -4680,8 +4708,8 @@
         }
 
         function selectProduct(product) {
-            document.getElementById('productSearchResults').classList.remove('open');
-            document.getElementById('productSearchInput').value = '';
+            const _psr = document.getElementById('productSearchResults'); if (_psr) _psr.classList.remove('open');
+            const _psi = document.getElementById('productSearchInput'); if (_psi) _psi.value = '';
 
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart.currency] || '€';
 
@@ -4819,6 +4847,17 @@
                 function updateOrderTotals() {
             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[orderCart?.currency] || '€';
             const subtotal = orderItems.reduce((sum, item) => sum + (item.editPrice * item.editQty), 0);
+            // Render itemized summary
+            const summaryEl = document.getElementById('orderSummaryItems');
+            if (summaryEl) {
+                summaryEl.innerHTML = orderItems.map(item => {
+                    const name = (item.productTitle || item.name || 'Izdelek').replace(/<[^>]*>/g, '');
+                    const short = name.length > 40 ? name.slice(0, 38) + '…' : name;
+                    return '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);padding:2px 0;">' +
+                      '<span>' + short + ' x' + item.editQty + '</span>' +
+                      '<span>' + sym + (item.editPrice * item.editQty).toFixed(2) + '</span></div>';
+                }).join('');
+            }
             const shipping = freeShipping ? 0 : SHIPPING_COST;
             const total = subtotal + shipping;
 
