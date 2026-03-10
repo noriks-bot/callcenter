@@ -1501,6 +1501,8 @@ app.get('/api/abandoned-carts', (req, res) => {
     const saved = callData[cart.id] || {};
     return { ...cart, callStatus: saved.callStatus || cart.callStatus || 'not_called', notes: saved.notes || cart.notes || '' };
   });
+  // Hide converted carts
+  carts = carts.filter(c => c.callStatus !== "converted" && !c.converted);
   if (req.query.store) carts = carts.filter(c => c.storeCode === req.query.store);
   res.json({ success: true, data: carts, cached: true, lastRefresh: RAM.lastRefresh });
 });
