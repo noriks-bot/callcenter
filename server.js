@@ -1466,7 +1466,6 @@ async function buildPaketomatiCache() {
 
 function fetchPaketomatOrders(filter = 'all') {
   let orders = RAM.paketomati;
-  console.log('[Paketomati] Scanned', offset, 'orders, found', allShippedOrders.length, 'shipped');
   const statusData = loadPaketomatStatus();
   for (const order of orders) {
     const saved = statusData[order.id];
