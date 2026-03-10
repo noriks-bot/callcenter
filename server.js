@@ -1345,7 +1345,8 @@ const PAKETOMAT_STATUSES = [
   "Čaka na prevzem", "Waiting for pickup", "Ready for pickup", "Ready for collection",
   "Available for pickup", "Dostavljen na pošto", "Dostavljen v paketnik",
   "Dostavljen na prevzemno mesto", "Delivered to parcel locker", "Delivered to pickup point",
-  "waiting at pickup", "at collection point"
+  "waiting at pickup", "at collection point",
+  "Awaiting another delivery attempt", "Delivery failed"
 ];
 
 async function buildPaketomatiCache() {
