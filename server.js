@@ -645,7 +645,7 @@ async function fetchAbandonedCarts() {
         const cartId = `${storeCode}_${cart.id || 'unknown'}`;
         const savedData = callData[cartId] || {};
 
-        if (savedData.callStatus === 'converted' && savedData.orderId) continue;
+        if (savedData.callStatus === 'converted') continue;
 n        // Skip auto-detected converted carts (ordered without call center)
         if (isConverted) continue;
 
