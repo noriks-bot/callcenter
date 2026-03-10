@@ -1357,7 +1357,8 @@ async function buildPaketomatiCache() {
   const allShippedOrders = [];
   let offset = 0;
   let emptyCount = 0;
-  while (emptyCount < 3 && offset < 3000) {
+  const thisYear = new Date().getFullYear().toString();
+  while (emptyCount < 3) {
     try {
       const resp = await axios.post(mkSearchUrl, {
         secret_key: secretKey, company_id: companyId, doc_type: 'sales_order',
@@ -1365,13 +1366,25 @@ async function buildPaketomatiCache() {
       }, { timeout: 30000 });
       const orders = resp.data?.result || [];
       if (orders.length === 0) { emptyCount++; offset += 100; continue; }
-      allShippedOrders.push(...orders.filter(o => o.status_desc === 'shipped'));
+      emptyCount = 0;
+      // Only noriks, shipped, this year
+      for (const o of orders) {
+        if (o.status_desc !== 'shipped') continue;
+        if (!o.eshop_name || !/noriks/i.test(o.eshop_name)) continue;
+        const shipDate = o.shipped_date || o.doc_date || '';
+        if (!shipDate.startsWith(thisYear)) continue;
+        allShippedOrders.push(o);
+      }
+      // Stop if we hit orders from last year (they're sorted desc)
+      const lastOrder = orders[orders.length - 1];
+      const lastDate = lastOrder?.doc_date || lastOrder?.shipped_date || '';
+      if (lastDate && !lastDate.startsWith(thisYear)) break;
       if (orders.length < 100) break;
       offset += 100;
     } catch { emptyCount++; offset += 100; continue; }
   }
 
-  console.log('[Paketomati] Scanned', offset, 'orders, found', allShippedOrders.length, 'shipped');
+  console.log('[Paketomati] Scanned', offset, 'orders, found', allShippedOrders.length, 'shipped noriks this year');
   const statusData = loadPaketomatStatus();
   const paketomatOrders = [];
 
