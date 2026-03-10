@@ -646,6 +646,8 @@ async function fetchAbandonedCarts() {
         const savedData = callData[cartId] || {};
 
         if (savedData.callStatus === 'converted' && savedData.orderId) continue;
+n        // Skip auto-detected converted carts (ordered without call center)
+        if (isConverted) continue;
 
         const cartContents = [];
         const cartData = cart.cart_contents || {};
@@ -844,6 +846,7 @@ async function fetchOneTimeBuyers(storeFilter = null) {
         orderId: order.id || null,
         customerName: `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'Unknown',
         email, phone: billing.phone || '',
+        address: billing.address_1 || '', city: billing.city || '', postcode: billing.postcode || '',
         location: `${billing.city || ''}, ${billing.country || ''}`.replace(/^,\s*|,\s*$/g, ''),
         totalSpent: parseFloat(order.total) || 0, currency: order.currency || storeCurrencies[storeCode] || 'EUR',
         registeredAt: order.date_created || '', orderStatus: order.status || '',

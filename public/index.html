@@ -4300,10 +4300,13 @@
 
         function renderUpsellConfig() {
             const container = document.getElementById('upsellColorRows');
-            const colorOpts = '<option value="">-- Color --</option>' + getColorsForType(upsellType, currentOrderStoreCode).map(c =>
+            const isSocks = upsellType === 'nogavice';
+            const colors = isSocks ? QB_SOCK_COLORS : getColorsForType(upsellType, currentOrderStoreCode);
+            const colorOpts = '<option value="">-- Color --</option>' + colors.map(c =>
                 '<option value="' + c.name + '">' + c.name + '</option>'
             ).join('');
-            const sizeOpts = '<option value="">-- Size --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+            const sizes = isSocks ? QB_SOCK_SIZES : QB_SIZES;
+            const sizeOpts = '<option value="">-- Size --</option>' + sizes.map(s => '<option value="' + s + '">' + s + '</option>').join('');
             let rows = '<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="width:24px"></span><span style="flex:1;font-size:11px;color:var(--text-muted);font-weight:500;">Color</span><span style="width:80px;font-size:11px;color:var(--text-muted);font-weight:500;">Size</span></div>';
             for (let i = 0; i < upsellQty; i++) {
                 rows += '<div class="qb-color-row" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
@@ -4440,7 +4443,8 @@
             const sc = currentOrderStoreCode;
             const boxColors = getColorsForType('bokserice', sc);
             const majColors = getColorsForType('majice', sc);
-            const sizeOpts = '<option value="">-- Size --</option>' + QB_SIZES.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+            const sizes = isSocks ? QB_SOCK_SIZES : QB_SIZES;
+            const sizeOpts = '<option value="">-- Size --</option>' + sizes.map(s => '<option value="' + s + '">' + s + '</option>').join('');
             const boxColorOpts = '<option value="">-- Color --</option>' + boxColors.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
             const majColorOpts = '<option value="">-- Color --</option>' + majColors.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
 

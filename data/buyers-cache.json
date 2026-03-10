@@ -1,7 +1,32 @@
 {
-  "generated_at": 1773141532,
+  "generated_at": 1773142792,
   "count": 1877,
   "buyers": [
+    {
+      "id": "it_buyer_1fad8b6bab2f012043db5dd92b4e1f4e",
+      "storeCode": "it",
+      "storeName": "Italy",
+      "storeFlag": "🇮🇹",
+      "orderId": 5831,
+      "customerName": "Erasmus Omobono",
+      "email": "cred.n.p.c.1966@gmail.com",
+      "phone": "3932853545",
+      "location": "Gallarate, IT",
+      "totalSpent": 52.98,
+      "currency": "EUR",
+      "registeredAt": "2026-02-28T11:38:39",
+      "orderStatus": "completed",
+      "callStatus": "not_called",
+      "notes": "",
+      "converted": false,
+      "orderItems": [
+        {
+          "name": "NORIKS | Maglietta: Nero - 2XL, Nero - 2XL, Nero - 2XL",
+          "quantity": 1,
+          "total": 49.99
+        }
+      ]
+    },
     {
       "id": "hr_buyer_3a9dcabc546bb19eeac3fcc88f3e71b3",
       "storeCode": "hr",
@@ -1099,31 +1124,6 @@
           "name": "NORIKS | Majica: Crna - L, Siva - L, Zelena - L",
           "quantity": 1,
           "total": 44.99
-        }
-      ]
-    },
-    {
-      "id": "hr_buyer_80ff98388e0898c740f62511c3b74314",
-      "storeCode": "hr",
-      "storeName": "Croatia",
-      "storeFlag": "🇭🇷",
-      "orderId": 5773,
-      "customerName": "Nenad Vasovic",
-      "email": "vasovicnenad79@gmail.com",
-      "phone": "0992127525",
-      "location": "Hvar",
-      "totalSpent": 86.99,
-      "currency": "EUR",
-      "registeredAt": "2026-02-26T06:14:16",
-      "orderStatus": "processing",
-      "callStatus": "not_called",
-      "notes": "",
-      "converted": false,
-      "orderItems": [
-        {
-          "name": "NORIKS | Majica: Zelena - S, Zelena - S, Tamnoplava - S, Tamnoplava - S, Siva - S, Siva - S",
-          "quantity": 1,
-          "total": 86.99
         }
       ]
     },
