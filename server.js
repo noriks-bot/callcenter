@@ -29,7 +29,7 @@ app.use((req, res, next) => {
 
 // ========== CONFIGURATION ==========
 const stores = {
-  hr: { name: 'Croatia', flag: '🇭🇷', url: 'https://noriks.com/hr', ck: 'ck_d73881b20fd65125fb071414b8d54af7681549e3', cs: 'cs_e024298df41e4352d90e006d2ec42a5b341c1ce5' },
+  hr: { name: 'Croatia', flag: '🇭🇷', url: 'https://noriks.com/hr', ck: 'ck_ff08e90a8ff90be9f7fdfe7badfd4fdaa456d86b', cs: 'cs_0c36e01e44e488ae9d8a931b591a4d52584d975f' },
   cz: { name: 'Czech', flag: '🇨🇿', url: 'https://noriks.com/cz', ck: 'ck_396d624acec5f7a46dfcfa7d2a74b95c82b38962', cs: 'cs_2a69c7ad4a4d118a2b8abdf44abdd058c9be9115' },
   pl: { name: 'Poland', flag: '🇵🇱', url: 'https://noriks.com/pl', ck: 'ck_8fd83582ada887d0e586a04bf870d43634ca8f2c', cs: 'cs_f1bf98e46a3ae0623c5f2f9fcf7c2478240c5115' },
   gr: { name: 'Greece', flag: '🇬🇷', url: 'https://noriks.com/gr', ck: 'ck_2595568b83966151e08031e42388dd1c34307107', cs: 'cs_dbd091b4fc11091638f8ec4c838483be32cfb15b' },
@@ -1355,19 +1355,23 @@ async function buildPaketomatiCache() {
   const companyId = String(metakocka.company_id);
 
   const allShippedOrders = [];
-  for (let offset = 0; offset < 500; offset += 100) {
+  let offset = 0;
+  let emptyCount = 0;
+  while (emptyCount < 3 && offset < 3000) {
     try {
       const resp = await axios.post(mkSearchUrl, {
         secret_key: secretKey, company_id: companyId, doc_type: 'sales_order',
         result_type: 'doc', limit: 100, offset, order_direction: 'desc'
       }, { timeout: 30000 });
       const orders = resp.data?.result || [];
-      if (orders.length === 0) break;
+      if (orders.length === 0) { emptyCount++; offset += 100; continue; }
       allShippedOrders.push(...orders.filter(o => o.status_desc === 'shipped'));
       if (orders.length < 100) break;
-    } catch { break; }
+      offset += 100;
+    } catch { emptyCount++; offset += 100; continue; }
   }
 
+  console.log('[Paketomati] Scanned', offset, 'orders, found', allShippedOrders.length, 'shipped');
   const statusData = loadPaketomatStatus();
   const paketomatOrders = [];
 
@@ -1449,6 +1453,7 @@ async function buildPaketomatiCache() {
 
 function fetchPaketomatOrders(filter = 'all') {
   let orders = RAM.paketomati;
+  console.log('[Paketomati] Scanned', offset, 'orders, found', allShippedOrders.length, 'shipped');
   const statusData = loadPaketomatStatus();
   for (const order of orders) {
     const saved = statusData[order.id];
@@ -2106,6 +2111,7 @@ app.get('/api/paketomati-raw', async (req, res) => {
 app.post('/api/paketomati-update', (req, res) => {
   const { id, status = 'not_called', notes = '' } = req.body;
   if (!id) return res.status(400).json({ error: 'Missing order ID' });
+  console.log('[Paketomati] Scanned', offset, 'orders, found', allShippedOrders.length, 'shipped');
   const statusData = loadPaketomatStatus();
   statusData[id] = { status, notes, lastUpdated: new Date().toISOString() };
   savePaketomatStatus(statusData);
