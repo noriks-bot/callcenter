@@ -1,4 +1,5 @@
 const express = require('express');
+const compression = require("compression");
 const { dbWrite, dbRead, dbReadData, dbLastRefresh } = require('./db');
 
 const cors = require('cors');
@@ -11,6 +12,7 @@ app.set('etag', false);
 const PORT = process.env.PORT || 3087;
 
 app.use(cors());
+app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 
 // Disable caching for HTML files

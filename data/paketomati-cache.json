@@ -1,149 +1,651 @@
 {
-  "generated_at": "2026-03-04T10:09:21.925Z",
+  "generated_at": "2026-03-10T11:17:20.076Z",
   "orders": [
     {
-      "id": "mk_5471/2026",
-      "orderNumber": "5471/2026",
+      "id": "mk_5748/2026",
+      "orderNumber": "5748/2026",
       "customer": {
-        "name": "Dragana Gomaz",
-        "email": "dragana.gomaz@t.ht.hr",
-        "phone": "+38598484284"
+        "name": "Sanjin Vrbanus",
+        "email": "vrbanus@gmail.com",
+        "phone": "098 5536 73"
       },
       "address": {
-        "street": "Jurja Sizgorica, 3",
-        "city": "Zagreb",
-        "postcode": "10000",
+        "street": "Kutinska Cesta 120, 120",
+        "city": "Sisak",
+        "postcode": "44000",
         "country": "Croatia"
       },
       "deliveryService": "NORIKS HR POŠTA",
-      "trackingCode": "LD523693017HR",
-      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD523693017HR",
+      "trackingCode": "LD525538134HR",
+      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD525538134HR",
       "paketomatLocation": "Pošiljka predana u paketomat",
       "lastDeliveryEvent": "Pošiljka predana u paketomat",
-      "orderTotal": 61.1,
+      "orderTotal": 51.98,
+      "currency": "EUR",
+      "createdAt": "2026-03-08+02:00",
+      "shippedAt": "2026-03-09+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hr",
+      "items": [
+        {
+          "name": "Ponoćni mix 5-paket - XL",
+          "quantity": 1,
+          "price": 48.99
+        },
+        {
+          "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5734/2026",
+      "orderNumber": "5734/2026",
+      "customer": {
+        "name": "Anita Moguš",
+        "email": "moguanita@gmail.com",
+        "phone": "0915160032"
+      },
+      "address": {
+        "street": "Ulica 137. Brigade, 4",
+        "city": "Duga Resa",
+        "postcode": "47250",
+        "country": "Croatia"
+      },
+      "deliveryService": "NORIKS HR POŠTA",
+      "trackingCode": "LD525538236HR",
+      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD525538236HR",
+      "paketomatLocation": "Pošiljka predana u paketomat",
+      "lastDeliveryEvent": "Pošiljka predana u paketomat",
+      "orderTotal": 114.98,
+      "currency": "EUR",
+      "createdAt": "2026-03-08+02:00",
+      "shippedAt": "2026-03-09+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hr",
+      "items": [
+        {
+          "name": "Obalni 3-Paket - L",
+          "quantity": 1,
+          "price": 49.99
+        },
+        {
+          "name": "Ponoćni mix 7-paket - XL",
+          "quantity": 1,
+          "price": 64.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5618/2026",
+      "orderNumber": "5618/2026",
+      "customer": {
+        "name": "LADISLAV SARIKUDIS Sarikudis",
+        "email": "pajasarikudis@gmail.com",
+        "phone": "+420704004325"
+      },
+      "address": {
+        "street": "VODNI 104/6, č bytu 3",
+        "city": "ALBRECHTICE MĚSTO 79395 psč",
+        "postcode": "793 95",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2178179244458",
+      "trackingLink": "https://expedico.eu/tracking?code=2178179244458",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 1278,
+      "currency": "CZK",
+      "createdAt": "2026-03-06+02:00",
+      "shippedAt": "2026-03-06+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 1209
+        }
+      ]
+    },
+    {
+      "id": "mk_5605/2026",
+      "orderNumber": "5605/2026",
+      "customer": {
+        "name": "Rafał Gawiński",
+        "email": "rafgav@gmail.com",
+        "phone": "+48503538604"
+      },
+      "address": {
+        "street": "Aleja Kompozytorów Polskich, 5/60",
+        "city": "Lublin",
+        "postcode": "20-848",
+        "country": "Poland"
+      },
+      "deliveryService": "EXPEDICO PL",
+      "trackingCode": "2178179244464",
+      "trackingLink": "https://expedico.eu/tracking?code=2178179244464",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 219.99,
+      "currency": "PLN",
+      "createdAt": "2026-03-06+02:00",
+      "shippedAt": "2026-03-06+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "pl",
+      "items": [
+        {
+          "name": "Crne bokserice 3-paket - L",
+          "quantity": 1,
+          "price": 104
+        },
+        {
+          "name": "Crne bokserice 3-paket - XL",
+          "quantity": 1,
+          "price": 104
+        },
+        {
+          "name": "Standardowa 2–5 dni – InPost",
+          "quantity": 1,
+          "price": 11.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5567/2026",
+      "orderNumber": "5567/2026",
+      "customer": {
+        "name": "Tünde Hosszu",
+        "email": "hosszu770105@gmail.com",
+        "phone": "06204331670"
+      },
+      "address": {
+        "street": "Kossuth Telep 1, 0",
+        "city": "Perkáta",
+        "postcode": "2431",
+        "country": "Hungary"
+      },
+      "deliveryService": "EXPEDICO HU NORIKS",
+      "trackingCode": "2177324884488",
+      "trackingLink": "https://expedico.eu/tracking?code=2177324884488",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 19050,
+      "currency": "HUF",
+      "createdAt": "2026-03-05+02:00",
+      "shippedAt": "2026-03-05+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hu",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 18250
+        },
+        {
+          "name": "Normál: 2-5 nap - GLS",
+          "quantity": 1,
+          "price": 800
+        }
+      ]
+    },
+    {
+      "id": "mk_5539/2026",
+      "orderNumber": "5539/2026",
+      "customer": {
+        "name": "Janos Kovacs",
+        "email": "jancsikanada@gmail.com",
+        "phone": "06309167776"
+      },
+      "address": {
+        "street": "poprád utca 9, f.sz. 1.",
+        "city": "budapest",
+        "postcode": "1204",
+        "country": "Hungary"
+      },
+      "deliveryService": "EXPEDICO HU NORIKS",
+      "trackingCode": "2177324884493",
+      "trackingLink": "https://expedico.eu/tracking?code=2177324884493",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 25670,
+      "currency": "HUF",
+      "createdAt": "2026-03-04+02:00",
+      "shippedAt": "2026-03-05+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hu",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 25670
+        }
+      ]
+    },
+    {
+      "id": "mk_5533/2026",
+      "orderNumber": "5533/2026",
+      "customer": {
+        "name": "Vasilis Souflis",
+        "email": "souflisv@yahoo.com",
+        "phone": "6936600373"
+      },
+      "address": {
+        "street": "Deligiorgi 42, Souflis",
+        "city": "Alimos",
+        "postcode": "17456",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2177324884280",
+      "trackingLink": "https://expedico.eu/tracking?code=2177324884280",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 52.98,
+      "currency": "EUR",
+      "createdAt": "2026-03-04+02:00",
+      "shippedAt": "2026-03-05+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 49.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5504/2026",
+      "orderNumber": "5504/2026",
+      "customer": {
+        "name": "Χρήστος Ζιγκιριδης",
+        "email": "zigkiridisxristos4@gmail.com",
+        "phone": "6985785752"
+      },
+      "address": {
+        "street": "0, Στίβος 0",
+        "city": "ΣΤΙΒΟΣ (Θεσσαλονίκης)",
+        "postcode": "57020",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2175592397672",
+      "trackingLink": "https://expedico.eu/tracking?code=2175592397672",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 52.98,
+      "currency": "EUR",
+      "createdAt": "2026-03-03+02:00",
+      "shippedAt": "2026-03-04+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 49.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5495/2026",
+      "orderNumber": "5495/2026",
+      "customer": {
+        "name": "Φανης Τσιογκας",
+        "email": "tsiogkas13fanis@gmail.com",
+        "phone": "6971583462"
+      },
+      "address": {
+        "street": "Βέλο Ασκληπιού 22, Κορινθίας",
+        "city": "Κορινθίας",
+        "postcode": "20200",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2175592397675",
+      "trackingLink": "https://expedico.eu/tracking?code=2175592397675",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 52.98,
+      "currency": "EUR",
+      "createdAt": "2026-03-03+02:00",
+      "shippedAt": "2026-03-04+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 49.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5486/2026",
+      "orderNumber": "5486/2026",
+      "customer": {
+        "name": "Michaela Rohlederová",
+        "email": "mive321@seznam.cz",
+        "phone": "+420737800348"
+      },
+      "address": {
+        "street": "U Stavu Ii 1154, 1154",
+        "city": "Hulín",
+        "postcode": "768 24",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2175592397767",
+      "trackingLink": "https://expedico.eu/tracking?code=2175592397767",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 579,
+      "currency": "CZK",
+      "createdAt": "2026-03-03+02:00",
+      "shippedAt": "2026-03-04+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 510
+        }
+      ]
+    },
+    {
+      "id": "mk_5479/2026",
+      "orderNumber": "5479/2026",
+      "customer": {
+        "name": "Ευθυμιος Χαντζηγιαννης",
+        "email": "thimiisxatz@yahoo.com",
+        "phone": "+306978937175"
+      },
+      "address": {
+        "street": "Άγιος βησσαριος σοφαδες καρδιτσας 1, 1",
+        "city": "Σοφάδες",
+        "postcode": "43300",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2175592387089",
+      "trackingLink": "https://expedico.eu/tracking?code=2175592387089",
+      "paketomatLocation": "Delivery failed",
+      "lastDeliveryEvent": "Delivery failed",
+      "orderTotal": 99.98,
       "currency": "EUR",
       "createdAt": "2026-03-03+02:00",
       "shippedAt": "2026-03-03+02:00",
       "status": "not_called",
       "notes": "",
-      "storeCode": "hr",
+      "storeCode": "gr",
       "items": [
         {
           "name": "NORIKS majica",
           "quantity": 1,
-          "price": 87.29
+          "price": 49.99
+        },
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 49.99
         }
       ]
     },
     {
-      "id": "mk_5431/2026",
-      "orderNumber": "5431/2026",
+      "id": "mk_5477/2026",
+      "orderNumber": "5477/2026",
       "customer": {
-        "name": "Matija Jurković",
-        "email": "kafic.jumi@gmail.com",
-        "phone": "0992212886"
+        "name": "Χρηστος Μπερσιανης",
+        "email": "chris.mpersianis@gmail.com",
+        "phone": "6972015508"
       },
       "address": {
-        "street": "Pizza Zakaj Ne, Lašćinska Cesta 111/111",
-        "city": "Grad Zagreb",
-        "postcode": "10000",
-        "country": "Croatia"
+        "street": "Περιφερειακή Οδός Φαρσάλων, Φαρσαλα",
+        "city": "Φάρσαλα",
+        "postcode": "40300",
+        "country": "Greece"
       },
-      "deliveryService": "NORIKS HR POŠTA",
-      "trackingCode": "LD523309099HR",
-      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD523309099HR",
-      "paketomatLocation": "Pošiljka predana u paketomat",
-      "lastDeliveryEvent": "Pošiljka predana u paketomat",
-      "orderTotal": 86.99,
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2175592387088",
+      "trackingLink": "https://expedico.eu/tracking?code=2175592387088",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 134.99,
+      "currency": "EUR",
+      "createdAt": "2026-03-03+02:00",
+      "shippedAt": "2026-03-03+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 134.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5473/2026",
+      "orderNumber": "5473/2026",
+      "customer": {
+        "name": "Δημητριος Ξενος",
+        "email": "xenosdimitrios@gmail.com",
+        "phone": "6974022339"
+      },
+      "address": {
+        "street": "Καλβου, 80",
+        "city": "Ζακυνθος",
+        "postcode": "29100",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2175592387087",
+      "trackingLink": "https://expedico.eu/tracking?code=2175592387087",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 81.98,
+      "currency": "EUR",
+      "createdAt": "2026-03-03+02:00",
+      "shippedAt": "2026-03-03+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "Ponoćni Mix 3-Paket - 3XL",
+          "quantity": 1,
+          "price": 49.99
+        },
+        {
+          "name": "Μεσονύκτιο μιξ – συσκευασία 3 τεμ - 3XL",
+          "quantity": 1,
+          "price": 31.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5470/2026",
+      "orderNumber": "5470/2026",
+      "customer": {
+        "name": "ΣΤΑΥΡΟΥΛΑ ΙΩΑΝΝΙΔΟΥ",
+        "email": "s.ioannidou@hotmail.gr",
+        "phone": "6944963827"
+      },
+      "address": {
+        "street": "ΣΩΚΡΑΤΟΥΣ 55, ΕΥΟΣΜΟΣ",
+        "city": "ΘΕΣΣΑΛΟΝΙΚΗ",
+        "postcode": "56224",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2175592384293",
+      "trackingLink": "https://expedico.eu/tracking?code=2175592384293",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 52.98,
+      "currency": "EUR",
+      "createdAt": "2026-03-03+02:00",
+      "shippedAt": "2026-03-03+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "NORIKS majica",
+          "quantity": 1,
+          "price": 49.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5416/2026",
+      "orderNumber": "5416/2026",
+      "customer": {
+        "name": "Γεράσιμος Γιαννουλας",
+        "email": "gerasimosgiannoulas4@gmail.com",
+        "phone": "6985961108"
+      },
+      "address": {
+        "street": "Ιωνίας 1, Γιαννούλας Γεράσιμος",
+        "city": "Πατρα",
+        "postcode": "26226",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2174743426006",
+      "trackingLink": "https://expedico.eu/tracking?code=2174743426006",
+      "paketomatLocation": "Delivery failed",
+      "lastDeliveryEvent": "Delivery failed",
+      "orderTotal": 25.98,
       "currency": "EUR",
       "createdAt": "2026-03-01+02:00",
       "shippedAt": "2026-03-02+02:00",
       "status": "not_called",
       "notes": "",
-      "storeCode": "hr",
+      "storeCode": "gr",
       "items": [
         {
-          "name": "NORIKS majica",
+          "name": "Starter paket | 2 majici",
           "quantity": 1,
-          "price": 86.99
-        }
-      ]
-    },
-    {
-      "id": "mk_5385/2026",
-      "orderNumber": "5385/2026",
-      "customer": {
-        "name": "Ivan Ilić",
-        "email": "ivan87ilic@gmail.com",
-        "phone": "099/220-2687"
-      },
-      "address": {
-        "street": "Zamlačka ulica, 28E",
-        "city": "Velika Mlaka",
-        "postcode": "10408",
-        "country": "Croatia"
-      },
-      "deliveryService": "NORIKS HR POŠTA",
-      "trackingCode": "LD523309010HR",
-      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD523309010HR",
-      "paketomatLocation": "Pošiljka predana u paketomat",
-      "lastDeliveryEvent": "Pošiljka predana u paketomat",
-      "orderTotal": 52.98,
-      "currency": "EUR",
-      "createdAt": "2026-02-28+02:00",
-      "shippedAt": "2026-03-02+02:00",
-      "status": "not_called",
-      "notes": "",
-      "storeCode": "hr",
-      "items": [
-        {
-          "name": "NORIKS bokserice",
-          "quantity": 1,
-          "price": 49.99
+          "price": 22.99
         },
         {
-          "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
           "quantity": 1,
           "price": 2.99
         }
       ]
     },
     {
-      "id": "mk_5381/2026",
-      "orderNumber": "5381/2026",
+      "id": "mk_5388/2026",
+      "orderNumber": "5388/2026",
       "customer": {
-        "name": "Marko Vukas",
-        "email": "marko.vukas20@gmail.com",
-        "phone": "098826491"
+        "name": "Kovács Gábor",
+        "email": "grubner20@gmail.com",
+        "phone": "06202190955"
       },
       "address": {
-        "street": "Široki Put 77, 77",
-        "city": "Vukovar",
-        "postcode": "32000",
-        "country": "Croatia"
+        "street": "Besztercebánya út 75, .",
+        "city": "Endrefalva",
+        "postcode": "3165",
+        "country": "Hungary"
       },
-      "deliveryService": "NORIKS HR POŠTA",
-      "trackingCode": "LD523309054HR",
-      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD523309054HR",
-      "paketomatLocation": "Pošiljka predana u paketomat",
-      "lastDeliveryEvent": "Pošiljka predana u paketomat",
-      "orderTotal": 27.98,
+      "deliveryService": "EXPEDICO HU NORIKS",
+      "trackingCode": "2174743430974",
+      "trackingLink": "https://expedico.eu/tracking?code=2174743430974",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 13440,
+      "currency": "HUF",
+      "createdAt": "2026-02-28+02:00",
+      "shippedAt": "2026-03-02+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hu",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 12640
+        },
+        {
+          "name": "Normál: 2-5 nap - GLS",
+          "quantity": 1,
+          "price": 800
+        }
+      ]
+    },
+    {
+      "id": "mk_5377/2026",
+      "orderNumber": "5377/2026",
+      "customer": {
+        "name": "Ευθύμιος Φωτόπουλος",
+        "email": "efthimios.fotopoulos73@gmail.com",
+        "phone": "694 444 7226"
+      },
+      "address": {
+        "street": "6944447226, Κοκκοτά 1",
+        "city": "Κηφισιά",
+        "postcode": "14561",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2174743426008",
+      "trackingLink": "https://expedico.eu/tracking?code=2174743426008",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 99.98,
       "currency": "EUR",
       "createdAt": "2026-02-27+02:00",
       "shippedAt": "2026-03-02+02:00",
       "status": "not_called",
       "notes": "",
-      "storeCode": "hr",
+      "storeCode": "gr",
       "items": [
         {
-          "name": "Crna majica - M",
+          "name": "NORIKS majica",
           "quantity": 1,
-          "price": 24.99
+          "price": 49.99
         },
         {
-          "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
+          "name": "NORIKS majica",
           "quantity": 1,
-          "price": 2.99
+          "price": 49.99
         }
       ]
     },
@@ -192,206 +694,275 @@
       ]
     },
     {
-      "id": "mk_5323/2026",
-      "orderNumber": "5323/2026",
+      "id": "mk_5346/2026",
+      "orderNumber": "5346/2026",
       "customer": {
-        "name": "Marian Pizur",
-        "email": "pizur131@seznam.cz",
-        "phone": "+420607598828"
+        "name": "ΒΑΣΙΛΗΣ ΚΟΥΡΝΟΥΤΗΣ",
+        "email": "basileskournoutes@gmail.com",
+        "phone": "+306971752470"
       },
       "address": {
-        "street": "Staré Oldřůvky, 30",
-        "city": "Budišov nad Budišovkou",
-        "postcode": "747 87",
-        "country": "Czech Republic"
+        "street": "Αμυντα, 16",
+        "city": "Κατερίνη",
+        "postcode": "60132",
+        "country": "Greece"
       },
-      "deliveryService": "EXPEDICO CZ NORIKS",
-      "trackingCode": "2171267104388",
-      "trackingLink": "https://expedico.eu/tracking?code=2171267104388",
-      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "orderTotal": 579,
-      "currency": "CZK",
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2172138192340",
+      "trackingLink": "https://expedico.eu/tracking?code=2172138192340",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 22.98,
+      "currency": "EUR",
+      "createdAt": "2026-02-26+02:00",
+      "shippedAt": "2026-02-27+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "NORIKS | Starter paket",
+          "quantity": 1,
+          "price": 19.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5330/2026",
+      "orderNumber": "5330/2026",
+      "customer": {
+        "name": "ΚΑΒΑΛΙΕΡΙ ΜΟΝΟΠΡΟΣΩΠΗ Ι Κ Ε",
+        "email": "andreaskavalieros1@gmail.com",
+        "phone": "+306970530783"
+      },
+      "address": {
+        "street": "Αγίου Ιωάννη του Προδρόμου 23, 23",
+        "city": "Κάτω Αχαΐα",
+        "postcode": "25200",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2171267104187",
+      "trackingLink": "https://expedico.eu/tracking?code=2171267104187",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 51.98,
+      "currency": "EUR",
       "createdAt": "2026-02-25+02:00",
       "shippedAt": "2026-02-26+02:00",
       "status": "not_called",
       "notes": "",
-      "storeCode": "cz",
+      "storeCode": "gr",
       "items": [
         {
           "name": "NORIKS bokserice",
           "quantity": 1,
-          "price": 510
+          "price": 48.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
         }
       ]
     },
     {
-      "id": "mk_5303/2026",
-      "orderNumber": "5303/2026",
+      "id": "mk_5314/2026",
+      "orderNumber": "5314/2026",
       "customer": {
-        "name": "Ondřej Daněk",
-        "email": "odanek.bn@gmail.com",
-        "phone": "606615049"
+        "name": "József Kovács",
+        "email": "keni38.kovacs.jozsef@gmail.com",
+        "phone": "+36308674107"
       },
       "address": {
-        "street": "Wolkerova 667, 1",
-        "city": "Benešov",
-        "postcode": "256 01",
-        "country": "Czech Republic"
+        "street": "Napfény Utca 5., 2/8.",
+        "city": "Szigetszentmiklós",
+        "postcode": "2310",
+        "country": "Hungary"
       },
-      "deliveryService": "EXPEDICO CZ NORIKS",
-      "trackingCode": "2169546237664",
-      "trackingLink": "https://expedico.eu/tracking?code=2169546237664",
+      "deliveryService": "EXPEDICO HU NORIKS",
+      "trackingCode": "2174743430967",
+      "trackingLink": "https://expedico.eu/tracking?code=2174743430967",
       "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
       "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "orderTotal": 444,
-      "currency": "CZK",
+      "orderTotal": 12643,
+      "currency": "HUF",
       "createdAt": "2026-02-25+02:00",
-      "shippedAt": "2026-02-25+02:00",
+      "shippedAt": "2026-03-02+02:00",
       "status": "not_called",
       "notes": "",
-      "storeCode": "cz",
+      "storeCode": "hu",
       "items": [
         {
-          "name": "NORIKS | Starter paket",
+          "name": "NORIKS bokserice",
           "quantity": 1,
-          "price": 375
+          "price": 12640
+        },
+        {
+          "name": "Normál: 2-5 nap - GLS",
+          "quantity": 1,
+          "price": 3
         }
       ]
     },
     {
-      "id": "mk_5293/2026",
-      "orderNumber": "5293/2026",
+      "id": "mk_5305/2026",
+      "orderNumber": "5305/2026",
       "customer": {
-        "name": "Milan Dalecký",
-        "email": "milan.dalecky@gmail.com",
-        "phone": "+420792283345"
+        "name": "Sipos Tibor",
+        "email": "sipostiborju@gmail.com",
+        "phone": "06307353248"
       },
       "address": {
-        "street": "Jaromírova 174/46, Jaromírova 46",
-        "city": "Praha",
-        "postcode": "128 00",
-        "country": "Czech Republic"
+        "street": "Orgona, 1/2",
+        "city": "Kozármisleny",
+        "postcode": "7761",
+        "country": "Hungary"
       },
-      "deliveryService": "EXPEDICO CZ NORIKS",
-      "trackingCode": "2169546237663",
-      "trackingLink": "https://expedico.eu/tracking?code=2169546237663",
+      "deliveryService": "EXPEDICO HU NORIKS",
+      "trackingCode": "2174743430969",
+      "trackingLink": "https://expedico.eu/tracking?code=2174743430969",
       "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
       "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "orderTotal": 444,
-      "currency": "CZK",
+      "orderTotal": 12643,
+      "currency": "HUF",
+      "createdAt": "2026-02-25+02:00",
+      "shippedAt": "2026-03-02+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hu",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 12640
+        },
+        {
+          "name": "Normál: 2-5 nap - GLS",
+          "quantity": 1,
+          "price": 3
+        }
+      ]
+    },
+    {
+      "id": "mk_5298/2026",
+      "orderNumber": "5298/2026",
+      "customer": {
+        "name": "Ιακωβος Χατζηγιακουμης",
+        "email": "iakovos-aqua@hotmail.com",
+        "phone": "6936155000"
+      },
+      "address": {
+        "street": "Ροδος, Εθνικης αντηστασης 73",
+        "city": "Ροδος δωδεκανησα",
+        "postcode": "85100",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2169546237660",
+      "trackingLink": "https://expedico.eu/tracking?code=2169546237660",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 52.98,
+      "currency": "EUR",
       "createdAt": "2026-02-24+02:00",
       "shippedAt": "2026-02-25+02:00",
       "status": "not_called",
       "notes": "",
-      "storeCode": "cz",
+      "storeCode": "gr",
       "items": [
         {
-          "name": "NORIKS | Starter paket",
+          "name": "NORIKS majica",
           "quantity": 1,
-          "price": 375
+          "price": 49.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
         }
       ]
     },
     {
-      "id": "mk_5252/2026",
-      "orderNumber": "5252/2026",
+      "id": "mk_5247/2026",
+      "orderNumber": "5247/2026",
       "customer": {
-        "name": "Pavel Kalous",
-        "email": "pavka.64@seznam.cz",
-        "phone": "702916887"
+        "name": "ΜΙΧΆΛΗΣ ΠΑΠΑΝΙΚΟΛΆΟΥ",
+        "email": "MIchalis.Papanikolaou2015@gmail.com",
+        "phone": "+306979794000"
       },
       "address": {
-        "street": "Volgogradská 2504/31, Byt č 8",
-        "city": "Ostrava Jih",
-        "postcode": "700 30",
-        "country": "Czech Republic"
+        "street": "ΜΑΡΑΘΩΝΟΜΆΧΩΝ 18, Τύμβος",
+        "city": "Μαραθώνα",
+        "postcode": "19007",
+        "country": "Greece"
       },
-      "deliveryService": "EXPEDICO CZ NORIKS",
-      "trackingCode": "2159889527349",
-      "trackingLink": "https://expedico.eu/tracking?code=2159889527349",
-      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "orderTotal": 534,
-      "currency": "CZK",
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2169546241985",
+      "trackingLink": "https://expedico.eu/tracking?code=2169546241985",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 34.98,
+      "currency": "EUR",
+      "createdAt": "2026-02-22+02:00",
+      "shippedAt": "2026-02-25+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "Αστικό-γήινο μιξ – συσκευασία 5 τεμ - 4XL",
+          "quantity": 1,
+          "price": 31.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_5238/2026",
+      "orderNumber": "5238/2026",
+      "customer": {
+        "name": "SAVVAS LERGOS",
+        "email": "slergos@gmail.com",
+        "phone": "+306948176445"
+      },
+      "address": {
+        "street": "ARNITHA, 1",
+        "city": "RHODES / GREECE",
+        "postcode": "85109",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2159889527550",
+      "trackingLink": "https://expedico.eu/tracking?code=2159889527550",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 148.97,
+      "currency": "EUR",
       "createdAt": "2026-02-22+02:00",
       "shippedAt": "2026-02-23+02:00",
       "status": "not_called",
       "notes": "",
-      "storeCode": "cz",
+      "storeCode": "gr",
       "items": [
         {
-          "name": "NORIKS | Starter paket",
-          "quantity": 1,
-          "price": 465
-        }
-      ]
-    },
-    {
-      "id": "mk_5219/2026",
-      "orderNumber": "5219/2026",
-      "customer": {
-        "name": "Jiri Gorol",
-        "email": "jirkagorol86@gmail.com",
-        "phone": "+420604136020"
-      },
-      "address": {
-        "street": "Podolská 1049/56, Podoli",
-        "city": "Praha 4",
-        "postcode": "147 00",
-        "country": "Czech Republic"
-      },
-      "deliveryService": "EXPEDICO CZ NORIKS",
-      "trackingCode": "2159889527357",
-      "trackingLink": "https://expedico.eu/tracking?code=2159889527357",
-      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "orderTotal": 1274,
-      "currency": "CZK",
-      "createdAt": "2026-02-22+02:00",
-      "shippedAt": "2026-02-23+02:00",
-      "status": "not_called",
-      "notes": "",
-      "storeCode": "cz",
-      "items": [
+          "name": "Μεσονύκτιο μιξ – συσκευασία 3 τεμ - M",
+          "quantity": 2,
+          "price": 49.99
+        },
         {
-          "name": "Pobřežní 3-balíček - XL",
+          "name": "Αστικό-γήινο μιξ – συσκευασία 5 τεμ - M",
           "quantity": 1,
-          "price": 1205
-        }
-      ]
-    },
-    {
-      "id": "mk_5175/2026",
-      "orderNumber": "5175/2026",
-      "customer": {
-        "name": "Monika Bárnetová",
-        "email": "barnetova123@seznam.cz",
-        "phone": "731 922 616"
-      },
-      "address": {
-        "street": "Rudoltice, 623",
-        "city": "Rudoltice",
-        "postcode": "561 25",
-        "country": "Czech Republic"
-      },
-      "deliveryService": "EXPEDICO CZ NORIKS",
-      "trackingCode": "2159889527346",
-      "trackingLink": "https://expedico.eu/tracking?code=2159889527346",
-      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
-      "orderTotal": 1064,
-      "currency": "CZK",
-      "createdAt": "2026-02-20+02:00",
-      "shippedAt": "2026-02-23+02:00",
-      "status": "not_called",
-      "notes": "",
-      "storeCode": "cz",
-      "items": [
-        {
-          "name": "NORIKS bokserice",
-          "quantity": 1,
-          "price": 995
+          "price": 48.99
         }
       ]
     },
@@ -465,6 +1036,186 @@
           "name": "NORIKS bokserice",
           "quantity": 1,
           "price": 670
+        }
+      ]
+    },
+    {
+      "id": "mk_5138/2026",
+      "orderNumber": "5138/2026",
+      "customer": {
+        "name": "Εκτορας Καββαδιας",
+        "email": "ektoraskavvadias@yahoo.com",
+        "phone": "6946557520"
+      },
+      "address": {
+        "street": "8, Αγιος γεωργιος αργυραδων 8",
+        "city": "Άγιος Γεώργιος (Κορισσίων Κερκύρας)",
+        "postcode": "49080",
+        "country": "Greece"
+      },
+      "deliveryService": "EXPEDICO GR GENIKI NORIKS",
+      "trackingCode": "2169546241976",
+      "trackingLink": "https://expedico.eu/tracking?code=2169546241976",
+      "paketomatLocation": "Awaiting another delivery attempt",
+      "lastDeliveryEvent": "Awaiting another delivery attempt",
+      "orderTotal": 22.98,
+      "currency": "EUR",
+      "createdAt": "2026-02-19+02:00",
+      "shippedAt": "2026-02-25+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "gr",
+      "items": [
+        {
+          "name": "NORIKS | Starter paket",
+          "quantity": 1,
+          "price": 19.99
+        },
+        {
+          "name": "Στάνταρ: 4-8 ντάνα - Geniki Taxydromiki",
+          "quantity": 1,
+          "price": 2.99
+        }
+      ]
+    },
+    {
+      "id": "mk_4956/2026",
+      "orderNumber": "4956/2026",
+      "customer": {
+        "name": "Petr Sobotěnko",
+        "email": "petrsobi@seznam.cz",
+        "phone": "739271780"
+      },
+      "address": {
+        "street": "Kosmonautů, 2273",
+        "city": "Louny",
+        "postcode": "440 01",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2169546242018",
+      "trackingLink": "https://expedico.eu/tracking?code=2169546242018",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 1124,
+      "currency": "CZK",
+      "createdAt": "2026-02-06+02:00",
+      "shippedAt": "2026-02-25+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 1055
+        }
+      ]
+    },
+    {
+      "id": "mk_4882/2026",
+      "orderNumber": "4882/2026",
+      "customer": {
+        "name": "David Jelinek",
+        "email": "david.jelinek79@seznam.cz",
+        "phone": "+420775078193"
+      },
+      "address": {
+        "street": "Skramníky, 20",
+        "city": "Klučov-Český Brod",
+        "postcode": "282 01",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2169546242006",
+      "trackingLink": "https://expedico.eu/tracking?code=2169546242006",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 1124,
+      "currency": "CZK",
+      "createdAt": "2026-02-03+02:00",
+      "shippedAt": "2026-02-25+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 1055
+        }
+      ]
+    },
+    {
+      "id": "mk_4877/2026",
+      "orderNumber": "4877/2026",
+      "customer": {
+        "name": "Tibor Lakatos",
+        "email": "lakatos1971@email.cz",
+        "phone": "+420736839500"
+      },
+      "address": {
+        "street": "Radonice 43, 43",
+        "city": "Radonice",
+        "postcode": "431 55",
+        "country": "Czech Republic"
+      },
+      "deliveryService": "EXPEDICO CZ NORIKS",
+      "trackingCode": "2169546242017",
+      "trackingLink": "https://expedico.eu/tracking?code=2169546242017",
+      "paketomatLocation": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "lastDeliveryEvent": "Packet has been delivered to its destination branch and is waiting for pickup",
+      "orderTotal": 604,
+      "currency": "CZK",
+      "createdAt": "2026-02-01+02:00",
+      "shippedAt": "2026-02-25+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "cz",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 535
+        }
+      ]
+    },
+    {
+      "id": "mk_4618/2026",
+      "orderNumber": "4618/2026",
+      "customer": {
+        "name": "Predrag Polovina",
+        "email": "peco.polovina111@gmail.com",
+        "phone": "098 962 2736"
+      },
+      "address": {
+        "street": "Crnčićeva 1/555, 555",
+        "city": "Rijeka",
+        "postcode": "51000",
+        "country": "Croatia"
+      },
+      "deliveryService": "NORIKS HR POŠTA",
+      "trackingCode": "LD521845562HR",
+      "trackingLink": "https://posiljka.posta.hr/hr/tracking/trackingdata?barcode=LD521845562HR",
+      "paketomatLocation": "Pošiljka predana u paketomat",
+      "lastDeliveryEvent": "Pošiljka predana u paketomat",
+      "orderTotal": 54.95,
+      "currency": "EUR",
+      "createdAt": "2026-01-16+02:00",
+      "shippedAt": "2026-02-25+02:00",
+      "status": "not_called",
+      "notes": "",
+      "storeCode": "hr",
+      "items": [
+        {
+          "name": "NORIKS bokserice",
+          "quantity": 1,
+          "price": 51.96
+        },
+        {
+          "name": "Standard: 2-5 dana - Paket24 Hrvatske pošte",
+          "quantity": 1,
+          "price": 2.99
         }
       ]
     }

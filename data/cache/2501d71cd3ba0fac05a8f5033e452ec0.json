@@ -1,5 +1,202 @@
 [
   {
+    "id": "hr_order_5902",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5902,
+    "customerName": "TEST TEST",
+    "email": "test@test.com",
+    "phone": "+385981112233",
+    "location": "HR",
+    "orderStatus": "cancelled",
+    "orderTotal": 7.99,
+    "currency": "EUR",
+    "createdAt": "2026-03-10T07:39:24",
+    "items": [
+      {
+        "name": "Bokserice (1 kos): Zelena - L: Zelena - L",
+        "quantity": 1,
+        "total": 7.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_5901",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5901,
+    "customerName": "TEST TEST",
+    "email": "test@test.com",
+    "phone": "+385981112233",
+    "location": "HR",
+    "orderStatus": "cancelled",
+    "orderTotal": 48.96,
+    "currency": "EUR",
+    "createdAt": "2026-03-10T07:36:42",
+    "items": [
+      {
+        "name": "Majice (3 kos): Bijela - S, Smeđa - XL, Bijela - XL: Bijela - S, Smeđa - XL, Bijela - XL",
+        "quantity": 1,
+        "total": 38.97
+      },
+      {
+        "name": "Bokserice (1 kos): Plava - L: Plava - L",
+        "quantity": 1,
+        "total": 9.99
+      }
+    ],
+    "callStatus": "converted",
+    "notes": "\nOrder #5902 created by hr"
+  },
+  {
+    "id": "pl_order_3623",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "orderId": 3623,
+    "customerName": "Krzysztof Antecki",
+    "email": "kantkant12@wp.pl",
+    "phone": "693354093",
+    "location": "Osiek Mały, PL",
+    "orderStatus": "cancelled",
+    "orderTotal": 60.99,
+    "currency": "PLN",
+    "createdAt": "2026-03-07T14:46:14",
+    "items": [
+      {
+        "name": "Noriks | AirFlow Modal: Czerwony - M, Zielony - M, Niebieski - M",
+        "quantity": 1,
+        "total": 49
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "it_order_5866",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5866,
+    "customerName": "MariaGrazia Angelini",
+    "email": "grazia.angelini53@gmail.comcom",
+    "phone": "3921946343",
+    "location": "Lodi, IT",
+    "orderStatus": "failed",
+    "orderTotal": 52.98,
+    "currency": "EUR",
+    "createdAt": "2026-03-05T00:23:09",
+    "items": [
+      {
+        "name": "Mix mezzanotte pacco da 3 - L",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_5852",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5852,
+    "customerName": "TEST TEST",
+    "email": "test@test.com",
+    "phone": "+385981112233",
+    "location": "Split, HR",
+    "orderStatus": "cancelled",
+    "orderTotal": 133.94,
+    "currency": "EUR",
+    "createdAt": "2026-03-04T12:22:21",
+    "items": [
+      {
+        "name": "Tamni 10-paket",
+        "quantity": 1,
+        "total": 80.99
+      }
+    ],
+    "callStatus": "converted",
+    "notes": "\nOrder #5901 created by noriks"
+  },
+  {
+    "id": "hr_order_5851",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5851,
+    "customerName": "VERIFY TEST",
+    "email": "verify@test.com",
+    "phone": "+385991234567",
+    "location": "Zagreb, HR",
+    "orderStatus": "cancelled",
+    "orderTotal": 19.98,
+    "currency": "EUR",
+    "createdAt": "2026-03-04T12:18:57",
+    "items": [
+      {
+        "name": "Bokserice (2 kos): Crna - L, Plava - XL",
+        "quantity": 1,
+        "total": 19.98
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_5850",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5850,
+    "customerName": "TEST TEST",
+    "email": "test@test.com",
+    "phone": "+385977654321",
+    "location": "Osijek, HR",
+    "orderStatus": "cancelled",
+    "orderTotal": 158.95,
+    "currency": "EUR",
+    "createdAt": "2026-03-04T12:09:38",
+    "items": [
+      {
+        "name": "Komplet: 5 majica + 5 bokserica",
+        "quantity": 1,
+        "total": 109.99
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
+    "id": "hr_order_5849",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5849,
+    "customerName": "TEST TEST",
+    "email": "test@test.com",
+    "phone": "+385915559876",
+    "location": "Rijeka, HR",
+    "orderStatus": "cancelled",
+    "orderTotal": 67.48,
+    "currency": "EUR",
+    "createdAt": "2026-03-04T11:48:24",
+    "items": [
+      {
+        "name": "Ponoćni mix 7-paket",
+        "quantity": 1,
+        "total": 58.49
+      }
+    ],
+    "callStatus": "not_called",
+    "notes": ""
+  },
+  {
     "id": "hr_order_5848",
     "storeCode": "hr",
     "storeName": "Croatia",

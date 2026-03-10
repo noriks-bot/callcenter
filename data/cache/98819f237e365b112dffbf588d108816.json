@@ -1,10 +1,62 @@
 {
   "emails": [
-    "xmn@vp.pl",
-    "monikamers@wp.pl"
+    "labkam88@wp.pl",
+    "spt.m@wp.pl",
+    "marian.puchala@oblaci.pl",
+    "renatalupa77@gmail.com",
+    "leo49@poczta.fm",
+    "przemyslawmuza@gmail.com",
+    "andrzej.samoraj@onet.pl",
+    "gruszka13@op.pl",
+    "gchmiel@vp.pl",
+    "rafgav@gmail.com",
+    "estankiewicz56@gmail.com"
   ],
   "phones": [
-    "500154913",
-    "518678218"
-  ]
+    "48793260054",
+    "793260054",
+    "729775701",
+    "48501462421",
+    "501462421",
+    "692333966",
+    "609668789",
+    "48733518890",
+    "733518890",
+    "48730958781",
+    "730958781",
+    "604326583",
+    "603512249",
+    "48503538604",
+    "503538604",
+    "692373212"
+  ],
+  "orderTotals": {
+    "501462421": 60.99,
+    "503538604": 219.99,
+    "603512249": 60.99,
+    "604326583": 60.99,
+    "609668789": 60.99,
+    "692333966": 60.99,
+    "692373212": 133.99,
+    "729775701": 60.99,
+    "730958781": 133.99,
+    "733518890": 60.99,
+    "793260054": 221.99,
+    "labkam88@wp.pl": 221.99,
+    "48793260054": 221.99,
+    "spt.m@wp.pl": 60.99,
+    "marian.puchala@oblaci.pl": 60.99,
+    "48501462421": 60.99,
+    "renatalupa77@gmail.com": 60.99,
+    "leo49@poczta.fm": 60.99,
+    "przemyslawmuza@gmail.com": 60.99,
+    "48733518890": 60.99,
+    "andrzej.samoraj@onet.pl": 133.99,
+    "48730958781": 133.99,
+    "gruszka13@op.pl": 60.99,
+    "gchmiel@vp.pl": 60.99,
+    "rafgav@gmail.com": 219.99,
+    "48503538604": 219.99,
+    "estankiewicz56@gmail.com": 133.99
+  }
 }

@@ -1,5 +1,2577 @@
 [
   {
+    "id": "pl_872",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "cartDbId": "872",
+    "customerName": "Kamil Łabecki",
+    "firstName": "Kamil",
+    "lastName": "Łabecki",
+    "email": "labkam88@wp.pl",
+    "phone": "+48793260054",
+    "address": "Moniuszki 17/15",
+    "city": "PL, Sępopol",
+    "postcode": "11-210",
+    "location": "PL, Sępopol",
+    "cartContents": [
+      {
+        "name": "Product #1042 (3XL)",
+        "quantity": 1,
+        "price": 210,
+        "productId": 1042,
+        "variationId": 1048,
+        "selectedSize": "3XL"
+      }
+    ],
+    "cartValue": 221.99,
+    "currency": "PLN",
+    "abandonedAt": "2026-03-10 07:38:56",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 221.99
+  },
+  {
+    "id": "gr_1199",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1199",
+    "customerName": "Christis Pareas",
+    "firstName": "Christis",
+    "lastName": "Pareas",
+    "email": "christispareas@yahoo.com",
+    "phone": "6932020555",
+    "address": "",
+    "city": "",
+    "postcode": "",
+    "location": "",
+    "cartContents": [
+      {
+        "name": "Μαύρο - L, Μπλε - L, Γκρι - L",
+        "quantity": 1,
+        "price": 31.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 34.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-10 06:51:02",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2229",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2229",
+    "customerName": "Marialodovica Lusardi",
+    "firstName": "Marialodovica",
+    "lastName": "Lusardi",
+    "email": "msi.lusardi@libero.it",
+    "phone": "3355289970",
+    "address": "Vis msteda",
+    "city": "Mesero",
+    "postcode": "20010",
+    "location": "Mesero",
+    "cartContents": [
+      {
+        "name": "Nero - 4XL, Bianco - 4XL, Blu scuro - 4XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-10 00:19:02",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2228",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2228",
+    "customerName": "Antonio Licciardello",
+    "firstName": "Antonio",
+    "lastName": "Licciardello",
+    "email": "licciardello_a@yahoo.it",
+    "phone": "3421215654",
+    "address": "Via Piave 14",
+    "city": "San Gregorio Di Catania",
+    "postcode": "95027",
+    "location": "San Gregorio Di Catania",
+    "cartContents": [
+      {
+        "name": "Blu - L, Nero - L, Blu - L, Nero - L, Nero - L",
+        "quantity": 1,
+        "price": 38.99,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 41.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-09 23:51:44",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_980",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "980",
+    "customerName": "Bořivoj Hruška",
+    "firstName": "Bořivoj",
+    "lastName": "Hruška",
+    "email": "borekhruska@seznam.cz",
+    "phone": "723383681",
+    "address": "Svatopluka Čecha",
+    "city": "CZ, Jablonec Nad Nisou",
+    "postcode": "466 01",
+    "location": "CZ, Jablonec Nad Nisou",
+    "cartContents": [
+      {
+        "name": "Tmavě modrá - 4XL, Hnědá - 4XL, Zelená - 4XL",
+        "quantity": 1,
+        "price": 1029,
+        "productId": 4806,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 1098,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-09 23:48:25",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 1098
+  },
+  {
+    "id": "sk_927",
+    "storeCode": "sk",
+    "storeName": "Slovakia",
+    "storeFlag": "🇸🇰",
+    "cartDbId": "927",
+    "customerName": "Fazekas Gábor",
+    "firstName": "Fazekas",
+    "lastName": "Gábor",
+    "email": "mate.gabor.fazekas@gmail.com",
+    "phone": "+36306422298",
+    "address": "Solymos utca 6",
+    "city": "SK, Gyöngyös",
+    "postcode": "3200",
+    "location": "SK, Gyöngyös",
+    "cartContents": [
+      {
+        "name": "Product #2786 (S)",
+        "quantity": 1,
+        "price": 80.99,
+        "productId": 2786,
+        "variationId": 2798,
+        "selectedSize": "S"
+      }
+    ],
+    "cartValue": 80.99,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-09 20:17:08",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1197",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1197",
+    "customerName": "Arsen",
+    "firstName": "Arsen",
+    "lastName": "",
+    "email": "arsenhaxhia1985@hotmail.com",
+    "phone": "697 039 4879",
+    "address": "Stilivi",
+    "city": "Πλάνος",
+    "postcode": "291 00",
+    "location": "Πλάνος",
+    "cartContents": [
+      {
+        "name": "Γκρι - M, Μαύρο - M, Μαύρο - M",
+        "quantity": 1,
+        "price": 31.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 34.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-09 19:58:53",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1195",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1195",
+    "customerName": "Tasos Doukas",
+    "firstName": "Tasos",
+    "lastName": "Doukas",
+    "email": "adou81@otenet.gr",
+    "phone": "2467043029",
+    "address": "M Alexandrou 7",
+    "city": "Άργος Ορεστικό",
+    "postcode": "522 00",
+    "location": "Άργος Ορεστικό",
+    "cartContents": [
+      {
+        "name": "Μαύρο - XL, Μπλε - XL, Γκρι - XL, Πράσινο - XL, Μαύρο - XL",
+        "quantity": 1,
+        "price": 48.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 51.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-09 18:51:04",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "pl_871",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "cartDbId": "871",
+    "customerName": "Dariusz Maszewski",
+    "firstName": "Dariusz",
+    "lastName": "Maszewski",
+    "email": "maszed@o2.pl",
+    "phone": "",
+    "address": "Topolowa 1",
+    "city": "PL, Piotrków Trybunalski",
+    "postcode": "97-300",
+    "location": "PL, Piotrków Trybunalski",
+    "cartContents": [
+      {
+        "name": "Czarny - M, Czarny - M, Czarny - M, Czarny - M, Czarny - M",
+        "quantity": 1,
+        "price": 122,
+        "productId": 3534,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 133.99,
+    "currency": "PLN",
+    "abandonedAt": "2026-03-09 13:48:11",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2224",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2224",
+    "customerName": "Claudio Casadio",
+    "firstName": "Claudio",
+    "lastName": "Casadio",
+    "email": "doppiodio@gmail.com",
+    "phone": "3356464905",
+    "address": "Via Maggiore 63/63",
+    "city": "Ravenna",
+    "postcode": "48121",
+    "location": "Ravenna",
+    "cartContents": [
+      {
+        "name": "Nero - XL, Nero - XL, Nero - XL, Nero - XL, Nero - XL, Nero - XL",
+        "quantity": 1,
+        "price": 96.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 6
+      },
+      {
+        "name": "Nero - XL, Nero - XL, Nero - XL, Nero - XL, Nero - XL, Nero - XL",
+        "quantity": 1,
+        "price": 96.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 6
+      }
+    ],
+    "cartValue": 193.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-09 04:11:42",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1189",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1189",
+    "customerName": "Αχιλλέας Kondilis",
+    "firstName": "Αχιλλέας",
+    "lastName": "Kondilis",
+    "email": "akondilis@hotmail.gr",
+    "phone": "6986862376",
+    "address": "Πιερίας 26 αχαρνες",
+    "city": "Acharnes",
+    "postcode": "13671",
+    "location": "Acharnes",
+    "cartContents": [
+      {
+        "name": "Μαύρο - 3XL, Γκρι - 3XL, Γκρι - 3XL, Μαύρο - 3XL, Μαύρο - 3XL, Σκούρο μπλε - 3XL",
+        "quantity": 1,
+        "price": 96.99,
+        "productId": 3015,
+        "variationId": null,
+        "bundlePairs": 6
+      }
+    ],
+    "cartValue": 96.99,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-09 02:22:29",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1123",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1123",
+    "customerName": "John Mitilineos",
+    "firstName": "John",
+    "lastName": "Mitilineos",
+    "email": "iomit69@gmail.com",
+    "phone": "6944897014",
+    "address": "Αντύπα Μαρίνου",
+    "city": "Ηράκλειο",
+    "postcode": "141 21",
+    "location": "Ηράκλειο",
+    "cartContents": [
+      {
+        "name": "Μαύρο - L, Λευκό - L, Σκούρο μπλε - L",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3015,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-08 23:19:37",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2214",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2214",
+    "customerName": "Péter Jászvári",
+    "firstName": "Péter",
+    "lastName": "Jászvári",
+    "email": "peter@jaszvari.hu",
+    "phone": "0036309295282",
+    "address": "Teleki Blanka Utca 1",
+    "city": "HU, Veszprém",
+    "postcode": "8200",
+    "location": "HU, Veszprém",
+    "cartContents": [
+      {
+        "name": "Sötétkék - 3XL, Fekete - 3XL, Fekete - 3XL",
+        "quantity": 1,
+        "price": 18250,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 19050,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-08 20:58:13",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_977",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "977",
+    "customerName": "Petr Siuda",
+    "firstName": "Petr",
+    "lastName": "Siuda",
+    "email": "petrsiuda261@gmail.com",
+    "phone": "+420739437455",
+    "address": "Husova",
+    "city": "CZ, Český Těšín",
+    "postcode": "737 01",
+    "location": "CZ, Český Těšín",
+    "cartContents": [
+      {
+        "name": "Zelená - L, Hnědá - L, Béžová - L",
+        "quantity": 1,
+        "price": 1029,
+        "productId": 4806,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 1098,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-08 17:40:02",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 444
+  },
+  {
+    "id": "hu_2213",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2213",
+    "customerName": "Katalin Bíróné Lázár",
+    "firstName": "Katalin",
+    "lastName": "Bíróné Lázár",
+    "email": "katyusa0409@gmail.com",
+    "phone": "+36306362606",
+    "address": "Kossuth Lajos út 41",
+    "city": "HU, Füzesabony",
+    "postcode": "3390",
+    "location": "HU, Füzesabony",
+    "cartContents": [
+      {
+        "name": "Fekete - 2XL, Zöld - 2XL, Szürke - 2XL",
+        "quantity": 1,
+        "price": 18250,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 19050,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-08 17:03:57",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1106",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1106",
+    "customerName": "Χριστος Αντιβάκης",
+    "firstName": "Χριστος",
+    "lastName": "Αντιβάκης",
+    "email": "c.antivakis@gmail.com",
+    "phone": "6949292020",
+    "address": "Μουσαίου 9",
+    "city": "Παλαιό Φάληρο",
+    "postcode": "175 63",
+    "location": "Παλαιό Φάληρο",
+    "cartContents": [
+      {
+        "name": "Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "quantity": 1,
+        "price": 48.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 51.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-08 16:17:03",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1184",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1184",
+    "customerName": "Ευαγγελος Κοκαρακης",
+    "firstName": "Ευαγγελος",
+    "lastName": "Κοκαρακης",
+    "email": "kokarakisv@gmail.com",
+    "phone": "+306938054884",
+    "address": "Κομβος αναληψης/χερσονησου",
+    "city": "Χερσόνησος",
+    "postcode": "700 14",
+    "location": "Χερσόνησος",
+    "cartContents": [
+      {
+        "name": "Μαύρο - 4XL, Σκούρο μπλε - 4XL, Μαύρο - 4XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3015,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-08 16:04:53",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "pl_868",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "cartDbId": "868",
+    "customerName": "Ola Brodzińska",
+    "firstName": "Ola",
+    "lastName": "Brodzińska",
+    "email": "brodzik7@buziaczek.pl",
+    "phone": "603786287",
+    "address": "787",
+    "city": "PL, Mazańcowice",
+    "postcode": "43-391",
+    "location": "PL, Mazańcowice",
+    "cartContents": [
+      {
+        "name": "Czarny - L, Czarny - L, Czarny - L, Czarny - L, Czarny - L",
+        "quantity": 1,
+        "price": 122,
+        "productId": 3534,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 133.99,
+    "currency": "PLN",
+    "abandonedAt": "2026-03-08 09:31:28",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2217",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2217",
+    "customerName": "Filippo Fragale",
+    "firstName": "Filippo",
+    "lastName": "Fragale",
+    "email": "filippo-fragale@hotmail.com",
+    "phone": "324 865 3321",
+    "address": "Piazza San Vigilio 20/20",
+    "city": "Merano",
+    "postcode": "39012",
+    "location": "Merano",
+    "cartContents": [
+      {
+        "name": "Nero - L, Grigio - L, Blu scuro - L",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-08 09:19:32",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_974",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "974",
+    "customerName": "Vladimír Boštík",
+    "firstName": "Vladimír",
+    "lastName": "Boštík",
+    "email": "v.bostik@centrum.cz",
+    "phone": "606063009",
+    "address": "Vraclav",
+    "city": "CZ, Vraclav",
+    "postcode": "565 42",
+    "location": "CZ, Vraclav",
+    "cartContents": [
+      {
+        "name": "Černá - 2XL, Černá - 2XL, Černá - 2XL",
+        "quantity": 1,
+        "price": 1029,
+        "productId": 4806,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 1098,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-08 00:36:55",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 1098
+  },
+  {
+    "id": "gr_1177",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1177",
+    "customerName": "Κατερινα Μασούρα",
+    "firstName": "Κατερινα",
+    "lastName": "Μασούρα",
+    "email": "katrinmas@gmail.com",
+    "phone": "+306974780385",
+    "address": "Βενιζέλου Ελευθέριου 22",
+    "city": "Βέροια",
+    "postcode": "591 32",
+    "location": "Βέροια",
+    "cartContents": [
+      {
+        "name": "Μαύρο - 3XL, Μπλε - 4XL, Πράσινο - 4XL",
+        "quantity": 1,
+        "price": 31.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 34.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 21:55:04",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1174",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1174",
+    "customerName": "MAΡΚΟΣ ΨΑΡΡΟΣ",
+    "firstName": "MAΡΚΟΣ",
+    "lastName": "ΨΑΡΡΟΣ",
+    "email": "markospsarros@hotmail.gr",
+    "phone": "+306973303548",
+    "address": "ΣΤΥΛΙΑΝΟΥ ΒΛΑΧΑΚΗ 5",
+    "city": "ΤΗΝΟΣ",
+    "postcode": "84200",
+    "location": "ΤΗΝΟΣ",
+    "cartContents": [
+      {
+        "name": "Γκρι - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3015,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 19:27:13",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1173",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1173",
+    "customerName": "tasos gilfesis",
+    "firstName": "tasos",
+    "lastName": "gilfesis",
+    "email": "tasosgilfesis@gmail.com",
+    "phone": "6972517085",
+    "address": "",
+    "city": "αγιος νικολαος",
+    "postcode": "72100",
+    "location": "αγιος νικολαος",
+    "cartContents": [
+      {
+        "name": "Μαύρο - 3XL, Κόκκινο - 3XL, Γκρι - 3XL, Γκρι - 4XL, Μαύρο - 4XL",
+        "quantity": 1,
+        "price": 48.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 51.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 18:53:27",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "pl_866",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "cartDbId": "866",
+    "customerName": "Krzysztof Antecki",
+    "firstName": "Krzysztof",
+    "lastName": "Antecki",
+    "email": "kantkant12@wp.pl",
+    "phone": "693354093",
+    "address": "Ul. Leśna 4/2",
+    "city": "PL, Osiek Mały",
+    "postcode": "62-613",
+    "location": "PL, Osiek Mały",
+    "cartContents": [
+      {
+        "name": "Czerwony - M, Zielony - M, Niebieski - M",
+        "quantity": 1,
+        "price": 49,
+        "productId": 3534,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 60.99,
+    "currency": "PLN",
+    "abandonedAt": "2026-03-07 17:25:21",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1170",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1170",
+    "customerName": "Κωνσταντίνος Κατσιάς",
+    "firstName": "Κωνσταντίνος",
+    "lastName": "Κατσιάς",
+    "email": "kkatsias@gmail.com",
+    "phone": "+306948589859",
+    "address": "Σερρών 07 Κάτω Τούμπα",
+    "city": "Θεσσαλονίκη",
+    "postcode": "544 54",
+    "location": "Θεσσαλονίκη",
+    "cartContents": [
+      {
+        "name": "Γκρι - 2XL, Σκούρο μπλε - 2XL",
+        "quantity": 1,
+        "price": 22.99,
+        "productId": 3009,
+        "variationId": null,
+        "bundlePairs": 1
+      }
+    ],
+    "cartValue": 25.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 17:07:26",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1168",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1168",
+    "customerName": "Αγγελίνα Ξυνή",
+    "firstName": "Αγγελίνα",
+    "lastName": "Ξυνή",
+    "email": "angelaxini@hotmail.com",
+    "phone": "6973554737",
+    "address": "Πιθάρι Παναγίας 55",
+    "city": "Χανιά",
+    "postcode": "73135",
+    "location": "Χανιά",
+    "cartContents": [
+      {
+        "name": "Product #2816 (L)",
+        "quantity": 1,
+        "price": 31.99,
+        "productId": 2816,
+        "variationId": 3459,
+        "selectedSize": "L"
+      }
+    ],
+    "cartValue": 34.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 13:31:30",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2199",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2199",
+    "customerName": "Székely Katalin",
+    "firstName": "Székely",
+    "lastName": "Katalin",
+    "email": "bode.katalin1978@gmail.com",
+    "phone": "36302977597",
+    "address": "Széchenyi Utca 28",
+    "city": "HU, Ács",
+    "postcode": "2941",
+    "location": "HU, Ács",
+    "cartContents": [
+      {
+        "name": "Kék - 2XL, Kék - 2XL, Zöld - 2XL",
+        "quantity": 1,
+        "price": 12640,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 13440,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-07 11:14:29",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1163",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1163",
+    "customerName": "Γιωργος Κυπαρισσης",
+    "firstName": "Γιωργος",
+    "lastName": "Κυπαρισσης",
+    "email": "georgekyparissis@gmail.com",
+    "phone": "+306971680638",
+    "address": "Σολωνος 8",
+    "city": "Ελευσίνα",
+    "postcode": "192 00",
+    "location": "Ελευσίνα",
+    "cartContents": [
+      {
+        "name": "Μαύρο - XL, Μπλε - XL, Γκρι - XL",
+        "quantity": 1,
+        "price": 31.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 34.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 10:47:57",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "sk_924",
+    "storeCode": "sk",
+    "storeName": "Slovakia",
+    "storeFlag": "🇸🇰",
+    "cartDbId": "924",
+    "customerName": "Ervin Zigmond",
+    "firstName": "Ervin",
+    "lastName": "Zigmond",
+    "email": "ervin.zigmond@gmail.com",
+    "phone": "004210918757583",
+    "address": "206",
+    "city": "SK, Kojšov",
+    "postcode": "055 52",
+    "location": "SK, Kojšov",
+    "cartContents": [
+      {
+        "name": "Čierna - S, Čierna - S",
+        "quantity": 1,
+        "price": 19.99,
+        "productId": 3103,
+        "variationId": null,
+        "bundlePairs": 1
+      }
+    ],
+    "cartValue": 22.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 09:08:58",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_970",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "970",
+    "customerName": "Tomáš Iránek",
+    "firstName": "Tomáš",
+    "lastName": "Iránek",
+    "email": "tomas@irankovi.com",
+    "phone": "+420737287076",
+    "address": "Suchdol 5",
+    "city": "CZ, Vavřinec",
+    "postcode": "67913",
+    "location": "CZ, Vavřinec",
+    "cartContents": [
+      {
+        "name": "Černá - 4XL, Černá - 4XL, Černá - 4XL",
+        "quantity": 1,
+        "price": 510,
+        "productId": 4811,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 579,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-07 09:00:42",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 579
+  },
+  {
+    "id": "hu_2194",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2194",
+    "customerName": "Molnár-Varga Adrienn",
+    "firstName": "Molnár-Varga",
+    "lastName": "Adrienn",
+    "email": "vargaadr@gmail.com",
+    "phone": "+36304535301",
+    "address": "Hóvirág Utca",
+    "city": "HU, Felsőörs",
+    "postcode": "8227",
+    "location": "HU, Felsőörs",
+    "cartContents": [
+      {
+        "name": "Bez - 2XL, Szürke - 2XL, Sötétkék - 2XL, Bez - 2XL, Barna - 2XL, Zöld - 2XL",
+        "quantity": 1,
+        "price": 28310,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 6
+      }
+    ],
+    "cartValue": 28310,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-07 08:31:37",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_968",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "968",
+    "customerName": "Radek Bezchleba",
+    "firstName": "Radek",
+    "lastName": "Bezchleba",
+    "email": "radekbezchleba@seznam.cz",
+    "phone": "+420775000460",
+    "address": "Dr.Václava Kůrky 2828",
+    "city": "CZ, Žatec",
+    "postcode": "43801",
+    "location": "CZ, Žatec",
+    "cartContents": [
+      {
+        "name": "Černá - 3XL, Modrá - 3XL, Zelená - 3XL, Černá - M, Černá - M",
+        "quantity": 1,
+        "price": 829,
+        "productId": 4811,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 898,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-07 08:29:03",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_967",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "967",
+    "customerName": "Rudolf Strohmayer",
+    "firstName": "Rudolf",
+    "lastName": "Strohmayer",
+    "email": "strohmayer.r@seznam.cz",
+    "phone": "+420736235500",
+    "address": "Jírovcova 2117/85",
+    "city": "CZ, České Budějovice 4",
+    "postcode": "370 04",
+    "location": "CZ, České Budějovice 4",
+    "cartContents": [
+      {
+        "name": "Tmavě modrá - 3XL, Zelená - 3XL, Šedá - 3XL",
+        "quantity": 1,
+        "price": 1029,
+        "productId": 4806,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 1098,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-07 08:15:47",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "sk_923",
+    "storeCode": "sk",
+    "storeName": "Slovakia",
+    "storeFlag": "🇸🇰",
+    "cartDbId": "923",
+    "customerName": "Viktor Gerencséri",
+    "firstName": "Viktor",
+    "lastName": "Gerencséri",
+    "email": "viktorgerencseri@gmail.com",
+    "phone": "0903264754",
+    "address": "Vodná 30",
+    "city": "SK, Komárno",
+    "postcode": "94501",
+    "location": "SK, Komárno",
+    "cartContents": [
+      {
+        "name": "Čierna - 2XL, Čierna - 2XL, Čierna - 2XL",
+        "quantity": 1,
+        "price": 46.99,
+        "productId": 3109,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 49.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 07:34:40",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1157",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1157",
+    "customerName": "Αντώνης Θωμάς",
+    "firstName": "Αντώνης",
+    "lastName": "Θωμάς",
+    "email": "oikodomika.thomas@gmail.com",
+    "phone": "694 923 5183",
+    "address": "10",
+    "city": "Πλατείες",
+    "postcode": "280 86",
+    "location": "Πλατείες",
+    "cartContents": [
+      {
+        "name": "Γκρι - L, Μπλε - L, Μπλε - L, Κόκκινο - L, Μπλε - L, Μπλε - L, Πράσινο - L",
+        "quantity": 1,
+        "price": 64.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 7
+      }
+    ],
+    "cartValue": 67.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 06:17:44",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_965",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "965",
+    "customerName": "Radek Hušek",
+    "firstName": "Radek",
+    "lastName": "Hušek",
+    "email": "radekhusek@seznam.cz",
+    "phone": "778003030",
+    "address": "Rasošky 121",
+    "city": "CZ, Rasošky",
+    "postcode": "552 21",
+    "location": "CZ, Rasošky",
+    "cartContents": [
+      {
+        "name": "Černá - 4XL, Černá - 3XL, Černá - 3XL, Černá - 4XL, Černá - 4XL",
+        "quantity": 1,
+        "price": 829,
+        "productId": 4811,
+        "variationId": null,
+        "bundlePairs": 5
+      },
+      {
+        "name": "Černá - 4XL, Černá - 3XL, Černá - 3XL, Černá - 4XL, Černá - 4XL",
+        "quantity": 1,
+        "price": 829,
+        "productId": 4811,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 1727,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-07 06:06:27",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1155",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1155",
+    "customerName": "Αγγελος ΚΑΡΥΔΗΣ",
+    "firstName": "Αγγελος",
+    "lastName": "ΚΑΡΥΔΗΣ",
+    "email": "a.karydis@olympiamarecorfu.com",
+    "phone": "+30 694 469 1714",
+    "address": "Μαρινα γουβιων",
+    "city": "Κερκυρα",
+    "postcode": "491 00",
+    "location": "Κερκυρα",
+    "cartContents": [
+      {
+        "name": "Μαύρο - XL, Μαύρο - XL, Μαύρο - XL, Μαύρο - XL, Μαύρο - XL, Μαύρο - XL, Μαύρο - XL",
+        "quantity": 1,
+        "price": 64.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 7
+      }
+    ],
+    "cartValue": 67.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-07 00:35:48",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2187",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2187",
+    "customerName": "Péter Horváth",
+    "firstName": "Péter",
+    "lastName": "Horváth",
+    "email": "horvathpeter85@gmail.com",
+    "phone": "+36304683261",
+    "address": "Szövetség utca 22.",
+    "city": "HU, Pécs",
+    "postcode": "7632",
+    "location": "HU, Pécs",
+    "cartContents": [
+      {
+        "name": "Sötétkék - 3XL, Szürke - 3XL, Fekete - 3XL",
+        "quantity": 1,
+        "price": 18250,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 19050,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-07 00:34:26",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1132",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1132",
+    "customerName": "Κωνσταντίνος Γκουτζας",
+    "firstName": "Κωνσταντίνος",
+    "lastName": "Γκουτζας",
+    "email": "gkoutzas1977@gmail.com",
+    "phone": "+306983365571",
+    "address": "Μοσχοχώρι",
+    "city": "Κατερίνη",
+    "postcode": "60100",
+    "location": "Κατερίνη",
+    "cartContents": [
+      {
+        "name": "Product #2849 (M)",
+        "quantity": 1,
+        "price": 31.99,
+        "productId": 2849,
+        "variationId": 3493,
+        "selectedSize": "M"
+      }
+    ],
+    "cartValue": 34.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-06 15:42:36",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2212",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2212",
+    "customerName": "Alessandro Argela",
+    "firstName": "Alessandro",
+    "lastName": "Argela",
+    "email": "alessandroargi@alice.it",
+    "phone": "3313670803",
+    "address": "Interno 5",
+    "city": "La Spezia",
+    "postcode": "19126",
+    "location": "La Spezia",
+    "cartContents": [
+      {
+        "name": "Blu scuro - 2XL, Verde - 2XL, Nero - 2XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-06 14:27:28",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2175",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2175",
+    "customerName": "Ilona Solti",
+    "firstName": "Ilona",
+    "lastName": "Solti",
+    "email": "h.solti.i@gmail.com",
+    "phone": "06205126595",
+    "address": "Ipari park,Inkubátorház",
+    "city": "HU, Körmend",
+    "postcode": "9900",
+    "location": "HU, Körmend",
+    "cartContents": [
+      {
+        "name": "Fekete - 2XL, Fekete - 2XL, Fekete - 2XL, Fekete - 2XL, Fekete - 2XL",
+        "quantity": 1,
+        "price": 19350,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 20150,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-06 14:00:34",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_963",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "963",
+    "customerName": "Marcela Šustková",
+    "firstName": "Marcela",
+    "lastName": "Šustková",
+    "email": "marc.sustkova@seznam.cz",
+    "phone": "732647568",
+    "address": "U Rybníka 327",
+    "city": "CZ, Nový Jičín",
+    "postcode": "74101",
+    "location": "CZ, Nový Jičín",
+    "cartContents": [
+      {
+        "name": "Černá - 4XL, Černá - 4XL, Zelená - 4XL, Šedá - 4XL, Šedá - 4XL",
+        "quantity": 1,
+        "price": 829,
+        "productId": 4811,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 898,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-06 13:58:18",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2173",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2173",
+    "customerName": "Sándor Fazekas",
+    "firstName": "Sándor",
+    "lastName": "Fazekas",
+    "email": "fazeksandor2895@gmail.com",
+    "phone": "06208523487",
+    "address": "Agyag Utca 2/2/2/2",
+    "city": "HU, Szigethalom",
+    "postcode": "2315",
+    "location": "HU, Szigethalom",
+    "cartContents": [
+      {
+        "name": "Fekete - 3XL, Sötétkék - 3XL, Fehér - 3XL, Fekete - 3XL, Zöld - 3XL, Szürke - 3XL",
+        "quantity": 1,
+        "price": 28310,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 6
+      }
+    ],
+    "cartValue": 28310,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-06 13:32:43",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2171",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2171",
+    "customerName": "Virag Adam",
+    "firstName": "Virag",
+    "lastName": "Adam",
+    "email": "adam.virag@volvocars.com",
+    "phone": "06302050958",
+    "address": "Volvo Galeria Recepcio",
+    "city": "HU, Budapest",
+    "postcode": "1044",
+    "location": "HU, Budapest",
+    "cartContents": [
+      {
+        "name": "Piros - L, Zöld - L, Kék - L",
+        "quantity": 1,
+        "price": 12640,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 13440,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-06 10:51:34",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "pl_861",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "cartDbId": "861",
+    "customerName": "Marek Meyer",
+    "firstName": "Marek",
+    "lastName": "Meyer",
+    "email": "senaszel@gmail.com",
+    "phone": "736804722",
+    "address": "Jagodowa",
+    "city": "PL, Murowana Goślina",
+    "postcode": "62-095",
+    "location": "PL, Murowana Goślina",
+    "cartContents": [
+      {
+        "name": "Niebieski - 4XL, Niebieski - 4XL, Niebieski - 4XL",
+        "quantity": 1,
+        "price": 49,
+        "productId": 3534,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 60.99,
+    "currency": "PLN",
+    "abandonedAt": "2026-03-06 10:35:04",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "pl_860",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "cartDbId": "860",
+    "customerName": "Tadeusz Kieres",
+    "firstName": "Tadeusz",
+    "lastName": "Kieres",
+    "email": "tadkieres@wp.pl",
+    "phone": "535000787",
+    "address": "Ul. Lubliniecka 63/9 9",
+    "city": "PL, Gliwice",
+    "postcode": "44-102",
+    "location": "PL, Gliwice",
+    "cartContents": [
+      {
+        "name": "Czarny - 3XL, Czarny - 3XL, Czarny - 3XL",
+        "quantity": 1,
+        "price": 49,
+        "productId": 3534,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 60.99,
+    "currency": "PLN",
+    "abandonedAt": "2026-03-06 10:04:22",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_962",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "962",
+    "customerName": "LADISLAV SARIKUDIS Sarikudis",
+    "firstName": "LADISLAV SARIKUDIS",
+    "lastName": "Sarikudis",
+    "email": "pajasarikudis@gmail.com",
+    "phone": "+420704004325",
+    "address": "VODNI 104/6",
+    "city": "CZ, ALBRECHTICE MĚSTO 79395 psč",
+    "postcode": "79395",
+    "location": "CZ, ALBRECHTICE MĚSTO 79395 psč",
+    "cartContents": [
+      {
+        "name": "Černá - 3XL, Modrá - 3XL, Šedá - 3XL, Zelená - 3XL, Červená - 3XL, Červená - 3XL, Zelená - 3XL",
+        "quantity": 1,
+        "price": 1209,
+        "productId": 4811,
+        "variationId": null,
+        "bundlePairs": 7
+      }
+    ],
+    "cartValue": 1278,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-06 08:43:00",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 1278
+  },
+  {
+    "id": "hu_2166",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2166",
+    "customerName": "Gábor Horváth",
+    "firstName": "Gábor",
+    "lastName": "Horváth",
+    "email": "gabor9595@gmail.com",
+    "phone": "+36707395428",
+    "address": "Rákóczi Ferenc 12.",
+    "city": "HU, Lázi",
+    "postcode": "9089",
+    "location": "HU, Lázi",
+    "cartContents": [
+      {
+        "name": "Fekete - 2XL, Kék - 2XL, Szürke - 2XL, Zöld - 2XL, Piros - 2XL, Zöld - 2XL, Piros - 2XL",
+        "quantity": 1,
+        "price": 25670,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 7
+      }
+    ],
+    "cartValue": 25670,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-06 08:18:22",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2208",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2208",
+    "customerName": "Giancarlo Balbini",
+    "firstName": "Giancarlo",
+    "lastName": "Balbini",
+    "email": "gbalbini@libero.it",
+    "phone": "+393339539347",
+    "address": "Via Trento",
+    "city": "San Giorgio Delle Pertiche",
+    "postcode": "35010",
+    "location": "San Giorgio Delle Pertiche",
+    "cartContents": [
+      {
+        "name": "Nero - 4XL, Nero - 4XL, Nero - 4XL",
+        "quantity": 1,
+        "price": 24.99,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 27.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-06 07:58:21",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2162",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2162",
+    "customerName": "András Várnagy",
+    "firstName": "András",
+    "lastName": "Várnagy",
+    "email": "bandika197903@gmail.com",
+    "phone": "+36204762506",
+    "address": "Toldi Miklós Utca 100/100/100/100",
+    "city": "HU, Budapest",
+    "postcode": "1171",
+    "location": "HU, Budapest",
+    "cartContents": [
+      {
+        "name": "Fekete - 4XL, Fekete - 4XL, Fekete - 4XL",
+        "quantity": 1,
+        "price": 12640,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 13440,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-06 06:44:58",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2205",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2205",
+    "customerName": "Andrea Berlese",
+    "firstName": "Andrea",
+    "lastName": "Berlese",
+    "email": "berlese78andrea@gmail.com",
+    "phone": "",
+    "address": "Via dell'indipendenza",
+    "city": "",
+    "postcode": "",
+    "location": "",
+    "cartContents": [
+      {
+        "name": "Nero - 4XL, Nero - 4XL, Nero - 4XL, Nero - 4XL, Nero - 4XL",
+        "quantity": 1,
+        "price": 38.99,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 41.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-05 22:23:17",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2154",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2154",
+    "customerName": "Jozsef Verebes",
+    "firstName": "Jozsef",
+    "lastName": "Verebes",
+    "email": "jozsef.verebes@gmail.com",
+    "phone": "707787880",
+    "address": "Malom út",
+    "city": "HU, Szécsény",
+    "postcode": "3170",
+    "location": "HU, Szécsény",
+    "cartContents": [
+      {
+        "name": "Fekete - 3XL, Fehér - 3XL, Szürke - 3XL, Bez - 3XL, Sötétkék - 3XL, Barna - 3XL",
+        "quantity": 1,
+        "price": 28310,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 6
+      }
+    ],
+    "cartValue": 28310,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-05 20:00:56",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1136",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1136",
+    "customerName": "Νικος Ζαφειροπουλος",
+    "firstName": "Νικος",
+    "lastName": "Ζαφειροπουλος",
+    "email": "nikoszaf66@gmail.com",
+    "phone": "6943290099",
+    "address": "Μαγαζι",
+    "city": "Θεσσαλονίκη",
+    "postcode": "542 48",
+    "location": "Θεσσαλονίκη",
+    "cartContents": [
+      {
+        "name": "Μαύρο - S, Μαύρο - S, Μαύρο - S",
+        "quantity": 1,
+        "price": 31.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 34.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-05 13:41:09",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2147",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2147",
+    "customerName": "Balázs Kiss",
+    "firstName": "Balázs",
+    "lastName": "Kiss",
+    "email": "kb199507@gmail.com",
+    "phone": "+36304247124",
+    "address": "Épület",
+    "city": "HU, Hernádkércs",
+    "postcode": "3846",
+    "location": "HU, Hernádkércs",
+    "cartContents": [
+      {
+        "name": "Product #504 (4XL)",
+        "quantity": 1,
+        "price": 9870,
+        "productId": 504,
+        "variationId": 3665,
+        "selectedSize": "4XL"
+      }
+    ],
+    "cartValue": 10670,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-05 12:12:55",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "cz_959",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "cartDbId": "959",
+    "customerName": "Pavel Habart",
+    "firstName": "Pavel",
+    "lastName": "Habart",
+    "email": "habartpavel@seznam.cz",
+    "phone": "777071106",
+    "address": "Pod Kavalírkou 296/ 12",
+    "city": "CZ, Praha 5",
+    "postcode": "15000",
+    "location": "CZ, Praha 5",
+    "cartContents": [
+      {
+        "name": "Product #4676 (3XL)",
+        "quantity": 1,
+        "price": 3245,
+        "productId": 4676,
+        "variationId": 4682,
+        "selectedSize": "3XL"
+      },
+      {
+        "name": "Product #5598 (3XL)",
+        "quantity": 1,
+        "price": 2645,
+        "productId": 5598,
+        "variationId": 5604,
+        "selectedSize": "3XL"
+      }
+    ],
+    "cartValue": 5890,
+    "currency": "CZK",
+    "abandonedAt": "2026-03-05 12:12:29",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 5890
+  },
+  {
+    "id": "gr_1135",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1135",
+    "customerName": "Κωστας Δουρος",
+    "firstName": "Κωστας",
+    "lastName": "Δουρος",
+    "email": "kdourfarm@gmail.com",
+    "phone": "+306972408070",
+    "address": "Γουρνά Σπ. 6",
+    "city": "Μαλεσίνα",
+    "postcode": "350 01",
+    "location": "Μαλεσίνα",
+    "cartContents": [
+      {
+        "name": "Γκρι - 2XL, Λευκό - 2XL, Μαύρο - 2XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3015,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-05 10:56:43",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "hu_2146",
+    "storeCode": "hu",
+    "storeName": "Hungary",
+    "storeFlag": "🇭🇺",
+    "cartDbId": "2146",
+    "customerName": "Zoltán Horváth",
+    "firstName": "Zoltán",
+    "lastName": "Horváth",
+    "email": "zoli710825@gmail.com",
+    "phone": "+36303005081",
+    "address": "Xantus János Utca 77",
+    "city": "HU, Csokonyavisonta",
+    "postcode": "7555",
+    "location": "HU, Csokonyavisonta",
+    "cartContents": [
+      {
+        "name": "Szürke - 2XL, Szürke - 2XL, Kék - 2XL, Kék - 2XL, Zöld - 2XL, Zöld - 2XL, Szürke - 2XL",
+        "quantity": 1,
+        "price": 25670,
+        "productId": 3386,
+        "variationId": null,
+        "bundlePairs": 7
+      },
+      {
+        "name": "Product #1395 (2XL)",
+        "quantity": 1,
+        "price": 9870,
+        "productId": 1395,
+        "variationId": 1400,
+        "selectedSize": "2XL"
+      },
+      {
+        "name": "Product #1042 (2XL)",
+        "quantity": 1,
+        "price": 19750,
+        "productId": 1042,
+        "variationId": 1047,
+        "selectedSize": "2XL"
+      }
+    ],
+    "cartValue": 55290,
+    "currency": "HUF",
+    "abandonedAt": "2026-03-05 09:24:56",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "pl_857",
+    "storeCode": "pl",
+    "storeName": "Poland",
+    "storeFlag": "🇵🇱",
+    "cartDbId": "857",
+    "customerName": "Mirosław Chmurzynski",
+    "firstName": "Mirosław",
+    "lastName": "Chmurzynski",
+    "email": "miroslaw.chmurzynski1@wp.pl",
+    "phone": "602858215",
+    "address": "Ul. Słowiańska 8/h",
+    "city": "PL, Koszalin",
+    "postcode": "75-848",
+    "location": "PL, Koszalin",
+    "cartContents": [
+      {
+        "name": "Czarny - 3XL, Czarny - 3XL, Czarny - 3XL",
+        "quantity": 1,
+        "price": 89,
+        "productId": 3534,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 100.99,
+    "currency": "PLN",
+    "abandonedAt": "2026-03-05 09:05:34",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1130",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1130",
+    "customerName": "ΚΟΥΡΟΥΚΛΗΣ",
+    "firstName": "",
+    "lastName": "ΚΟΥΡΟΥΚΛΗΣ",
+    "email": "tallpost33@gmail.com",
+    "phone": "",
+    "address": "ΜΑΚΡΗΣ 22",
+    "city": "ΝΕΑ ΣΜΥΡΝΗ",
+    "postcode": "17124",
+    "location": "ΝΕΑ ΣΜΥΡΝΗ",
+    "cartContents": [
+      {
+        "name": "Μαύρο - 3XL, Μαύρο - 3XL, Μπλε - 3XL, Μπλε - 3XL, Γκρι - 3XL, Γκρι - 3XL, Πράσινο - 3XL",
+        "quantity": 1,
+        "price": 64.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 7
+      },
+      {
+        "name": "Πράσινο - 3XL, Πράσινο - 3XL, Κόκκινο - 3XL, Γκρι - 3XL, Μπλε - 3XL",
+        "quantity": 1,
+        "price": 48.99,
+        "productId": 3026,
+        "variationId": null,
+        "bundlePairs": 5
+      }
+    ],
+    "cartValue": 113.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-05 07:31:25",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2197",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2197",
+    "customerName": "Ciro Lanzillo",
+    "firstName": "Ciro",
+    "lastName": "Lanzillo",
+    "email": "ciro.lanzillo63@gmail.com",
+    "phone": "3892810914",
+    "address": "Via Cosimo Miccoli 69",
+    "city": "Pomigliano D'arco",
+    "postcode": "80038",
+    "location": "Pomigliano D'arco",
+    "cartContents": [
+      {
+        "name": "Blu scuro - 2XL, Marrone - 2XL, Grigio - 2XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-05 06:10:22",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2196",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2196",
+    "customerName": "MariaGrazia Angelini",
+    "firstName": "MariaGrazia",
+    "lastName": "Angelini",
+    "email": "grazia.angelini53@gmail.comcom",
+    "phone": "3921946343",
+    "address": "Via Umbria",
+    "city": "Lodi",
+    "postcode": "26900",
+    "location": "Lodi",
+    "cartContents": [
+      {
+        "name": "Product #1035 (L)",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 1035,
+        "variationId": 1038,
+        "selectedSize": "L"
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-05 00:21:54",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2189",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2189",
+    "customerName": "Antonio Serra",
+    "firstName": "Antonio",
+    "lastName": "Serra",
+    "email": "alano.brahma@gmail.com",
+    "phone": "3939382815",
+    "address": "Via Soleto",
+    "city": "Galatina",
+    "postcode": "73013",
+    "location": "Galatina",
+    "cartContents": [
+      {
+        "name": "Grigio - XL, Nero - XL, Nero - XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-04 18:52:49",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "sk_916",
+    "storeCode": "sk",
+    "storeName": "Slovakia",
+    "storeFlag": "🇸🇰",
+    "cartDbId": "916",
+    "customerName": "Karol Sebok",
+    "firstName": "Karol",
+    "lastName": "Sebok",
+    "email": "tyari@centrum.sk",
+    "phone": "+421 903 792 601",
+    "address": "štvrť SNP 995/5",
+    "city": "SK, Galanta",
+    "postcode": "92401",
+    "location": "SK, Galanta",
+    "cartContents": [
+      {
+        "name": "Zelená - 3XL, Tmavě modrá - 3XL, Biela - 3XL",
+        "quantity": 1,
+        "price": 46.99,
+        "productId": 3109,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 49.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-04 17:17:52",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "it_2188",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2188",
+    "customerName": "Marco Moschini",
+    "firstName": "Marco",
+    "lastName": "Moschini",
+    "email": "mmilmosco@gmail.com",
+    "phone": "3923811342",
+    "address": "Via delle Danaidi",
+    "city": "Perugia",
+    "postcode": "06134",
+    "location": "Perugia",
+    "cartContents": [
+      {
+        "name": "Verde - 3XL, Blu scuro - 3XL, Grigio - 3XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-04 16:50:17",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 52.98
+  },
+  {
+    "id": "it_2186",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "cartDbId": "2186",
+    "customerName": "Renato Taibi",
+    "firstName": "Renato",
+    "lastName": "Taibi",
+    "email": "tairena60@gmail.com",
+    "phone": "+393382393316",
+    "address": "Corso Grosseto",
+    "city": "Torino",
+    "postcode": "10151",
+    "location": "Torino",
+    "cartContents": [
+      {
+        "name": "Verde - S, Nero - S, Blu scuro - S",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      },
+      {
+        "name": "Nero - S, Verde - S, Blu scuro - S",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 99.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-04 16:48:37",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1125",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1125",
+    "customerName": "Unknown",
+    "firstName": "",
+    "lastName": "",
+    "email": "zirpilisioannis@gmail.com",
+    "phone": "",
+    "address": "",
+    "city": "",
+    "postcode": "",
+    "location": "",
+    "cartContents": [
+      {
+        "name": "Μαύρο - 2XL, Μαύρο - 2XL, Μαύρο - 2XL",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 3015,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-04 13:44:08",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
+    "id": "gr_1119",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "cartDbId": "1119",
+    "customerName": "Ευσταθιος Ρουκουτακης",
+    "firstName": "Ευσταθιος",
+    "lastName": "Ρουκουτακης",
+    "email": "roukoukisst@gmail.co",
+    "phone": "6973034917",
+    "address": "Βρυσες αποκορωνου χανια",
+    "city": "Χανια",
+    "postcode": "73007",
+    "location": "Χανια",
+    "cartContents": [
+      {
+        "name": "Product #1042 (XL)",
+        "quantity": 1,
+        "price": 49.99,
+        "productId": 1042,
+        "variationId": 1046,
+        "selectedSize": "XL"
+      }
+    ],
+    "cartValue": 52.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-04 10:48:12",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": true,
+    "matchedOrderTotal": 52.98
+  },
+  {
+    "id": "hr_2267",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "cartDbId": "2267",
+    "customerName": "Ivica Marketin",
+    "firstName": "Ivica",
+    "lastName": "Marketin",
+    "email": "imarketin777@gmail.com",
+    "phone": "0958845602",
+    "address": "Barakovićeva 18",
+    "city": "Split",
+    "postcode": "21000",
+    "location": "Split",
+    "cartContents": [
+      {
+        "name": "Crna - 2XL, Tamnoplava - 2XL, Zelena - 2XL",
+        "quantity": 1,
+        "price": 44.99,
+        "productId": 3421,
+        "variationId": null,
+        "bundlePairs": 3
+      }
+    ],
+    "cartValue": 47.98,
+    "currency": "EUR",
+    "abandonedAt": "2026-03-04 09:46:48",
+    "status": "abandoned",
+    "callStatus": "not_called",
+    "notes": "",
+    "lastUpdated": null,
+    "orderId": null,
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
+  },
+  {
     "id": "gr_1118",
     "storeCode": "gr",
     "storeName": "Greece",
@@ -32,7 +2604,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1034",
@@ -67,7 +2641,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1115",
@@ -102,7 +2678,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1109",
@@ -137,7 +2715,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1108",
@@ -172,42 +2752,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "gr_1106",
-    "storeCode": "gr",
-    "storeName": "Greece",
-    "storeFlag": "🇬🇷",
-    "cartDbId": "1106",
-    "customerName": "Χριστος Αντιβάκης",
-    "firstName": "Χριστος",
-    "lastName": "Αντιβάκης",
-    "email": "c.antivakis@gmail.com",
-    "phone": "6949292020",
-    "address": "Μουσαίου 9",
-    "city": "Παλαιό Φάληρο",
-    "postcode": "175 63",
-    "location": "Παλαιό Φάληρο",
-    "cartContents": [
-      {
-        "name": "Product #2805 (4XL)",
-        "quantity": 1,
-        "price": 48.99,
-        "productId": 2805,
-        "variationId": 6400,
-        "selectedSize": "4XL"
-      }
-    ],
-    "cartValue": 51.98,
-    "currency": "EUR",
-    "abandonedAt": "2026-03-03 18:17:14",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1102",
@@ -242,7 +2789,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1101",
@@ -277,7 +2826,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1100",
@@ -312,7 +2863,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1098",
@@ -347,7 +2900,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "sk_913",
@@ -390,42 +2945,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "gr_1094",
-    "storeCode": "gr",
-    "storeName": "Greece",
-    "storeFlag": "🇬🇷",
-    "cartDbId": "1094",
-    "customerName": "VASILEIOS ZOUGLIS",
-    "firstName": "VASILEIOS",
-    "lastName": "ZOUGLIS",
-    "email": "bzougl@hotmail.com",
-    "phone": "+306979593609",
-    "address": "Nea Tiryntha, Naupliou",
-    "city": "Nafplio",
-    "postcode": "21100",
-    "location": "Nafplio",
-    "cartContents": [
-      {
-        "name": "Μαύρο - XL, Μπλε - XL, Γκρι - XL, Πράσινο - XL, Κόκκινο - XL",
-        "quantity": 1,
-        "price": 48.99,
-        "productId": 3026,
-        "variationId": null,
-        "bundlePairs": 5
-      }
-    ],
-    "cartValue": 51.98,
-    "currency": "EUR",
-    "abandonedAt": "2026-03-03 09:33:34",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1090",
@@ -460,7 +2982,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hu_2123",
@@ -495,7 +3019,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1088",
@@ -530,7 +3056,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hu_2122",
@@ -565,7 +3093,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hu_2121",
@@ -600,7 +3130,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_949",
@@ -635,7 +3167,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "pl_856",
@@ -670,7 +3204,9 @@
     "notes": "",
     "lastUpdated": "2026-03-02T22:07:28.560Z",
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1084",
@@ -705,7 +3241,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2255",
@@ -740,7 +3278,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_948",
@@ -775,7 +3315,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_947",
@@ -810,7 +3352,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": true
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2171",
@@ -853,7 +3397,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2170",
@@ -888,7 +3434,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1079",
@@ -923,7 +3471,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1078",
@@ -958,7 +3508,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1076",
@@ -993,7 +3545,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1074",
@@ -1028,7 +3582,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1072",
@@ -1063,7 +3619,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1071",
@@ -1098,7 +3656,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1066",
@@ -1133,7 +3693,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1068",
@@ -1168,7 +3730,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": true
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2163",
@@ -1203,7 +3767,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2241",
@@ -1238,7 +3804,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2240",
@@ -1281,7 +3849,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2162",
@@ -1316,7 +3886,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2161",
@@ -1351,7 +3923,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1063",
@@ -1386,7 +3960,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2237",
@@ -1421,7 +3997,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1061",
@@ -1464,7 +4042,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1058",
@@ -1499,7 +4079,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1057",
@@ -1534,7 +4116,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "sk_909",
@@ -1569,7 +4153,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1053",
@@ -1604,7 +4190,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1051",
@@ -1639,7 +4227,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1047",
@@ -1698,7 +4288,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1046",
@@ -1733,7 +4325,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_937",
@@ -1776,7 +4370,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2224",
@@ -1819,7 +4415,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2149",
@@ -1854,7 +4452,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2222",
@@ -1889,7 +4489,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2147",
@@ -1932,7 +4534,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_936",
@@ -1967,7 +4571,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_935",
@@ -2002,7 +4608,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_933",
@@ -2053,42 +4661,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": true
-  },
-  {
-    "id": "it_2146",
-    "storeCode": "it",
-    "storeName": "Italy",
-    "storeFlag": "🇮🇹",
-    "cartDbId": "2146",
-    "customerName": "Alessandro Corridori",
-    "firstName": "Alessandro",
-    "lastName": "Corridori",
-    "email": "alecoracquepure@gmail.com",
-    "phone": "3297744682",
-    "address": "V. Arturo Labriola",
-    "city": "Grosseto",
-    "postcode": "58100",
-    "location": "Grosseto",
-    "cartContents": [
-      {
-        "name": "Beige - 3XL, Bianco - 3XL, Nero - 3XL",
-        "quantity": 1,
-        "price": 49.99,
-        "productId": 3421,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 52.98,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-26 16:07:58",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_931",
@@ -2123,7 +4698,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_930",
@@ -2158,7 +4735,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": true
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hu_2113",
@@ -2193,7 +4772,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_928",
@@ -2236,7 +4817,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": true
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1025",
@@ -2279,7 +4862,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "sk_907",
@@ -2314,7 +4899,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "pl_854",
@@ -2349,7 +4936,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1019",
@@ -2384,7 +4973,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_922",
@@ -2419,7 +5010,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hu_2107",
@@ -2454,7 +5047,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2143",
@@ -2497,7 +5092,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "pl_852",
@@ -2532,7 +5129,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_1011",
@@ -2567,7 +5166,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2141",
@@ -2610,7 +5211,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2140",
@@ -2645,66 +5248,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "hr_2205",
-    "storeCode": "hr",
-    "storeName": "Croatia",
-    "storeFlag": "🇭🇷",
-    "cartDbId": "2205",
-    "customerName": "Vedran Šegvić",
-    "firstName": "Vedran",
-    "lastName": "Šegvić",
-    "email": "v3821459@gmail.com",
-    "phone": "+385915533043",
-    "address": "Bukovčeva 5",
-    "city": "Splitsko-Dalmatinska",
-    "postcode": "21000",
-    "location": "Splitsko-Dalmatinska",
-    "cartContents": [
-      {
-        "name": "Crna - 3XL, Crna - 4XL",
-        "quantity": 1,
-        "price": 19.99,
-        "productId": 4362,
-        "variationId": null,
-        "bundlePairs": 1
-      },
-      {
-        "name": "Crna - 3XL, Crna - 4XL",
-        "quantity": 1,
-        "price": 19.99,
-        "productId": 4362,
-        "variationId": null,
-        "bundlePairs": 1
-      },
-      {
-        "name": "Crna - 3XL, Crna - 4XL",
-        "quantity": 1,
-        "price": 19.99,
-        "productId": 4362,
-        "variationId": null,
-        "bundlePairs": 1
-      },
-      {
-        "name": "Crna - 3XL, Crna - 4XL",
-        "quantity": 1,
-        "price": 19.99,
-        "productId": 4362,
-        "variationId": null,
-        "bundlePairs": 1
-      }
-    ],
-    "cartValue": 79.96,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-24 14:19:05",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_917",
@@ -2739,50 +5285,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "gr_1003",
-    "storeCode": "gr",
-    "storeName": "Greece",
-    "storeFlag": "🇬🇷",
-    "cartDbId": "1003",
-    "customerName": "ΚΩΣΤΑΣ ΔΟΥΛΓΕΡΙΔΗΣ",
-    "firstName": "ΚΩΣΤΑΣ",
-    "lastName": "ΔΟΥΛΓΕΡΙΔΗΣ",
-    "email": "kwsstasdoul@gmail.com",
-    "phone": "6972328396",
-    "address": "",
-    "city": "Νέα Μάκρη",
-    "postcode": "190 05",
-    "location": "Νέα Μάκρη",
-    "cartContents": [
-      {
-        "name": "Πράσινο - 3XL, Κόκκινο - 3XL",
-        "quantity": 1,
-        "price": 16.99,
-        "productId": 3009,
-        "variationId": null,
-        "bundlePairs": 1
-      },
-      {
-        "name": "Γκρι - 3XL, Καφέ - 3XL",
-        "quantity": 1,
-        "price": 22.99,
-        "productId": 3009,
-        "variationId": null,
-        "bundlePairs": 1
-      }
-    ],
-    "cartValue": 42.97,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-23 18:35:41",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_915",
@@ -2825,7 +5330,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2201",
@@ -2860,7 +5367,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "pl_848",
@@ -2895,7 +5404,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_912",
@@ -2930,7 +5441,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_988",
@@ -2965,7 +5478,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_987",
@@ -3000,7 +5515,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_985",
@@ -3035,7 +5552,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "sk_903",
@@ -3078,7 +5597,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2128",
@@ -3113,7 +5634,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_906",
@@ -3148,7 +5671,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2185",
@@ -3182,7 +5707,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_904",
@@ -3217,7 +5744,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_973",
@@ -3252,7 +5781,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_901",
@@ -3287,7 +5818,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_899",
@@ -3322,7 +5855,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_967",
@@ -3357,7 +5892,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "sk_902",
@@ -3392,7 +5929,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_897",
@@ -3427,7 +5966,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_958",
@@ -3462,7 +6003,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2122",
@@ -3497,7 +6040,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_895",
@@ -3532,7 +6077,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_893",
@@ -3567,7 +6114,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_891",
@@ -3602,7 +6151,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2118",
@@ -3637,7 +6188,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_888",
@@ -3672,7 +6225,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_949",
@@ -3707,7 +6262,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2117",
@@ -3742,7 +6299,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_948",
@@ -3777,7 +6336,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_946",
@@ -3820,7 +6381,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_943",
@@ -3855,7 +6418,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_942",
@@ -3906,7 +6471,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2112",
@@ -3941,7 +6508,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_939",
@@ -3976,7 +6545,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_937",
@@ -4019,7 +6590,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_934",
@@ -4054,7 +6627,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_882",
@@ -4089,7 +6664,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "it_2107",
@@ -4124,7 +6701,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2135",
@@ -4159,7 +6738,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_907",
@@ -4194,7 +6775,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "gr_906",
@@ -4229,7 +6812,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2128",
@@ -4264,7 +6849,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2119",
@@ -4299,7 +6886,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_875",
@@ -4334,7 +6923,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_873",
@@ -4369,7 +6960,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2106",
@@ -4404,7 +6997,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_872",
@@ -4439,7 +7034,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "cz_871",
@@ -4474,42 +7071,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "it_2094",
-    "storeCode": "it",
-    "storeName": "Italy",
-    "storeFlag": "🇮🇹",
-    "cartDbId": "2094",
-    "customerName": "Vjekoslav Čurčić",
-    "firstName": "Vjekoslav",
-    "lastName": "Čurčić",
-    "email": "vjekocure0000@gmail.com",
-    "phone": "+385 91 950 6046",
-    "address": "Put Ošega Dolca",
-    "city": "Supetar",
-    "postcode": "21400",
-    "location": "Supetar",
-    "cartContents": [
-      {
-        "name": "Crna - 2XL, Siva - 2XL, Siva - 2XL",
-        "quantity": 1,
-        "price": 49.99,
-        "productId": 3421,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 52.98,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-09 08:36:15",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2094",
@@ -4544,112 +7108,46 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
-    "id": "cz_869",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "869",
-    "customerName": "Roman Porč",
-    "firstName": "Roman",
-    "lastName": "Porč",
-    "email": "roman.porc@centrum.cz",
-    "phone": "+420608570518",
-    "address": "Rooseveltova 101",
-    "city": "CZ, Olomouc-Olomouc 9",
-    "postcode": "779 00",
-    "location": "CZ, Olomouc-Olomouc 9",
-    "cartContents": [
-      {
-        "name": "Černá - 4XL, Černá - 4XL, Černá - 4XL, Černá - 4XL, Černá - 4XL",
-        "quantity": 1,
-        "price": 795,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 5
-      }
-    ],
-    "cartValue": 864,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-08 21:14:40",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_866",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "866",
-    "customerName": "Luděk Russe",
-    "firstName": "Luděk",
-    "lastName": "Russe",
-    "email": "ludek.russe@tiscali.cz",
-    "phone": "+420777668076",
-    "address": "Husova 2737/52",
-    "city": "CZ, Chomutov",
-    "postcode": "43003",
-    "location": "CZ, Chomutov",
-    "cartContents": [
-      {
-        "name": "Černá - 4XL, Modrá - 4XL, Šedá - 4XL, Zelená - 4XL, Červená - 4XL, Černá - 4XL, Černá - 4XL",
-        "quantity": 1,
-        "price": 1055,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 7
-      }
-    ],
-    "cartValue": 1124,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-08 15:18:09",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "it_2082",
+    "id": "it_2094",
     "storeCode": "it",
     "storeName": "Italy",
     "storeFlag": "🇮🇹",
-    "cartDbId": "2082",
-    "customerName": "Darko Brekalo",
-    "firstName": "Darko",
-    "lastName": "Brekalo",
-    "email": "horvat.djakovo.breki@gmail.com",
-    "phone": "0996669367",
-    "address": "Frankopanska 40/40",
-    "city": "Đakovo",
-    "postcode": "31400",
-    "location": "Đakovo",
+    "cartDbId": "2094",
+    "customerName": "Vjekoslav Čurčić",
+    "firstName": "Vjekoslav",
+    "lastName": "Čurčić",
+    "email": "vjekocure0000@gmail.com",
+    "phone": "+385 91 950 6046",
+    "address": "Put Ošega Dolca",
+    "city": "Supetar",
+    "postcode": "21400",
+    "location": "Supetar",
     "cartContents": [
       {
-        "name": "Crna - 2XL, Tamnoplava - 2XL, Siva - 2XL",
+        "name": "Crna - 2XL, Siva - 2XL, Siva - 2XL",
         "quantity": 1,
-        "price": 39.98,
+        "price": 49.99,
         "productId": 3421,
         "variationId": null,
         "bundlePairs": 3
       }
     ],
-    "cartValue": 42.97,
+    "cartValue": 52.98,
     "currency": "EUR",
-    "abandonedAt": "2026-02-08 12:29:33",
+    "abandonedAt": "2026-02-09 08:36:15",
     "status": "abandoned",
     "callStatus": "not_called",
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2082",
@@ -4684,112 +7182,9 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_864",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "864",
-    "customerName": "Jaroslav Kalasek",
-    "firstName": "Jaroslav",
-    "lastName": "Kalasek",
-    "email": "kaldy1@seznam.cz",
-    "phone": "728 995 260",
-    "address": "Jihlávka 87",
-    "city": "CZ, Jihlávka",
-    "postcode": "588 51",
-    "location": "CZ, Jihlávka",
-    "cartContents": [
-      {
-        "name": "Černá - 3XL, Černá - 3XL",
-        "quantity": 1,
-        "price": 290,
-        "productId": 4807,
-        "variationId": null,
-        "bundlePairs": 1
-      }
-    ],
-    "cartValue": 359,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-08 09:16:49",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_862",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "862",
-    "customerName": "Roman Stojka",
-    "firstName": "Roman",
-    "lastName": "Stojka",
-    "email": "paveza1234@seznam.cz",
-    "phone": "777266532",
-    "address": "Terezy novakove",
-    "city": "CZ, Brno",
-    "postcode": "62100",
-    "location": "CZ, Brno",
-    "cartContents": [
-      {
-        "name": "Černá - 2XL, Černá - 2XL, Černá - 2XL",
-        "quantity": 1,
-        "price": 535,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 604,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-07 23:39:42",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "it_2076",
-    "storeCode": "it",
-    "storeName": "Italy",
-    "storeFlag": "🇮🇹",
-    "cartDbId": "2076",
-    "customerName": "Goran Guštović",
-    "firstName": "Goran",
-    "lastName": "Guštović",
-    "email": "goran.gustovic@gmail.com",
-    "phone": "0912382180",
-    "address": "Gornje Psarjevo",
-    "city": "Sveti Ivan Zelina",
-    "postcode": "10380",
-    "location": "Sveti Ivan Zelina",
-    "cartContents": [
-      {
-        "name": "Crna - 3XL, Tamnoplava - 3XL, Bez - 3XL",
-        "quantity": 1,
-        "price": 39.98,
-        "productId": 3421,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 42.97,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-07 22:40:39",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   },
   {
     "id": "hr_2076",
@@ -4824,940 +7219,8 @@
     "notes": "",
     "lastUpdated": null,
     "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_857",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "857",
-    "customerName": "Unknown",
-    "firstName": "",
-    "lastName": "",
-    "email": "kanak70@seznam.cz",
-    "phone": "",
-    "address": "",
-    "city": "CZ, ",
-    "postcode": "",
-    "location": "CZ, ",
-    "cartContents": [
-      {
-        "name": "Černá - XL, Tmavě modrá - XL",
-        "quantity": 1,
-        "price": 465,
-        "productId": 4807,
-        "variationId": null,
-        "bundlePairs": 1
-      },
-      {
-        "name": "Černá - 2XL, Modrá - 2XL",
-        "quantity": 1,
-        "price": 290,
-        "productId": 4807,
-        "variationId": null,
-        "bundlePairs": 1
-      }
-    ],
-    "cartValue": 824,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-07 11:44:02",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "pl_842",
-    "storeCode": "pl",
-    "storeName": "Poland",
-    "storeFlag": "🇵🇱",
-    "cartDbId": "842",
-    "customerName": "Jolanta Staworowska",
-    "firstName": "Jolanta",
-    "lastName": "Staworowska",
-    "email": "jolanta.staworowska@gmail.com",
-    "phone": "693-456-875",
-    "address": "Ul. Kawaleryjska 2d/16",
-    "city": "PL, Legnica",
-    "postcode": "59-220",
-    "location": "PL, Legnica",
-    "cartContents": [
-      {
-        "name": "Czarny - 2XL, Szary - 2XL",
-        "quantity": 1,
-        "price": 55,
-        "productId": 3566,
-        "variationId": null,
-        "bundlePairs": 1
-      }
-    ],
-    "cartValue": 66.99,
-    "currency": "PLN",
-    "abandonedAt": "2026-02-07 10:10:56",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_855",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "855",
-    "customerName": "Jiří Daniel",
-    "firstName": "Jiří",
-    "lastName": "Daniel",
-    "email": "danieljiri22@gmail.com",
-    "phone": "+420605021063",
-    "address": "U tvrze",
-    "city": "CZ, Děčín",
-    "postcode": "40502",
-    "location": "CZ, Děčín",
-    "cartContents": [
-      {
-        "name": "Černá - XL, Černá - XL",
-        "quantity": 1,
-        "price": 290,
-        "productId": 4807,
-        "variationId": null,
-        "bundlePairs": 1
-      }
-    ],
-    "cartValue": 359,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-07 07:41:27",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "it_2067",
-    "storeCode": "it",
-    "storeName": "Italy",
-    "storeFlag": "🇮🇹",
-    "cartDbId": "2067",
-    "customerName": "Sonja Vukmanić",
-    "firstName": "Sonja",
-    "lastName": "Vukmanić",
-    "email": "sonja.vukmanic1@gmail.com",
-    "phone": "0915908801",
-    "address": "Taborgradska Ulica 4/4",
-    "city": "Desinić",
-    "postcode": "49216",
-    "location": "Desinić",
-    "cartContents": [
-      {
-        "name": "Crna - 3XL, Crna - 3XL, Crna - 3XL",
-        "quantity": 1,
-        "price": 25.98,
-        "productId": 3386,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 28.97,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-07 04:45:46",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_851",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "851",
-    "customerName": "Radomír Budka",
-    "firstName": "Radomír",
-    "lastName": "Budka",
-    "email": "taxi124taxi@seznam.cz",
-    "phone": "+420608100060",
-    "address": "Na Vlčinci 72/1",
-    "city": "CZ, Olomouc",
-    "postcode": "77900",
-    "location": "CZ, Olomouc",
-    "cartContents": [
-      {
-        "name": "Černá - XL, Černá - XL",
-        "quantity": 1,
-        "price": 375,
-        "productId": 4809,
-        "variationId": null,
-        "bundlePairs": 1
-      },
-      {
-        "name": "Bílá - XL, Zelená - XL",
-        "quantity": 1,
-        "price": 375,
-        "productId": 4809,
-        "variationId": null,
-        "bundlePairs": 1
-      }
-    ],
-    "cartValue": 819,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-06 15:05:04",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_850",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "850",
-    "customerName": "Unknown",
-    "firstName": "",
-    "lastName": "",
-    "email": "zdedoktor@seznam.cz",
-    "phone": "",
-    "address": "",
-    "city": "CZ, ",
-    "postcode": "",
-    "location": "CZ, ",
-    "cartContents": [
-      {
-        "name": "Product #5495 (2XL)",
-        "quantity": 1,
-        "price": 535,
-        "productId": 5495,
-        "variationId": 5500,
-        "selectedSize": "2XL"
-      }
-    ],
-    "cartValue": 604,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-06 14:43:49",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_849",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "849",
-    "customerName": "Blanka Brdečková",
-    "firstName": "Blanka",
-    "lastName": "Brdečková",
-    "email": "blanka.brdeckova@seznam.cz",
-    "phone": "723988494",
-    "address": "Kobylí 790",
-    "city": "CZ, Kobylí Na Moravě",
-    "postcode": "691 10",
-    "location": "CZ, Kobylí Na Moravě",
-    "cartContents": [
-      {
-        "name": "Modrá - 4XL, Šedá - 4XL, Zelená - 4XL",
-        "quantity": 1,
-        "price": 535,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 604,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-06 10:17:23",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_846",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "846",
-    "customerName": "Petr Sobotěnko",
-    "firstName": "Petr",
-    "lastName": "Sobotěnko",
-    "email": "petrsobi@seznam.cz",
-    "phone": "739271780",
-    "address": "Kosmonautů",
-    "city": "CZ, Louny",
-    "postcode": "44001",
-    "location": "CZ, Louny",
-    "cartContents": [
-      {
-        "name": "Černá - 4XL, Černá - 4XL, Černá - 4XL, Černá - 4XL, Černá - 4XL, Černá - 4XL, Černá - 4XL",
-        "quantity": 1,
-        "price": 1055,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 7
-      }
-    ],
-    "cartValue": 1124,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-06 07:41:27",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "pl_839",
-    "storeCode": "pl",
-    "storeName": "Poland",
-    "storeFlag": "🇵🇱",
-    "cartDbId": "839",
-    "customerName": "Grzegorz Chmiel",
-    "firstName": "Grzegorz",
-    "lastName": "Chmiel",
-    "email": "gchmiel@vp.pl",
-    "phone": "603 512 249",
-    "address": "Ul. Hetmańska 22/38",
-    "city": "PL, Rzeszów",
-    "postcode": "35-045",
-    "location": "PL, Rzeszów",
-    "cartContents": [
-      {
-        "name": "Czarny - 4XL, Czerwony - 4XL, Szary - 4XL",
-        "quantity": 1,
-        "price": 105,
-        "productId": 3534,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 116.99,
-    "currency": "PLN",
-    "abandonedAt": "2026-02-06 06:07:20",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_844",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "844",
-    "customerName": "Jan Soroka",
-    "firstName": "Jan",
-    "lastName": "Soroka",
-    "email": "gogos31@email.cz",
-    "phone": "720123169",
-    "address": "Dr.Milady Horákové",
-    "city": "CZ, Liberec",
-    "postcode": "460 07",
-    "location": "CZ, Liberec",
-    "cartContents": [
-      {
-        "name": "Zelená - 3XL, Černá - 3XL",
-        "quantity": 1,
-        "price": 375,
-        "productId": 4807,
-        "variationId": null,
-        "bundlePairs": 1
-      }
-    ],
-    "cartValue": 444,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-06 04:53:48",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_841",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "841",
-    "customerName": "Milan Humlíček",
-    "firstName": "Milan",
-    "lastName": "Humlíček",
-    "email": "humlicekmi@seznam.cz",
-    "phone": "+420 605 445 732",
-    "address": "Třanovského 885",
-    "city": "CZ, Dolní Lutyně",
-    "postcode": "735 53",
-    "location": "CZ, Dolní Lutyně",
-    "cartContents": [
-      {
-        "name": "Modrá - 2XL, Šedá - 2XL, Černá - 2XL",
-        "quantity": 1,
-        "price": 535,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 604,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-05 14:44:28",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "pl_838",
-    "storeCode": "pl",
-    "storeName": "Poland",
-    "storeFlag": "🇵🇱",
-    "cartDbId": "838",
-    "customerName": "Anna Janina Pękała",
-    "firstName": "Anna Janina",
-    "lastName": "Pękała",
-    "email": "joankapekala@gmail.com",
-    "phone": "512 345 532",
-    "address": "Ul. Śródmiejska 4",
-    "city": "PL, Łęczna",
-    "postcode": "21-010",
-    "location": "PL, Łęczna",
-    "cartContents": [
-      {
-        "name": "Czarny - M, Czarny - XL, Czarny - S",
-        "quantity": 1,
-        "price": 105,
-        "productId": 3534,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 116.99,
-    "currency": "PLN",
-    "abandonedAt": "2026-02-05 14:37:16",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_840",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "840",
-    "customerName": "Pavel Krejčí",
-    "firstName": "Pavel",
-    "lastName": "Krejčí",
-    "email": "pk.privat@email.cz",
-    "phone": "602942640",
-    "address": "Rýnovická 22",
-    "city": "CZ, Jablonec Nad Nisou",
-    "postcode": "466 01",
-    "location": "CZ, Jablonec Nad Nisou",
-    "cartContents": [
-      {
-        "name": "Černá - 4XL, Červená - 4XL, Červená - 4XL, Šedá - 4XL, Černá - 4XL",
-        "quantity": 1,
-        "price": 795,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 5
-      }
-    ],
-    "cartValue": 864,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-05 12:36:36",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_837",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "837",
-    "customerName": "TEREZA Bahulová",
-    "firstName": "TEREZA",
-    "lastName": "Bahulová",
-    "email": "tereza.harapatova@gmail.com",
-    "phone": "+420734322452",
-    "address": "Halova",
-    "city": "CZ, Zlín",
-    "postcode": "76001",
-    "location": "CZ, Zlín",
-    "cartContents": [
-      {
-        "name": "Product #1021 (3XL)",
-        "quantity": 1,
-        "price": 965,
-        "productId": 1021,
-        "variationId": 1027,
-        "selectedSize": "3XL"
-      }
-    ],
-    "cartValue": 1034,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-05 10:00:36",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "pl_837",
-    "storeCode": "pl",
-    "storeName": "Poland",
-    "storeFlag": "🇵🇱",
-    "cartDbId": "837",
-    "customerName": "Mateusz Śliwiński",
-    "firstName": "Mateusz",
-    "lastName": "Śliwiński",
-    "email": "masaker1232@gmail.com",
-    "phone": "+48721264283",
-    "address": "Ul. Wojska Polskiego 62",
-    "city": "PL, Chodzież",
-    "postcode": "64-800",
-    "location": "PL, Chodzież",
-    "cartContents": [
-      {
-        "name": "Czarny - 3XL, Szary - 3XL, Czerwony - 3XL",
-        "quantity": 1,
-        "price": 105,
-        "productId": 3534,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 116.99,
-    "currency": "PLN",
-    "abandonedAt": "2026-02-05 06:52:25",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_834",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "834",
-    "customerName": "Bořivoj Hruška",
-    "firstName": "Bořivoj",
-    "lastName": "Hruška",
-    "email": "borekhruska@seznam.cz",
-    "phone": "723383681",
-    "address": "Svatopluka Čecha",
-    "city": "CZ, Jablonec Nad Nisou",
-    "postcode": "466 01",
-    "location": "CZ, Jablonec Nad Nisou",
-    "cartContents": [
-      {
-        "name": "Černá - 4XL, Modrá - 4XL, Šedá - 4XL, Zelená - 4XL, Červená - 4XL",
-        "quantity": 1,
-        "price": 795,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 5
-      }
-    ],
-    "cartValue": 864,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-04 17:06:45",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "it_2033",
-    "storeCode": "it",
-    "storeName": "Italy",
-    "storeFlag": "🇮🇹",
-    "cartDbId": "2033",
-    "customerName": "Borislav Lončar",
-    "firstName": "Borislav",
-    "lastName": "Lončar",
-    "email": "borislav.loncar1952@gmail.com",
-    "phone": "098439708",
-    "address": "Jadranska obala",
-    "city": "Cres",
-    "postcode": "515578",
-    "location": "Cres",
-    "cartContents": [
-      {
-        "name": "Product #490 (XL)",
-        "quantity": 1,
-        "price": 19.99,
-        "productId": 490,
-        "variationId": 494,
-        "selectedSize": "XL"
-      },
-      {
-        "name": "Product #1395 (XL)",
-        "quantity": 1,
-        "price": 19.99,
-        "productId": 1395,
-        "variationId": 1399,
-        "selectedSize": "XL"
-      }
-    ],
-    "cartValue": 42.97,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-04 16:57:37",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "pl_835",
-    "storeCode": "pl",
-    "storeName": "Poland",
-    "storeFlag": "🇵🇱",
-    "cartDbId": "835",
-    "customerName": "Dagmara Kubiak",
-    "firstName": "Dagmara",
-    "lastName": "Kubiak",
-    "email": "dagmara_kubiak@op.pl",
-    "phone": "606 116 635",
-    "address": "Ul. Bolesława Chrobrego 108 A",
-    "city": "PL, Poznań",
-    "postcode": "60-681",
-    "location": "PL, Poznań",
-    "cartContents": [
-      {
-        "name": "Product #1035 (3XL)",
-        "quantity": 1,
-        "price": 170,
-        "productId": 1035,
-        "variationId": 1041,
-        "selectedSize": "3XL"
-      }
-    ],
-    "cartValue": 181.99,
-    "currency": "PLN",
-    "abandonedAt": "2026-02-04 15:31:59",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_832",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "832",
-    "customerName": "Miloš Kejnovský",
-    "firstName": "Miloš",
-    "lastName": "Kejnovský",
-    "email": "Kejnovsky@gmail.com",
-    "phone": "+420725658343",
-    "address": "Úvoz 241",
-    "city": "CZ, Přibyslavice",
-    "postcode": "67521",
-    "location": "CZ, Přibyslavice",
-    "cartContents": [
-      {
-        "name": "Product #605 (2XL)",
-        "quantity": 1,
-        "price": 965,
-        "productId": 605,
-        "variationId": 610,
-        "selectedSize": "2XL"
-      }
-    ],
-    "cartValue": 1034,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-04 13:25:43",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "pl_834",
-    "storeCode": "pl",
-    "storeName": "Poland",
-    "storeFlag": "🇵🇱",
-    "cartDbId": "834",
-    "customerName": "Małgorzata Wieczorek",
-    "firstName": "Małgorzata",
-    "lastName": "Wieczorek",
-    "email": "gosiuniawie57@o2.pl",
-    "phone": "609 733 726",
-    "address": "Ul. Wągrowiecka 4",
-    "city": "PL, Damasławek",
-    "postcode": "62-110",
-    "location": "PL, Damasławek",
-    "cartContents": [
-      {
-        "name": "Czarny - 3XL, Granatowy - 3XL, Czarny - 3XL",
-        "quantity": 1,
-        "price": 170,
-        "productId": 3560,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 181.99,
-    "currency": "PLN",
-    "abandonedAt": "2026-02-04 10:40:42",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "it_2017",
-    "storeCode": "it",
-    "storeName": "Italy",
-    "storeFlag": "🇮🇹",
-    "cartDbId": "2017",
-    "customerName": "Miroslav Koracevic",
-    "firstName": "Miroslav",
-    "lastName": "Koracevic",
-    "email": "miro.koracevic@gmail.com",
-    "phone": "",
-    "address": "I.mazuranica",
-    "city": "Lepoglava",
-    "postcode": "42250",
-    "location": "Lepoglava",
-    "cartContents": [
-      {
-        "name": "Crna - XL, Plava - XL, Siva - XL",
-        "quantity": 1,
-        "price": 25.98,
-        "productId": 3386,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 28.97,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-03 22:33:17",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "it_2014",
-    "storeCode": "it",
-    "storeName": "Italy",
-    "storeFlag": "🇮🇹",
-    "cartDbId": "2014",
-    "customerName": "Milos Dzonic",
-    "firstName": "Milos",
-    "lastName": "Dzonic",
-    "email": "milos56dzonic91@gmail.com",
-    "phone": "0992168141",
-    "address": "Boze Gumpca 30",
-    "city": "Pula - Pola",
-    "postcode": "52100",
-    "location": "Pula - Pola",
-    "cartContents": [
-      {
-        "name": "Crna - 2XL, Crna - 2XL, Crna - 2XL",
-        "quantity": 1,
-        "price": 25.98,
-        "productId": 3386,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 28.97,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-03 20:40:13",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "hr_2014",
-    "storeCode": "hr",
-    "storeName": "Croatia",
-    "storeFlag": "🇭🇷",
-    "cartDbId": "2014",
-    "customerName": "Milos Dzonic",
-    "firstName": "Milos",
-    "lastName": "Dzonic",
-    "email": "milos56dzonic91@gmail.com",
-    "phone": "0992168141",
-    "address": "Boze Gumpca 30",
-    "city": "Pula - Pola",
-    "postcode": "52100",
-    "location": "Pula - Pola",
-    "cartContents": [
-      {
-        "name": "Crna - 2XL, Crna - 2XL, Crna - 2XL",
-        "quantity": 1,
-        "price": 25.98,
-        "productId": 3386,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 28.97,
-    "currency": "EUR",
-    "abandonedAt": "2026-02-03 20:40:13",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_827",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "827",
-    "customerName": "Jan Příhoda",
-    "firstName": "Jan",
-    "lastName": "Příhoda",
-    "email": "prihoda26@seznam.cz",
-    "phone": "731301871",
-    "address": "Štětínská 368/7",
-    "city": "CZ, Praha",
-    "postcode": "18100",
-    "location": "CZ, Praha",
-    "cartContents": [
-      {
-        "name": "Černá - 4XL, Černá - 4XL, Černá - 4XL",
-        "quantity": 1,
-        "price": 535,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 604,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-03 19:25:45",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_824",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "824",
-    "customerName": "Ivana Planá",
-    "firstName": "Ivana",
-    "lastName": "Planá",
-    "email": "ivanaplana63@gmail.com",
-    "phone": "608200037",
-    "address": "Kamenná 202",
-    "city": "CZ, Zlatníky-hodkovice",
-    "postcode": "252 41",
-    "location": "CZ, Zlatníky-hodkovice",
-    "cartContents": [
-      {
-        "name": "Černá - 3XL, Zelená - 3XL, Hnědá - 3XL",
-        "quantity": 1,
-        "price": 965,
-        "productId": 4806,
-        "variationId": null,
-        "bundlePairs": 3
-      }
-    ],
-    "cartValue": 1034,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-03 11:20:15",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
-  },
-  {
-    "id": "cz_822",
-    "storeCode": "cz",
-    "storeName": "Czech",
-    "storeFlag": "🇨🇿",
-    "cartDbId": "822",
-    "customerName": "Martina Dudíková",
-    "firstName": "Martina",
-    "lastName": "Dudíková",
-    "email": "dudikovamartina123@gmail.com",
-    "phone": "605177161",
-    "address": "Sluneční 169",
-    "city": "CZ, Srnojedy",
-    "postcode": "53002",
-    "location": "CZ, Srnojedy",
-    "cartContents": [
-      {
-        "name": "Červená - XL, Zelená - XL, Červená - XL, Modrá - 2XL, Šedá - 2XL",
-        "quantity": 1,
-        "price": 795,
-        "productId": 4811,
-        "variationId": null,
-        "bundlePairs": 5
-      }
-    ],
-    "cartValue": 864,
-    "currency": "CZK",
-    "abandonedAt": "2026-02-03 08:18:39",
-    "status": "abandoned",
-    "callStatus": "not_called",
-    "notes": "",
-    "lastUpdated": null,
-    "orderId": null,
-    "converted": false
+    "orderTotal": null,
+    "converted": false,
+    "matchedOrderTotal": null
   }
 ]
