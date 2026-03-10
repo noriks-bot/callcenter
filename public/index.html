@@ -3725,7 +3725,8 @@
                     <tbody>
                         ${data.map(c => {
                             const sym = {EUR:'€',CZK:'Kč',PLN:'zł',HUF:'Ft'}[c.currency] || '€';
-                            const isConverted = c.converted === true || c.callStatus === 'converted' || c.justConverted === true;
+                            const isConverted = c.converted === true || c.callStatus === "converted" || c.justConverted === true;
+                            if (isConverted && !c.justConverted) return "";
                             const rowStyle = isConverted ? 'background: linear-gradient(90deg, #d4edda 0%, #f8f9fa 100%); opacity: 0.85;' : '';
                             const convertedBadge = isConverted ? '<span style="background:#28a745;color:white;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:6px;">KUPIL ✓</span>' : '';
                             return `<tr style="${rowStyle}">
