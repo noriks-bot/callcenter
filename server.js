@@ -646,7 +646,7 @@ async function fetchAbandonedCarts() {
         const savedData = callData[cartId] || {};
 
         if (savedData.callStatus === 'converted') continue;
-n        // Skip auto-detected converted carts (ordered without call center)
+        // Skip auto-detected converted carts (ordered without call center)
         if (isConverted) continue;
 
         const cartContents = [];
