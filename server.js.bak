@@ -556,7 +556,7 @@ function extractLineItemDetails(item) {
 // ========== FETCH RECENT ORDER CONTACTS ==========
 async function getRecentOrderContacts(storeCode) {
   const cacheKey = `recent_order_contacts_${storeCode}`;
-  const cached = getCache(cacheKey, 600);
+  const cached = getCache(cacheKey, 300);
   if (cached) return cached;
 
   const contacts = { emails: [], phones: [], orderTotals: {} };
@@ -780,7 +780,7 @@ async function fetchAbandonedCarts() {
 }
 
 // ========== FETCH ONE-TIME BUYERS ==========
-async function fetchOneTimeBuyers(storeFilter = null, forceFull = false) {
+async function fetchOneTimeBuyers(storeFilter = null) {
   const minDaysFromPurchase = (() => {
     try {
       const s = readJson(buyersSettingsFile, { minDaysFromPurchase: 10 });
@@ -804,76 +804,24 @@ async function fetchOneTimeBuyers(storeFilter = null, forceFull = false) {
   const allBuyers = [];
   const storesToFetch = storeFilter ? { [storeFilter]: stores[storeFilter] } : stores;
 
-  // --- Incremental snapshot logic ---
-  const snapshotFile = path.join(DATA_DIR, 'buyers-full-snapshot.json');
-  let snapshot = readJson(snapshotFile, null);
-  const now = Date.now();
-  const sixHours = 6 * 3600 * 1000;
-  const needFullFetch = forceFull || !snapshot || !snapshot.timestamp || (now - snapshot.timestamp > sixHours);
-
-  let allOrdersFlat = [];
-
-  if (needFullFetch) {
-    // Full fetch: get all orders from all stores
-    console.log('[Buyers] Full fetch (snapshot rebuild)...');
-    for (const [storeCode, config] of Object.entries(storesToFetch)) {
-      if (!config) continue;
-      for (let page = 1; page <= 999; page++) {
-        try {
-          const orders = await wcApiRequest(storeCode, 'orders', {
-            per_page: 100, status: 'processing,completed', orderby: 'date', order: 'desc', page
-          });
-          if (!Array.isArray(orders) || orders.length === 0 || orders.error) break;
-          for (const o of orders) {
-            allOrdersFlat.push({ storeCode, email: (o.billing?.email || '').toLowerCase(), orderId: o.id, total: o.total, currency: o.currency, dateCreated: o.date_created, billing: o.billing, lineItems: o.line_items, status: o.status });
-          }
-          if (orders.length < 100) break;
-        } catch { break; }
-      }
-    }
-    snapshot = { timestamp: now, allOrders: allOrdersFlat };
-    writeJson(snapshotFile, snapshot);
-    console.log('[Buyers] Snapshot saved:', allOrdersFlat.length, 'orders');
-  } else {
-    // Incremental: fetch only orders after snapshot timestamp
-    console.log('[Buyers] Incremental fetch (since ' + new Date(snapshot.timestamp).toISOString() + ')...');
-    const afterDate = new Date(snapshot.timestamp).toISOString();
-    const newOrders = [];
-    for (const [storeCode, config] of Object.entries(storesToFetch)) {
-      if (!config) continue;
-      try {
-        const orders = await wcApiRequest(storeCode, 'orders', {
-          per_page: 100, status: 'processing,completed', orderby: 'date', order: 'desc', after: afterDate
-        });
-        if (Array.isArray(orders)) {
-          for (const o of orders) {
-            newOrders.push({ storeCode, email: (o.billing?.email || '').toLowerCase(), orderId: o.id, total: o.total, currency: o.currency, dateCreated: o.date_created, billing: o.billing, lineItems: o.line_items, status: o.status });
-          }
-        }
-      } catch { /* skip */ }
-    }
-    // Merge: add new orders, deduplicate by storeCode+orderId
-    const existingKey = new Set(snapshot.allOrders.map(o => o.storeCode + '_' + o.orderId));
-    for (const o of newOrders) {
-      if (!existingKey.has(o.storeCode + '_' + o.orderId)) {
-        snapshot.allOrders.push(o);
-      }
-    }
-    snapshot.timestamp = now;
-    writeJson(snapshotFile, snapshot);
-    allOrdersFlat = snapshot.allOrders;
-    console.log('[Buyers] Incremental: ' + newOrders.length + ' new, ' + allOrdersFlat.length + ' total');
-  }
-
-  // Derive one-time buyers from allOrdersFlat
   for (const [storeCode, config] of Object.entries(storesToFetch)) {
     if (!config) continue;
-    const storeOrders = allOrdersFlat.filter(o => o.storeCode === storeCode);
+    const allOrders = [];
+    for (let page = 1; page <= 999; page++) {
+      try {
+        const orders = await wcApiRequest(storeCode, 'orders', {
+          per_page: 100, status: 'processing,completed', orderby: 'date', order: 'desc', page
+        });
+        if (!Array.isArray(orders) || orders.length === 0 || orders.error) break;
+        allOrders.push(...orders);
+        if (orders.length < 100) break;
+      } catch { break; }
+    }
 
     // Group by email
     const customerOrders = {};
-    for (const order of storeOrders) {
-      const email = order.email;
+    for (const order of allOrders) {
+      const email = (order.billing?.email || '').toLowerCase();
       if (!email) continue;
       if (!customerOrders[email]) customerOrders[email] = { orders: [], billing: order.billing, firstOrder: order };
       customerOrders[email].orders.push(order);
@@ -882,7 +830,7 @@ async function fetchOneTimeBuyers(storeFilter = null, forceFull = false) {
     for (const [email, data] of Object.entries(customerOrders)) {
       if (data.orders.length !== 1) continue;
       const order = data.firstOrder;
-      const orderDate = order.dateCreated ? new Date(order.dateCreated).getTime() : (order.date_created ? new Date(order.date_created).getTime() : 0);
+      const orderDate = order.date_created ? new Date(order.date_created).getTime() : 0;
       const daysSince = orderDate ? (Date.now() - orderDate) / 86400000 : 0;
       if (daysSince < minDaysFromPurchase) continue;
 
@@ -890,18 +838,18 @@ async function fetchOneTimeBuyers(storeFilter = null, forceFull = false) {
       const savedData = callData[customerId] || {};
       if (savedData.callStatus === 'converted') continue;
 
-      const orderItems = (order.lineItems || order.line_items || []).map(extractLineItemDetails);
+      const orderItems = (order.line_items || []).map(extractLineItemDetails);
 
       const billing = data.billing || {};
       allBuyers.push({
         id: customerId, storeCode, storeName: config.name, storeFlag: config.flag,
-        orderId: order.orderId || order.id || null,
+        orderId: order.id || null,
         customerName: `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'Unknown',
         email, phone: billing.phone || '',
         address: billing.address_1 || '', city: billing.city || '', postcode: billing.postcode || '',
         location: `${billing.city || ''}, ${billing.country || ''}`.replace(/^,\s*|,\s*$/g, ''),
         totalSpent: parseFloat(order.total) || 0, currency: order.currency || storeCurrencies[storeCode] || 'EUR',
-        registeredAt: order.dateCreated || order.date_created || '', orderStatus: order.status || '',
+        registeredAt: order.date_created || '', orderStatus: order.status || '',
         callStatus: savedData.callStatus || 'not_called', notes: savedData.notes || '',
         converted: false, orderItems
       });
@@ -914,9 +862,9 @@ async function fetchOneTimeBuyers(storeFilter = null, forceFull = false) {
 }
 
 // ========== FETCH PENDING ORDERS ==========
-async function fetchPendingOrders(forceFull = false) {
+async function fetchPendingOrders() {
   const cached = getCache('pending_orders', 300);
-  if (cached && !forceFull) {
+  if (cached) {
     const callData = loadCallData();
     for (const order of cached) {
       const saved = callData[order.id] || {};
@@ -929,19 +877,11 @@ async function fetchPendingOrders(forceFull = false) {
   const callData = loadCallData();
   const allOrders = [];
 
-  // Incremental: use modified_after if we have a recent full fetch
-  const pendingStateFile = path.join(DATA_DIR, 'pending-last-fetch.json');
-  const pendingState = readJson(pendingStateFile, null);
-  const now = Date.now();
-  const useModifiedAfter = !forceFull && pendingState && pendingState.timestamp && (now - pendingState.timestamp < 15 * 60 * 1000);
-
   const promises = Object.entries(stores).map(async ([storeCode, config]) => {
     try {
-      const params = { status: 'pending,cancelled,failed,on-hold', per_page: 50, orderby: 'date', order: 'desc' };
-      if (useModifiedAfter && pendingState.timestamp) {
-        params.modified_after = new Date(pendingState.timestamp).toISOString();
-      }
-      const orders = await wcApiRequest(storeCode, 'orders', params);
+      const orders = await wcApiRequest(storeCode, 'orders', {
+        status: 'pending,cancelled,failed,on-hold', per_page: 50, orderby: 'date', order: 'desc'
+      });
       if (!Array.isArray(orders)) return;
       for (const order of orders) {
         const orderId = `${storeCode}_order_${order.id || 'unknown'}`;
@@ -963,25 +903,8 @@ async function fetchPendingOrders(forceFull = false) {
   });
 
   await Promise.all(promises);
-
-  // If incremental, merge with previous data
-  if (useModifiedAfter && pendingState && pendingState.lastOrders) {
-    const newIds = new Set(allOrders.map(o => o.id));
-    for (const prev of pendingState.lastOrders) {
-      if (!newIds.has(prev.id)) allOrders.push(prev);
-    }
-  }
-
   allOrders.sort((a, b) => new Date(b.createdAt || '1970-01-01') - new Date(a.createdAt || '1970-01-01'));
   setCache('pending_orders', allOrders);
-
-  // Save state for incremental fetching
-  if (!useModifiedAfter) {
-    writeJson(pendingStateFile, { timestamp: now, lastOrders: allOrders });
-  } else {
-    writeJson(pendingStateFile, { timestamp: pendingState.timestamp, lastOrders: allOrders });
-  }
-
   return allOrders;
 }
 
@@ -1431,25 +1354,16 @@ const PAKETOMAT_STATUSES = [
   "Awaiting another delivery attempt", "Delivery failed"
 ];
 
-async function buildPaketomatiCache(forceFull = false) {
+async function buildPaketomatiCache() {
   const mkSearchUrl = 'https://main.metakocka.si/rest/eshop/v1/search';
   const mkGetDocUrl = 'https://main.metakocka.si/rest/eshop/v1/get_document';
   const secretKey = metakocka.secret_key;
   const companyId = String(metakocka.company_id);
 
-  // --- Incremental logic with known IDs ---
-  const knownIdsFile = path.join(DATA_DIR, 'paketomati-known-ids.json');
-  const knownState = readJson(knownIdsFile, null);
-  const twoHours = 2 * 3600 * 1000;
-  const needFullScan = forceFull || !knownState || !knownState.timestamp || (Date.now() - knownState.timestamp > twoHours);
-  const knownMkIds = new Set(knownState?.knownMkIds || []);
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
-
   const allShippedOrders = [];
   let offset = 0;
   let emptyCount = 0;
   const thisYear = new Date().getFullYear().toString();
-  let hitKnown = false;
   while (emptyCount < 3) {
     try {
       const resp = await axios.post(mkSearchUrl, {
@@ -1459,7 +1373,6 @@ async function buildPaketomatiCache(forceFull = false) {
       const orders = resp.data?.result || [];
       if (orders.length === 0) { emptyCount++; offset += 100; continue; }
       emptyCount = 0;
-      let allKnownInBatch = !needFullScan;
       // Only noriks, shipped, this year
       for (const o of orders) {
         if (o.status_desc !== 'shipped') continue;
@@ -1467,43 +1380,26 @@ async function buildPaketomatiCache(forceFull = false) {
         const shipDate = o.shipped_date || o.doc_date || '';
         if (!shipDate.startsWith(thisYear)) continue;
         allShippedOrders.push(o);
-        if (!needFullScan && o.mk_id && !knownMkIds.has(String(o.mk_id))) {
-          allKnownInBatch = false; // found a new order
-        }
       }
       // Stop if we hit orders from last year (they're sorted desc)
       const lastOrder = orders[orders.length - 1];
       const lastDate = lastOrder?.doc_date || lastOrder?.shipped_date || '';
       if (lastDate && !lastDate.startsWith(thisYear)) break;
-      // Incremental: stop scanning once we hit a batch where all shipped noriks orders are known
-      // But still check recent orders (last 7 days) for delivery event updates
-      if (!needFullScan && allKnownInBatch) {
-        const oldestInBatch = lastDate || '';
-        if (oldestInBatch && oldestInBatch < sevenDaysAgo) {
-          hitKnown = true;
-          break;
-        }
-      }
       if (orders.length < 100) break;
       offset += 100;
     } catch { emptyCount++; offset += 100; continue; }
   }
 
-  console.log('[Paketomati]', needFullScan ? 'Full scan:' : 'Incremental scan:', 'scanned', offset, 'orders, found', allShippedOrders.length, 'shipped noriks this year');
+  console.log('[Paketomati] Scanned', offset, 'orders, found', allShippedOrders.length, 'shipped noriks this year');
   const statusData = loadPaketomatStatus();
   const paketomatOrders = [];
 
-  // Process in batches — skip get_document for known orders (unless recent, for delivery event updates)
+  // Process in batches
   for (let i = 0; i < allShippedOrders.length; i += 20) {
     const batch = allShippedOrders.slice(i, i + 20);
     const docPromises = batch.map(async (order) => {
       const mkId = order.mk_id;
       if (!mkId) return null;
-      // Skip API call for known orders older than 7 days (no delivery event changes expected)
-      if (!needFullScan && knownMkIds.has(String(mkId))) {
-        const shipDate = order.shipped_date || order.doc_date || '';
-        if (shipDate && shipDate < sevenDaysAgo) return null;
-      }
       try {
         const resp = await axios.post(mkGetDocUrl, {
           secret_key: secretKey, company_id: companyId, doc_type: 'sales_order',
@@ -1566,26 +1462,8 @@ async function buildPaketomatiCache(forceFull = false) {
     }
   }
 
-  // If incremental and we have previous cache, merge with previous orders not in current scan
-  if (!needFullScan) {
-    const prevCache = readJson(path.join(DATA_DIR, 'paketomati-cache.json'), null);
-    if (prevCache && Array.isArray(prevCache.orders)) {
-      const currentIds = new Set(paketomatOrders.map(o => o.id));
-      for (const prev of prevCache.orders) {
-        if (!currentIds.has(prev.id)) paketomatOrders.push(prev);
-      }
-    }
-  }
-
   const cacheData = { generated_at: new Date().toISOString(), orders: paketomatOrders };
   writeJson(path.join(DATA_DIR, 'paketomati-cache.json'), cacheData);
-
-  // Save known IDs for incremental scanning
-  const allKnownIds = allShippedOrders.map(o => String(o.mk_id)).filter(Boolean);
-  // Merge with previous known IDs on incremental
-  if (!needFullScan) { for (const id of knownMkIds) allKnownIds.push(id); }
-  writeJson(knownIdsFile, { timestamp: Date.now(), knownMkIds: [...new Set(allKnownIds)] });
-
   // Persist to SQLite
   if (paketomatOrders.length > 0) dbWrite('paketomati', paketomatOrders);
   console.log('[DB] Paketomati persisted:', paketomatOrders.length);
@@ -2307,20 +2185,15 @@ async function warmAllCaches() {
   }
 }
 
-// Background refresh every 5 minutes (optimized: incremental fetching)
-let _bgRefreshCounter = 0;
+// Background refresh every 5 minutes
 function startBackgroundRefresh() {
   setInterval(async () => {
-    _bgRefreshCounter++;
     const start = Date.now();
-    const forceFullBuyers = (_bgRefreshCounter % 72 === 0); // every 6 hours
-    const forceFullPaketomati = (_bgRefreshCounter % 24 === 0); // every 2 hours
-    const forceFullPending = (_bgRefreshCounter % 3 === 0); // every 15 min
-    console.log('[Cron] Running 5-minute refresh #' + _bgRefreshCounter + ' (fullBuyers=' + forceFullBuyers + ', fullPaketomati=' + forceFullPaketomati + ', fullPending=' + forceFullPending + ')...');
-    // NOTE: clearAllCache() removed to preserve short-term caches
+    console.log('[Cron] Running 5-minute refresh for ALL 4 tabs...');
+    clearAllCache();
 
     const results = await Promise.allSettled([
-      // 1. Abandoned carts (uses its own 300s cache internally)
+      // 1. Abandoned carts
       fetchAbandonedCarts().then(async carts => {
         if (carts && carts.length > 0) {
           await enrichCartProductNames(carts);
@@ -2329,13 +2202,13 @@ function startBackgroundRefresh() {
         }
         console.log('[Cron] ✓ Carts:', (carts || []).length);
       }),
-      // 2. Pending orders (incremental with modified_after)
-      fetchPendingOrders(forceFullPending).then(orders => {
+      // 2. Pending orders
+      fetchPendingOrders().then(orders => {
         if (orders && orders.length > 0) dbWrite('pending', orders);
         console.log('[Cron] ✓ Pending:', (orders || []).length);
       }),
-      // 3. One-time buyers (incremental with snapshot)
-      fetchOneTimeBuyers(null, forceFullBuyers).then(buyers => {
+      // 3. One-time buyers
+      fetchOneTimeBuyers(null).then(buyers => {
         if (buyers && buyers.length > 0) {
           dbWrite('buyers', buyers);
           const buyersCacheFile = path.join(DATA_DIR, 'buyers-cache.json');
@@ -2343,8 +2216,8 @@ function startBackgroundRefresh() {
         }
         console.log('[Cron] ✓ Buyers:', (buyers || []).length);
       }),
-      // 4. Paketomati (incremental with known IDs)
-      buildPaketomatiCache(forceFullPaketomati).then(cache => {
+      // 4. Paketomati (Metakocka)
+      buildPaketomatiCache().then(cache => {
         console.log('[Cron] ✓ Paketomati:', (cache?.orders || []).length);
       })
     ]);
@@ -2360,7 +2233,7 @@ function startBackgroundRefresh() {
   }, 5 * 60 * 1000);
   // Refresh product colors every hour
   setInterval(() => fetchProductColors().catch(e => console.error("[Colors] refresh error:", e.message)), 3600000);
-  console.log('[Cron] Background refresh scheduled every 5 minutes (incremental, all 4 tabs)');
+  console.log('[Cron] Background refresh scheduled every 5 minutes (all 4 tabs)');
 }
 
 

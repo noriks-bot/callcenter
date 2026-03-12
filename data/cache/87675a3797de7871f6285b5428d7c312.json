@@ -1,5 +1,1211 @@
 [
   {
+    "id": "cz_buyer_2569c06b71474ca21fee8891d5902ece",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 5795,
+    "customerName": "Radek Padevět",
+    "email": "padevet.radek@gmail.com",
+    "phone": "737955722",
+    "address": "Sídl. Štědřík 153",
+    "city": "Psáry",
+    "postcode": "252 44",
+    "location": "Psáry, CZ",
+    "totalSpent": 444,
+    "currency": "CZK",
+    "registeredAt": "2026-03-02T09:35:44",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Startovací balíček: Trička: Černá - 4XL, Boxerky: Černá - 4XL",
+        "quantity": 1,
+        "total": 375
+      }
+    ]
+  },
+  {
+    "id": "sk_buyer_9e6c5653ff79a5dc65bc17658b86e8cf",
+    "storeCode": "sk",
+    "storeName": "Slovakia",
+    "storeFlag": "🇸🇰",
+    "orderId": 6344,
+    "customerName": "Miloš Mariak",
+    "email": "milos.mariak85@gmail.com",
+    "phone": "+421907615522",
+    "address": "Okružná 836/68",
+    "city": "Čadca",
+    "postcode": "022 04",
+    "location": "Čadca, SK",
+    "totalSpent": 27.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-02T00:19:28",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Čierna - M, Červená - M, Modrá - M",
+        "quantity": 1,
+        "total": 24.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_21b1f4f458ef7e8b54d0bebbd2646acd",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6574,
+    "customerName": "Νεκτάριος Γαλανακης",
+    "email": "nekg79@hotmail.com",
+    "phone": "6972669804",
+    "address": "Αδελιανός Καμπος",
+    "city": "Ρέθυμνο",
+    "postcode": "74100",
+    "location": "Ρέθυμνο, GR",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T23:47:31",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Μπλουζάκι: Μαύρο - 4XL, Πράσινο - 4XL, Σκούρο μπλε - 4XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_fb4ba43b74581d65125b5350cefced32",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5843,
+    "customerName": "Massimo Cenci",
+    "email": "bigbearfe@hotmail.com",
+    "phone": "3339952655",
+    "address": "Via provinciale per consandolo",
+    "city": "Portomaggiore",
+    "postcode": "44015",
+    "location": "Portomaggiore, IT",
+    "totalSpent": 27.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T21:56:35",
+    "orderStatus": "completed",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Nero - 3XL, Blu - 3XL, Nero - 4XL",
+        "quantity": 1,
+        "total": 24.99
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_53c6c6a1bd71a367a86f0b13352e1710",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5808,
+    "customerName": "Josip Rončević",
+    "email": "josiproncevic24@gmail.com",
+    "phone": "0919216694",
+    "address": "Bana Josipa Jelačića",
+    "city": "Selci Đakovački",
+    "postcode": "31400",
+    "location": "Selci Đakovački",
+    "totalSpent": 47.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T21:52:09",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Majica: Crna - L, Siva - L, Zelena - L",
+        "quantity": 1,
+        "total": 44.99
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_8862e193baca81b3fcd288855823ba7c",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5842,
+    "customerName": "Stefano Mosconi",
+    "email": "viperaccia1966@gmail.com",
+    "phone": "+393931911966",
+    "address": "Via Sergio Failoni",
+    "city": "Verona",
+    "postcode": "37124",
+    "location": "Verona, IT",
+    "totalSpent": 27.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T21:44:49",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Nero - 3XL, Nero - 3XL, Nero - 3XL",
+        "quantity": 1,
+        "total": 24.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_6d096e9fd8c6332cfe624920b3c4d491",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6573,
+    "customerName": "Ioannis Vasileiadis",
+    "email": "giannisv93@gmail.com",
+    "phone": "+306955853616",
+    "address": "1st",
+    "city": "Καλαμαριά",
+    "postcode": "55133",
+    "location": "Καλαμαριά, GR",
+    "totalSpent": 134.99,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T21:33:38",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Μαύρο μπλουζάκια – συσκευασία 9 τεμ - 3XL",
+        "quantity": 1,
+        "total": 134.99
+      }
+    ]
+  },
+  {
+    "id": "cz_buyer_6a91475c3cca20208640403b0529eeca",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 5794,
+    "customerName": "Miluse Klimentova",
+    "email": "miluseklimentova@seznam.cz",
+    "phone": "605338667",
+    "address": "Husova 582",
+    "city": "Podbořany",
+    "postcode": "441 01",
+    "location": "Podbořany, CZ",
+    "totalSpent": 579,
+    "currency": "CZK",
+    "registeredAt": "2026-03-01T20:56:44",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Černá - 3XL, Černá - 3XL, Černá - 3XL",
+        "quantity": 1,
+        "total": 510
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_d1142cb7b967dbb7b835d38d43d356b5",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5841,
+    "customerName": "Stefano Rusticelli",
+    "email": "srusticelli@gmail.com",
+    "phone": "347 872 9077",
+    "address": "Via Cavamento",
+    "city": "San Giovanni In Persiceto",
+    "postcode": "40017",
+    "location": "San Giovanni In Persiceto, IT",
+    "totalSpent": 41.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T20:29:35",
+    "orderStatus": "completed",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Nero - 2XL, Blu - 2XL, Grigio - 2XL, Verde - 2XL, Rosso - 2XL",
+        "quantity": 1,
+        "total": 38.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_c11d10ab52429118bf9ccae0fdc4d6e3",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6572,
+    "customerName": "ΚΩΝΣΤΑΝΤΙΝΟΣ ΔΕΣΤΕΣ",
+    "email": "kostasdest@yahoo.com",
+    "phone": "697 3435467",
+    "address": "ΑΡΓΥΡΟΥΠΟΛΕΩΣ 90",
+    "city": "ΑΡΓΥΡΟΥΠΟΛΗ",
+    "postcode": "16451",
+    "location": "ΑΡΓΥΡΟΥΠΟΛΗ, GR",
+    "totalSpent": 34.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T19:28:49",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | AirFlow Modal: Μπλε - XL, Μπλε - XL, Μπλε - XL",
+        "quantity": 1,
+        "total": 31.99
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_db1aa898af3b4f4d5006e7fcc77fb8ed",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5839,
+    "customerName": "Giovanni SAVINA",
+    "email": "svngiocentosette@gmail.com",
+    "phone": "3713667389",
+    "address": "Via Buenos Aires",
+    "city": "Torino",
+    "postcode": "10134",
+    "location": "Torino, IT",
+    "totalSpent": 135.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T19:04:05",
+    "orderStatus": "completed",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Quotidiano pacco da 6 - 2XL",
+        "quantity": 1,
+        "total": 96.99
+      },
+      {
+        "name": "Noriks | AirFlow Modal: Nero - 3XL, Grigio - 3XL, Nero - 2XL, Blu - 2XL, Nero - 2XL",
+        "quantity": 1,
+        "total": 38.99
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_9ca575e8dcb2119852ca7166cc886e61",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5807,
+    "customerName": "Ksenija Celiček",
+    "email": "ksenijaljubicic57@gmail.com",
+    "phone": "0912237960",
+    "address": "Adria Oil",
+    "city": "Sveta Nedelja",
+    "postcode": "10431",
+    "location": "Sveta Nedelja",
+    "totalSpent": 47.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T18:59:13",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Majica: Crna - 2XL, Crna - 2XL, Crna - 2XL",
+        "quantity": 1,
+        "total": 44.99
+      }
+    ]
+  },
+  {
+    "id": "cz_buyer_458a824db0151782f6295fe819d8d4c5",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 5793,
+    "customerName": "Josef stuchlik",
+    "email": "dieseltdi@post.cz",
+    "phone": "605 239 822",
+    "address": "Pihel e38",
+    "city": "Pihel",
+    "postcode": "471 18",
+    "location": "Pihel, CZ",
+    "totalSpent": 579,
+    "currency": "CZK",
+    "registeredAt": "2026-03-01T16:29:06",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Černá - 4XL, Černá - 4XL, Černá - 4XL",
+        "quantity": 1,
+        "total": 510
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_cf7f8fa4b3571e7fe8f2397a7d3e4647",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6570,
+    "customerName": "ΝΙΚΉΤΑΣ ΣΩΠΑΣΗΣ",
+    "email": "nikisop@gmail.com",
+    "phone": "+306976686820",
+    "address": "Θεοφίλου 4",
+    "city": "Ηράκλειο",
+    "postcode": "71304",
+    "location": "Ηράκλειο, GR",
+    "totalSpent": 51.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T16:15:12",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | AirFlow Modal: Μαύρο - 2XL, Μαύρο - 2XL, Μαύρο - 2XL, Μαύρο - 2XL, Μαύρο - 2XL",
+        "quantity": 1,
+        "total": 48.99
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_17d77962e8d0677cac28ac0900d5669e",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5838,
+    "customerName": "Manuel Arzuffi",
+    "email": "manuelarzuffi@virgilio.it",
+    "phone": "3453012302",
+    "address": "Via Canonico Francesco Cossali 35",
+    "city": "Ghisalba",
+    "postcode": "24050",
+    "location": "Ghisalba, IT",
+    "totalSpent": 27.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T14:29:26",
+    "orderStatus": "completed",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Nero - 4XL, Nero - 4XL, Nero - 4XL",
+        "quantity": 1,
+        "total": 24.99
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_bd7f641776e29645dde07ca3f1d8234a",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5805,
+    "customerName": "Ivan Filipić",
+    "email": "ifilipic80@gmail.com",
+    "phone": "0992153888",
+    "address": "Cocaletto",
+    "city": "Rovinj",
+    "postcode": "52210",
+    "location": "Rovinj",
+    "totalSpent": 47.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T14:08:36",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Majica: Crna - L, Bijela - L, Tamnoplava - L",
+        "quantity": 1,
+        "total": 44.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_426c98299f15b9ec2c862b11c4df1fb6",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6569,
+    "customerName": "ΧΑΡΑΛΑΜΠΟΣ ΣΙΑΤΡΑΣ",
+    "email": "bsiatras@hotmail.com",
+    "phone": "+306942473939",
+    "address": "ΦΙΛΙΠΠΟΥ",
+    "city": "ΧΑΙΔΑΡΙ",
+    "postcode": "12461",
+    "location": "ΧΑΙΔΑΡΙ, GR",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T13:59:34",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Μονόχρωμο – συσκευασία 3 τεμ - 4XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_553b2dc7dfc8886d4519d6a9113b25bc",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6568,
+    "customerName": "Eleftherios Konsolakis",
+    "email": "el.konsolakis@icloud.com",
+    "phone": "6944325003",
+    "address": "Αριστειδου",
+    "city": "Καλλιθεα",
+    "postcode": "17672",
+    "location": "Καλλιθεα, GR",
+    "totalSpent": 99.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T13:52:09",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Μπλουζάκι: Γκρι - 3XL, Μαύρο - 3XL, Μπεζ - 3XL",
+        "quantity": 1,
+        "total": 49.99
+      },
+      {
+        "name": "NORIKS | Μπλουζάκι: Γκρι - 3XL, Μαύρο - 3XL, Γκρι - 3XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_01f18672d506747ce3886844b14704c8",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6567,
+    "customerName": "Αντώνιος Λυμπεροπουλος",
+    "email": "78libe78@gmail.com",
+    "phone": "6970997408",
+    "address": "Περσεφόνης 1",
+    "city": "Νίκαια",
+    "postcode": "18452",
+    "location": "Νίκαια, GR",
+    "totalSpent": 25.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T11:16:35",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Σετ εκκίνησης | 2 μπλουζάκια: Μπλούζα 1: Μαύρο - 2XL, Μπλούζα 2: Μαύρο - 2XL",
+        "quantity": 1,
+        "total": 22.99
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_1aa2baee25967a965eb44c5e88b1f981",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5804,
+    "customerName": "Željko Vučkovivić",
+    "email": "zeljko.vuckovic@3maj.hr",
+    "phone": "0993113572",
+    "address": "Ante Kovačića 24/24",
+    "city": "Rijeka",
+    "postcode": "51000",
+    "location": "Rijeka",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T10:37:35",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Crna - 2XL, Zelena - 2XL, Zelena - 2XL, Plava - 2XL, Crna - 2XL, Crna - 2XL, Crna - 2XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "sk_buyer_1bdee7696b0c1169882f2d08c5f84c70",
+    "storeCode": "sk",
+    "storeName": "Slovakia",
+    "storeFlag": "🇸🇰",
+    "orderId": 6343,
+    "customerName": "Peter Tabak",
+    "email": "peter4tabak@gmail.com",
+    "phone": "0904597834",
+    "address": "Kukucinova Ds Smith 477",
+    "city": "Ilava",
+    "postcode": "019 01",
+    "location": "Ilava, SK",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T10:13:17",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Tričká: Čierna - 3XL, Tmavě modrá - 3XL, Sivá - 3XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "cz_buyer_5015ca849b90119a7d408b820f52b4f6",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 5792,
+    "customerName": "Radka Jašková",
+    "email": "radushka321@seznam.cz",
+    "phone": "607424060",
+    "address": "Gen. Govorova 560",
+    "city": "Smiřice",
+    "postcode": "503 03",
+    "location": "Smiřice, CZ",
+    "totalSpent": 1278,
+    "currency": "CZK",
+    "registeredAt": "2026-03-01T08:06:14",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Černá - 4XL, Černá - 4XL, Modrá - 4XL, Modrá - 4XL, Zelená - 4XL, Šedá - 4XL, Šedá - 4XL",
+        "quantity": 1,
+        "total": 1209
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_7386b28cde91af35958254175912fe4a",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6566,
+    "customerName": "Πέτρος Χιος",
+    "email": "petros_g_chios@hotmail.com",
+    "phone": "+30 694 860 1583",
+    "address": "Λεωφόρος Αγίου Δημητρίου 49",
+    "city": "Άγιος Δημήτριος",
+    "postcode": "17343",
+    "location": "Άγιος Δημήτριος, GR",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T07:25:22",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Μπλουζάκι: Μαύρο - 4XL, Γκρι - 4XL, Σκούρο μπλε - 4XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "cz_buyer_0b2bb333cfb5de2d51594b322655f77e",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 5791,
+    "customerName": "Zdeněk Koza",
+    "email": "zdenek-koza@seznam.cz",
+    "phone": "776 758 144",
+    "address": "J. A. Komenského 210",
+    "city": "Stochov",
+    "postcode": "273 03",
+    "location": "Stochov, CZ",
+    "totalSpent": 579,
+    "currency": "CZK",
+    "registeredAt": "2026-03-01T06:52:09",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Černá - 4XL, Modrá - 4XL, Červená - 4XL",
+        "quantity": 1,
+        "total": 510
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_59fae5bb80408d5d18e83fee10eec7a5",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6565,
+    "customerName": "Γεράσιμος Γιαννουλας",
+    "email": "gerasimosgiannoulas4@gmail.com",
+    "phone": "6985961108",
+    "address": "Ιωνίας 1",
+    "city": "Πατρα",
+    "postcode": "26226",
+    "location": "Πατρα, GR",
+    "totalSpent": 25.98,
+    "currency": "EUR",
+    "registeredAt": "2026-03-01T00:31:41",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Σετ εκκίνησης | 2 μπλουζάκια: Μπλούζα 1: Μαύρο - 4XL, Μπλούζα 2: Σκούρο μπλε - 4XL",
+        "quantity": 1,
+        "total": 22.99
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_ae84fbd9943ce198bfb767d444074cc5",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5799,
+    "customerName": "zoran Petković",
+    "email": "mojcupko123@gmail.com",
+    "phone": "091 190 5986",
+    "address": "Jadrija 1.",
+    "city": "Šibenik",
+    "postcode": "22000",
+    "location": "Šibenik",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T21:24:33",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Crna - 3XL, Crna - 3XL, Crna - 3XL, Crna - 3XL, Crna - 3XL, Crna - 3XL, Crna - 3XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_a76d7433d843a24ea5f713a4738ea6aa",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6564,
+    "customerName": "ΓΙΑΝΝΗΣ ΘΕΟΔΩΡΟΥ",
+    "email": "giannistheo7@yahoo.gr",
+    "phone": "6973824338",
+    "address": "Κασσαβέτη 68",
+    "city": "Βόλος",
+    "postcode": "38221",
+    "location": "Βόλος, GR",
+    "totalSpent": 42.97,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T20:33:32",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Σετ εκκίνησης | Μπλουζάκι + μπόξερ: Μπλούζα: Μαύρο - 4XL, Μπόξερ: Μαύρο - 4XL",
+        "quantity": 2,
+        "total": 39.98
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_ef6bb7cda30c3d3ee63b6b883e725246",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6563,
+    "customerName": "Γιάννης Χανιωτάκης",
+    "email": "jchaniotakis@hotmail.com",
+    "phone": "+306942057772",
+    "address": "19",
+    "city": "Ρόδος",
+    "postcode": "85132",
+    "location": "Ρόδος, GR",
+    "totalSpent": 51.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T19:13:12",
+    "orderStatus": "completed",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | AirFlow Modal: Μαύρο - L, Μπλε - L, Γκρι - L, Πράσινο - L, Μαύρο - L",
+        "quantity": 1,
+        "total": 48.99
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_2a608df03f4ab63c2bd74507a124edbe",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5836,
+    "customerName": "Giuseppe Chetta",
+    "email": "geom.chetta@libero.it",
+    "phone": "3281192340",
+    "address": "Via giuseppe pitre",
+    "city": "Palermo",
+    "postcode": "90135",
+    "location": "Palermo, IT",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T18:51:50",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Blu - 3XL, Blu - 3XL, Blu - 3XL, Blu - 3XL, Blu - 3XL, Grigio - 3XL, Verde - 3XL",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_989cfc39262b73ef56fec3e4d7c8efe8",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5835,
+    "customerName": "Maurizio bortoluzzi",
+    "email": "batutio6@gmail.com",
+    "phone": "3482933435",
+    "address": "Via Salvatore Quasimodo 8",
+    "city": "Susegana",
+    "postcode": "31058",
+    "location": "Susegana, IT",
+    "totalSpent": 41.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T18:25:02",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Rosso - M, Grigio - M, Verde - M, Nero - M, Blu - M",
+        "quantity": 1,
+        "total": 38.99
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_5369afb826aac3014fd2f5b2e2d78696",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5834,
+    "customerName": "Marco Santarelli",
+    "email": "marco77santarelli@gmail.com",
+    "phone": "3939275409",
+    "address": "Montesilvano",
+    "city": "Montesilvano",
+    "postcode": "65015",
+    "location": "Montesilvano, IT",
+    "totalSpent": 96.99,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T17:49:46",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Maglietta: Nero - XL, Blu scuro - XL, Verde - XL, Nero - XL, Blu scuro - XL, Nero - XL",
+        "quantity": 1,
+        "total": 96.99
+      }
+    ]
+  },
+  {
+    "id": "cz_buyer_1ae3fccad3dccc4818dc3bbda9f7035e",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 5790,
+    "customerName": "Radek Jablonský",
+    "email": "radek.jablko@seznam.cz",
+    "phone": "+420737894030",
+    "address": "Mánesova 48",
+    "city": "Plzeň",
+    "postcode": "301 00",
+    "location": "Plzeň, CZ",
+    "totalSpent": 1064,
+    "currency": "CZK",
+    "registeredAt": "2026-02-28T17:18:25",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Startovací balíček: Trička: Tmavě modrá - 2XL, Boxerky: Šedá - 2XL",
+        "quantity": 1,
+        "total": 375
+      },
+      {
+        "name": "Startovací balíček | Tričko + boxerky: Trička: Černá - 2XL, Boxerky: Modrá - 2XL",
+        "quantity": 1,
+        "total": 375
+      },
+      {
+        "name": "Černé ponožky (5 párů) - 43-46",
+        "quantity": 1,
+        "total": 245
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_a9011d93be4f35f3c534ad850b9c0cb5",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5798,
+    "customerName": "Mario Ivanjko",
+    "email": "mario.ivanjko123@gmail.com",
+    "phone": "0921896206",
+    "address": "Mokrička",
+    "city": "Zaprešić",
+    "postcode": "10290",
+    "location": "Zaprešić",
+    "totalSpent": 28.58,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T16:56:13",
+    "orderStatus": "completed",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Ponoćni mix 3-paket - XL",
+        "quantity": 1,
+        "total": 25.59
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_ab024c58672f9f20019d0e21a1c543c9",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5797,
+    "customerName": "Drazen Prelog",
+    "email": "drazen.prelog@zg.t-com.hr",
+    "phone": "+38598239633",
+    "address": "Zagrebačka Ulica 34",
+    "city": "Vrbovec",
+    "postcode": "10340",
+    "location": "Vrbovec",
+    "totalSpent": 47.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T14:36:11",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Majica: Crna - 3XL, Tamnoplava - 3XL, Tamnoplava - 3XL",
+        "quantity": 1,
+        "total": 44.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_dd3cc97efdd6f101ce8063bd15b0e8e7",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6561,
+    "customerName": "christos zachogeorgos",
+    "email": "cris13gizi@hotmail.com",
+    "phone": "+306956548852",
+    "address": "ploutarxou",
+    "city": "Athens Kolonaki Smartbnb 2 floor",
+    "postcode": "10675",
+    "location": "Athens Kolonaki Smartbnb 2 floor, GR",
+    "totalSpent": 42.97,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T14:27:05",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Σετ εκκίνησης | 2× μπόξερ: Μπόξερ 1: Πράσινο - 3XL, Μπόξερ 2 2: Μπλε - 3XL",
+        "quantity": 1,
+        "total": 16.99
+      },
+      {
+        "name": "Σετ εκκίνησης | 2 μπλουζάκια: Μπλούζα 1: Καφέ - 3XL, Μπλούζα 2: Πράσινο - 3XL",
+        "quantity": 1,
+        "total": 22.99
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_ccad90b06743d8c604da5abae3bb82f1",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5833,
+    "customerName": "Piero Barca",
+    "email": "pierob23@yahoo.it",
+    "phone": "3475058213",
+    "address": "Via Pasquale Dessanai 137/137/137",
+    "city": "Nuoro",
+    "postcode": "08100",
+    "location": "Nuoro, IT",
+    "totalSpent": 52.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T14:13:45",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Nero - M, Nero - M, Nero - M, Nero - M, Nero - M, Nero - M, Nero - M",
+        "quantity": 1,
+        "total": 49.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_38e5308f3d42bc3473989eb146924c6e",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6560,
+    "customerName": "GERASIMOS DOUROS",
+    "email": "gerdouros@hotmail.com",
+    "phone": "6936296596",
+    "address": "ZAIMI",
+    "city": "ATHENS",
+    "postcode": "10682",
+    "location": "ATHENS, GR",
+    "totalSpent": 22.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T14:01:25",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | Σετ εκκίνησης: Μπλούζα: Μαύρο - 2XL, Μπόξερ: Μπλε - 2XL",
+        "quantity": 1,
+        "total": 19.99
+      }
+    ]
+  },
+  {
+    "id": "cz_buyer_cc2e2d3de6dc17ef860098573e148203",
+    "storeCode": "cz",
+    "storeName": "Czech",
+    "storeFlag": "🇨🇿",
+    "orderId": 5789,
+    "customerName": "Stanislav Berčák",
+    "email": "s.bercak@seznam.cz",
+    "phone": "776758944",
+    "address": "Družstevní",
+    "city": "Bučovice",
+    "postcode": "685 01",
+    "location": "Bučovice, CZ",
+    "totalSpent": 898,
+    "currency": "CZK",
+    "registeredAt": "2026-02-28T13:54:29",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Černá - 4XL, Modrá - 4XL, Černá - 4XL, Šedá - 4XL, Zelená - 4XL",
+        "quantity": 1,
+        "total": 829
+      }
+    ]
+  },
+  {
+    "id": "it_buyer_b6dabdd6fac42d21f3c5ec1201d06cc6",
+    "storeCode": "it",
+    "storeName": "Italy",
+    "storeFlag": "🇮🇹",
+    "orderId": 5832,
+    "customerName": "ANTONIO Primavera",
+    "email": "primaveraantonio74@gmail.com",
+    "phone": "3482353497",
+    "address": "Via strada provinciale",
+    "city": "Scerne Di Pineto",
+    "postcode": "64025",
+    "location": "Scerne Di Pineto, IT",
+    "totalSpent": 66.97,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T13:50:21",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Noriks | AirFlow Modal: Blu - 4XL, Nero - 4XL, Verde - 4XL",
+        "quantity": 1,
+        "total": 24.99
+      },
+      {
+        "name": "Noriks | AirFlow Modal: Nero - 4XL, Nero - 4XL, Grigio - 4XL, Verde - 4XL, Rosso - 4XL",
+        "quantity": 1,
+        "total": 38.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_51dab4d291f781e300e541645f7d7128",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6559,
+    "customerName": "ΑΓΗΣ ΠΕΤΡΑΚΗΣ",
+    "email": "agiscv@yahoo.gr",
+    "phone": "6948109448",
+    "address": "ΛΕΥΚΑΤΑ 21",
+    "city": "Λευκάδα",
+    "postcode": "31100",
+    "location": "Λευκάδα, GR",
+    "totalSpent": 34.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T13:30:52",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | AirFlow Modal: Μαύρο - 4XL, Μαύρο - 4XL, Μαύρο - 4XL",
+        "quantity": 1,
+        "total": 31.99
+      }
+    ]
+  },
+  {
+    "id": "hr_buyer_6a166c87b7123ccb5292c4f7c717aaba",
+    "storeCode": "hr",
+    "storeName": "Croatia",
+    "storeFlag": "🇭🇷",
+    "orderId": 5796,
+    "customerName": "Ivana Mihalic",
+    "email": "ivanamihalic93@gmail.com",
+    "phone": "955012127",
+    "address": "Ulica Bana Josipa Jelačića 143/143",
+    "city": "Čakovec",
+    "postcode": "40000",
+    "location": "Čakovec",
+    "totalSpent": 34.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T13:23:49",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "Urbano-zemljani 3-paket - L",
+        "quantity": 1,
+        "total": 31.99
+      }
+    ]
+  },
+  {
+    "id": "gr_buyer_1d3dfda6aff4ce57b5f7c8517ba5c747",
+    "storeCode": "gr",
+    "storeName": "Greece",
+    "storeFlag": "🇬🇷",
+    "orderId": 6558,
+    "customerName": "Αθηνά Ζαφειρίου",
+    "email": "athinazafei@gmail.com",
+    "phone": "6978060262",
+    "address": "Προφήτης Λαγκαδά",
+    "city": "Θεσσαλονίκη",
+    "postcode": "57200",
+    "location": "Θεσσαλονίκη, GR",
+    "totalSpent": 34.98,
+    "currency": "EUR",
+    "registeredAt": "2026-02-28T11:55:45",
+    "orderStatus": "processing",
+    "callStatus": "not_called",
+    "notes": "",
+    "converted": false,
+    "orderItems": [
+      {
+        "name": "NORIKS | AirFlow Modal: Μαύρο - 3XL, Μπλε - 3XL, Γκρι - 3XL",
+        "quantity": 1,
+        "total": 31.99
+      }
+    ]
+  },
+  {
     "id": "it_buyer_1fad8b6bab2f012043db5dd92b4e1f4e",
     "storeCode": "it",
     "storeName": "Italy",
@@ -3375,39 +4581,6 @@
         "name": "Komplet: 2 majice + 5 bokserica",
         "quantity": 1,
         "total": 79.99
-      }
-    ]
-  },
-  {
-    "id": "gr_buyer_70be226a7a22261e41ef8bda8dd772b9",
-    "storeCode": "gr",
-    "storeName": "Greece",
-    "storeFlag": "🇬🇷",
-    "orderId": 6500,
-    "customerName": "SAVVAS LERGOS",
-    "email": "slergos@gmail.com",
-    "phone": "+306948176445",
-    "address": "ARNITHA",
-    "city": "RHODES / GREECE",
-    "postcode": "85109",
-    "location": "RHODES / GREECE, GR",
-    "totalSpent": 148.97,
-    "currency": "EUR",
-    "registeredAt": "2026-02-22T14:10:15",
-    "orderStatus": "processing",
-    "callStatus": "not_called",
-    "notes": "",
-    "converted": false,
-    "orderItems": [
-      {
-        "name": "Μεσονύκτιο μιξ – συσκευασία 3 τεμ - M",
-        "quantity": 2,
-        "total": 99.98
-      },
-      {
-        "name": "Αστικό-γήινο μιξ – συσκευασία 5 τεμ - M",
-        "quantity": 1,
-        "total": 48.99
       }
     ]
   },
@@ -8943,34 +10116,6 @@
         "name": "NORIKS | Starter paket: Majica: Siva - L, Bokserica: Siva - M",
         "quantity": 1,
         "total": 19.99
-      }
-    ]
-  },
-  {
-    "id": "hr_buyer_4b8a2182af2142dd16b9a66a9a439784",
-    "storeCode": "hr",
-    "storeName": "Croatia",
-    "storeFlag": "🇭🇷",
-    "orderId": 5519,
-    "customerName": "Pero Perić",
-    "email": "mcduzg@gmail.com",
-    "phone": "+385914954114",
-    "address": "Piranska",
-    "city": "Zagreb",
-    "postcode": "10040",
-    "location": "Zagreb",
-    "totalSpent": 53.38,
-    "currency": "EUR",
-    "registeredAt": "2026-02-04T14:51:42",
-    "orderStatus": "processing",
-    "callStatus": "not_called",
-    "notes": "",
-    "converted": false,
-    "orderItems": [
-      {
-        "name": "Komplet: 2 majice + 5 bokserica",
-        "quantity": 1,
-        "total": 50.39
       }
     ]
   },
@@ -15784,34 +16929,6 @@
     "orderItems": [
       {
         "name": "Noriks AirFlow Modal: Crna - XL, Crna - XL, Crna - XL, Crna - XL, Crna - XL",
-        "quantity": 1,
-        "total": 38.97
-      }
-    ]
-  },
-  {
-    "id": "hr_buyer_bf9275ab06deba4baa7c46a2a7a756a9",
-    "storeCode": "hr",
-    "storeName": "Croatia",
-    "storeFlag": "🇭🇷",
-    "orderId": 4026,
-    "customerName": "David Mandić",
-    "email": "david.mandic6070@gmail.com",
-    "phone": "+385996370313",
-    "address": "Breza Ulica 12",
-    "city": "Zagreb",
-    "postcode": "10040",
-    "location": "Zagreb",
-    "totalSpent": 41.96,
-    "currency": "EUR",
-    "registeredAt": "2025-12-20T13:54:26",
-    "orderStatus": "completed",
-    "callStatus": "not_called",
-    "notes": "",
-    "converted": false,
-    "orderItems": [
-      {
-        "name": "Noriks AirFlow Modal: Crna - 2XL, Plava - 2XL, Siva - 2XL, Zelena - 2XL, Crvena - 2XL",
         "quantity": 1,
         "total": 38.97
       }
@@ -51684,34 +52801,6 @@
         "name": "Urbano-Zemljani 3-Paket - 2XL",
         "quantity": 1,
         "total": 53.97
-      }
-    ]
-  },
-  {
-    "id": "hr_buyer_f4df77e2cba71f24489e598f6b14626d",
-    "storeCode": "hr",
-    "storeName": "Croatia",
-    "storeFlag": "🇭🇷",
-    "orderId": 1724,
-    "customerName": "Aleksandra Dužević",
-    "email": "aleksandra.duzevic@gmail.com",
-    "phone": "0959037645",
-    "address": "Vukovarska 24",
-    "city": "Stari Grad",
-    "postcode": "21460",
-    "location": "Stari Grad",
-    "totalSpent": 22.98,
-    "currency": "EUR",
-    "registeredAt": "2025-08-01T18:06:39",
-    "orderStatus": "processing",
-    "callStatus": "not_called",
-    "notes": "",
-    "converted": false,
-    "orderItems": [
-      {
-        "name": "Jedna Tamnoplava Majica - 2XL",
-        "quantity": 1,
-        "total": 19.99
       }
     ]
   },
