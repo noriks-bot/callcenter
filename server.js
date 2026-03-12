@@ -769,7 +769,7 @@ async function fetchAbandonedCarts() {
         });
       }
     } catch (err) {
-      console.error(`Error fetching carts from ${storeCode}:`, err.message);
+      console.error(`Error fetching carts from ${storeCode}:`, err.message, err.stack);
     }
   });
 
