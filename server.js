@@ -608,14 +608,18 @@ async function fetchAbandonedCarts() {
   // Fetch order contacts for conversion tracking
   const orderContacts = {};
   const contactPromises = Object.keys(stores).map(async code => {
-    orderContacts[code] = await getRecentOrderContacts(code);
+    try { orderContacts[code] = await getRecentOrderContacts(code); }
+    catch (e) { console.error("[Carts] orderContacts failed for " + code + ":", e.message); orderContacts[code] = { emails: [], phones: [], orderTotals: {} }; }
   });
+
+
+
   await Promise.all(contactPromises);
 
   // Fetch abandoned carts from all stores in parallel
   const cartPromises = Object.entries(stores).map(async ([storeCode, config]) => {
     try {
-      const response = await axios.get(`https://noriks.com/${storeCode}/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355`, { timeout: 20000 });
+      const response = await axios.get(`https://noriks.com/${storeCode}/wp-json/noriks/v1/abandoned-carts?key=n0r1k5-c4rt-4cc355`, { timeout: 30000 });
       const carts = response.data;
       if (!Array.isArray(carts)) return;
 
@@ -2313,10 +2317,10 @@ function startBackgroundRefresh() {
   setInterval(async () => {
     _bgRefreshCounter++;
     const start = Date.now();
-    const forceFullBuyers = (_bgRefreshCounter % 72 === 0); // every 6 hours
-    const forceFullPaketomati = (_bgRefreshCounter % 24 === 0); // every 2 hours
-    const forceFullPending = (_bgRefreshCounter % 3 === 0); // every 15 min
-    console.log('[Cron] Running 5-minute refresh #' + _bgRefreshCounter + ' (fullBuyers=' + forceFullBuyers + ', fullPaketomati=' + forceFullPaketomati + ', fullPending=' + forceFullPending + ')...');
+    const forceFullBuyers = (_bgRefreshCounter % 2 === 0); // every 6 hours (2 * 3h interval)
+    const forceFullPaketomati = (_bgRefreshCounter % 2 === 0); // every 6 hours (2 * 3h interval)
+    const forceFullPending = true; // always full on 3h interval
+    console.log('[Cron] Running 3-hour refresh #' + _bgRefreshCounter + ' (fullBuyers=' + forceFullBuyers + ', fullPaketomati=' + forceFullPaketomati + ', fullPending=' + forceFullPending + ')...');
     // NOTE: clearAllCache() removed to preserve short-term caches
 
     const results = await Promise.allSettled([
