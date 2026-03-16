@@ -2357,10 +2357,10 @@ function startBackgroundRefresh() {
 
     const ok = results.filter(r => r.status === 'fulfilled').length;
     console.log('[Cron] Refresh done: ' + ok + '/4 OK in ' + ((Date.now()-start)/1000).toFixed(1) + 's');
-  }, 5 * 60 * 1000);
+  }, 3 * 60 * 60 * 1000); // Every 3 hours (was 5 min)
   // Refresh product colors every hour
   setInterval(() => fetchProductColors().catch(e => console.error("[Colors] refresh error:", e.message)), 3600000);
-  console.log('[Cron] Background refresh scheduled every 5 minutes (incremental, all 4 tabs)');
+  console.log('[Cron] Background refresh scheduled every 3 hours (incremental, all 4 tabs)');
 }
 
 
@@ -2659,8 +2659,8 @@ app.get('/api/product-colors', async (req, res) => {
     
 app.listen(PORT, () => {
       console.log(`🎧 Noriks Call Center running on port ${PORT}`);
-      startBackgroundRefresh();
-      fetchProductColors().catch(e => console.error("[Colors] startup error:", e.message));
+      // startBackgroundRefresh(); // TEMP DISABLED - API optimization
+      // fetchProductColors().catch(e => console.error("[Colors] startup error:", e.message)); // TEMP DISABLED
       // Refresh data in background (non-blocking)
       warmRAM().then(() => warmAllCaches()).catch(e => console.error('[DB] Background warm failed:', e.message));
     });
@@ -2669,7 +2669,7 @@ app.listen(PORT, () => {
     await warmRAM();
     app.listen(PORT, () => {
       console.log(`🎧 Noriks Call Center running on port ${PORT}`);
-      startBackgroundRefresh();
+      // startBackgroundRefresh(); // TEMP DISABLED - API optimization
       setTimeout(() => warmAllCaches(), 2000);
     });
   }
