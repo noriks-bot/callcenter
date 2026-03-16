@@ -2317,7 +2317,7 @@ function startBackgroundRefresh() {
   setInterval(async () => {
     _bgRefreshCounter++;
     const start = Date.now();
-    const forceFullBuyers = (_bgRefreshCounter % 2 === 0); // every 6 hours (2 * 3h interval)
+    const forceFullBuyers = false; // never force full — incremental only
     const forceFullPaketomati = (_bgRefreshCounter % 2 === 0); // every 6 hours (2 * 3h interval)
     const forceFullPending = true; // always full on 3h interval
     console.log('[Cron] Running 3-hour refresh #' + _bgRefreshCounter + ' (fullBuyers=' + forceFullBuyers + ', fullPaketomati=' + forceFullPaketomati + ', fullPending=' + forceFullPending + ')...');
