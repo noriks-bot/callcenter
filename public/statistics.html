@@ -3,173 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CallBoss - Statistics</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <title>Statistics - Noriks Call Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: var(--bg-primary, #0f1117); color: var(--text-primary, #e4e4e7); font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 0; }
-        :root { --bg-primary: #0f1117; --bg-secondary: #1a1b23; --bg-card: #21222d; --text-primary: #e4e4e7; --text-secondary: #a1a1aa; --accent-blue: #3b82f6; --accent-green: #22c55e; --accent-red: #ef4444; --accent-orange: #f59e0b; --border-color: #2d2e3a; --radius: 12px; }
-        .stats-page { max-width: 1200px; margin: 0 auto; padding: 24px; }
-        .stats-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
-        .stats-header h1 { font-size: 24px; font-weight: 700; margin: 0; }
-        .stats-header .back-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
-        .stats-header .back-btn:hover { background: var(--accent-blue); }
-        .stats-controls { display: flex; gap: 12px; flex-wrap: wrap; }
-        .stats-controls select { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 8px; font-size: 14px; }
-        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .summary-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; }
-        .summary-card .label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .summary-card .value { font-size: 28px; font-weight: 700; }
-        .summary-card .value.green { color: var(--accent-green); }
-        .summary-card .value.blue { color: var(--accent-blue); }
-        .summary-card .value.orange { color: var(--accent-orange); }
-        .chart-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; margin-bottom: 24px; }
-        .chart-container h3 { margin: 0 0 16px 0; font-size: 16px; }
-        .chart-wrapper { position: relative; height: 300px; }
-        .stats-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
-        .stats-table th, .stats-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-        .stats-table th { background: var(--bg-secondary); color: var(--text-secondary); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stats-table tr:last-child td { border-bottom: none; }
-        .stats-table tr:hover td { background: rgba(59, 130, 246, 0.05); }
-        .country-table { margin-bottom: 24px; }
-        .country-table h3 { margin: 0 0 16px 0; font-size: 16px; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-        .badge-green { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
-        .loading-spinner { display: flex; align-items: center; justify-content: center; padding: 60px; }
-        .loading-spinner .spinner { width: 40px; height: 40px; border: 3px solid var(--border-color); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        body { background: #F0F2F5; }
+        .main-content { margin-left: var(--sidebar-width); min-height: 100vh; transition: margin-left var(--transition-slow); }
+        .sidebar.collapsed ~ .main-content { margin-left: 70px; }
+        @media (max-width: 1024px) { .main-content { margin-left: 0; } }
+        .pg { padding: 74px 16px 30px;  }
+
+        /* Period pills */
+        .pills { display:inline-flex; background:#fff; border:1px solid #E0E0E5; border-radius:8px; padding:4px; gap:2px; margin-bottom:16px; flex-wrap:wrap; }
+        .pill { padding:6px 14px; border-radius:6px; border:1px solid transparent; background:transparent; color:#6B7280; font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; }
+        .pill:hover { color:#1A1A2E; }
+        .pill.on { background:#fff; color:#1A1A2E; font-weight:600; border-color:#D1D5DB; box-shadow:0 1px 2px rgba(0,0,0,0.06); }
+
+        /* Country tabs */
+        .ctabs { display:flex; gap:0; background:#fff; border:1px solid #E8E8EC; border-radius:4px; overflow-x:auto; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+        .ctabs::-webkit-scrollbar { height:0; }
+        .ctab { padding:8px 14px; border:none; background:transparent; color:#6B7280; font-size:13px; font-weight:500; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:all .15s; }
+        .ctab:hover { color:#1A1A2E; background:#F9FAFB; }
+        .ctab.on { color:#2563EB; border-bottom-color:#2563EB; font-weight:600; }
+
+
+
+        /* Section cards */
+        .card { background:#fff; border:1px solid #E8E8EC; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.04); margin-bottom:16px; overflow:hidden; }
+        .card-h { padding:12px 16px; border-bottom:1px solid #E8E8EC; display:flex; align-items:center; gap:10px; }
+        .card-h h3 { font-size:13px; font-weight:600; color:#1A1A2E; margin:0; }
+        .card-h .badge { margin-left:auto; font-size:11px; font-weight:600; color:#6B7280; background:#E5E7EB; padding:2px 8px; border-radius:10px; }
+
+        /* Metric table */
+        .mt { width:100%; border-collapse:collapse;  }
+        
+        .mt td { padding:8px 16px; border-bottom:1px solid #F3F4F6; font-size:12px; color:#374151; }
+        .mt tr:last-child td { border-bottom:none; }
+        .mt tr:hover td { background:#F9FAFB; transition:background .15s; }
+        .mt .label { font-weight:500; }
+        .mt .indent { padding-left:36px; color:#6B7280; font-size:11px; }
+        .mt .val { text-align:right; font-weight:600; font-size:13px; color:#1A1A2E; font-variant-numeric:tabular-nums; width:100px; }
+        .mt .pct { text-align:right; font-size:11px; color:#9CA3AF; width:80px; }
+        .mt .row-total td { font-weight:700; border-bottom:2px solid #E5E7EB; }
+        .mt .row-total .val { font-size:18px; }
+        .mt .row-conv td { background:rgba(16,185,129,0.04); border-bottom:2px solid rgba(16,185,129,0.1); }
+        .mt .row-conv .val { color:#10B981; font-size:14px; }
+        .mt .row-conv .pct { color:#10B981; font-weight:600; font-size:13px; }
+        .mt .row-nc td { color:#9CA3AF; }
+        .mt .row-nc .val { font-weight:400; color:#9CA3AF; font-size:12px; }
+
+        /* Orders table */
+        .otbl { width:100%; border-collapse:collapse; }
+        .otbl th { text-align:left; padding:6px 10px; background:#F9FAFB; border-bottom:2px solid #E5E7EB; font-size:10px; font-weight:600; color:#6B7280; }
+        .otbl td { padding:8px 10px; border-bottom:1px solid #F3F4F6; font-size:11px; color:#374151; vertical-align:top; }
+        .otbl tr:last-child td { border-bottom:none; }
+        .otbl tr:hover td { background:#F9FAFB; transition:background .15s; }
+        .onum { color:#10B981; font-weight:700; }
+        .oitems { font-size:11px; color:#6B7280; max-width:220px; line-height:1.5; }
+        .ototal { font-weight:700; color:#1A1A2E; white-space:nowrap; font-variant-numeric:tabular-nums; }
+        .type-tag { display:inline-block; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.3px; }
+        .type-tag.ab { background:#FEF3C7; color:#D97706; }
+        .type-tag.ot { background:#EDE9FE; color:#7C3AED; }
+        .type-tag.pd { background:#DBEAFE; color:#2563EB; }
+        .agent-tag { display:inline-block; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600; background:#DBEAFE; color:#2563EB; }
+        .status-tag { display:inline-block; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:600; }
+        .status-tag.processing { background:#DBEAFE; color:#2563EB; }
+        .status-tag.completed { background:#D1FAE5; color:#059669; }
+        .status-tag.on-hold { background:#FEF3C7; color:#D97706; }
+        .status-tag.pending { background:#FEF3C7; color:#D97706; }
+        .empty { text-align:center; padding:40px; color:#9CA3AF; font-size:14px; }
+        .sx { overflow-x:auto; }
+
+        @media (max-width:900px) { .kpi-row { grid-template-columns:repeat(2,1fr); } }
+        @media (max-width:600px) { .kpi-row { grid-template-columns:1fr; } .pg { padding:70px 12px 30px; } }
     </style>
 </head>
 <body>
-    <div class="stats-page">
-        <div class="stats-header">
-            <div style="display:flex;align-items:center;gap:16px;">
-                <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
-                <h1><i class="fas fa-chart-bar" style="color:var(--accent-blue)"></i> Statistics</h1>
-            </div>
-            <div class="stats-controls">
-                <select id="periodSelect">
-                    <option value="7">Last 7 days</option>
-                    <option value="14">Last 14 days</option>
-                    <option value="30" selected>Last 30 days</option>
-                    <option value="60">Last 60 days</option>
-                    <option value="90">Last 90 days</option>
-                </select>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">N</div>
+            <div class="brand">
+                Noriks
+                <span>Call Center</span>
             </div>
         </div>
-
-        <div id="loadingArea" class="loading-spinner"><div class="spinner"></div></div>
-
-        <div id="statsContent" style="display:none;">
-            <div class="summary-cards">
-                <div class="summary-card"><div class="label">Total Leads</div><div class="value blue" id="totalLeads">0</div></div>
-                <div class="summary-card"><div class="label">Total Conversions</div><div class="value green" id="totalConversions">0</div></div>
-                <div class="summary-card"><div class="label">Total Calls</div><div class="value" id="totalCalls">0</div></div>
-                <div class="summary-card"><div class="label">Conversion Rate</div><div class="value orange" id="convRate">0%</div></div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-title">Menu</div>
+                <a href="/#leads" class="nav-item" data-tab="leads">
+                    <i class="fas fa-users"></i>
+                    <span>Leads</span>
+                </a>
+                <a href="/statistics" class="nav-item active">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
             </div>
-
-            <div class="chart-container">
-                <h3>Daily Leads & Conversions</h3>
-                <div class="chart-wrapper"><canvas id="dailyChart"></canvas></div>
+            
+            
+            
+            <div class="nav-section admin-only" id="messagingSection">
+                <div class="nav-title">Messaging</div>
+                <a href="/#sms-automation" class="nav-item" data-tab="sms-automation">
+                    <i class="fas fa-robot"></i>
+                    <span>SMS Automation</span>
+                </a>
+                <a href="/#sms-dashboard" class="nav-item" data-tab="sms-dashboard">
+                    <i class="fas fa-comment-sms"></i>
+                    <span>SMS Dashboard</span>
+                    <span class="badge" id="navSms">0</span>
+                </a>
+                <a href="/#sms-settings" class="nav-item" data-tab="sms-settings">
+                    <i class="fas fa-cog"></i>
+                    <span>SMS Settings</span>
+                </a>
+                <a href="/#buyers-settings" class="nav-item" data-tab="buyers-settings">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Options</span>
+                </a>
             </div>
-
-            <div class="country-table">
-                <h3>Performance by Country</h3>
-                <table class="stats-table">
-                    <thead><tr><th>Country</th><th>Leads</th><th>Conversions</th><th>Conv. Rate</th></tr></thead>
-                    <tbody id="countryTableBody"></tbody>
-                </table>
+            
+            <div class="nav-section admin-only" id="adminSection">
+                <div class="nav-title">Admin</div>
+                <a href="/#agents" class="nav-item" data-tab="agents">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Agents</span>
+                </a>
             </div>
-
-            <div>
-                <h3>Daily Breakdown</h3>
-                <table class="stats-table">
-                    <thead><tr><th>Date</th><th>Leads</th><th>Calls</th><th>Conversions</th><th>Conv. Rate</th></tr></thead>
-                    <tbody id="dailyTableBody"></tbody>
-                </table>
+            
+            
+        </nav>
+        
+        <div class="sidebar-footer">
+            <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Prikaži/Skrij sidebar">
+                <i class="fas fa-chevron-left"></i>
+                <span>Skrij meni</span>
+            </button>
+            
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">N</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Noriks</div>
+                    <div class="user-role" id="userRole">Admin</div>
+                </div>
+                <button class="logout-btn" onclick="logout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
+        </div>
+    </aside>
+
+    <div class="top-bar" id="topBar">
+        <button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
+        <div class="page-title">Statistics</div>
+        <div class="top-bar-actions">
+            <button class="action-btn-header primary" onclick="loadStats()" style="background:#2563EB;color:#fff;border-color:#2563EB;box-shadow:0 1px 3px rgba(37,99,235,0.3);"><i class="fas fa-sync-alt"></i> <span class="hide-mobile">Refresh</span></button>
+            <div class="header-avatar" id="headerAvatar">N</div>
         </div>
     </div>
 
-    <script>
-        // Auth check
-        const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
-        if (!user) { window.location.href = '/login'; }
+    <main class="main-content">
+        <div class="pg">
+            <style>@keyframes spin{to{transform:rotate(360deg);}}</style>
+            <div class="pills" id="monthPills"></div>
+            <div class="ctabs" id="countryTabs"></div>
+            
+            <div id="loadingOverlay" style="text-align:center;padding:80px 0;"><div style="display:inline-block;width:36px;height:36px;border:3px solid #E8E8EC;border-top-color:#2563EB;border-radius:50%;animation:spin .8s linear infinite;"></div><div style="margin-top:12px;font-size:13px;color:#9CA3AF;">Loading statistics...</div></div><div id="kpiRow"></div><div style="display:flex;gap:16px;" id="statsRow"><div id="secAb" style="flex:1;min-width:0;"></div><div id="secOt" style="flex:1;min-width:0;"></div></div>
+            <div id="secOrd"></div>
+        </div>
+    </main>
 
-        const isAdmin = user.role === 'admin' || user.username === 'noriks';
-        const userCountries = user.countries || [];
-        const countriesParam = isAdmin || userCountries.includes('all') ? 'all' : userCountries.join(',');
+<script>
+var user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
+if (!user) window.location.href = '/login';
+else {
+    document.getElementById('userName').textContent = user.username;
+    document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Agent';
+    document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
+    document.getElementById('headerAvatar').textContent = user.username[0].toUpperCase();
+}
+document.getElementById('menuToggle').addEventListener('click', function() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); });
+document.getElementById('sidebarOverlay').addEventListener('click', function() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); });
+function logout() { localStorage.removeItem('callcenter_user'); window.location.href = '/login'; }
+if (user && user.role === 'admin') document.body.classList.add('is-admin');
+function toggleSidebarCollapse() {
+    var sb = document.getElementById('sidebar');
+    var collapsed = sb.classList.toggle('collapsed');
+    localStorage.setItem('sidebar_collapsed', collapsed ? 'true' : 'false');
+}
+if (localStorage.getItem('sidebar_collapsed') === 'true') document.getElementById('sidebar').classList.add('collapsed');
 
-        let dailyChart = null;
+var dateFrom, dateTo, cf = 'hr', cached = null;
 
-        async function loadStats() {
-            const days = document.getElementById('periodSelect').value;
-            document.getElementById('loadingArea').style.display = 'flex';
-            document.getElementById('statsContent').style.display = 'none';
+// Month buttons
+(function() {
+    var now = new Date(), h = '';
+    var startMonth = 0; // Jan 2026
+    var endMonth = now.getMonth(); // current month
+    for (var i = endMonth; i >= startMonth; i--) {
+        var d = new Date(2026, i, 1);
+        var lbl = d.toLocaleString('en', { month: 'short' }) + ' ' + d.getFullYear();
+        var ym = '2026-' + String(i + 1).padStart(2, '0');
+        h += '<button class="pill' + (i === endMonth ? ' on' : '') + '" data-ym="' + ym + '" onclick="pM(this)">' + lbl + '</button>';
+    }
+    document.getElementById('monthPills').innerHTML = h;
+    dateFrom = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    dateTo = now.toISOString().slice(0, 10);
+})();
 
-            try {
-                const resp = await fetch(`/api/statistics?days=${days}&countries=${countriesParam}`);
-                const data = await resp.json();
-                if (!data.success) throw new Error(data.error || 'Failed');
+function pM(b) {
+    document.querySelectorAll('.pill').forEach(function(x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    var p = b.dataset.ym.split('-'), y = +p[0], m = +p[1] - 1;
+    dateFrom = new Date(y, m, 1).toISOString().slice(0, 10);
+    var last = new Date(y, m + 1, 0), now = new Date();
+    dateTo = (last > now ? now : last).toISOString().slice(0, 10);
+    loadStats();
+}
 
-                document.getElementById('totalLeads').textContent = data.totalLeads;
-                document.getElementById('totalConversions').textContent = data.totalConversions;
-                document.getElementById('totalCalls').textContent = data.totalCalls;
-                const rate = data.totalLeads > 0 ? (data.totalConversions / data.totalLeads * 100).toFixed(1) : '0';
-                document.getElementById('convRate').textContent = rate + '%';
+function pC(code) {
+    cf = code;
+    document.querySelectorAll('.ctab').forEach(function(x) { x.classList.remove('on'); });
+    var el = document.querySelector('.ctab[data-c="' + code + '"]');
+    if (el) el.classList.add('on');
+    render();
+}
 
-                // Chart
-                const labels = data.dailyStats.map(d => {
-                    const dt = new Date(d.date);
-                    return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                });
-                const leadsData = data.dailyStats.map(d => d.leads);
-                const conversionsData = data.dailyStats.map(d => d.conversions);
-                const callsData = data.dailyStats.map(d => d.calls);
+function loadStats() {
+    var c = (user && !user.countries.includes('all')) ? user.countries.join(',') : 'all';
+    document.getElementById('loadingOverlay').style.display='block'; fetch('/api/statistics?from=' + dateFrom + '&to=' + dateTo + '&countries=' + c)
+        .then(function(r) { return r.json(); })
+        .then(function(d) { if (!d.success) throw new Error(d.error); cached = d; buildTabs(); render(); document.getElementById('loadingOverlay').style.display='none'; })
+        .catch(function(e) { console.error('Stats:', e); document.getElementById('loadingOverlay').style.display='none'; });
+}
 
-                if (dailyChart) dailyChart.destroy();
-                dailyChart = new Chart(document.getElementById('dailyChart'), {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [
-                            { label: 'Leads', data: leadsData, backgroundColor: 'rgba(59,130,246,0.7)', borderRadius: 4 },
-                            { label: 'Calls', data: callsData, backgroundColor: 'rgba(168,85,247,0.5)', borderRadius: 4 },
-                            { label: 'Conversions', data: conversionsData, backgroundColor: 'rgba(34,197,94,0.7)', borderRadius: 4 }
-                        ]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        scales: {
-                            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a1a1aa', maxRotation: 45 } },
-                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a1a1aa' }, beginAtZero: true }
-                        },
-                        plugins: { legend: { labels: { color: '#e4e4e7' } } }
-                    }
-                });
+function buildTabs() {
+    if (!cached) return;
+    var cs = cached.countryStats, h = '';
+    Object.entries(cs).forEach(function(e) {
+        h += '<button class="ctab' + (cf === e[0] ? ' on' : '') + '" data-c="' + e[0] + '" onclick="pC(\'' + e[0] + '\')">' + e[1].flag + ' ' + e[1].name + '</button>';
+    });
+    h += '<button class="ctab' + (cf === 'all' ? ' on' : '') + '" data-c="all" onclick="pC(\'all\')">🌍 All Countries</button>';
+    document.getElementById('countryTabs').innerHTML = h;
+}
 
-                // Country table
-                const ctb = document.getElementById('countryTableBody');
-                ctb.innerHTML = Object.entries(data.countryStats).map(([code, s]) =>
-                    `<tr><td>${s.flag} ${s.name}</td><td>${s.leads}</td><td>${s.conversions}</td><td><span class="badge badge-green">${s.conversionRate}%</span></td></tr>`
-                ).join('');
+function render() {
+    if (!cached) return;
+    var ab, ot;
+    if (cf === 'all') { ab = agg('abandoned'); ot = agg('onetime'); }
+    else { var s = cached.countryStats[cf]; ab = s ? (s.abandoned || z()) : z(); ot = s ? (s.onetime || z()) : z(); }
+    rKpi(ab, ot);
+    var abExtra = [];
+    var abAllTotal = 0, abNewTotal = 0;
+    if (cf === 'all') {
+        Object.values(cached.countryStats).forEach(function(s) { abAllTotal += (s.allCarts || 0); });
+        Object.values(cached.countryStats).forEach(function(s) { abAllTotal += (s.allCarts || 0); });
+        var cs2 = cached.countryStats[cf]; abNewTotal = cs2 ? (cs2.newCarts || 0) : 0;
+    } else {
+        var cs = cached.countryStats[cf];
+        abAllTotal = cs ? (cs.allCarts || 0) : 0;
+        var cs2 = cached.countryStats[cf]; abNewTotal = cs2 ? (cs2.newCarts || 0) : 0;
+    }
+    abExtra.push({ label: '↳ All abandoned carts (total)', value: abAllTotal });
+    abExtra.push({ label: '↳ New in this period', value: abNewTotal });
+    abExtra.push({ label: '↳ Called in this period', value: ab.called });
+    rSec('secAb', '🛒', 'Abandoned Carts', ab, abExtra);
+    var otExtra = [];
+    var otAllTotal = 0, otNewTotal = 0;
+    if (cf === 'all') {
+        Object.values(cached.countryStats).forEach(function(s) { otAllTotal += (s.allBuyers || 0); });
+        Object.values(cached.countryStats).forEach(function(s) { otAllTotal += (s.allBuyers || 0); });
+        var cs3 = cached.countryStats[cf]; otNewTotal = cs3 ? (cs3.newBuyers || 0) : 0;
+    } else {
+        var cs = cached.countryStats[cf];
+        otAllTotal = cs ? (cs.allBuyers || 0) : 0;
+        var cs3 = cached.countryStats[cf]; otNewTotal = cs3 ? (cs3.newBuyers || 0) : 0;
+    }
+    otExtra.push({ label: '↳ All one-time buyers (total)', value: otAllTotal });
+    otExtra.push({ label: '↳ New in this period', value: otNewTotal });
+    otExtra.push({ label: '↳ Called in this period', value: ot.called });
+    rSec('secOt', '👤', 'One-time Buyers', ot, otExtra);
+    rOrd(cached.convertedOrders || []);
+}
 
-                // Daily table
-                const dtb = document.getElementById('dailyTableBody');
-                dtb.innerHTML = data.dailyStats.slice().reverse().map(d =>
-                    `<tr><td>${d.date}</td><td>${d.leads}</td><td>${d.calls}</td><td>${d.conversions}</td><td><span class="badge badge-green">${d.conversionRate}%</span></td></tr>`
-                ).join('');
+function z() { return {total:0,not_called:0,called:0,no_answer:0,callback:0,interested:0,not_interested:0,invalid:0,converted:0,convRate:0}; }
+function agg(t) { var r=z(); Object.values(cached.countryStats).forEach(function(s){var d=s[t];Object.keys(r).forEach(function(k){r[k]+=(d[k]||0);});}); r.convRate=r.total>0?Math.round(r.converted/r.total*1000)/10:0; return r; }
+function pc(n,t) { return t>0?(Math.round(n/t*1000)/10)+'%':'—'; }
 
-                document.getElementById('loadingArea').style.display = 'none';
-                document.getElementById('statsContent').style.display = 'block';
-            } catch (e) {
-                document.getElementById('loadingArea').innerHTML = '<p style="color:var(--accent-red)">Error: ' + e.message + '</p>';
-            }
-        }
+function rKpi(ab, ot) {
+    var allOrds = cached.convertedOrders || [];
+    var filtOrds = allOrds.filter(function(o) { return parseFloat(o.total||0) > 0 && !(o.id||'').includes('test'); });
+    var byCountry = {};
+    filtOrds.forEach(function(o) {
+        if (!byCountry[o.storeCode]) byCountry[o.storeCode] = { flag: o.storeFlag, name: o.storeName, orders: 0, rev: 0 };
+        byCountry[o.storeCode].orders++;
+        byCountry[o.storeCode].rev += parseFloat(o.total || 0);
+    });
+    var h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px;">';
+    Object.entries(byCountry).forEach(function(e) {
+        var c = e[1];
+        h += '<div style="background:#fff;border:1px solid #E8E8EC;border-radius:8px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
+        h += '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#9CA3AF;margin-bottom:6px;">' + c.flag + ' ' + c.name + '</div>';
+        h += '<div style="font-size:10px;color:#9CA3AF;margin-bottom:2px;">Orders</div>';
+        h += '<div style="font-size:22px;font-weight:700;color:#1A1A2E;">' + c.orders + '</div>';
+        h += '<div style="font-size:10px;color:#9CA3AF;margin-top:8px;">Revenue</div>';
+        h += '<div style="font-size:16px;font-weight:700;color:#10B981;">\u20ac' + c.rev.toFixed(2) + '</div>';
+        h += '</div>';
+    });
+    // Potential Profit card
+    var totalProfit = 0;
+    filtOrds.forEach(function(o) { totalProfit += (o.profit || 0); });
+    h += '<div style="background:linear-gradient(135deg,#10B981,#059669);border-radius:8px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
+    h += '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:rgba(255,255,255,.7);margin-bottom:6px;">\u2728 Potential Profit</div>';
+    h += '<div style="font-size:24px;font-weight:700;color:#fff;">\u20ac' + totalProfit.toFixed(2) + '</div>';
+    h += '<div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:4px;">\u20ac' + (filtOrds.length > 0 ? (totalProfit/filtOrds.length).toFixed(2) : '0') + '/order</div>';
+    h += '</div>';
+    // Prevzeti card
+    var deliveredCount = filtOrds.filter(function(o) { return o.deliveryStatus === 'delivered'; }).length;
+    h += '<div style="background:#fff;border:1px solid #E8E8EC;border-radius:8px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
+    h += '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#9CA3AF;margin-bottom:6px;">\u2705 Prevzeti</div>';
+    h += '<div style="font-size:22px;font-weight:700;color:#10B981;">' + deliveredCount + '</div>';
+    h += '<div style="font-size:10px;color:#9CA3AF;margin-top:4px;">of ' + filtOrds.length + ' orders</div>';
+    h += '</div>';
+    // Real Profit card (only delivered orders)
+    var realProfit = 0;
+    filtOrds.forEach(function(o) { if (o.deliveryStatus === 'delivered') realProfit += (o.profit || 0); });
+    h += '<div style="background:linear-gradient(135deg,#059669,#047857);border-radius:8px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
+    h += '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:rgba(255,255,255,.7);margin-bottom:6px;">€ Real Profit</div>';
+    h += '<div style="font-size:24px;font-weight:700;color:#fff;">€' + realProfit.toFixed(2) + '</div>';
+    h += '<div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:4px;">Only delivered orders</div>';
+    h += '</div>';
+    h += '</div>';
+    document.getElementById('kpiRow').innerHTML = h;
+}
 
-        document.getElementById('periodSelect').addEventListener('change', loadStats);
-        loadStats();
-    </script>
+function rSec(id, ico, title, s, extra) {
+    var h = '<div class="card"><div class="card-h"><h3>' + ico + ' ' + title + '</h3></div>';
+    h += '<table class="mt">';
+    
+    if (extra) { for (var ei = 0; ei < extra.length; ei++) { h += '<tr><td class="label" style="color:#6B7280;font-size:11px;padding-left:24px;">' + extra[ei].label + '</td><td class="val" style="font-size:13px;color:#6B7280;">' + extra[ei].value + '</td><td class="pct"></td></tr>'; } }
+    h += '<tr><td class="label">📞 Called (status changed)</td><td class="val">' + s.called + '</td><td class="pct">' + pc(s.called, s.total) + '</td></tr>';
+    h += '<tr><td class="label indent">↳ No Answer</td><td class="val" style="color:#F59E0B;">' + s.no_answer + '</td><td class="pct">' + pc(s.no_answer, s.total) + '</td></tr>';
+    h += '<tr><td class="label indent">↳ Callback</td><td class="val">' + s.callback + '</td><td class="pct">' + pc(s.callback, s.total) + '</td></tr>';
+    h += '<tr><td class="label indent">↳ Interested</td><td class="val" style="color:#3B82F6;">' + s.interested + '</td><td class="pct">' + pc(s.interested, s.total) + '</td></tr>';
+    h += '<tr><td class="label indent">↳ Not Interested</td><td class="val" style="color:#EF4444;">' + s.not_interested + '</td><td class="pct">' + pc(s.not_interested, s.total) + '</td></tr>';
+    h += '<tr><td class="label indent">↳ Invalid Number</td><td class="val" style="color:#9CA3AF;">' + s.invalid + '</td><td class="pct">' + pc(s.invalid, s.total) + '</td></tr>';
+    h += '<tr class="row-conv"><td class="label indent">↳ Converted to Order</td><td class="val">' + s.converted + '</td><td class="pct">' + pc(s.converted, s.total) + '</td></tr>';
+    
+    h += '</table></div>';
+    document.getElementById(id).innerHTML = h;
+}
+
+function rOrd(orders) {
+    var f = (cf === 'all' ? orders : orders.filter(function(o) { return o.storeCode === cf; })).filter(function(o) { return parseFloat(o.total || 0) > 0 && !(o.id || '').includes('test'); }).sort(function(a,b) { return (b.date||'').localeCompare(a.date||''); });
+    var syms = { EUR:'\u20ac', CZK:'K\u010d', PLN:'z\u0142', HUF:'Ft' };
+    var h = '<div class="card"><div class="card-h"><h3>✅ Call Center Orders</h3><span class="badge">' + f.length + '</span></div>';
+    if (!f.length) { h += '<div class="empty">No orders in this period</div>'; }
+    else {
+        h += '<div class="sx"><table class="otbl"><thead><tr><th>#</th><th>Date</th><th>Order</th><th>Type</th><th>Customer</th><th>Country</th><th>Items</th><th>Total</th><th>Agent</th><th>Status</th><th>Profit</th><th>MK Status</th></tr></thead><tbody>';
+        f.forEach(function(o, idx) {
+            var sym = syms[o.currency] || '\u20ac';
+            var items = (o.items || []).map(function(i) { return '<div>' + i.quantity + 'x ' + i.name + '</div>'; }).join('') || '\u2014';
+            var tc = o.orderType === 'onetime' ? 'ot' : (o.orderType === 'pending' ? 'pd' : 'ab');
+            var tl = o.orderType === 'onetime' ? 'One-time' : (o.orderType === 'pending' ? 'Pending' : 'Abandoned');
+            var sc = (o.status || '').replace('_', '-');
+            var rowBg = o.mkStatusDesc === 'completed' ? 'background:rgba(16,185,129,0.04);' : ''; h += '<tr style="' + rowBg + '"><td style="color:#9CA3AF;font-size:11px;">' + (idx+1) + '</td><td style="white-space:nowrap;font-weight:500;">' + (o.date || '').slice(0, 10) + '</td>';
+            h += '<td><span class="onum">#' + (o.orderId || '\u2014') + '</span></td>';
+            h += '<td><span class="type-tag ' + tc + '">' + tl + '</span></td>';
+            h += '<td><div style="font-weight:600;">' + (o.customerName || '\u2014') + '</div><div style="font-size:10px;color:#9CA3AF;">' + (o.email || '') + '</div></td>';
+            h += '<td style="white-space:nowrap;">' + (o.storeFlag || '') + ' ' + (o.storeName || '') + '</td>';
+            h += '<td><div class="oitems">' + items + '</div></td>';
+            h += '<td ototal" style="color:' + (o.mkStatusDesc === 'completed' ? '#10B981' : '#1A1A2E') + '">' + sym + parseFloat(o.total || 0).toFixed(2) + '</td>';
+            h += '<td><span class="agent-tag">' + (o.agent || '\u2014') + '</span></td>';
+            var oProfit = o.profit || 0; var profitColor = (o.mkStatusDesc === 'completed') ? '#10B981' : '#1A1A2E';
+            var ds = o.deliveryStatus || 'unknown';
+            var dLabel = o.mkStatusDesc || ds;
+            var dColor = {delivered:'#10B981',in_transit:'#3B82F6',shipped:'#F59E0B',created:'#9CA3AF',paused:'#F59E0B',manually_closed:'#10B981',completed:'#10B981',draft:'#9CA3AF'}[ds] || '#6B7280';
+            h += '<td><span class="status-tag ' + sc + '">' + (o.status || '\u2014') + '</span></td><td style="font-weight:700;color:' + (oProfit >= 0 ? '#10B981' : '#EF4444') + ';white-space:nowrap;">\u20ac' + oProfit.toFixed(2) + '</td><td style="font-weight:600;color:' + dColor + ';font-size:11px;white-space:nowrap;">' + dLabel + '</td></tr>';
+        });
+        var totalSum = 0; var symsR = { EUR:'\u20ac', CZK:'K\u010d', PLN:'z\u0142', HUF:'Ft' };
+        f.forEach(function(o) { totalSum += parseFloat(o.total || 0); });
+        var totalProfit2 = 0; f.forEach(function(o) { totalProfit2 += (o.profit || 0); }); h += '<tr style="font-weight:700;background:#F9FAFB;border-top:2px solid #E5E7EB;"><td></td><td colspan="5">TOTAL</td><td class="ototal">' + f.length + ' orders</td><td class="ototal">\u20ac' + totalSum.toFixed(2) + '</td><td colspan="2"></td><td style="font-weight:700;color:#10B981;">\u20ac' + totalProfit2.toFixed(2) + '</td><td></td></tr>';
+        h += '</tbody></table></div>';
+    }
+    h += '</div>';
+    document.getElementById('secOrd').innerHTML = h;
+}
+
+loadStats();
+</script>
 </body>
 </html>
