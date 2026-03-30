@@ -164,6 +164,13 @@ async function warmRAM() {
       }
     }).catch(e => console.error('[DB] Buyers refresh failed:', e.message));
 
+    // Warm callcenter-orders cache for statistics (background, don't block startup)
+    setTimeout(() => {
+      axios.get('http://localhost:' + (process.env.PORT || 3087) + '/api/callcenter-orders', { timeout: 120000 })
+        .then(() => console.log('[DB] CC orders cache warmed'))
+        .catch(() => {});
+    }, 5000);
+
     const carts = dbReadData('carts');
     const pending = dbReadData('pending');
     const buyers = dbReadData('buyers');
