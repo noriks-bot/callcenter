@@ -2433,18 +2433,25 @@ function detectProductCost(items) {
 }
 
 // MK paketomati cache for delivery status matching
-function getMkStatusForOrder(orderNumber) {
+function getMkStatusForOrder(orderNumber, customerEmail) {
   try {
-    const paketomatiData = dbReadData ? dbReadData('paketomati') : [];
+    const paketomatiData = RAM.paketomati || [];
     if (!Array.isArray(paketomatiData)) return null;
-    // Match by buyer_order field (NORIKS-HR-XXXX format)
-    const match = paketomatiData.find(p => {
-      const bo = (p.buyer_order || p.orderNumber || '').toUpperCase();
+    let match = null;
+    // Try match by email first (most reliable)
+    if (customerEmail) {
+      match = paketomatiData.find(p => (p.customer?.email || '').toLowerCase() === customerEmail.toLowerCase());
+    }
+    // Fallback: match by WC order number in orderNumber field
+    if (!match && orderNumber) {
       const on = String(orderNumber).toUpperCase();
-      return bo === on || bo.endsWith('-' + on) || bo.includes(on);
-    });
+      match = paketomatiData.find(p => {
+        const bo = (p.buyer_order || p.orderNumber || '').toUpperCase();
+        return bo === on || bo.endsWith('-' + on) || bo.includes(on);
+      });
+    }
     if (!match) return null;
-    return { deliveryStatus: match.status || 'unknown', mkStatusDesc: match.lastEventStatus || match.status || '' };
+    return { deliveryStatus: match.status || 'unknown', mkStatusDesc: match.lastDeliveryEvent || match.status || '' };
   } catch(e) { return null; }
 }
 
@@ -2474,7 +2481,8 @@ async function enrichConvertedOrders(conversions) {
           const profit = netTotal - productCost - shippingCost;
           // MK status
           const orderNum = order.number || ('NORIKS-' + conv.storeCode?.toUpperCase() + '-' + conv.orderId);
-          const mkStatus = getMkStatusForOrder(orderNum) || getMkStatusForOrder(String(conv.orderId));
+          const email = order.billing?.email || '';
+          const mkStatus = getMkStatusForOrder(orderNum, email) || getMkStatusForOrder(String(conv.orderId), email);
           convertedOrderCache[key] = {
             ts: now,
             customerName: ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown',
