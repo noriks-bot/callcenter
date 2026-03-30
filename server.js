@@ -941,7 +941,7 @@ async function fetchPendingOrders(forceFull = false) {
 
   const promises = Object.entries(stores).map(async ([storeCode, config]) => {
     try {
-      const params = { status: 'pending,cancelled,failed,on-hold', per_page: 50, orderby: 'date', order: 'desc' };
+      const params = { status: 'failed', per_page: 50, orderby: 'date', order: 'desc' };
       if (useModifiedAfter && pendingState.timestamp) {
         params.modified_after = new Date(pendingState.timestamp).toISOString();
       }
@@ -1019,6 +1019,15 @@ async function createOrderFromCart(input) {
         if (item.price !== undefined) {
           li.subtotal = String(item.price * qty);
           li.total = String(item.price * qty);
+        }
+        // Add name/attribute meta_data if present (e.g. from cart contents with color/size info)
+        const itemName = item.name || '';
+        if (itemName && itemName.trim()) {
+          const pieces = itemName.split(/,\s*/);
+          const meta = pieces.map((piece, idx) => ({ key: String(idx + 1), value: piece.trim() }));
+          meta.push({ key: '_bundle_pairs', value: String(pieces.length) });
+          meta.push({ key: '_cc_source', value: 'call_center' });
+          li.meta_data = meta;
         }
         lineItems.push(li);
       } else {
@@ -2389,8 +2398,52 @@ app.get('/api/pending-orders-count', async (req, res) => {
 const convertedOrderCache = {};
 const CONVERTED_CACHE_TTL = 5 * 60 * 1000; // 5 min
 
+// VAT rates per country
+const VAT_RATES = { hr: 0.25, cz: 0.21, pl: 0.23, sk: 0.20, hu: 0.27, gr: 0.24, it: 0.22, si: 0.22 };
+// Shipping costs
+const SHIPPING_COSTS_FILE = '/home/ec2-user/apps/raketa/dashboard/shipping-costs.json';
+function getShippingCosts() {
+  try { return JSON.parse(fs.readFileSync(SHIPPING_COSTS_FILE, 'utf8')); } catch(e) { return {}; }
+}
+// Product cost detection (tshirt=3.5, boxer=3.5, sock=1.5 EUR)
+const PRODUCT_COSTS = { tshirt: 3.5, boxer: 3.5, sock: 1.5 };
+function detectProductCost(items) {
+  let cost = 0;
+  for (const item of (items || [])) {
+    const name = (item.name || '').toLowerCase();
+    const qty = item.quantity || 1;
+    // Try to detect product type from name
+    let unitCost = 0;
+    if (/sock|nogavic|čarap|zokni|calze|ponožk|κάλτσ/i.test(name)) unitCost = PRODUCT_COSTS.sock;
+    else if (/boxer|bokser|bokseric|μπόξερ|boxerk|spodky|alsónemű|mutande|bokserki|trenírk/i.test(name)) unitCost = PRODUCT_COSTS.boxer;
+    else unitCost = PRODUCT_COSTS.tshirt; // default to tshirt
+    // Check for pack count in name: "(X kos)" or "X kos"
+    const packMatch = name.match(/\((\d+)\s*kos\)|(\d+)\s*kos/i) || name.match(/(\d+)\s*ks/i);
+    const packCount = packMatch ? parseInt(packMatch[1] || packMatch[2]) : qty;
+    cost += unitCost * packCount;
+  }
+  return cost;
+}
+
+// MK paketomati cache for delivery status matching
+function getMkStatusForOrder(orderNumber) {
+  try {
+    const paketomatiData = dbReadData ? dbReadData('paketomati') : [];
+    if (!Array.isArray(paketomatiData)) return null;
+    // Match by buyer_order field (NORIKS-HR-XXXX format)
+    const match = paketomatiData.find(p => {
+      const bo = (p.buyer_order || p.orderNumber || '').toUpperCase();
+      const on = String(orderNumber).toUpperCase();
+      return bo === on || bo.endsWith('-' + on) || bo.includes(on);
+    });
+    if (!match) return null;
+    return { deliveryStatus: match.status || 'unknown', mkStatusDesc: match.lastEventStatus || match.status || '' };
+  } catch(e) { return null; }
+}
+
 async function enrichConvertedOrders(conversions) {
   const now = Date.now();
+  const shippingCosts = getShippingCosts();
   const toFetch = conversions.filter(c => {
     if (!c.orderId || !c.storeCode || !stores[c.storeCode]) return false;
     const cached = convertedOrderCache[c.storeCode + '_' + c.orderId];
@@ -2405,13 +2458,27 @@ async function enrichConvertedOrders(conversions) {
         const order = await wcApiRequest(conv.storeCode, 'orders/' + conv.orderId);
         if (order && !order.error) {
           const b = order.billing || {};
+          const grossTotal = parseFloat(order.total) || 0;
+          const vat = VAT_RATES[conv.storeCode] || 0.25;
+          const netTotal = grossTotal / (1 + vat);
+          const items = (order.line_items || []).map(li => ({ name: li.name || '', quantity: li.quantity || 1, total: li.total || '0' }));
+          const productCost = detectProductCost(items);
+          const shippingCost = shippingCosts[conv.storeCode?.toUpperCase()] || 4.5;
+          const profit = netTotal - productCost - shippingCost;
+          // MK status
+          const orderNum = order.number || ('NORIKS-' + conv.storeCode?.toUpperCase() + '-' + conv.orderId);
+          const mkStatus = getMkStatusForOrder(orderNum) || getMkStatusForOrder(String(conv.orderId));
           convertedOrderCache[key] = {
             ts: now,
             customerName: ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown',
             email: b.email || '', phone: b.phone || '',
             total: order.total || '0', currency: order.currency || 'EUR',
             status: order.status || '',
-            items: (order.line_items || []).map(li => ({ name: li.name || '', quantity: li.quantity || 1, total: li.total || '0' }))
+            items,
+            profit: Math.round(profit * 100) / 100,
+            deliveryStatus: mkStatus?.deliveryStatus || 'unknown',
+            mkStatusDesc: mkStatus?.mkStatusDesc || '',
+            orderType: order.meta_data?.find(m => m.key === '_order_type')?.value || 'abandoned'
           };
         }
       } catch (e) { /* skip */ }
@@ -2421,7 +2488,7 @@ async function enrichConvertedOrders(conversions) {
   // Apply cached data to all conversions
   return conversions.map(conv => {
     const cached = convertedOrderCache[conv.storeCode + '_' + conv.orderId];
-    if (cached) Object.assign(conv, { customerName: cached.customerName, email: cached.email, phone: cached.phone, total: cached.total, currency: cached.currency, status: cached.status, items: cached.items });
+    if (cached) Object.assign(conv, { customerName: cached.customerName, email: cached.email, phone: cached.phone, total: cached.total, currency: cached.currency, status: cached.status, items: cached.items, profit: cached.profit, deliveryStatus: cached.deliveryStatus, mkStatusDesc: cached.mkStatusDesc, orderType: cached.orderType });
     return conv;
   });
 }
@@ -2449,31 +2516,57 @@ app.get('/api/statistics', async (req, res) => {
       return d >= fromDate && d <= toDate;
     });
     
-    // Get call data (status tracking) for conversions
+    // Get call data (status tracking)
     const callData = loadCallData();
-    
-    // Build conversions list with dates and store codes
+
+    // Build conversions list — prefer WC callcenter-orders cache (all CC orders), fallback to call_data
     const conversions = [];
-    for (const [id, data] of Object.entries(callData)) {
-      if (data.callStatus !== 'converted') continue;
-      // Extract store code from id (e.g. "gr_914" -> "gr", "cz_cart_123" -> "cz")
-      const sc = id.split('_')[0];
-      if (allowedCountries && !allowedCountries.includes(sc)) continue;
-      const convDate = (data.lastUpdated || '').slice(0, 10);
-      if (convDate < fromDate || convDate > toDate) continue;
-      const agentMatch = (data.notes || '').match(/created by (\w+)/);
-      const agent = agentMatch ? agentMatch[1] : 'Unknown';
-      const storeInfo = stores[sc] || {};
-      conversions.push({
-        id, storeCode: sc,
-        date: convDate,
-        orderId: data.orderId,
-        agent,
-        storeName: storeInfo.name || sc.toUpperCase(),
-        storeFlag: storeInfo.flag || '',
-        notes: data.notes || '',
-        time: data.lastUpdated || ''
-      });
+    const ccOrdersCache = getCache('callcenter_orders', 600);
+    if (ccOrdersCache && ccOrdersCache.length > 0) {
+      // Use WC orders as authoritative source
+      for (const order of ccOrdersCache) {
+        const sc = order.storeCode;
+        if (!sc || !stores[sc]) continue;
+        if (allowedCountries && !allowedCountries.includes(sc)) continue;
+        const convDate = (order.date || '').slice(0, 10);
+        if (!convDate || convDate < fromDate || convDate > toDate) continue;
+        const wcOrderId = order.id || order.orderId;
+        conversions.push({
+          id: sc + '_order_' + wcOrderId,
+          storeCode: sc,
+          date: convDate,
+          orderId: wcOrderId,
+          agent: order.agent || 'Unknown',
+          storeName: stores[sc].name || sc.toUpperCase(),
+          storeFlag: stores[sc].flag || '',
+          notes: '',
+          time: order.date || '',
+          total: order.total,
+          currency: order.currency,
+          customerName: order.customer,
+          email: order.email,
+          phone: order.phone,
+          status: order.status,
+          items: order.items
+        });
+      }
+    } else {
+      // Fallback: use call_data converted entries
+      for (const [id, data] of Object.entries(callData)) {
+        if (data.callStatus !== 'converted') continue;
+        const sc = id.split('_')[0];
+        if (allowedCountries && !allowedCountries.includes(sc)) continue;
+        const convDate = (data.lastUpdated || '').slice(0, 10);
+        if (convDate < fromDate || convDate > toDate) continue;
+        const agentMatch = (data.notes || '').match(/created by (\w+)/);
+        const agent = agentMatch ? agentMatch[1] : 'Unknown';
+        const storeInfo = stores[sc] || {};
+        conversions.push({
+          id, storeCode: sc, date: convDate, orderId: data.orderId, agent,
+          storeName: storeInfo.name || sc.toUpperCase(), storeFlag: storeInfo.flag || '',
+          notes: data.notes || '', time: data.lastUpdated || ''
+        });
+      }
     }
     
     // Count all status changes as "calls" (any interaction)
@@ -2510,6 +2603,32 @@ app.get('/api/statistics', async (req, res) => {
       });
     }
     
+    // All buyers (one-time) - needed for statistics
+    const allBuyersRaw = RAM.buyers || [];
+    const allCartsRaw = await fetchAbandonedCarts();
+
+    // Helper: build status breakdown object from callData entries filtered by ids
+    function buildStatusObj(ids) {
+      const s = { total: 0, not_called: 0, called: 0, no_answer: 0, callback: 0, interested: 0, not_interested: 0, invalid: 0, converted: 0, convRate: 0 };
+      for (const id of ids) {
+        const d = callData[id];
+        const status = d ? d.callStatus : 'not_called';
+        s.total++;
+        if (!status || status === 'not_called') s.not_called++;
+        else {
+          s.called++;
+          if (status.includes('no_answer') || status === 'called_no_answer') s.no_answer++;
+          else if (status === 'called_callback') s.callback++;
+          else if (status === 'called_interested') s.interested++;
+          else if (status === 'called_not_interested') s.not_interested++;
+          else if (status === 'invalid_number') s.invalid++;
+          else if (status === 'converted') s.converted++;
+        }
+      }
+      s.convRate = s.total > 0 ? Math.round(s.converted / s.total * 1000) / 10 : 0;
+      return s;
+    }
+
     // Country breakdown
     const countryStats = {};
     const storeList = allowedCountries || Object.keys(stores);
@@ -2518,13 +2637,49 @@ app.get('/api/statistics', async (req, res) => {
       const storeCarts = allCarts.filter(c => c.storeCode === sc);
       const storeConversions = conversions.filter(c => c.storeCode === sc);
       const storeCalls = allCalls.filter(c => c.storeCode === sc);
+
+      // All-time totals for this country (not date filtered)
+      const allCartsForStore = allCartsRaw.filter(c => c.storeCode === sc);
+      const allBuyersForStore = allBuyersRaw.filter(b => b.storeCode === sc);
+
+      // New carts/buyers in period
+      const newCarts = allCartsForStore.filter(c => {
+        const d = (c.abandonedAt || '').slice(0, 10);
+        return d >= fromDate && d <= toDate;
+      }).length;
+      const newBuyers = allBuyersForStore.filter(b => {
+        const d = (b.registeredAt || '').slice(0, 10);
+        return d >= fromDate && d <= toDate;
+      }).length;
+
+      // Build abandoned carts status breakdown (period carts)
+      const cartIds = storeCarts.map(c => c.id);
+      const abandoned = buildStatusObj(cartIds);
+
+      // Build one-time buyers status breakdown (all buyers for store with call data in period)
+      const buyerIdsInPeriod = allBuyersForStore
+        .filter(b => {
+          const d = callData[b.id];
+          if (!d) return false;
+          const callDate = (d.lastUpdated || '').slice(0, 10);
+          return callDate >= fromDate && callDate <= toDate;
+        })
+        .map(b => b.id);
+      const onetime = buildStatusObj(buyerIdsInPeriod);
+
       countryStats[sc] = {
         flag: stores[sc].flag,
         name: stores[sc].name,
         leads: storeCarts.length,
         conversions: storeConversions.length, orders: storeConversions.length,
         calls: storeCalls.length,
-        conversionRate: storeCarts.length > 0 ? Math.round(storeConversions.length / storeCarts.length * 1000) / 10 : 0
+        conversionRate: storeCarts.length > 0 ? Math.round(storeConversions.length / storeCarts.length * 1000) / 10 : 0,
+        abandoned,
+        onetime,
+        allCarts: allCartsForStore.length,
+        allBuyers: allBuyersForStore.length,
+        newCarts,
+        newBuyers
       };
     }
     
