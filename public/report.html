@@ -3,20 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report - Noriks Call Center</title>
+    <title>Statistics - Noriks Call Center</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .main-content { margin-left: var(--sidebar-width); min-height: 100vh; transition: margin-left var(--transition-slow); }
         .sidebar.collapsed ~ .main-content { margin-left: 70px; }
-        .page-content { padding: 80px 24px 24px; }
+        .page-content { padding: 80px 20px 24px; max-width: 1400px; }
+
+        /* Period Filter Bar */
+        .period-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 12px 16px; }
+        .period-bar .label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+        .period-btn { padding: 6px 14px; border: 1px solid var(--card-border); background: var(--content-bg); color: var(--text-secondary); border-radius: 3px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+        .period-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .period-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+        .period-bar .sep { color: var(--text-muted); font-size: 12px; }
+        .period-bar input[type="date"] { padding: 5px 10px; border: 1px solid var(--card-border); border-radius: 3px; background: var(--content-bg); color: var(--text-primary); font-size: 12px; font-family: inherit; }
+        .period-bar input[type="date"]:focus { outline: none; border-color: var(--accent-blue); }
+        .apply-btn { padding: 6px 18px; background: var(--accent-blue); color: #fff; border: none; border-radius: 3px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+        .apply-btn:hover { background: #2563eb; }
+
+        /* KPI Cards */
+        .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
+        .kpi { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px; text-align: center; transition: border-color 0.15s; }
+        .kpi:hover { border-color: var(--accent-blue); }
+        .kpi .val { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+        .kpi .lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .kpi .val.green { color: var(--accent-green); }
+        .kpi .val.blue { color: var(--accent-blue); }
+        .kpi .val.orange { color: var(--accent-orange); }
+        .kpi .val.purple { color: var(--accent-purple); }
+        .kpi .val.red { color: var(--accent-red); }
+
+        /* Section headers */
+        .section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); margin-bottom: 20px; overflow: hidden; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--card-border); }
+        .section-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: var(--accent-blue); }
+
+        /* Country Stats Table */
+        .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .stats-table th { text-align: center; padding: 8px 6px; background: var(--content-bg); color: var(--text-muted); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--card-border); white-space: nowrap; }
+        .stats-table th:first-child { text-align: left; padding-left: 16px; }
+        .stats-table td { text-align: center; padding: 8px 6px; border-bottom: 1px solid var(--card-border); }
+        .stats-table td:first-child { text-align: left; padding-left: 16px; font-weight: 600; }
+        .stats-table tr:hover td { background: rgba(59, 130, 246, 0.03); }
+        .stats-table .total-row td { font-weight: 700; background: var(--content-bg); border-top: 2px solid var(--card-border); }
+        .stats-table .type-label { display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 10px; font-weight: 600; }
+        .type-label.abandoned { background: var(--accent-orange-light); color: var(--accent-orange); }
+        .type-label.onetime { background: var(--accent-purple-light); color: var(--accent-purple); }
+        .stats-table .country-cell { display: flex; align-items: center; gap: 8px; }
+        .stats-table .flag { font-size: 16px; }
+        .num-green { color: var(--accent-green); font-weight: 700; }
+        .num-red { color: var(--accent-red); }
+        .num-orange { color: var(--accent-orange); }
+        .num-muted { color: var(--text-muted); }
+
+        /* Expandable daily rows */
+        .expand-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 12px; padding: 4px; transition: transform 0.2s; }
+        .expand-btn.open { transform: rotate(90deg); }
+        .daily-rows td { background: rgba(59, 130, 246, 0.02); font-size: 11px; }
+        .daily-rows td:first-child { padding-left: 40px; }
+        .daily-rows { display: none; }
+        .daily-rows.show { display: table-row-group; }
+
+        /* Tab pills for type filter */
+        .type-tabs { display: flex; gap: 4px; }
+        .type-tab { padding: 4px 12px; border: 1px solid var(--card-border); background: var(--content-bg); color: var(--text-secondary); border-radius: 3px; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+        .type-tab.active { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+
+        /* Orders table */
+        .orders-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .orders-table th { text-align: left; padding: 8px 10px; background: var(--content-bg); color: var(--text-muted); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--card-border); white-space: nowrap; }
+        .orders-table td { padding: 10px; border-bottom: 1px solid var(--card-border); vertical-align: top; }
+        .orders-table tr:hover td { background: rgba(59, 130, 246, 0.03); }
+        .order-num { color: var(--accent-blue); font-weight: 600; }
+        .order-status { display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 10px; font-weight: 600; }
+        .order-status.processing { background: var(--accent-blue-light); color: var(--accent-blue); }
+        .order-status.completed { background: var(--accent-green-light); color: var(--accent-green); }
+        .order-status.on-hold { background: var(--accent-orange-light); color: var(--accent-orange); }
+        .order-status.pending { background: var(--accent-yellow-light); color: var(--accent-yellow); }
+        .order-status.cancelled, .order-status.failed { background: var(--accent-red-light); color: var(--accent-red); }
+        .customer-detail { font-size: 10px; color: var(--text-muted); }
+        .order-items-list { font-size: 11px; color: var(--text-secondary); max-width: 350px; }
+        .order-total { font-weight: 700; color: var(--accent-green); white-space: nowrap; }
+
+        /* Loading */
+        .loading-bar { height: 3px; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-blue)); background-size: 200%; animation: shimmer 1.5s infinite; border-radius: 2px; margin: 20px 0; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+        .empty-state i { font-size: 32px; opacity: 0.3; margin-bottom: 8px; display: block; }
+
+        /* Responsive */
+        @media (max-width: 1200px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) {
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .period-bar { flex-direction: column; align-items: stretch; }
+            .page-content { padding: 72px 12px 20px; }
+        }
+        @media (max-width: 1024px) {
+            .main-content { margin-left: 0; }
+        }
+
+        /* Scrollable table wrapper */
+        .tbl-wrap { overflow-x: auto; }
     </style>
 </head>
 <body>
-    <!-- Sidebar Overlay (Mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header"><div class="logo">N</div><div class="brand">Noriks<span>Call Center</span></div></div>
         <nav class="sidebar-nav">
@@ -31,118 +127,487 @@
             </div>
         </div>
     </aside>
-    
+
     <div class="top-bar" id="topBar">
         <button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
-        <div class="page-title">Statistics</div>
+        <div class="page-title"><i class="fas fa-chart-bar" style="color:var(--accent-blue);margin-right:8px;"></i> Statistics</div>
         <div class="top-bar-actions">
-            <button class="action-btn-header" onclick="loadStats()"><i class="fas fa-sync-alt"></i> <span class="hide-mobile">Refresh</span></button>
+            <button class="action-btn-header" onclick="loadAll()"><i class="fas fa-sync-alt"></i> <span class="hide-mobile">Refresh</span></button>
             <div class="header-avatar" id="headerAvatar">N</div>
         </div>
     </div>
-    
+
     <main class="main-content">
         <div class="page-content">
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-globe"></i></div><div><div class="stat-value" id="statCountries">0</div><div class="stat-label">Active Countries</div></div></div>
-                <div class="stat-card"><div class="stat-icon purple"><i class="fas fa-shopping-cart"></i></div><div><div class="stat-value" id="statTotalCarts">0</div><div class="stat-label">Total Abandoned</div></div></div>
-                <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div><div class="stat-value" id="statConverted">0</div><div class="stat-label">Converted</div></div></div>
-                <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-percentage"></i></div><div><div class="stat-value" id="statConvRate">0%</div><div class="stat-label">Conversion Rate</div></div></div>
+
+            <!-- Period Filter -->
+            <div class="period-bar">
+                <span class="label">Period</span>
+                <button class="period-btn active" data-period="today">Today</button>
+                <button class="period-btn" data-period="yesterday">Yesterday</button>
+                <button class="period-btn" data-period="7d">7D</button>
+                <button class="period-btn" data-period="14d">14D</button>
+                <button class="period-btn" data-period="30d">30D</button>
+                <button class="period-btn" data-period="this-month">This Month</button>
+                <button class="period-btn" data-period="last-month">Last Month</button>
+                <button class="period-btn" data-period="all">All Time</button>
+                <span class="sep" style="margin-left:8px;">|</span>
+                <span class="label" style="margin-left:8px;">Range</span>
+                <input type="date" id="dateFrom">
+                <span class="sep">→</span>
+                <input type="date" id="dateTo">
+                <button class="apply-btn" onclick="applyCustomRange()">Apply</button>
             </div>
-            
-            <div class="card">
-                <div class="card-header"><h2 class="card-title"><i class="fas fa-chart-bar"></i> Call Statistics by Country</h2></div>
-                <div class="card-body"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Country</th><th>Total</th><th>Not Called</th><th>Called</th><th>Answered</th><th>No Answer</th><th>Converted</th><th>Not Interested</th><th>Conv. Rate</th></tr></thead><tbody id="countryStats"><tr><td colspan="9"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr></tbody></table></div></div>
+
+            <!-- KPI Row -->
+            <div class="kpi-row">
+                <div class="kpi"><div class="val blue" id="kpiAbandoned">-</div><div class="lbl">🛒 Abandoned Carts</div></div>
+                <div class="kpi"><div class="val purple" id="kpiOnetime">-</div><div class="lbl">👤 One-time Buyers</div></div>
+                <div class="kpi"><div class="val" id="kpiCalled">-</div><div class="lbl">📞 Total Called</div></div>
+                <div class="kpi"><div class="val green" id="kpiConverted">-</div><div class="lbl">✅ Orders Won</div></div>
+                <div class="kpi"><div class="val red" id="kpiNotInterested">-</div><div class="lbl">❌ Not Interested</div></div>
+                <div class="kpi"><div class="val orange" id="kpiConvRate">-</div><div class="lbl">📊 Conv. Rate</div></div>
             </div>
-            
-            <div class="card" style="margin-top:24px;">
-                <div class="card-header"><h2 class="card-title"><i class="fas fa-clock"></i> Pending Orders Statistics</h2></div>
-                <div class="card-body"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Country</th><th>Pending</th><th>Cancelled</th><th>Failed</th><th>On Hold</th><th>Total Value</th></tr></thead><tbody id="pendingStats"><tr><td colspan="6"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr></tbody></table></div></div>
+
+            <!-- Country Stats -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title"><i class="fas fa-globe"></i> Performance by Country</div>
+                    <div class="type-tabs">
+                        <button class="type-tab active" data-type="all" onclick="setTypeFilter('all',this)">All</button>
+                        <button class="type-tab" data-type="abandoned" onclick="setTypeFilter('abandoned',this)">🛒 Abandoned</button>
+                        <button class="type-tab" data-type="onetime" onclick="setTypeFilter('onetime',this)">👤 One-time</button>
+                    </div>
+                </div>
+                <div class="tbl-wrap">
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th style="width:30px;"></th>
+                                <th style="text-align:left;">Country</th>
+                                <th>Type</th>
+                                <th>Total Leads</th>
+                                <th>Not Called</th>
+                                <th>Called</th>
+                                <th>No Answer</th>
+                                <th>Callback</th>
+                                <th>Interested</th>
+                                <th>Not Interested</th>
+                                <th>Invalid #</th>
+                                <th>Converted</th>
+                                <th>Conv %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="countryBody">
+                            <tr><td colspan="13"><div class="loading-bar"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Daily Breakdown -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title"><i class="fas fa-calendar-alt"></i> Daily Breakdown</div>
+                    <div id="dailyCountryTabs" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+                </div>
+                <div class="tbl-wrap">
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left;">Date</th>
+                                <th>Type</th>
+                                <th>Total Leads</th>
+                                <th>Called</th>
+                                <th>No Answer</th>
+                                <th>Callback</th>
+                                <th>Interested</th>
+                                <th>Not Interested</th>
+                                <th>Invalid #</th>
+                                <th>Converted</th>
+                                <th>Conv %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyBody">
+                            <tr><td colspan="11"><div class="loading-bar"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Call Center Orders -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title"><i class="fas fa-check-circle" style="color:var(--accent-green);"></i> Call Center Orders</div>
+                    <span id="ordersCount" style="font-size:12px;color:var(--text-muted);"></span>
+                </div>
+                <div class="tbl-wrap">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Country</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Agent</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersBody">
+                            <tr><td colspan="8"><div class="loading-bar"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
-    
-    <script>
-        const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
-        if (!user) window.location.href = '/login';
+
+<script>
+const user = JSON.parse(localStorage.getItem('callcenter_user') || 'null');
+if (!user) window.location.href = '/login';
+else {
+    document.getElementById('userName').textContent = user.username;
+    document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Agent';
+    const initial = user.username[0].toUpperCase();
+    document.getElementById('userAvatar').textContent = initial;
+    document.getElementById('headerAvatar').textContent = initial;
+    if (user.role === 'admin') document.body.classList.add('is-admin');
+}
+
+document.getElementById('menuToggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+});
+document.getElementById('sidebarOverlay').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+});
+function logout() { localStorage.removeItem('callcenter_user'); window.location.href = '/login'; }
+
+// ========== STATE ==========
+let allAbandoned = [];
+let allOnetime = [];
+let allCallLogs = [];
+let allOrders = [];
+let currentPeriod = 'today';
+let dateFrom = '', dateTo = '';
+let typeFilter = 'all';
+let dailyCountry = 'all';
+
+const flags = { hr:'🇭🇷', cz:'🇨🇿', pl:'🇵🇱', sk:'🇸🇰', gr:'🇬🇷', it:'🇮🇹', hu:'🇭🇺' };
+const names = { hr:'Croatia', cz:'Czech', pl:'Poland', sk:'Slovakia', gr:'Greece', it:'Italy', hu:'Hungary' };
+const syms = { EUR:'€', CZK:'Kč', PLN:'zł', HUF:'Ft' };
+const storeCurr = { hr:'EUR', cz:'CZK', pl:'PLN', sk:'EUR', hu:'HUF', gr:'EUR', it:'EUR' };
+
+// ========== DATE HELPERS ==========
+function today() { return new Date().toISOString().slice(0,10); }
+function daysAgo(n) { return new Date(Date.now() - n*86400000).toISOString().slice(0,10); }
+function monthStart() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0,10); }
+function lastMonthRange() {
+    const d = new Date(); const first = new Date(d.getFullYear(), d.getMonth()-1, 1);
+    const last = new Date(d.getFullYear(), d.getMonth(), 0);
+    return [first.toISOString().slice(0,10), last.toISOString().slice(0,10)];
+}
+
+function setPeriod(p) {
+    currentPeriod = p;
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === p));
+    switch(p) {
+        case 'today': dateFrom = dateTo = today(); break;
+        case 'yesterday': dateFrom = dateTo = daysAgo(1); break;
+        case '7d': dateFrom = daysAgo(6); dateTo = today(); break;
+        case '14d': dateFrom = daysAgo(13); dateTo = today(); break;
+        case '30d': dateFrom = daysAgo(29); dateTo = today(); break;
+        case 'this-month': dateFrom = monthStart(); dateTo = today(); break;
+        case 'last-month': { const [a,b] = lastMonthRange(); dateFrom=a; dateTo=b; break; }
+        case 'all': dateFrom = '2020-01-01'; dateTo = today(); break;
+    }
+    document.getElementById('dateFrom').value = dateFrom;
+    document.getElementById('dateTo').value = dateTo;
+    renderAll();
+}
+
+function applyCustomRange() {
+    dateFrom = document.getElementById('dateFrom').value;
+    dateTo = document.getElementById('dateTo').value;
+    if (!dateFrom || !dateTo) return;
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    currentPeriod = 'custom';
+    renderAll();
+}
+
+document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', () => setPeriod(btn.dataset.period));
+});
+
+// ========== TYPE FILTER ==========
+function setTypeFilter(t, el) {
+    typeFilter = t;
+    document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderCountryStats();
+    renderDailyBreakdown();
+}
+
+// ========== FETCHING ==========
+async function loadAll() {
+    const [abandoned, onetime, logs, orders] = await Promise.all([
+        fetch('/api/abandoned-carts').then(r => r.json()).catch(() => []),
+        fetch('/api/buyers-cache').then(r => r.json()).then(d => d.buyers || []).catch(() => []),
+        fetch('/api/call-logs').then(r => r.json()).catch(() => []),
+        fetch('/api/callcenter-orders').then(r => r.json()).catch(() => [])
+    ]);
+
+    // Filter by user countries
+    if (user && !user.countries.includes('all')) {
+        allAbandoned = abandoned.filter(c => user.countries.includes(c.storeCode));
+        allOnetime = onetime.filter(c => user.countries.includes(c.storeCode));
+        allCallLogs = logs.filter(l => user.countries.includes(l.storeCode));
+        allOrders = orders.filter(o => user.countries.includes(o.storeCode));
+    } else {
+        allAbandoned = Array.isArray(abandoned) ? abandoned : [];
+        allOnetime = Array.isArray(onetime) ? onetime : [];
+        allCallLogs = Array.isArray(logs) ? logs : [];
+        allOrders = Array.isArray(orders) ? orders : [];
+    }
+
+    // Merge callStatus from call_data into abandoned & onetime
+    // (already done server-side, but let's ensure)
+
+    setPeriod(currentPeriod);
+}
+
+// ========== FILTER HELPERS ==========
+function inRange(dateStr) {
+    if (!dateStr) return false;
+    const d = dateStr.slice(0,10);
+    return d >= dateFrom && d <= dateTo;
+}
+
+function getLeads(type) {
+    let items = [];
+    if (type === 'all' || type === 'abandoned') items = items.concat(allAbandoned.map(c => ({...c, _type:'abandoned'})));
+    if (type === 'all' || type === 'onetime') items = items.concat(allOnetime.map(c => ({...c, _type:'onetime'})));
+    return items;
+}
+
+// Status categorization
+function isCalled(status) { return status && status !== 'not_called'; }
+function isNoAnswer(status) { return /^no_answer/.test(status); }
+function isCallback(status) { return status === 'called_callback'; }
+function isInterested(status) { return status === 'called_interested'; }
+function isNotInterested(status) { return status === 'called_not_interested'; }
+function isInvalid(status) { return status === 'invalid_number'; }
+function isConverted(status) { return status === 'converted'; }
+
+function countStats(items) {
+    const s = { total:0, not_called:0, called:0, no_answer:0, callback:0, interested:0, not_interested:0, invalid:0, converted:0 };
+    for (const item of items) {
+        s.total++;
+        const st = item.callStatus || 'not_called';
+        if (!isCalled(st)) s.not_called++;
         else {
-            document.getElementById('userName').textContent = user.username;
-            document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Agent';
-            document.getElementById('userAvatar').textContent = user.username[0].toUpperCase();
-            document.getElementById('headerAvatar').textContent = user.username[0].toUpperCase();
-            if (user.role === 'admin') document.body.classList.add('is-admin');
+            s.called++;
+            if (isNoAnswer(st)) s.no_answer++;
+            if (isCallback(st)) s.callback++;
+            if (isInterested(st)) s.interested++;
+            if (isNotInterested(st)) s.not_interested++;
+            if (isInvalid(st)) s.invalid++;
+            if (isConverted(st)) s.converted++;
         }
-        
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
-        });
-        document.getElementById('sidebarOverlay').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-        });
-        
-        function logout() { localStorage.removeItem('callcenter_user'); window.location.href = '/login'; }
-        
-        async function loadStats() {
-            try {
-                const [carts, orders] = await Promise.all([
-                    fetch('/api/abandoned-carts').then(r => r.json()).catch(() => []),
-                    fetch('/api/pending-orders').then(r => r.json()).catch(() => [])
-                ]);
-                let filteredCarts = carts, filteredOrders = orders;
-                if (user && !user.countries.includes('all')) {
-                    filteredCarts = carts.filter(c => user.countries.includes(c.storeCode));
-                    filteredOrders = orders.filter(o => user.countries.includes(o.storeCode));
-                }
-                renderCountryStats(filteredCarts);
-                renderPendingStats(filteredOrders);
-            } catch (e) { console.error('Failed to load stats:', e); }
-        }
-        
-        function renderCountryStats(carts) {
-            const byCountry = {};
-            const flags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', gr: '🇬🇷', it: '🇮🇹', hu: '🇭🇺' };
-            carts.forEach(c => {
-                if (!byCountry[c.storeCode]) byCountry[c.storeCode] = { flag: flags[c.storeCode] || '🌍', name: c.storeName || c.storeCode.toUpperCase(), total: 0, not_called: 0, called: 0, answered: 0, no_answer: 0, converted: 0, not_interested: 0 };
-                byCountry[c.storeCode].total++;
-                const status = c.callStatus || 'not_called';
-                if (byCountry[c.storeCode][status] !== undefined) byCountry[c.storeCode][status]++;
-            });
-            const totals = { total: 0, not_called: 0, called: 0, answered: 0, no_answer: 0, converted: 0, not_interested: 0 };
-            let html = '';
-            Object.entries(byCountry).sort((a, b) => b[1].total - a[1].total).forEach(([code, s]) => {
-                const rate = s.total > 0 ? ((s.converted / s.total) * 100).toFixed(1) : '0.0';
-                html += `<tr><td><span class="store-badge"><span class="store-flag">${s.flag}</span> ${s.name}</span></td><td><strong>${s.total}</strong></td><td>${s.not_called}</td><td>${s.called}</td><td>${s.answered}</td><td>${s.no_answer}</td><td><span class="badge converted">${s.converted}</span></td><td><span class="badge not_interested">${s.not_interested}</span></td><td>${rate}%</td></tr>`;
-                Object.keys(totals).forEach(k => totals[k] += (s[k] || 0));
-            });
-            const totalRate = totals.total > 0 ? ((totals.converted / totals.total) * 100).toFixed(1) : '0.0';
-            html += `<tr style="font-weight:600;"><td>📊 <strong>TOTAL</strong></td><td><strong>${totals.total}</strong></td><td>${totals.not_called}</td><td>${totals.called}</td><td>${totals.answered}</td><td>${totals.no_answer}</td><td><span class="badge converted">${totals.converted}</span></td><td><span class="badge not_interested">${totals.not_interested}</span></td><td>${totalRate}%</td></tr>`;
-            document.getElementById('countryStats').innerHTML = html || '<tr><td colspan="9">No data</td></tr>';
-            document.getElementById('statCountries').textContent = Object.keys(byCountry).length;
-            document.getElementById('statTotalCarts').textContent = totals.total.toLocaleString();
-            document.getElementById('statConverted').textContent = totals.converted.toLocaleString();
-            document.getElementById('statConvRate').textContent = totalRate + '%';
-        }
-        
-        function renderPendingStats(orders) {
-            const byCountry = {};
-            const flags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', gr: '🇬🇷', it: '🇮🇹', hu: '🇭🇺' };
-            orders.forEach(o => {
-                if (!byCountry[o.storeCode]) byCountry[o.storeCode] = { flag: flags[o.storeCode] || '🌍', name: o.storeName || o.storeCode.toUpperCase(), pending: 0, cancelled: 0, failed: 0, 'on-hold': 0, totalValue: 0, currency: o.currency || 'EUR' };
-                const status = o.orderStatus || 'pending';
-                if (byCountry[o.storeCode][status] !== undefined) byCountry[o.storeCode][status]++;
-                byCountry[o.storeCode].totalValue += parseFloat(o.orderTotal || 0);
-            });
-            let html = '';
-            Object.entries(byCountry).forEach(([code, s]) => {
-                const sym = { EUR: '€', CZK: 'Kč', PLN: 'zł', HUF: 'Ft' }[s.currency] || s.currency;
-                html += `<tr><td><span class="store-badge"><span class="store-flag">${s.flag}</span> ${s.name}</span></td><td>${s.pending}</td><td>${s.cancelled}</td><td>${s.failed}</td><td>${s['on-hold']}</td><td><strong>${sym} ${s.totalValue.toFixed(2)}</strong></td></tr>`;
-            });
-            document.getElementById('pendingStats').innerHTML = html || '<tr><td colspan="6">No pending orders</td></tr>';
-        }
-        
-        loadStats();
-    </script>
+    }
+    s.rate = s.total > 0 ? ((s.converted / s.total) * 100).toFixed(1) : '0.0';
+    return s;
+}
+
+// ========== RENDER ==========
+function renderAll() {
+    renderKPIs();
+    renderCountryStats();
+    renderDailyBreakdown();
+    renderOrders();
+    buildDailyCountryTabs();
+}
+
+function renderKPIs() {
+    // Filter by date: use abandonedAt for carts, registeredAt for buyers
+    const abInRange = allAbandoned.filter(c => inRange(c.abandonedAt));
+    const otInRange = allOnetime.filter(c => inRange(c.registeredAt));
+    const all = [...abInRange.map(c=>({...c,_type:'abandoned'})), ...otInRange.map(c=>({...c,_type:'onetime'}))];
+    const s = countStats(all);
+
+    // Orders in range
+    const ordersInRange = allOrders.filter(o => inRange(o.date));
+
+    document.getElementById('kpiAbandoned').textContent = abInRange.length;
+    document.getElementById('kpiOnetime').textContent = otInRange.length;
+    document.getElementById('kpiCalled').textContent = s.called;
+    document.getElementById('kpiConverted').textContent = ordersInRange.length;
+    document.getElementById('kpiNotInterested').textContent = s.not_interested;
+    document.getElementById('kpiConvRate').textContent = s.total > 0 ? ((ordersInRange.length / s.total) * 100).toFixed(1) + '%' : '0%';
+}
+
+function renderCountryStats() {
+    const leads = getLeads(typeFilter);
+    // Group by country + type
+    const groups = {};
+    for (const item of leads) {
+        const dateField = item._type === 'abandoned' ? item.abandonedAt : item.registeredAt;
+        // We show all leads (not filtered by date) but call statuses reflect current state
+        const key = `${item.storeCode}_${item._type}`;
+        if (!groups[key]) groups[key] = { storeCode: item.storeCode, type: item._type, items: [] };
+        groups[key].items.push(item);
+    }
+
+    // Sort: by country, then abandoned before onetime
+    const sorted = Object.values(groups).sort((a,b) => {
+        if (a.storeCode !== b.storeCode) return a.storeCode.localeCompare(b.storeCode);
+        return a.type === 'abandoned' ? -1 : 1;
+    });
+
+    let html = '';
+    const grandTotal = { total:0, not_called:0, called:0, no_answer:0, callback:0, interested:0, not_interested:0, invalid:0, converted:0 };
+
+    for (const g of sorted) {
+        const s = countStats(g.items);
+        Object.keys(grandTotal).forEach(k => grandTotal[k] += s[k]);
+        const typeCls = g.type === 'abandoned' ? 'abandoned' : 'onetime';
+        const typeLabel = g.type === 'abandoned' ? '🛒 Abandoned' : '👤 One-time';
+        html += `<tr>
+            <td></td>
+            <td><span class="country-cell"><span class="flag">${flags[g.storeCode]||'🌍'}</span> ${names[g.storeCode]||g.storeCode.toUpperCase()}</span></td>
+            <td><span class="type-label ${typeCls}">${typeLabel}</span></td>
+            <td><strong>${s.total}</strong></td>
+            <td class="num-muted">${s.not_called}</td>
+            <td>${s.called}</td>
+            <td class="num-orange">${s.no_answer || '-'}</td>
+            <td>${s.callback || '-'}</td>
+            <td>${s.interested || '-'}</td>
+            <td class="num-red">${s.not_interested || '-'}</td>
+            <td class="num-muted">${s.invalid || '-'}</td>
+            <td class="num-green">${s.converted || '-'}</td>
+            <td>${s.rate}%</td>
+        </tr>`;
+    }
+
+    const gr = grandTotal;
+    gr.rate = gr.total > 0 ? ((gr.converted / gr.total) * 100).toFixed(1) : '0.0';
+    html += `<tr class="total-row">
+        <td></td><td>📊 <strong>TOTAL</strong></td><td></td>
+        <td><strong>${gr.total}</strong></td>
+        <td>${gr.not_called}</td><td>${gr.called}</td>
+        <td class="num-orange">${gr.no_answer}</td><td>${gr.callback}</td><td>${gr.interested}</td>
+        <td class="num-red">${gr.not_interested}</td><td>${gr.invalid}</td>
+        <td class="num-green"><strong>${gr.converted}</strong></td><td><strong>${gr.rate}%</strong></td>
+    </tr>`;
+
+    document.getElementById('countryBody').innerHTML = html || '<tr><td colspan="13"><div class="empty-state"><i class="fas fa-inbox"></i>No data</div></td></tr>';
+}
+
+function buildDailyCountryTabs() {
+    const countries = new Set();
+    allAbandoned.forEach(c => countries.add(c.storeCode));
+    allOnetime.forEach(c => countries.add(c.storeCode));
+    let html = `<button class="type-tab ${dailyCountry==='all'?'active':''}" onclick="setDailyCountry('all',this)">All</button>`;
+    for (const code of [...countries].sort()) {
+        html += `<button class="type-tab ${dailyCountry===code?'active':''}" onclick="setDailyCountry('${code}',this)">${flags[code]||''} ${names[code]||code.toUpperCase()}</button>`;
+    }
+    document.getElementById('dailyCountryTabs').innerHTML = html;
+}
+
+function setDailyCountry(code, el) {
+    dailyCountry = code;
+    document.querySelectorAll('#dailyCountryTabs .type-tab').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderDailyBreakdown();
+}
+
+function renderDailyBreakdown() {
+    // Build day-by-day stats using call logs + lead data
+    let leads = getLeads(typeFilter);
+    if (dailyCountry !== 'all') leads = leads.filter(l => l.storeCode === dailyCountry);
+
+    // Group leads by the date they were last updated (call status change) or abandonedAt
+    // Better approach: group by abandonedAt/registeredAt date, show current status
+    const byDate = {};
+
+    for (const item of leads) {
+        const dateField = item._type === 'abandoned' ? item.abandonedAt : item.registeredAt;
+        if (!dateField) continue;
+        const d = dateField.slice(0,10);
+        if (d < dateFrom || d > dateTo) continue;
+        const key = `${d}_${item._type}`;
+        if (!byDate[key]) byDate[key] = { date: d, type: item._type, items: [] };
+        byDate[key].items.push(item);
+    }
+
+    // Sort by date desc, then type
+    const sorted = Object.values(byDate).sort((a,b) => {
+        if (a.date !== b.date) return b.date.localeCompare(a.date);
+        return a.type === 'abandoned' ? -1 : 1;
+    });
+
+    let html = '';
+    for (const g of sorted) {
+        const s = countStats(g.items);
+        const typeCls = g.type === 'abandoned' ? 'abandoned' : 'onetime';
+        const typeLabel = g.type === 'abandoned' ? '🛒 Abandoned' : '👤 One-time';
+        html += `<tr>
+            <td style="text-align:left;font-weight:600;">${g.date}</td>
+            <td><span class="type-label ${typeCls}">${typeLabel}</span></td>
+            <td><strong>${s.total}</strong></td>
+            <td>${s.called}</td>
+            <td class="num-orange">${s.no_answer || '-'}</td>
+            <td>${s.callback || '-'}</td>
+            <td>${s.interested || '-'}</td>
+            <td class="num-red">${s.not_interested || '-'}</td>
+            <td class="num-muted">${s.invalid || '-'}</td>
+            <td class="num-green">${s.converted || '-'}</td>
+            <td>${s.rate}%</td>
+        </tr>`;
+    }
+
+    document.getElementById('dailyBody').innerHTML = html || '<tr><td colspan="11"><div class="empty-state"><i class="fas fa-calendar-times"></i>No data for this period</div></td></tr>';
+}
+
+function renderOrders() {
+    const filtered = allOrders.filter(o => inRange(o.date));
+    document.getElementById('ordersCount').textContent = `${filtered.length} orders`;
+
+    if (filtered.length === 0) {
+        document.getElementById('ordersBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-shopping-bag"></i>No call center orders in this period</div></td></tr>';
+        return;
+    }
+
+    let html = '';
+    for (const o of filtered) {
+        const sym = syms[o.currency] || o.currency;
+        const itemsStr = (o.items || []).map(i => `${i.qty}x ${i.name}`).join('<br>');
+        const statusCls = (o.status || '').replace('_','-');
+        html += `<tr>
+            <td style="white-space:nowrap;">${(o.date||'').slice(0,10)}</td>
+            <td><span class="order-num">#${o.number}</span></td>
+            <td>
+                <div style="font-weight:600;">${o.customer || 'Unknown'}</div>
+                <div class="customer-detail">${o.email || ''}</div>
+                <div class="customer-detail">${o.phone || ''}</div>
+            </td>
+            <td>${o.storeFlag || ''} ${o.storeName || ''}</td>
+            <td><div class="order-items-list">${itemsStr || '-'}</div></td>
+            <td class="order-total">${sym} ${o.total.toFixed(2)}</td>
+            <td><span class="order-status ${statusCls}">${o.status || '-'}</span></td>
+            <td>${o.agent || '-'}</td>
+        </tr>`;
+    }
+
+    document.getElementById('ordersBody').innerHTML = html;
+}
+
+// ========== INIT ==========
+setPeriod('today');
+loadAll();
+</script>
 </body>
 </html>

@@ -2542,6 +2542,45 @@ app.get('/api/statistics', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Call Center Orders (orders with _call_center meta)
+app.get('/api/callcenter-orders', async (req, res) => {
+  try {
+    const cached = getCache('callcenter_orders', 300);
+    if (cached) return res.json(cached);
+    const allOrders = [];
+    const flags = { hr: '🇭🇷', cz: '🇨🇿', pl: '🇵🇱', sk: '🇸🇰', gr: '🇬🇷', it: '🇮🇹', hu: '🇭🇺' };
+    const promises = Object.entries(stores).map(async ([storeCode, config]) => {
+      try {
+        for (let page = 1; page <= 5; page++) {
+          const orders = await wcApiRequest(storeCode, 'orders', { per_page: 100, page, status: 'processing,completed,on-hold,pending', orderby: 'date', order: 'desc' });
+          if (!Array.isArray(orders) || orders.length === 0) break;
+          for (const order of orders) {
+            const meta = order.meta_data || [];
+            const isCC = meta.find(m => m.key === '_call_center' && m.value === 'yes');
+            if (!isCC) continue;
+            const agentMeta = meta.find(m => m.key === '_call_center_agent');
+            const dateMeta = meta.find(m => m.key === '_call_center_date');
+            allOrders.push({
+              id: order.id, number: order.number || order.id, storeCode, storeName: config.name, storeFlag: flags[storeCode] || '🌍',
+              date: dateMeta?.value || order.date_created,
+              customer: `${order.billing?.first_name || ''} ${order.billing?.last_name || ''}`.trim(),
+              email: order.billing?.email || '', phone: order.billing?.phone || '',
+              total: parseFloat(order.total) || 0, currency: order.currency || storeCurrencies[storeCode] || 'EUR',
+              status: order.status, agent: agentMeta?.value || 'unknown',
+              items: (order.line_items || []).map(i => ({ name: i.name, qty: i.quantity, total: i.total }))
+            });
+          }
+          if (orders.length < 100) break;
+        }
+      } catch (e) { console.error(`Error fetching CC orders from ${storeCode}:`, e.message); }
+    });
+    await Promise.all(promises);
+    allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+    setCache('callcenter_orders', allOrders);
+    res.json(allOrders);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // Page routes
 app.get('/login', (req, res) => res.sendFile('login.html', { root: path.join(__dirname, 'public') }));
 app.get('/report', (req, res) => res.sendFile('report.html', { root: path.join(__dirname, 'public') }));
