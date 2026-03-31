@@ -199,7 +199,15 @@ const emailTemplatesFile = path.join(DATA_DIR, 'email-templates.json');
 
 // ========== DATA LOADERS ==========
 function loadCallData() { return readJson(callDataFile, {}); }
-function saveCallData(data) { writeJson(callDataFile, data); }
+function saveCallData(data) {
+  writeJson(callDataFile, data);
+  // Also save backup to SQLite for recovery
+  try {
+    // Store as single-element array wrapping the object
+    const { db: _db } = require('./db');
+    _db.prepare('INSERT OR REPLACE INTO cache_data (key, data, updated_at) VALUES (?, ?, ?)').run('call_data_backup', JSON.stringify(data), new Date().toISOString());
+  } catch(e) { /* non-critical */ }
+}
 function loadSmsQueue() { return readJson(smsQueueFile, []); }
 function saveSmsQueue(data) { writeJson(smsQueueFile, data); }
 function loadCallLogs() { const d = readJson(callLogsFile, { logs: [] }); return d.logs || []; }
