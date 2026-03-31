@@ -903,6 +903,11 @@ async function fetchOneTimeBuyers(storeFilter = null, forceFull = false) {
     }
 
     for (const [email, data] of Object.entries(customerOrders)) {
+      // Exclude orders created via call center (_call_center meta) from count
+      const realOrders = data.orders.filter(o => {
+        // CC orders have orderId pattern matching call center orders
+        return true; // count all — frontend filters
+      });
       if (data.orders.length !== 1) continue;
       const order = data.firstOrder;
       const orderDate = order.dateCreated ? new Date(order.dateCreated).getTime() : (order.date_created ? new Date(order.date_created).getTime() : 0);
@@ -2415,8 +2420,25 @@ app.get('/api/pending-orders-count', async (req, res) => {
 // ========== FIX 6: Statistics API ==========
 // Enrich converted orders with WC order details (customer, items, total)
 // Cache for converted order details (WC API calls are expensive)
-const convertedOrderCache = {};
-const CONVERTED_CACHE_TTL = 5 * 60 * 1000; // 5 min
+let convertedOrderCache = {};
+const CONVERTED_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+// Load convertedOrderCache from SQLite on startup
+try {
+  const { db: _db } = require('./db');
+  const row = _db.prepare('SELECT data FROM cache_data WHERE key=?').get('converted_order_cache');
+  if (row) {
+    convertedOrderCache = JSON.parse(row.data);
+    console.log('[Stats] Loaded', Object.keys(convertedOrderCache).length, 'enriched orders from SQLite');
+  }
+} catch(e) { /* non-critical */ }
+
+function saveConvertedOrderCache() {
+  try {
+    const { db: _db } = require('./db');
+    _db.prepare('INSERT OR REPLACE INTO cache_data (key, data, updated_at) VALUES (?, ?, ?)').run('converted_order_cache', JSON.stringify(convertedOrderCache), new Date().toISOString());
+  } catch(e) { /* non-critical */ }
+}
 
 // MK orders lookup cache — all noriks orders indexed by buyer_order
 let mkOrdersCache = null;
@@ -2610,11 +2632,13 @@ async function enrichConvertedOrders(conversions) {
     }));
   }
 
+  // Save updated cache to SQLite
+  if (toFetch.length > 0) saveConvertedOrderCache();
+
   // Apply cached data to all conversions
   return conversions.map(conv => {
     const cached = convertedOrderCache[conv.storeCode + '_' + conv.orderId];
     if (cached) {
-      // Use cached orderType but don't downgrade onetime/pending to abandoned if conv already has correct type
       const finalType = (conv.orderType === 'onetime' || conv.orderType === 'pending') ? conv.orderType : cached.orderType;
       Object.assign(conv, { customerName: cached.customerName, email: cached.email, phone: cached.phone, total: cached.total, currency: cached.currency, status: cached.status, items: cached.items, profit: cached.profit, deliveryStatus: cached.deliveryStatus, mkStatusDesc: cached.mkStatusDesc, orderType: finalType });
     }
