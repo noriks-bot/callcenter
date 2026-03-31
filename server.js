@@ -2491,10 +2491,41 @@ async function enrichConvertedOrders(conversions) {
           // orderType from WC meta (fast — no MK needed)
           const cartIdMeta = order.meta_data?.find(m => m.key === '_abandoned_cart_id')?.value || '';
           const orderType = cartIdMeta.includes('buyer') ? 'onetime' : cartIdMeta.includes('order') ? 'pending' : 'abandoned';
-          // MK status from local paketomati cache (fast — no API call needed for basic status)
+          // MK status — fetch synchronously from MK API
           const orderNum = order.number || ('NORIKS-' + conv.storeCode?.toUpperCase() + '-' + conv.orderId);
           const email = b.email || '';
-          const mkStatus = getMkStatusForOrder(orderNum, email);
+          let mkDeliveryStatus = 'unknown';
+          let mkStatusDesc = '';
+          try {
+            const mkSearch = await axios.post('https://main.metakocka.si/rest/eshop/v1/search', {
+              secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
+              doc_type: 'sales_order', result_type: 'doc', limit: 5, buyer_order: orderNum
+            }, { timeout: 8000 });
+            const mkOrders = (mkSearch.data?.result || []).filter(o => /noriks/i.test(o.eshop_name || ''));
+            if (mkOrders.length > 0) {
+              const mkOrder = mkOrders[0];
+              mkDeliveryStatus = mkOrder.status_desc || 'unknown';
+              mkStatusDesc = mkOrder.status_desc || '';
+              if (mkOrder.mk_id && mkOrder.shipped_date) {
+                try {
+                  const docResp = await axios.post('https://main.metakocka.si/rest/eshop/v1/get_document', {
+                    secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
+                    doc_type: 'sales_order', doc_id: mkOrder.mk_id, return_delivery_service_events: 'true'
+                  }, { timeout: 8000 });
+                  let events = docResp.data?.delivery_service_events || [];
+                  if (events.event_status) events = [events];
+                  if (Array.isArray(events) && events.length > 0) {
+                    mkStatusDesc = events[0].event_status || mkStatusDesc;
+                    const evLower = mkStatusDesc.toLowerCase();
+                    if (/delivered|prevzet|completed|dostavljen.*kupcu/i.test(evLower)) mkDeliveryStatus = 'completed';
+                    else if (/transit|in delivery|v dostavi/i.test(evLower)) mkDeliveryStatus = 'in_transit';
+                    else if (/pickup|paketomat|locker|čaka/i.test(evLower)) mkDeliveryStatus = 'pickup';
+                    else mkDeliveryStatus = mkOrder.status_desc || 'unknown';
+                  }
+                } catch(e2) { /* skip doc fetch */ }
+              }
+            }
+          } catch(e) { /* skip MK */ }
           convertedOrderCache[key] = {
             ts: now,
             customerName: ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown',
@@ -2503,49 +2534,10 @@ async function enrichConvertedOrders(conversions) {
             status: order.status || '',
             items,
             profit: Math.round(profit * 100) / 100,
-            deliveryStatus: mkStatus?.deliveryStatus || 'unknown',
-            mkStatusDesc: mkStatus?.mkStatusDesc || '',
-            orderType,
-            orderNum // save for background MK fetch
+            deliveryStatus: mkDeliveryStatus,
+            mkStatusDesc,
+            orderType
           };
-          // Background MK fetch (non-blocking) — updates cache when done
-          (async () => {
-            try {
-              const mkSearch = await axios.post('https://main.metakocka.si/rest/eshop/v1/search', {
-                secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
-                doc_type: 'sales_order', result_type: 'doc', limit: 5, buyer_order: orderNum
-              }, { timeout: 10000 });
-              const mkOrders = (mkSearch.data?.result || []).filter(o => /noriks/i.test(o.eshop_name || ''));
-              if (mkOrders.length > 0) {
-                const mkOrder = mkOrders[0];
-                let deliveryStatus = mkOrder.status_desc || 'unknown';
-                let mkStatusDesc = mkOrder.status_desc || '';
-                if (mkOrder.mk_id && mkOrder.shipped_date) {
-                  try {
-                    const docResp = await axios.post('https://main.metakocka.si/rest/eshop/v1/get_document', {
-                      secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
-                      doc_type: 'sales_order', doc_id: mkOrder.mk_id, return_delivery_service_events: 'true'
-                    }, { timeout: 10000 });
-                    let events = docResp.data?.delivery_service_events || [];
-                    if (events.event_status) events = [events];
-                    if (Array.isArray(events) && events.length > 0) {
-                      mkStatusDesc = events[0].event_status || mkStatusDesc;
-                      const evLower = mkStatusDesc.toLowerCase();
-                      if (/delivered|prevzet|completed|dostavljen.*kupcu/i.test(evLower)) deliveryStatus = 'completed';
-                      else if (/transit|in delivery|v dostavi/i.test(evLower)) deliveryStatus = 'in_transit';
-                      else if (/pickup|paketomat|locker|čaka/i.test(evLower)) deliveryStatus = 'pickup';
-                    }
-                  } catch(e2) { /* skip */ }
-                }
-                // Update cache with MK status (will be fresh on next request)
-                if (convertedOrderCache[key]) {
-                  convertedOrderCache[key].deliveryStatus = deliveryStatus;
-                  convertedOrderCache[key].mkStatusDesc = mkStatusDesc;
-                  convertedOrderCache[key].ts = Date.now(); // extend cache lifetime
-                }
-              }
-            } catch(e) { /* skip MK fetch */ }
-          })();
         }
       } catch (e) { /* skip */ }
     }));
