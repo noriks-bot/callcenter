@@ -2546,7 +2546,11 @@ async function enrichConvertedOrders(conversions) {
   // Apply cached data to all conversions
   return conversions.map(conv => {
     const cached = convertedOrderCache[conv.storeCode + '_' + conv.orderId];
-    if (cached) Object.assign(conv, { customerName: cached.customerName, email: cached.email, phone: cached.phone, total: cached.total, currency: cached.currency, status: cached.status, items: cached.items, profit: cached.profit, deliveryStatus: cached.deliveryStatus, mkStatusDesc: cached.mkStatusDesc, orderType: cached.orderType });
+    if (cached) {
+      // Use cached orderType but don't downgrade onetime/pending to abandoned if conv already has correct type
+      const finalType = (conv.orderType === 'onetime' || conv.orderType === 'pending') ? conv.orderType : cached.orderType;
+      Object.assign(conv, { customerName: cached.customerName, email: cached.email, phone: cached.phone, total: cached.total, currency: cached.currency, status: cached.status, items: cached.items, profit: cached.profit, deliveryStatus: cached.deliveryStatus, mkStatusDesc: cached.mkStatusDesc, orderType: finalType });
+    }
     return conv;
   });
 }
@@ -2619,10 +2623,13 @@ app.get('/api/statistics', async (req, res) => {
         const agentMatch = (data.notes || '').match(/created by (\w+)/);
         const agent = agentMatch ? agentMatch[1] : 'Unknown';
         const storeInfo = stores[sc] || {};
+        // Determine orderType from cartId format
+        const fallbackType = id.includes('buyer') ? 'onetime' : id.includes('order') ? 'pending' : 'abandoned';
         conversions.push({
           id, storeCode: sc, date: convDate, orderId: data.orderId, agent,
           storeName: storeInfo.name || sc.toUpperCase(), storeFlag: storeInfo.flag || '',
-          notes: data.notes || '', time: data.lastUpdated || ''
+          notes: data.notes || '', time: data.lastUpdated || '',
+          orderType: fallbackType // set here so enrichConvertedOrders can override with WC meta
         });
       }
     }
