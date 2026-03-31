@@ -174,6 +174,14 @@ async function warmRAM() {
     setTimeout(() => {
       getMkOrdersCache().catch(() => {});
     }, 10000);
+    // Pre-warm statistics (enrich all CC orders) in background
+    setTimeout(() => {
+      const port = process.env.PORT || 3087;
+      axios.get('http://localhost:' + port + '/api/callcenter-orders', { timeout: 120000 })
+        .then(() => axios.get('http://localhost:' + port + '/api/statistics?from=2026-03-01&to=' + new Date().toISOString().slice(0,10) + '&countries=all', { timeout: 120000 }))
+        .then(() => console.log('[DB] Statistics warmed'))
+        .catch(() => {});
+    }, 20000);
 
     const carts = dbReadData('carts');
     const pending = dbReadData('pending');
