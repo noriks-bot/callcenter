@@ -2871,7 +2871,7 @@ app.get('/api/callcenter-orders', async (req, res) => {
     const promises = Object.entries(stores).map(async ([storeCode, config]) => {
       try {
         for (let page = 1; page <= 5; page++) {
-          const orders = await wcApiRequest(storeCode, 'orders', { per_page: 100, page, status: 'processing,completed,on-hold,pending', orderby: 'date', order: 'desc' });
+          const orders = await wcApiRequest(storeCode, 'orders', { per_page: 100, page, status: 'processing,completed,on-hold,pending,cancelled', orderby: 'date', order: 'desc' });
           if (!Array.isArray(orders) || orders.length === 0) break;
           for (const order of orders) {
             const meta = order.meta_data || [];
