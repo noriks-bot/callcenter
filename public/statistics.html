@@ -363,30 +363,38 @@ function rOrd(orders) {
     var h = '<div class="card"><div class="card-h"><h3>✅ Call Center Orders</h3><span class="badge">' + f.length + '</span></div>';
     if (!f.length) { h += '<div class="empty">No orders in this period</div>'; }
     else {
-        h += '<div class="sx"><table class="otbl"><thead><tr><th>#</th><th>Date</th><th>Order</th><th>Type</th><th>Customer</th><th>Country</th><th>Items</th><th>Total</th><th>Agent</th><th>Status</th><th>Profit</th><th>MK Status</th></tr></thead><tbody>';
+        h += '<div class="sx"><table class="otbl"><thead><tr><th>#</th><th>Date</th><th>Order</th><th>Type</th><th>Customer</th><th>Country</th><th>Items</th><th>Total</th><th>Agent</th><th>Profit</th><th>MK Status</th></tr></thead><tbody>';
         f.forEach(function(o, idx) {
             var sym = syms[o.currency] || '\u20ac';
             var items = (o.items || []).map(function(i) { return '<div>' + i.quantity + 'x ' + i.name + '</div>'; }).join('') || '\u2014';
             var tc = o.orderType === 'onetime' ? 'ot' : (o.orderType === 'pending' ? 'pd' : 'ab');
             var tl = o.orderType === 'onetime' ? 'One-time' : (o.orderType === 'pending' ? 'Pending' : 'Abandoned');
-            var sc = (o.status || '').replace('_', '-');
-            var rowBg = o.mkStatusDesc === 'completed' ? 'background:rgba(16,185,129,0.04);' : ''; h += '<tr style="' + rowBg + '"><td style="color:#9CA3AF;font-size:11px;">' + (idx+1) + '</td><td style="white-space:nowrap;font-weight:500;">' + (o.date || '').slice(0, 10) + '</td>';
+            var ds = o.deliveryStatus || 'unknown';
+            var isCompleted = ds === 'completed' || ds === 'delivered';
+            var rowBg = isCompleted ? 'background:rgba(16,185,129,0.08);' : '';
+            // MK status tag
+            var mkTagColor = {completed:'#059669',delivered:'#059669',shipped:'#D97706',in_transit:'#2563EB',created:'#9CA3AF',draft:'#9CA3AF',paused:'#D97706'}[ds] || '#6B7280';
+            var mkTagBg = {completed:'#D1FAE5',delivered:'#D1FAE5',shipped:'#FEF3C7',in_transit:'#DBEAFE',created:'#F3F4F6',draft:'#F3F4F6',paused:'#FEF3C7'}[ds] || '#F3F4F6';
+            var mkLabel = o.mkStatusDesc ? o.mkStatusDesc.toUpperCase() : (ds.toUpperCase());
+            if(mkLabel.length > 20) mkLabel = ds.toUpperCase();
+            var oProfit = o.profit || 0;
+            h += '<tr style="' + rowBg + '">';
+            h += '<td style="color:#9CA3AF;font-size:11px;">' + (idx+1) + '</td>';
+            h += '<td style="white-space:nowrap;font-weight:500;">' + (o.date || '').slice(0, 10) + '</td>';
             h += '<td><span class="onum">#' + (o.orderId || '\u2014') + '</span></td>';
             h += '<td><span class="type-tag ' + tc + '">' + tl + '</span></td>';
             h += '<td><div style="font-weight:600;">' + (o.customerName || '\u2014') + '</div><div style="font-size:10px;color:#9CA3AF;">' + (o.email || '') + '</div></td>';
             h += '<td style="white-space:nowrap;">' + (o.storeFlag || '') + ' ' + (o.storeName || '') + '</td>';
             h += '<td><div class="oitems">' + items + '</div></td>';
-            h += '<td ototal" style="color:' + (o.mkStatusDesc === 'completed' ? '#10B981' : '#1A1A2E') + '">' + sym + parseFloat(o.total || 0).toFixed(2) + '</td>';
+            h += '<td class="ototal" style="color:' + (isCompleted ? '#10B981' : '#1A1A2E') + '">' + sym + parseFloat(o.total || 0).toFixed(2) + '</td>';
             h += '<td><span class="agent-tag">' + (o.agent || '\u2014') + '</span></td>';
-            var oProfit = o.profit || 0; var profitColor = (o.mkStatusDesc === 'completed') ? '#10B981' : '#1A1A2E';
-            var ds = o.deliveryStatus || 'unknown';
-            var dLabel = o.mkStatusDesc || ds;
-            var dColor = {delivered:'#10B981',in_transit:'#3B82F6',shipped:'#F59E0B',created:'#9CA3AF',paused:'#F59E0B',manually_closed:'#10B981',completed:'#10B981',draft:'#9CA3AF'}[ds] || '#6B7280';
-            h += '<td><span class="status-tag ' + sc + '">' + (o.status || '\u2014') + '</span></td><td style="font-weight:700;color:' + (oProfit >= 0 ? '#10B981' : '#EF4444') + ';white-space:nowrap;">\u20ac' + oProfit.toFixed(2) + '</td><td style="font-weight:600;color:' + dColor + ';font-size:11px;white-space:nowrap;">' + dLabel + '</td></tr>';
+            h += '<td style="font-weight:700;color:' + (oProfit >= 0 ? '#10B981' : '#EF4444') + ';white-space:nowrap;">\u20ac' + oProfit.toFixed(2) + '</td>';
+            h += '<td><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:' + mkTagBg + ';color:' + mkTagColor + '">' + mkLabel + '</span></td>';
+            h += '</tr>';
         });
         var totalSum = 0; var symsR = { EUR:'\u20ac', CZK:'K\u010d', PLN:'z\u0142', HUF:'Ft' };
         f.forEach(function(o) { totalSum += parseFloat(o.total || 0); });
-        var totalProfit2 = 0; f.forEach(function(o) { totalProfit2 += (o.profit || 0); }); h += '<tr style="font-weight:700;background:#F9FAFB;border-top:2px solid #E5E7EB;"><td></td><td colspan="5">TOTAL</td><td class="ototal">' + f.length + ' orders</td><td class="ototal">\u20ac' + totalSum.toFixed(2) + '</td><td colspan="2"></td><td style="font-weight:700;color:#10B981;">\u20ac' + totalProfit2.toFixed(2) + '</td><td></td></tr>';
+        var totalProfit2 = 0; f.forEach(function(o) { totalProfit2 += (o.profit || 0); }); h += '<tr style="font-weight:700;background:#F9FAFB;border-top:2px solid #E5E7EB;"><td></td><td colspan="5">TOTAL</td><td class="ototal">' + f.length + ' orders</td><td class="ototal">\u20ac' + totalSum.toFixed(2) + '</td><td></td><td style="font-weight:700;color:#10B981;">\u20ac' + totalProfit2.toFixed(2) + '</td><td></td></tr>';
         h += '</tbody></table></div>';
     }
     h += '</div>';
