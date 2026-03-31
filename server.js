@@ -2520,9 +2520,10 @@ async function enrichConvertedOrders(conversions) {
                   if (Array.isArray(events) && events.length > 0) {
                     mkStatusDesc = events[0].event_status || mkStatusDesc;
                     const evLower = mkStatusDesc.toLowerCase();
-                    if (/delivered|prevzet|completed|dostavljen.*kupcu/i.test(evLower)) mkDeliveryStatus = 'completed';
-                    else if (/transit|in delivery|v dostavi/i.test(evLower)) mkDeliveryStatus = 'in_transit';
-                    else if (/pickup|paketomat|locker|čaka/i.test(evLower)) mkDeliveryStatus = 'pickup';
+                    if (/delivered|prevzet|completed|dostavljen.*kupcu|uručen|preuzet/i.test(evLower)) mkDeliveryStatus = 'completed';
+                    else if (/transit|in delivery|v dostavi|u dostavi|na putu/i.test(evLower)) mkDeliveryStatus = 'in_transit';
+                    else if (/pickup|paketomat|locker|čaka|na preuzimanje|awaiting/i.test(evLower)) mkDeliveryStatus = 'pickup';
+                    else if (/definirani|podaci|pošiljc|shipped|poslano/i.test(evLower)) mkDeliveryStatus = 'shipped';
                     else mkDeliveryStatus = mkOrder.status_desc || 'unknown';
                   }
                 } catch(e2) { /* skip doc fetch */ }
