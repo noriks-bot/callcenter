@@ -3359,20 +3359,25 @@
             // Buyer days filter
             if (dataTab === 'buyers') {
                 const daysVal = document.getElementById('buyerDaysFilter').value;
-                if (daysVal) {
-                    const now = Date.now();
-                    data = data.filter(b => {
-                        const regDate = b.registeredAt ? new Date(b.registeredAt).getTime() : 0;
-                        if (!regDate) return false;
-                        const daysSince = (now - regDate) / 86400000;
+                const productFilter = document.getElementById('buyerProductFilter').value;
+                const now = Date.now();
+                // Auto minimum days: starter=5, others=10 (unless manual days filter set)
+                data = data.filter(b => {
+                    const regDate = b.registeredAt ? new Date(b.registeredAt).getTime() : 0;
+                    if (!regDate) return false;
+                    const daysSince = (now - regDate) / 86400000;
+                    if (daysVal) {
                         if (daysVal === '10-20') return daysSince >= 10 && daysSince < 20;
                         if (daysVal === '20-30') return daysSince >= 20 && daysSince < 30;
                         if (daysVal === '40-60') return daysSince >= 40 && daysSince < 60;
                         if (daysVal === '60+') return daysSince >= 60;
                         return true;
-                    });
-                }
-                const productFilter = document.getElementById('buyerProductFilter').value;
+                    }
+                    // Auto filter by product type
+                    const isStarter = b.orderItems && b.orderItems.some(i => /starter|startovac/i.test(i.name));
+                    const minDays = isStarter ? 5 : 10;
+                    return daysSince >= minDays;
+                });
                 if (productFilter === 'starter') {
                     data = data.filter(b => b.orderItems && b.orderItems.some(i => /starter|startovac/i.test(i.name)));
                 } else if (productFilter === 'non-starter') {
