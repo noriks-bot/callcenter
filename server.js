@@ -2499,9 +2499,12 @@ async function enrichConvertedOrders(conversions) {
           try {
             const mkSearch = await axios.post('https://main.metakocka.si/rest/eshop/v1/search', {
               secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
-              doc_type: 'sales_order', result_type: 'doc', limit: 5, buyer_order: orderNum
+              doc_type: 'sales_order', result_type: 'doc', limit: 100,
+              order_direction: 'desc', eshop_name: 'noriks'
             }, { timeout: 8000 });
-            const mkOrders = (mkSearch.data?.result || []).filter(o => /noriks/i.test(o.eshop_name || ''));
+            const mkOrders = (mkSearch.data?.result || []).filter(o =>
+              /noriks/i.test(o.eshop_name || '') && o.buyer_order === orderNum
+            );
             if (mkOrders.length > 0) {
               const mkOrder = mkOrders[0];
               mkDeliveryStatus = mkOrder.status_desc || 'unknown';
