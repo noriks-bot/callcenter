@@ -909,6 +909,11 @@
                     <option value="40-60">40-60 days</option>
                     <option value="60+">60+ days</option>
                 </select>
+                <select class="filter-select" id="buyerProductFilter" style="max-width:200px;display:none;">
+                    <option value="">All Products</option>
+                    <option value="starter">Starter Pack</option>
+                    <option value="non-starter">Non-Starter</option>
+                </select>
                 <select class="filter-select" id="paketomatiStatusFilter" style="max-width:250px;display:none;">
                     <option value="">Vsi statusi</option>
                     <option value="not_called">⚪ Ni called</option>
@@ -2709,6 +2714,7 @@
                     // Update current content tab
                     currentContentTab = newTab;
                         document.getElementById('buyerDaysFilter').style.display = (newTab === 'buyers') ? '' : 'none';
+                        document.getElementById('buyerProductFilter').style.display = (newTab === 'buyers') ? '' : 'none';
                         document.getElementById('statusFilter').style.display = (newTab === 'paketomati') ? 'none' : '';
                         document.getElementById('paketomatiStatusFilter').style.display = (newTab === 'paketomati') ? '' : 'none';
                     currentTab = newTab; // Sync with main tab state
@@ -3270,6 +3276,7 @@
         document.getElementById('statusFilter').addEventListener('change', renderTable);
         document.getElementById('paketomatiStatusFilter').addEventListener('change', () => { renderTable(); });
         document.getElementById('buyerDaysFilter').addEventListener('change', () => { currentPage = 1; renderTable(); });
+        document.getElementById('buyerProductFilter').addEventListener('change', () => { currentPage = 1; renderTable(); });
 
         function renderTable() {
             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -3364,6 +3371,12 @@
                         if (daysVal === '60+') return daysSince >= 60;
                         return true;
                     });
+                }
+                const productFilter = document.getElementById('buyerProductFilter').value;
+                if (productFilter === 'starter') {
+                    data = data.filter(b => b.orderItems && b.orderItems.some(i => /starter|startovac/i.test(i.name)));
+                } else if (productFilter === 'non-starter') {
+                    data = data.filter(b => !b.orderItems || !b.orderItems.some(i => /starter|startovac/i.test(i.name)));
                 }
             }
             if (search) data = data.filter(d =>
