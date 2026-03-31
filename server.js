@@ -2461,7 +2461,8 @@ async function enrichConvertedOrders(conversions) {
   const toFetch = conversions.filter(c => {
     if (!c.orderId || !c.storeCode || !stores[c.storeCode]) return false;
     const cached = convertedOrderCache[c.storeCode + '_' + c.orderId];
-    return !cached || (now - cached.ts > CONVERTED_CACHE_TTL);
+    // Re-fetch if cache is stale OR if orderType is missing (old cache without this field)
+    return !cached || (now - cached.ts > CONVERTED_CACHE_TTL) || cached.orderType === undefined;
   });
 
   // Fetch missing orders in parallel (batch)
