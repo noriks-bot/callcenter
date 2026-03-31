@@ -2986,9 +2986,7 @@ app.get('/api/product-colors', async (req, res) => {
     
 app.listen(PORT, () => {
       console.log(`🎧 Noriks Call Center running on port ${PORT}`);
-      // startBackgroundRefresh(); // TEMP DISABLED - API optimization
-      // fetchProductColors().catch(e => console.error("[Colors] startup error:", e.message)); // TEMP DISABLED
-      // Refresh data in background (non-blocking)
+      startBackgroundRefresh();
       warmRAM().then(() => warmAllCaches()).catch(e => console.error('[DB] Background warm failed:', e.message));
     });
   } else {
@@ -2996,7 +2994,7 @@ app.listen(PORT, () => {
     await warmRAM();
     app.listen(PORT, () => {
       console.log(`🎧 Noriks Call Center running on port ${PORT}`);
-      // startBackgroundRefresh(); // TEMP DISABLED - API optimization
+      startBackgroundRefresh();
       setTimeout(() => warmAllCaches(), 2000);
     });
   }
