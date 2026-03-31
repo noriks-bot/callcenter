@@ -2425,25 +2425,29 @@ const MK_ORDERS_CACHE_TTL = 10 * 60 * 1000; // 10 min
 async function getMkOrdersCache() {
   const now = Date.now();
   if (mkOrdersCache && (now - mkOrdersCacheTs) < MK_ORDERS_CACHE_TTL) return mkOrdersCache;
-  // Try SQLite first
+  // Try SQLite first — always return SQLite if available, refresh in background
   try {
     const { db: _db } = require('./db');
-    const row = _db.prepare('SELECT data FROM cache_data WHERE key=?').get('mk_orders_cache');
+    const row = _db.prepare('SELECT data, updated_at FROM cache_data WHERE key=?').get('mk_orders_cache');
     if (row) {
       const saved = JSON.parse(row.data);
       mkOrdersCache = saved;
       mkOrdersCacheTs = now;
       console.log('[MK] Loaded', Object.keys(saved).length, 'orders from SQLite');
-      // Refresh in background if older than 1 hour
-      const meta = _db.prepare('SELECT updated_at FROM cache_data WHERE key=?').get('mk_orders_cache');
-      const age = meta ? (now - new Date(meta.updated_at).getTime()) : Infinity;
+      const age = now - new Date(row.updated_at).getTime();
       if (age > 60 * 60 * 1000) {
         refreshMkOrdersCache().catch(() => {});
       }
       return mkOrdersCache;
     }
-  } catch(e) { /* fallback to API */ }
-  return await refreshMkOrdersCache();
+  } catch(e) { /* fallback */ }
+  // No SQLite data — return empty and fetch in background
+  if (!mkOrdersCache) {
+    mkOrdersCache = {};
+    mkOrdersCacheTs = now;
+    refreshMkOrdersCache().catch(() => {});
+  }
+  return mkOrdersCache;
 }
 
 async function refreshMkOrdersCache() {
