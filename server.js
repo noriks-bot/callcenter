@@ -2413,6 +2413,37 @@ app.get('/api/pending-orders-count', async (req, res) => {
 const convertedOrderCache = {};
 const CONVERTED_CACHE_TTL = 5 * 60 * 1000; // 5 min
 
+// MK orders lookup cache — all noriks orders indexed by buyer_order
+let mkOrdersCache = null;
+let mkOrdersCacheTs = 0;
+const MK_ORDERS_CACHE_TTL = 10 * 60 * 1000; // 10 min
+
+async function getMkOrdersCache() {
+  const now = Date.now();
+  if (mkOrdersCache && (now - mkOrdersCacheTs) < MK_ORDERS_CACHE_TTL) return mkOrdersCache;
+  console.log('[MK] Fetching all noriks orders...');
+  const allOrders = {};
+  for (let offset = 0; offset < 5000; offset += 100) {
+    try {
+      const r = await axios.post('https://main.metakocka.si/rest/eshop/v1/search', {
+        secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
+        doc_type: 'sales_order', result_type: 'doc', limit: 100,
+        order_direction: 'desc', eshop_name: 'noriks', offset
+      }, { timeout: 15000 });
+      const batch = r.data?.result || [];
+      const noriks = batch.filter(o => /noriks/i.test(o.eshop_name || ''));
+      for (const o of noriks) {
+        if (o.buyer_order) allOrders[o.buyer_order] = o;
+      }
+      if (batch.length < 100) break;
+    } catch(e) { console.error('[MK] fetch error at offset', offset, e.message); break; }
+  }
+  console.log('[MK] Cached', Object.keys(allOrders).length, 'noriks orders');
+  mkOrdersCache = allOrders;
+  mkOrdersCacheTs = now;
+  return allOrders;
+}
+
 // VAT rates per country
 const VAT_RATES = { hr: 0.25, cz: 0.21, pl: 0.23, sk: 0.20, hu: 0.27, gr: 0.24, it: 0.22, si: 0.22 };
 // Shipping costs
@@ -2466,6 +2497,8 @@ function getMkStatusForOrder(orderNumber, customerEmail) {
 async function enrichConvertedOrders(conversions) {
   const now = Date.now();
   const shippingCosts = getShippingCosts();
+  // Load all MK orders once
+  const mkOrders = await getMkOrdersCache();
   const toFetch = conversions.filter(c => {
     if (!c.orderId || !c.storeCode || !stores[c.storeCode]) return false;
     const cached = convertedOrderCache[c.storeCode + '_' + c.orderId];
@@ -2497,21 +2530,8 @@ async function enrichConvertedOrders(conversions) {
           let mkDeliveryStatus = 'unknown';
           let mkStatusDesc = '';
           try {
-            let mkOrders = [];
-            for (let offset = 0; offset < 500 && mkOrders.length === 0; offset += 100) {
-              const mkSearch = await axios.post('https://main.metakocka.si/rest/eshop/v1/search', {
-                secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
-                doc_type: 'sales_order', result_type: 'doc', limit: 100,
-                order_direction: 'desc', eshop_name: 'noriks', offset
-              }, { timeout: 8000 });
-              const batch = (mkSearch.data?.result || []).filter(o =>
-                /noriks/i.test(o.eshop_name || '') && o.buyer_order === orderNum
-              );
-              mkOrders = batch;
-              if ((mkSearch.data?.result || []).length < 100) break;
-            }
-            if (mkOrders.length > 0) {
-              const mkOrder = mkOrders[0];
+            const mkOrder = mkOrders[orderNum];
+            if (mkOrder) {
               mkDeliveryStatus = mkOrder.status_desc || 'unknown';
               mkStatusDesc = mkOrder.status_desc || '';
               if (mkOrder.mk_id && mkOrder.shipped_date) {
