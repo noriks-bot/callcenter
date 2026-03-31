@@ -2493,7 +2493,13 @@ async function enrichConvertedOrders(conversions) {
             profit: Math.round(profit * 100) / 100,
             deliveryStatus: mkStatus?.deliveryStatus || 'unknown',
             mkStatusDesc: mkStatus?.mkStatusDesc || '',
-            orderType: order.meta_data?.find(m => m.key === '_order_type')?.value || 'abandoned'
+            orderType: (() => {
+              // Determine type from _abandoned_cart_id meta
+              const cartIdMeta = order.meta_data?.find(m => m.key === '_abandoned_cart_id')?.value || '';
+              if (cartIdMeta.includes('buyer')) return 'onetime';
+              if (cartIdMeta.includes('order')) return 'pending';
+              return 'abandoned';
+            })()
           };
         }
       } catch (e) { /* skip */ }
