@@ -907,7 +907,8 @@ async function fetchOneTimeBuyers(storeFilter = null, forceFull = false) {
       const order = data.firstOrder;
       const orderDate = order.dateCreated ? new Date(order.dateCreated).getTime() : (order.date_created ? new Date(order.date_created).getTime() : 0);
       const daysSince = orderDate ? (Date.now() - orderDate) / 86400000 : 0;
-      if (daysSince < minDaysFromPurchase) continue;
+      // Use min 1 day — frontend handles per-product filtering (starter=5d, others=10d)
+      if (daysSince < 1) continue;
 
       const customerId = `${storeCode}_buyer_${require('crypto').createHash('md5').update(email).digest('hex')}`;
       const savedData = callData[customerId] || {};
