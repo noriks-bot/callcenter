@@ -2565,7 +2565,9 @@ async function enrichConvertedOrders(conversions) {
           let mkDeliveryStatus = 'unknown';
           let mkStatusDesc = '';
           try {
-            const mkOrder = mkOrders[orderNum];
+            // Try full order number (NORIKS-HR-XXXX), then short ID (XXXX/YYYY), then orderId alone
+            const year = new Date().getFullYear();
+            const mkOrder = mkOrders[orderNum] || mkOrders[conv.orderId + '/' + year] || mkOrders[String(conv.orderId)];
             if (mkOrder) {
               mkDeliveryStatus = mkOrder.status_desc || 'unknown';
               mkStatusDesc = mkOrder.status_desc || '';
