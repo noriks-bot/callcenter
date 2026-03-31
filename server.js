@@ -2479,10 +2479,47 @@ async function enrichConvertedOrders(conversions) {
           const productCost = detectProductCost(items);
           const shippingCost = shippingCosts[conv.storeCode?.toUpperCase()] || 4.5;
           const profit = netTotal - productCost - shippingCost;
-          // MK status
+          // MK status — fetch from MK API by buyer_order (WC order number)
           const orderNum = order.number || ('NORIKS-' + conv.storeCode?.toUpperCase() + '-' + conv.orderId);
-          const email = order.billing?.email || '';
-          const mkStatus = getMkStatusForOrder(orderNum, email) || getMkStatusForOrder(String(conv.orderId), email);
+          let mkStatus = null;
+          try {
+            const mkSearch = await axios.post('https://main.metakocka.si/rest/eshop/v1/search', {
+              secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
+              doc_type: 'sales_order', result_type: 'doc', limit: 5, buyer_order: orderNum
+            }, { timeout: 8000 });
+            const mkOrders = (mkSearch.data?.result || []).filter(o => /noriks/i.test(o.eshop_name || ''));
+            if (mkOrders.length > 0) {
+              const mkOrder = mkOrders[0];
+              const statusDesc = mkOrder.status_desc || '';
+              // Get delivery events if shipped
+              let deliveryStatus = statusDesc;
+              let mkStatusDesc = statusDesc;
+              if (mkOrder.mk_id && mkOrder.shipped_date) {
+                try {
+                  const docResp = await axios.post('https://main.metakocka.si/rest/eshop/v1/get_document', {
+                    secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
+                    doc_type: 'sales_order', doc_id: mkOrder.mk_id, return_delivery_service_events: 'true'
+                  }, { timeout: 8000 });
+                  let events = docResp.data?.delivery_service_events || [];
+                  if (events.event_status) events = [events];
+                  if (Array.isArray(events) && events.length > 0) {
+                    mkStatusDesc = events[0].event_status || statusDesc;
+                    // Map to delivery status
+                    const evLower = mkStatusDesc.toLowerCase();
+                    if (/delivered|prevzet|completed|dostavljen.*kupcu/i.test(evLower)) deliveryStatus = 'completed';
+                    else if (/transit|in delivery|v dostavi/i.test(evLower)) deliveryStatus = 'in_transit';
+                    else if (/pickup|paketomat|locker|čaka/i.test(evLower)) deliveryStatus = 'pickup';
+                    else deliveryStatus = statusDesc;
+                  }
+                } catch(e) { /* skip doc fetch */ }
+              }
+              mkStatus = { deliveryStatus, mkStatusDesc };
+            }
+          } catch(e) { /* skip MK fetch */ }
+          if (!mkStatus) {
+            const email = order.billing?.email || '';
+            mkStatus = getMkStatusForOrder(orderNum, email);
+          }
           convertedOrderCache[key] = {
             ts: now,
             customerName: ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown',
