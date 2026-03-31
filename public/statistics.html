@@ -322,7 +322,7 @@ function rKpi(ab, ot) {
     h += '<div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:4px;">\u20ac' + (filtOrds.length > 0 ? (totalProfit/filtOrds.length).toFixed(2) : '0') + '/order</div>';
     h += '</div>';
     // Prevzeti card
-    var deliveredCount = filtOrds.filter(function(o) { return o.deliveryStatus === 'delivered'; }).length;
+    var deliveredCount = filtOrds.filter(function(o) { return o.deliveryStatus === 'delivered' || o.deliveryStatus === 'completed'; }).length;
     h += '<div style="background:#fff;border:1px solid #E8E8EC;border-radius:8px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
     h += '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#9CA3AF;margin-bottom:6px;">\u2705 Prevzeti</div>';
     h += '<div style="font-size:22px;font-weight:700;color:#10B981;">' + deliveredCount + '</div>';
@@ -330,7 +330,7 @@ function rKpi(ab, ot) {
     h += '</div>';
     // Real Profit card (only delivered orders)
     var realProfit = 0;
-    filtOrds.forEach(function(o) { if (o.deliveryStatus === 'delivered') realProfit += (o.profit || 0); });
+    filtOrds.forEach(function(o) { if (o.deliveryStatus === 'delivered' || o.deliveryStatus === 'completed') realProfit += (o.profit || 0); });
     h += '<div style="background:linear-gradient(135deg,#059669,#047857);border-radius:8px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
     h += '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:rgba(255,255,255,.7);margin-bottom:6px;">€ Real Profit</div>';
     h += '<div style="font-size:24px;font-weight:700;color:#fff;">€' + realProfit.toFixed(2) + '</div>';
