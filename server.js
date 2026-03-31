@@ -2465,7 +2465,7 @@ async function enrichConvertedOrders(conversions) {
     return !cached || (now - cached.ts > CONVERTED_CACHE_TTL) || cached.orderType === undefined;
   });
 
-  // Fetch missing orders in parallel (batch)
+  // Fetch missing orders in parallel (WC only — fast)
   if (toFetch.length > 0) {
     await Promise.allSettled(toFetch.map(async (conv) => {
       const key = conv.storeCode + '_' + conv.orderId;
@@ -2480,65 +2480,64 @@ async function enrichConvertedOrders(conversions) {
           const productCost = detectProductCost(items);
           const shippingCost = shippingCosts[conv.storeCode?.toUpperCase()] || 4.5;
           const profit = netTotal - productCost - shippingCost;
-          // MK status — fetch from MK API by buyer_order (WC order number)
+          // orderType from WC meta (fast — no MK needed)
+          const cartIdMeta = order.meta_data?.find(m => m.key === '_abandoned_cart_id')?.value || '';
+          const orderType = cartIdMeta.includes('buyer') ? 'onetime' : cartIdMeta.includes('order') ? 'pending' : 'abandoned';
+          // MK status from local paketomati cache (fast — no API call needed for basic status)
           const orderNum = order.number || ('NORIKS-' + conv.storeCode?.toUpperCase() + '-' + conv.orderId);
-          let mkStatus = null;
-          try {
-            const mkSearch = await axios.post('https://main.metakocka.si/rest/eshop/v1/search', {
-              secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
-              doc_type: 'sales_order', result_type: 'doc', limit: 5, buyer_order: orderNum
-            }, { timeout: 8000 });
-            const mkOrders = (mkSearch.data?.result || []).filter(o => /noriks/i.test(o.eshop_name || ''));
-            if (mkOrders.length > 0) {
-              const mkOrder = mkOrders[0];
-              const statusDesc = mkOrder.status_desc || '';
-              // Get delivery events if shipped
-              let deliveryStatus = statusDesc;
-              let mkStatusDesc = statusDesc;
-              if (mkOrder.mk_id && mkOrder.shipped_date) {
-                try {
-                  const docResp = await axios.post('https://main.metakocka.si/rest/eshop/v1/get_document', {
-                    secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
-                    doc_type: 'sales_order', doc_id: mkOrder.mk_id, return_delivery_service_events: 'true'
-                  }, { timeout: 8000 });
-                  let events = docResp.data?.delivery_service_events || [];
-                  if (events.event_status) events = [events];
-                  if (Array.isArray(events) && events.length > 0) {
-                    mkStatusDesc = events[0].event_status || statusDesc;
-                    // Map to delivery status
-                    const evLower = mkStatusDesc.toLowerCase();
-                    if (/delivered|prevzet|completed|dostavljen.*kupcu/i.test(evLower)) deliveryStatus = 'completed';
-                    else if (/transit|in delivery|v dostavi/i.test(evLower)) deliveryStatus = 'in_transit';
-                    else if (/pickup|paketomat|locker|čaka/i.test(evLower)) deliveryStatus = 'pickup';
-                    else deliveryStatus = statusDesc;
-                  }
-                } catch(e) { /* skip doc fetch */ }
-              }
-              mkStatus = { deliveryStatus, mkStatusDesc };
-            }
-          } catch(e) { /* skip MK fetch */ }
-          if (!mkStatus) {
-            const email = order.billing?.email || '';
-            mkStatus = getMkStatusForOrder(orderNum, email);
-          }
+          const email = b.email || '';
+          const mkStatus = getMkStatusForOrder(orderNum, email);
           convertedOrderCache[key] = {
             ts: now,
             customerName: ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || 'Unknown',
-            email: b.email || '', phone: b.phone || '',
+            email, phone: b.phone || '',
             total: order.total || '0', currency: order.currency || 'EUR',
             status: order.status || '',
             items,
             profit: Math.round(profit * 100) / 100,
             deliveryStatus: mkStatus?.deliveryStatus || 'unknown',
             mkStatusDesc: mkStatus?.mkStatusDesc || '',
-            orderType: (() => {
-              // Determine type from _abandoned_cart_id meta
-              const cartIdMeta = order.meta_data?.find(m => m.key === '_abandoned_cart_id')?.value || '';
-              if (cartIdMeta.includes('buyer')) return 'onetime';
-              if (cartIdMeta.includes('order')) return 'pending';
-              return 'abandoned';
-            })()
+            orderType,
+            orderNum // save for background MK fetch
           };
+          // Background MK fetch (non-blocking) — updates cache when done
+          (async () => {
+            try {
+              const mkSearch = await axios.post('https://main.metakocka.si/rest/eshop/v1/search', {
+                secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
+                doc_type: 'sales_order', result_type: 'doc', limit: 5, buyer_order: orderNum
+              }, { timeout: 10000 });
+              const mkOrders = (mkSearch.data?.result || []).filter(o => /noriks/i.test(o.eshop_name || ''));
+              if (mkOrders.length > 0) {
+                const mkOrder = mkOrders[0];
+                let deliveryStatus = mkOrder.status_desc || 'unknown';
+                let mkStatusDesc = mkOrder.status_desc || '';
+                if (mkOrder.mk_id && mkOrder.shipped_date) {
+                  try {
+                    const docResp = await axios.post('https://main.metakocka.si/rest/eshop/v1/get_document', {
+                      secret_key: metakocka.secret_key, company_id: String(metakocka.company_id),
+                      doc_type: 'sales_order', doc_id: mkOrder.mk_id, return_delivery_service_events: 'true'
+                    }, { timeout: 10000 });
+                    let events = docResp.data?.delivery_service_events || [];
+                    if (events.event_status) events = [events];
+                    if (Array.isArray(events) && events.length > 0) {
+                      mkStatusDesc = events[0].event_status || mkStatusDesc;
+                      const evLower = mkStatusDesc.toLowerCase();
+                      if (/delivered|prevzet|completed|dostavljen.*kupcu/i.test(evLower)) deliveryStatus = 'completed';
+                      else if (/transit|in delivery|v dostavi/i.test(evLower)) deliveryStatus = 'in_transit';
+                      else if (/pickup|paketomat|locker|čaka/i.test(evLower)) deliveryStatus = 'pickup';
+                    }
+                  } catch(e2) { /* skip */ }
+                }
+                // Update cache with MK status (will be fresh on next request)
+                if (convertedOrderCache[key]) {
+                  convertedOrderCache[key].deliveryStatus = deliveryStatus;
+                  convertedOrderCache[key].mkStatusDesc = mkStatusDesc;
+                  convertedOrderCache[key].ts = Date.now(); // extend cache lifetime
+                }
+              }
+            } catch(e) { /* skip MK fetch */ }
+          })();
         }
       } catch (e) { /* skip */ }
     }));
