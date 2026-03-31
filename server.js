@@ -2425,6 +2425,28 @@ const MK_ORDERS_CACHE_TTL = 10 * 60 * 1000; // 10 min
 async function getMkOrdersCache() {
   const now = Date.now();
   if (mkOrdersCache && (now - mkOrdersCacheTs) < MK_ORDERS_CACHE_TTL) return mkOrdersCache;
+  // Try SQLite first
+  try {
+    const { db: _db } = require('./db');
+    const row = _db.prepare('SELECT data FROM cache_data WHERE key=?').get('mk_orders_cache');
+    if (row) {
+      const saved = JSON.parse(row.data);
+      mkOrdersCache = saved;
+      mkOrdersCacheTs = now;
+      console.log('[MK] Loaded', Object.keys(saved).length, 'orders from SQLite');
+      // Refresh in background if older than 1 hour
+      const meta = _db.prepare('SELECT updated_at FROM cache_data WHERE key=?').get('mk_orders_cache');
+      const age = meta ? (now - new Date(meta.updated_at).getTime()) : Infinity;
+      if (age > 60 * 60 * 1000) {
+        refreshMkOrdersCache().catch(() => {});
+      }
+      return mkOrdersCache;
+    }
+  } catch(e) { /* fallback to API */ }
+  return await refreshMkOrdersCache();
+}
+
+async function refreshMkOrdersCache() {
   console.log('[MK] Fetching all noriks orders...');
   const allOrders = {};
   for (let offset = 0; offset < 5000; offset += 100) {
@@ -2444,7 +2466,12 @@ async function getMkOrdersCache() {
   }
   console.log('[MK] Cached', Object.keys(allOrders).length, 'noriks orders');
   mkOrdersCache = allOrders;
-  mkOrdersCacheTs = now;
+  mkOrdersCacheTs = Date.now();
+  // Save to SQLite
+  try {
+    const { db: _db } = require('./db');
+    _db.prepare('INSERT OR REPLACE INTO cache_data (key, data, updated_at) VALUES (?, ?, ?)').run('mk_orders_cache', JSON.stringify(allOrders), new Date().toISOString());
+  } catch(e) { /* non-critical */ }
   return allOrders;
 }
 
