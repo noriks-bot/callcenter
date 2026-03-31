@@ -170,6 +170,10 @@ async function warmRAM() {
         .then(() => console.log('[DB] CC orders cache warmed'))
         .catch(() => {});
     }, 5000);
+    // Pre-warm MK orders cache in background
+    setTimeout(() => {
+      getMkOrdersCache().catch(() => {});
+    }, 10000);
 
     const carts = dbReadData('carts');
     const pending = dbReadData('pending');
