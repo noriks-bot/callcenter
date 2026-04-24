@@ -4659,12 +4659,18 @@
         }
 
                 function updateItemQty(idx, val) {
+            if (_applyingDiscount) return;
             orderItems[idx].editQty = Math.max(1, parseInt(val) || 1);
             renderOrderItems();
         }
 
         function updateItemPrice(idx, val) {
+            if (_applyingDiscount) return;
             orderItems[idx].editPrice = Math.max(0, parseFloat(val) || 0);
+            originalPrices = null; // reset original prices when user manually edits
+            currentDiscount = 0;
+            document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('discountBtnNone')?.classList.add('active');
             renderOrderItems();
         }
 
@@ -4877,8 +4883,10 @@
 
         let currentDiscount = 0;
         let originalPrices = null;
+        let _applyingDiscount = false;
 
         function applyDiscount(pct) {
+            _applyingDiscount = true;
             if (originalPrices) {
                 orderItems.forEach((item, i) => {
                     if (originalPrices[i] !== undefined) item.editPrice = originalPrices[i];
@@ -4900,6 +4908,7 @@
                 });
             }
             renderOrderItems();
+            setTimeout(() => { _applyingDiscount = false; }, 50);
         }
 
                 function updateOrderTotals() {
