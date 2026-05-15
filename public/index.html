@@ -749,8 +749,8 @@
                     <span>Leads</span>
                 </a>
                 <a href="/statistics" class="nav-item" data-tab="statistics">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Statistics</span>
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Abandoned</span>
                 </a>
             </div>
             
@@ -4207,6 +4207,8 @@
                 editQty: item.quantity
             }));
 
+            currentDiscount = 0;
+            originalPrices = null;
             freeShipping = false;
             document.getElementById('freeShippingToggle').classList.remove('active');
 
@@ -4879,18 +4881,14 @@
         let originalPrices = null;
 
         function applyDiscount(pct) {
-            if (originalPrices) {
-                orderItems.forEach((item, i) => {
-                    if (originalPrices[i] !== undefined) item.editPrice = originalPrices[i];
-                });
+            if (!originalPrices) {
+                originalPrices = orderItems.map(item => item.editPrice);
             }
-            originalPrices = orderItems.map(item => item.editPrice);
             currentDiscount = pct;
-            if (pct > 0) {
-                orderItems.forEach(item => {
-                    item.editPrice = Math.round(item.editPrice * (1 - pct / 100) * 100) / 100;
-                });
-            }
+            orderItems.forEach((item, i) => {
+                const base = originalPrices[i] !== undefined ? originalPrices[i] : item.editPrice;
+                item.editPrice = pct > 0 ? Math.round(base * (1 - pct / 100) * 100) / 100 : base;
+            });
             document.querySelectorAll('.discount-btn').forEach(btn => btn.classList.remove('active'));
             if (pct === 0) {
                 document.getElementById('discountBtnNone').classList.add('active');
