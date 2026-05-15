@@ -2451,6 +2451,16 @@ app.get('/api/statistics', (req, res) => {
       if (day >= fromDate && day <= toDate) periodCartIds.add(c.id);
     }
 
+    // Count total previous-period carts per country (abandonedAt < fromDate)
+    const prevCartsTotal = {};
+    for (const c of countries) prevCartsTotal[c] = 0;
+    for (const c of carts) {
+      const country = c.storeCode;
+      if (!countries.includes(country)) continue;
+      const day = (c.abandonedAt || '').slice(0,10);
+      if (day < fromDate) prevCartsTotal[country]++;
+    }
+
     // Calls on previous-period carts per day
     const calledPrevByDC = {};
     for (const [id, data] of Object.entries(callData)) {
@@ -2486,7 +2496,7 @@ app.get('/api/statistics', (req, res) => {
           }
         }
         const calledPrev = calledPrevByDC[key] || 0;
-        row[c] = { newCarts: dayCarts.length, called, notCalled, calledPrev };
+        row[c] = { newCarts: dayCarts.length, called, notCalled, calledPrev, prevTotal: prevCartsTotal[c] || 0 };
         tNew += dayCarts.length;
         tCalled += called;
         tNotCalled += notCalled;
@@ -2497,7 +2507,7 @@ app.get('/api/statistics', (req, res) => {
     }
 
     // Month summary
-    let sumNew = 0, sumCalled = 0, sumNotCalled = 0, sumCalledPrev = 0;
+    let sumNew = 0, sumCalled = 0, sumNotCalled = 0, sumCalledPrev = 0, sumPrevTotal = 0;
     const countrySummary = {};
     for (const c of countries) {
       let cNew = 0, cCalled = 0, cNotCalled = 0, cCalledPrev = 0;
@@ -2508,8 +2518,8 @@ app.get('/api/statistics', (req, res) => {
         cNotCalled += cell.notCalled || 0;
         cCalledPrev += cell.calledPrev || 0;
       }
-      countrySummary[c] = { newCarts: cNew, called: cCalled, notCalled: cNotCalled, calledPrev: cCalledPrev };
-      sumNew += cNew; sumCalled += cCalled; sumNotCalled += cNotCalled; sumCalledPrev += cCalledPrev;
+      countrySummary[c] = { newCarts: cNew, called: cCalled, notCalled: cNotCalled, calledPrev: cCalledPrev, prevTotal: prevCartsTotal[c] || 0 };
+      sumNew += cNew; sumCalled += cCalled; sumNotCalled += cNotCalled; sumCalledPrev += cCalledPrev; sumPrevTotal += prevCartsTotal[c] || 0;
     }
 
     // === ONE-TIME BUYERS ===
@@ -2554,7 +2564,7 @@ app.get('/api/statistics', (req, res) => {
       abandonedCarts: abDays,
       abMonthSummary: {
         countries: countrySummary,
-        totals: { newCarts: sumNew, called: sumCalled, notCalled: sumNotCalled, calledPrev: sumCalledPrev }
+        totals: { newCarts: sumNew, called: sumCalled, notCalled: sumNotCalled, calledPrev: sumCalledPrev, prevTotal: sumPrevTotal }
       },
       allLeads: buyerDays
     });
