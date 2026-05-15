@@ -39,6 +39,7 @@
         .v-notcalled { color:#EF4444; font-weight:600; }
         .v-monthcalled { color:#10B981; font-weight:600; }
         .v-zero { color:#D1D5DB; }
+        .v-prev { color:#8B5CF6; font-weight:600; }
 
         .pills { display:inline-flex; background:#fff; border:1px solid #E0E0E5; border-radius:8px; padding:4px; gap:2px; flex-wrap:wrap; }
         .pill { padding:6px 14px; border-radius:6px; border:1px solid transparent; background:transparent; color:#6B7280; font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; }
@@ -182,7 +183,7 @@ function renderAbDayCards(days, countries) {
         h += '<div><span class="day-date">' + dateLabel + '</span><span class="day-weekday">' + weekday + '</span></div>';
         h += '<div class="day-summary"><b>' + (tot.called||0) + '</b> called today &middot; <b>' + (tot.newCarts||0) + '</b> new</div>';
         h += '</div>';
-        h += '<table class="day-tbl"><thead><tr><th></th><th>Called today</th><th>New today</th><th>Month total</th><th>Month not called</th><th>Month called</th></tr></thead><tbody>';
+        h += '<table class="day-tbl"><thead><tr><th></th><th>Called today</th><th>Called prev.</th><th>New today</th><th>Month total</th><th>Not called</th><th>Called</th></tr></thead><tbody>';
 
         for (var c = 0; c < countries.length; c++) {
             var cc = countries[c];
@@ -191,6 +192,7 @@ function renderAbDayCards(days, countries) {
             h += '<tr>';
             h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
             h += '<td>' + fv(cell.called||0, 'v-called') + '</td>';
+            h += '<td>' + fv(cell.calledPrev||0, 'v-prev') + '</td>';
             h += '<td>' + fv(cell.newCarts||0, 'v-new') + '</td>';
             h += '<td>' + fv(cell.monthTotal||0, 'v-total') + '</td>';
             h += '<td>' + fv(cell.monthNotCalled||0, 'v-notcalled') + '</td>';
@@ -240,9 +242,9 @@ function renderAbSummary(data, countries) {
     var h = '<div class="day-card" style="border:2px solid #2563EB;background:linear-gradient(135deg,#EFF6FF,#fff);">';
     h += '<div class="day-header" style="border-bottom:2px solid #DBEAFE;">';
     h += '<div><span class="day-date" style="font-size:15px;">\u{1F4CA} Month Total</span></div>';
-    h += '<div class="day-summary"><b>' + t.called + '</b> called &middot; <b>' + t.newCarts + '</b> new &middot; <b>' + t.monthTotal + '</b> total &middot; <span style="color:#EF4444;font-weight:600;">' + t.monthNotCalled + '</span> not called &middot; <span style="color:#10B981;font-weight:600;">' + t.monthCalled + '</span> called</div>';
+    h += '<div class="day-summary"><b>' + t.called + '</b> called &middot; <b>' + (t.calledPrev||0) + '</b> prev &middot; <b>' + t.newCarts + '</b> new &middot; <b>' + t.monthTotal + '</b> total</div>';
     h += '</div>';
-    h += '<table class="day-tbl"><thead><tr><th></th><th>Called (period)</th><th>New (period)</th><th>Month total</th><th>Month not called</th><th>Month called</th></tr></thead><tbody>';
+    h += '<table class="day-tbl"><thead><tr><th></th><th>Called</th><th>Called prev.</th><th>New</th><th>Month total</th><th>Not called</th><th>Called</th></tr></thead><tbody>';
     for (var c = 0; c < countries.length; c++) {
         var cc = countries[c];
         var cs = s.countries[cc] || {};
@@ -250,6 +252,7 @@ function renderAbSummary(data, countries) {
         h += '<tr>';
         h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
         h += '<td>' + fv(cs.totalCalled||0, 'v-called') + '</td>';
+        h += '<td>' + fv(cs.totalCalledPrev||0, 'v-prev') + '</td>';
         h += '<td>' + fv(cs.totalNew||0, 'v-new') + '</td>';
         h += '<td>' + fv(cs.monthTotal||0, 'v-total') + '</td>';
         h += '<td>' + fv(cs.monthNotCalled||0, 'v-notcalled') + '</td>';
