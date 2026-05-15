@@ -191,12 +191,55 @@ function renderDayCards(days, countries) {
     return h;
 }
 
+function renderSummaryCard(days, countries, label) {
+    var totals = {};
+    var totalCalled = 0, totalLeads = 0;
+    for (var c = 0; c < countries.length; c++) totals[countries[c]] = { called:0, leads:0 };
+    for (var d = 0; d < days.length; d++) {
+        var row = days[d];
+        for (var c = 0; c < countries.length; c++) {
+            var cc = countries[c];
+            var cell = row[cc] || { called:0, leads:0 };
+            totals[cc].called += cell.called;
+        }
+        totalCalled += (row.total || {}).called || 0;
+    }
+    // leads = total pool (same every day, take from first day)
+    if (days.length > 0) {
+        for (var c = 0; c < countries.length; c++) {
+            var cc = countries[c];
+            totals[cc].leads = (days[0][cc] || {}).leads || 0;
+            totalLeads += totals[cc].leads;
+        }
+    }
+    var h = '<div class="day-card" style="border:2px solid #2563EB;background:linear-gradient(135deg,#EFF6FF,#fff);">';
+    h += '<div class="day-header" style="border-bottom:2px solid #DBEAFE;">';
+    h += '<div><span class="day-date" style="font-size:15px;">' + label + '</span></div>';
+    h += '<div class="day-summary"><b>' + totalCalled + '</b> called / <b>' + totalLeads + '</b> leads</div>';
+    h += '</div>';
+    h += '<table class="day-tbl"><tbody>';
+    for (var c = 0; c < countries.length; c++) {
+        var cc = countries[c];
+        var t = totals[cc];
+        if (t.called === 0 && t.leads === 0) continue;
+        h += '<tr>';
+        h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
+        h += '<td><span class="called-val">' + t.called + '</span> <span class="leads-val">called</span></td>';
+        h += '<td><span class="leads-val">' + t.leads + ' leads</span></td>';
+        h += '</tr>';
+    }
+    h += '</tbody></table></div>';
+    return h;
+}
+
 function render(data) {
     var h = '';
     h += '<div class="section-title"><i class="fas fa-shopping-cart" style="color:#D97706;"></i> Abandoned Carts</div>';
+    h += renderSummaryCard(data.abandonedCarts, data.countries, "\u{1F4CA} Month Total");
     h += renderDayCards(data.abandonedCarts, data.countries);
 
     h += '<div class="section-title"><i class="fas fa-user-tag" style="color:#2563EB;"></i> One-time Buyers</div>';
+    h += renderSummaryCard(data.allLeads, data.countries, "\u{1F4CA} Month Total");
     h += renderDayCards(data.allLeads, data.countries);
 
     document.getElementById("statsContent").innerHTML = h;
