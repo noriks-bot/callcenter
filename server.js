@@ -2616,6 +2616,112 @@ app.get('/api/callcenter-orders', async (req, res) => {
 app.get('/login', (req, res) => res.sendFile('login.html', { root: path.join(__dirname, 'public') }));
 app.get('/report', (req, res) => res.sendFile('report.html', { root: path.join(__dirname, 'public') }));
 app.get('/statistics', (req, res) => res.sendFile('statistics.html', { root: path.join(__dirname, 'public') }));
+
+// ========== ONE-TIME STATISTICS API ==========
+app.get('/api/onetime-statistics', (req, res) => {
+  try {
+    const callData = loadCallData();
+    const buyers = RAM.buyers || [];
+    const countries = ['hr','cz','pl','gr','sk','it','si','hu'];
+
+    const today = new Date().toISOString().slice(0,10);
+    const fromDate = req.query.from || new Date(Date.now() - 29*86400000).toISOString().slice(0,10);
+    const toDate = req.query.to || today;
+
+    // Period buyer IDs
+    const periodBuyerIds = new Set();
+    for (const b of buyers) {
+      const day = (b.registeredAt || '').slice(0,10);
+      if (day >= fromDate && day <= toDate) periodBuyerIds.add(b.id);
+    }
+
+    // Group buyers by day + country
+    const buyersByDayCountry = {};
+    for (const b of buyers) {
+      const day = (b.registeredAt || '').slice(0,10);
+      if (!day || day < fromDate || day > toDate) continue;
+      const country = b.storeCode;
+      if (!countries.includes(country)) continue;
+      const key = day + '_' + country;
+      if (!buyersByDayCountry[key]) buyersByDayCountry[key] = [];
+      buyersByDayCountry[key].push(b);
+    }
+
+    // Prev period: unique old buyer IDs called in this period + call counts
+    const prevBuyerTotal = {};
+    const calledPrevByDC = {};
+    const prevBuyerIdsByCountry = {};
+    for (const c of countries) { prevBuyerTotal[c] = 0; prevBuyerIdsByCountry[c] = new Set(); }
+    for (const [id, data] of Object.entries(callData)) {
+      if (!id.includes('_buyer_')) continue;
+      if (periodBuyerIds.has(id)) continue;
+      if (!data.callStatus || data.callStatus === 'not_called') continue;
+      const day = (data.lastUpdated || '').slice(0,10);
+      if (!day || day < fromDate || day > toDate) continue;
+      const country = id.split('_')[0];
+      if (!countries.includes(country)) continue;
+      const key = day + '_' + country;
+      calledPrevByDC[key] = (calledPrevByDC[key] || 0) + 1;
+      prevBuyerIdsByCountry[country].add(id);
+    }
+    for (const c of countries) prevBuyerTotal[c] = prevBuyerIdsByCountry[c].size;
+
+    // Build daily rows
+    const days = [];
+    const start = new Date(fromDate + 'T00:00:00Z');
+    const end = new Date(toDate + 'T00:00:00Z');
+    for (let d = new Date(end); d >= start; d.setDate(d.getDate()-1)) {
+      const ds = d.toISOString().slice(0,10);
+      const row = { date: ds };
+      let tNew = 0, tCalled = 0, tNotCalled = 0, tCalledPrev = 0;
+      for (const c of countries) {
+        const key = ds + '_' + c;
+        const dayBuyers = buyersByDayCountry[key] || [];
+        let called = 0, notCalled = 0;
+        for (const buyer of dayBuyers) {
+          const cd = callData[buyer.id];
+          if (cd && cd.callStatus && cd.callStatus !== 'not_called') called++;
+          else notCalled++;
+        }
+        const calledPrev = calledPrevByDC[key] || 0;
+        row[c] = { newBuyers: dayBuyers.length, called, notCalled, calledPrev, prevTotal: prevBuyerTotal[c] || 0 };
+        tNew += dayBuyers.length; tCalled += called; tNotCalled += notCalled; tCalledPrev += calledPrev;
+      }
+      row.total = { newBuyers: tNew, called: tCalled, notCalled: tNotCalled, calledPrev: tCalledPrev };
+      days.push(row);
+    }
+
+    // Month summary
+    let sumNew = 0, sumCalled = 0, sumNotCalled = 0, sumCalledPrev = 0, sumPrevTotal = 0;
+    const countrySummary = {};
+    for (const c of countries) {
+      let cNew = 0, cCalled = 0, cNotCalled = 0, cCalledPrev = 0;
+      for (const row of days) {
+        const cell = row[c] || {};
+        cNew += cell.newBuyers || 0;
+        cCalled += cell.called || 0;
+        cNotCalled += cell.notCalled || 0;
+        cCalledPrev += cell.calledPrev || 0;
+      }
+      countrySummary[c] = { newBuyers: cNew, called: cCalled, notCalled: cNotCalled, calledPrev: cCalledPrev, prevTotal: prevBuyerTotal[c] || 0 };
+      sumNew += cNew; sumCalled += cCalled; sumNotCalled += cNotCalled; sumCalledPrev += cCalledPrev; sumPrevTotal += prevBuyerTotal[c] || 0;
+    }
+
+    res.json({
+      success: true,
+      countries,
+      days,
+      monthSummary: {
+        countries: countrySummary,
+        totals: { newBuyers: sumNew, called: sumCalled, notCalled: sumNotCalled, calledPrev: sumCalledPrev, prevTotal: sumPrevTotal }
+      }
+    });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/onetime-statistics', (req, res) => res.sendFile('onetime-statistics.html', { root: path.join(__dirname, 'public') }));
 // SSR: inject cached data into HTML so frontend has ZERO fetch delay
 app.get('/', (req, res) => {
   const htmlPath = path.join(__dirname, 'public', 'index.html');

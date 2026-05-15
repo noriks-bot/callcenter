@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abandoned Statistics - Noriks Call Center</title>
+    <title>One-Time Statistics - Noriks Call Center</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -63,8 +63,8 @@
             <div class="nav-section">
                 <div class="nav-title">Menu</div>
                 <a href="/#leads" class="nav-item" data-tab="leads"><i class="fas fa-users"></i><span>Leads</span></a>
-                <a href="/statistics" class="nav-item active"><i class="fas fa-shopping-cart"></i><span>Abandoned Statistics</span></a>
-                <a href="/onetime-statistics" class="nav-item"><i class="fas fa-user-tag"></i><span>One-Time Statistics</span></a>
+                <a href="/statistics" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Abandoned Statistics</span></a>
+                <a href="/onetime-statistics" class="nav-item active"><i class="fas fa-user-tag"></i><span>One-Time Statistics</span></a>
             </div>
             <div class="nav-section admin-only" id="messagingSection">
                 <div class="nav-title">Messaging</div>
@@ -90,7 +90,7 @@
 
     <div class="top-bar" id="topBar">
         <button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
-        <div class="page-title">Abandoned Statistics</div>
+        <div class="page-title">One-Time Statistics</div>
         <div class="top-bar-actions">
             <button onclick="loadStats()" style="background:#2563EB;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-sync-alt"></i> Refresh</button>
             <div class="header-avatar" id="headerAvatar">N</div>
@@ -160,7 +160,7 @@ var dateFrom, dateTo;
 
 function loadStats() {
     document.getElementById("statsContent").innerHTML = '<div class="loading"><div class="spinner"></div><div>Loading statistics...</div></div>';
-    fetch("/api/statistics?from=" + dateFrom + "&to=" + dateTo)
+    fetch("/api/onetime-statistics?from=" + dateFrom + "&to=" + dateTo)
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (!data.success) { document.getElementById("statsContent").innerHTML = '<div class="loading">Error: ' + (data.error||"unknown") + '</div>'; return; }
@@ -171,7 +171,7 @@ function loadStats() {
 
 function fv(val, cls) { return val === 0 ? '<span class="v-zero">0</span>' : '<span class="' + cls + '">' + val + '</span>'; }
 
-function renderAbDayCards(days, countries) {
+function renderDayCards(days, countries) {
     var h = "";
     for (var d = 0; d < days.length; d++) {
         var row = days[d];
@@ -179,30 +179,30 @@ function renderAbDayCards(days, countries) {
         var weekday = dt.toLocaleString("en", { weekday:"short" });
         var dateLabel = row.date.slice(8,10) + "." + row.date.slice(5,7) + ".";
         var tot = row.total || {};
-        if ((tot.newCarts||0) === 0 && (tot.called||0) === 0 && (tot.calledPrev||0) === 0) continue;
+        if ((tot.newBuyers||0) === 0 && (tot.called||0) === 0 && (tot.calledPrev||0) === 0) continue;
 
         h += '<div class="day-card">';
         h += '<div class="day-header">';
         h += '<div><span class="day-date">' + dateLabel + '</span><span class="day-weekday">' + weekday + '</span></div>';
-        var daySum = '<div class="day-summary"><b>' + (tot.newCarts||0) + '</b> new';
+        var daySum = '<div class="day-summary"><b>' + (tot.newBuyers||0) + '</b> new';
         var tCl = tot.called||0;
         var tNcl = tot.notCalled||0;
-        var tPct = (tot.newCarts||0) > 0 ? Math.round(tCl/(tot.newCarts||1)*100) : 0;
+        var tPct = (tot.newBuyers||0) > 0 ? Math.round(tCl/(tot.newBuyers||1)*100) : 0;
         var tPctColor = tPct === 100 ? '#10B981' : tPct >= 50 ? '#D97706' : '#EF4444';
-        if ((tot.newCarts||0) > 0) daySum += ' &middot; <span style="color:#10B981;font-weight:600;">' + tCl + ' called</span> &middot; <span style="color:#EF4444;font-weight:600;">' + tNcl + ' not called</span> &middot; <span style="color:' + tPctColor + ';font-weight:700;">' + tPct + '%</span>';
+        if ((tot.newBuyers||0) > 0) daySum += ' &middot; <span style="color:#10B981;font-weight:600;">' + tCl + ' called</span> &middot; <span style="color:#EF4444;font-weight:600;">' + tNcl + ' not called</span> &middot; <span style="color:' + tPctColor + ';font-weight:700;">' + tPct + '%</span>';
         if ((tot.calledPrev||0) > 0) daySum += ' &middot; <span style="color:#8B5CF6;">' + (tot.calledPrev||0) + ' prev</span>';
         daySum += '</div>';
         h += daySum;
         h += '</div>';
-        h += '<table class="day-tbl"><thead><tr><th></th><th>New</th><th>\u2705 Called</th><th>\u274C Not called</th><th>%</th><th style="color:#6B7280;">Prev. carts</th><th style="color:#8B5CF6;">Called prev.</th></tr></thead><tbody>';
+        h += '<table class="day-tbl"><thead><tr><th></th><th>New</th><th>\u2705 Called</th><th>\u274C Not called</th><th>%</th><th style="color:#6B7280;">Prev. buyers</th><th style="color:#8B5CF6;">Called prev.</th></tr></thead><tbody>';
 
         for (var c = 0; c < countries.length; c++) {
             var cc = countries[c];
             var cell = row[cc] || {};
-            if ((cell.newCarts||0) === 0 && (cell.called||0) === 0 && (cell.calledPrev||0) === 0) continue;
+            if ((cell.newBuyers||0) === 0 && (cell.called||0) === 0 && (cell.calledPrev||0) === 0) continue;
             h += '<tr>';
             h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
-            var nc = cell.newCarts||0;
+            var nc = cell.newBuyers||0;
             var cl = cell.called||0;
             var ncl = cell.notCalled||0;
             var pct = nc > 0 ? Math.round(cl/nc*100) : 0;
@@ -215,59 +215,27 @@ function renderAbDayCards(days, countries) {
             h += '<td>' + fv(cell.calledPrev||0, 'v-prev') + '</td>';
             h += '</tr>';
         }
-
         h += '</tbody></table></div>';
     }
     return h;
 }
 
-function renderBuyerDayCards(days, countries) {
-    var h = "";
-    for (var d = 0; d < days.length; d++) {
-        var row = days[d];
-        var dt = new Date(row.date + "T12:00:00");
-        var weekday = dt.toLocaleString("en", { weekday:"short" });
-        var dateLabel = row.date.slice(8,10) + "." + row.date.slice(5,7) + ".";
-        var tot = row.total || { called:0, leads:0 };
-        if (tot.called === 0 && tot.leads === 0) continue;
-
-        h += '<div class="day-card">';
-        h += '<div class="day-header">';
-        h += '<div><span class="day-date">' + dateLabel + '</span><span class="day-weekday">' + weekday + '</span></div>';
-        h += '<div class="day-summary"><b>' + tot.called + '</b> called / <b>' + tot.leads + '</b> leads</div>';
-        h += '</div>';
-        h += '<table class="day-tbl"><tbody>';
-        for (var c = 0; c < countries.length; c++) {
-            var cc = countries[c];
-            var cell = row[cc] || { called:0, leads:0 };
-            if (cell.called === 0 && cell.leads === 0) continue;
-            h += '<tr>';
-            h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
-            h += '<td><span class="v-called">' + cell.called + '</span> <span style="color:#9CA3AF;font-size:11px;">called</span></td>';
-            h += '<td><span style="color:#9CA3AF;font-size:11px;">' + cell.leads + ' leads</span></td>';
-            h += '</tr>';
-        }
-        h += '</tbody></table></div>';
-    }
-    return h;
-}
-
-function renderAbSummary(data, countries) {
-    var s = data.abMonthSummary;
+function renderSummary(data, countries) {
+    var s = data.monthSummary;
     var t = s.totals;
     var h = '<div class="day-card" style="border:2px solid #2563EB;background:linear-gradient(135deg,#EFF6FF,#fff);">';
     h += '<div class="day-header" style="border-bottom:2px solid #DBEAFE;">';
     h += '<div><span class="day-date" style="font-size:15px;">\u{1F4CA} Month Total</span></div>';
-    h += '<div class="day-summary"><b>' + t.newCarts + '</b> new &middot; <span style="color:#10B981;font-weight:600;">' + t.called + ' called</span> &middot; <span style="color:#EF4444;font-weight:600;">' + t.notCalled + ' not called</span> &middot; <span style="font-weight:700;color:' + (t.newCarts > 0 ? (Math.round(t.called/t.newCarts*100)===100?'#10B981':Math.round(t.called/t.newCarts*100)>=50?'#D97706':'#EF4444') : '#D1D5DB') + ';">' + (t.newCarts > 0 ? Math.round(t.called/t.newCarts*100)+'%' : '-') + '</span></div>';
+    h += '<div class="day-summary"><b>' + t.newBuyers + '</b> new &middot; <span style="color:#10B981;font-weight:600;">' + t.called + ' called</span> &middot; <span style="color:#EF4444;font-weight:600;">' + t.notCalled + ' not called</span> &middot; <span style="font-weight:700;color:' + (t.newBuyers > 0 ? (Math.round(t.called/t.newBuyers*100)===100?'#10B981':Math.round(t.called/t.newBuyers*100)>=50?'#D97706':'#EF4444') : '#D1D5DB') + ';">' + (t.newBuyers > 0 ? Math.round(t.called/t.newBuyers*100)+'%' : '-') + '</span></div>';
     h += '</div>';
-    h += '<table class="day-tbl"><thead><tr><th></th><th>New</th><th>\u2705 Called</th><th>\u274C Not called</th><th>%</th><th style="color:#6B7280;">Prev. carts</th><th style="color:#8B5CF6;">Called prev.</th></tr></thead><tbody>';
+    h += '<table class="day-tbl"><thead><tr><th></th><th>New</th><th>\u2705 Called</th><th>\u274C Not called</th><th>%</th><th style="color:#6B7280;">Prev. buyers</th><th style="color:#8B5CF6;">Called prev.</th></tr></thead><tbody>';
     for (var c = 0; c < countries.length; c++) {
         var cc = countries[c];
         var cs = s.countries[cc] || {};
-        if ((cs.newCarts||0) === 0 && (cs.calledPrev||0) === 0) continue;
+        if ((cs.newBuyers||0) === 0 && (cs.calledPrev||0) === 0) continue;
         h += '<tr>';
         h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
-        var sn = cs.newCarts||0;
+        var sn = cs.newBuyers||0;
         var scl = cs.called||0;
         var sncl = cs.notCalled||0;
         var spct = sn > 0 ? Math.round(scl/sn*100) : 0;
@@ -286,13 +254,9 @@ function renderAbSummary(data, countries) {
 
 function render(data) {
     var h = '';
-    h += '<div class="section-title"><i class="fas fa-shopping-cart" style="color:#D97706;"></i> Abandoned Carts</div>';
-    h += renderAbSummary(data, data.countries);
-    h += renderAbDayCards(data.abandonedCarts, data.countries);
-
-    h += '<div class="section-title"><i class="fas fa-user-tag" style="color:#2563EB;"></i> One-time Buyers</div>';
-    h += renderBuyerDayCards(data.allLeads, data.countries);
-
+    h += '<div class="section-title"><i class="fas fa-user-tag" style="color:#2563EB;"></i> One-Time Buyers</div>';
+    h += renderSummary(data, data.countries);
+    h += renderDayCards(data.days, data.countries);
     document.getElementById("statsContent").innerHTML = h;
 }
 
