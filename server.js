@@ -175,6 +175,7 @@ async function warmRAM() {
     setTimeout(() => {
       getMkOrdersCache().catch(() => {});
     }, 10000);
+
     const carts = dbReadData('carts');
     const pending = dbReadData('pending');
     const buyers = dbReadData('buyers');
@@ -2417,6 +2418,97 @@ app.get('/api/pending-orders-count', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ========== STATISTICS API ==========
+app.get('/api/statistics', (req, res) => {
+  try {
+    const callData = loadCallData();
+    const carts = RAM.carts || [];
+    const buyers = RAM.buyers || [];
+    const countries = ['hr','cz','pl','gr','sk','it','si','hu'];
+
+    const today = new Date().toISOString().slice(0,10);
+    const fromDate = req.query.from || new Date(Date.now() - 29*86400000).toISOString().slice(0,10);
+    const toDate = req.query.to || today;
+
+    // Called: only abandoned cart leads (id not containing _buyer_ or _order_)
+    const abCalledByDC = {};
+    // Called: ALL leads
+    const allCalledByDC = {};
+    for (const [id, data] of Object.entries(callData)) {
+      if (!data.callStatus || data.callStatus === 'not_called') continue;
+      const day = (data.lastUpdated || '').slice(0,10);
+      if (!day || day < fromDate || day > toDate) continue;
+      const country = id.split('_')[0];
+      if (!countries.includes(country)) continue;
+      const key = day + '_' + country;
+      allCalledByDC[key] = (allCalledByDC[key] || 0) + 1;
+      if (!id.includes('_buyer_') && !id.includes('_order_')) {
+        abCalledByDC[key] = (abCalledByDC[key] || 0) + 1;
+      }
+    }
+
+    // New abandoned carts per day
+    const abLeadsByDC = {};
+    for (const c of carts) {
+      const day = (c.abandonedAt || '').slice(0,10);
+      if (!day || day < fromDate || day > toDate) continue;
+      const country = c.storeCode;
+      if (!countries.includes(country)) continue;
+      const key = day + '_' + country;
+      abLeadsByDC[key] = (abLeadsByDC[key] || 0) + 1;
+    }
+
+    // All new leads per day (carts + buyers)
+    const allLeadsByDC = {};
+    for (const c of carts) {
+      const day = (c.abandonedAt || '').slice(0,10);
+      if (!day || day < fromDate || day > toDate) continue;
+      const country = c.storeCode;
+      if (!countries.includes(country)) continue;
+      const key = day + '_' + country;
+      allLeadsByDC[key] = (allLeadsByDC[key] || 0) + 1;
+    }
+    for (const b of buyers) {
+      const day = (b.registeredAt || '').slice(0,10);
+      if (!day || day < fromDate || day > toDate) continue;
+      const country = b.storeCode;
+      if (!countries.includes(country)) continue;
+      const key = day + '_' + country;
+      allLeadsByDC[key] = (allLeadsByDC[key] || 0) + 1;
+    }
+
+    function buildDays(calledMap, leadsMap) {
+      const days = [];
+      const start = new Date(fromDate + 'T00:00:00Z');
+      const end = new Date(toDate + 'T00:00:00Z');
+      for (let d = new Date(end); d >= start; d.setDate(d.getDate()-1)) {
+        const ds = d.toISOString().slice(0,10);
+        const row = { date: ds };
+        let totalCalled = 0, totalLeads = 0;
+        for (const c of countries) {
+          const called = calledMap[ds+'_'+c] || 0;
+          const leads = leadsMap[ds+'_'+c] || 0;
+          row[c] = { called, leads };
+          totalCalled += called;
+          totalLeads += leads;
+        }
+        row.total = { called: totalCalled, leads: totalLeads };
+        days.push(row);
+      }
+      return days;
+    }
+
+    res.json({
+      success: true,
+      countries,
+      abandonedCarts: buildDays(abCalledByDC, abLeadsByDC),
+      allLeads: buildDays(allCalledByDC, allLeadsByDC)
+    });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Call Center Orders (orders with _call_center meta)
 app.get('/api/callcenter-orders', async (req, res) => {
   try {
@@ -2459,75 +2551,6 @@ app.get('/api/callcenter-orders', async (req, res) => {
 // Page routes
 app.get('/login', (req, res) => res.sendFile('login.html', { root: path.join(__dirname, 'public') }));
 app.get('/report', (req, res) => res.sendFile('report.html', { root: path.join(__dirname, 'public') }));
-// ========== STATISTICS API ==========
-app.get('/api/statistics', (req, res) => {
-  try {
-    const callData = loadCallData();
-    const carts = RAM.carts || [];
-    const buyers = RAM.buyers || [];
-    const countries = ['hr','cz','pl','gr','sk','it','si','hu'];
-
-    // Date range from query params, default last 30 days
-    const today = new Date().toISOString().slice(0,10);
-    const fromDate = req.query.from || new Date(Date.now() - 29*86400000).toISOString().slice(0,10);
-    const toDate = req.query.to || today;
-
-    // Build per-day, per-country: called count + total new leads
-    // "called" = any lead whose status was changed on that day (lastUpdated date, status != not_called)
-    const calledByDayCountry = {};
-    for (const [id, data] of Object.entries(callData)) {
-      if (!data.callStatus || data.callStatus === 'not_called') continue;
-      const day = (data.lastUpdated || '').slice(0,10);
-      if (!day || day < fromDate || day > toDate) continue;
-      const country = id.split('_')[0];
-      if (!countries.includes(country)) continue;
-      const key = day + '_' + country;
-      calledByDayCountry[key] = (calledByDayCountry[key] || 0) + 1;
-    }
-
-    // Total new leads per day per country (carts by abandonedAt + buyers by registeredAt)
-    const leadsByDayCountry = {};
-    for (const c of carts) {
-      const day = (c.abandonedAt || '').slice(0,10);
-      if (!day || day < fromDate || day > toDate) continue;
-      const country = c.storeCode;
-      if (!countries.includes(country)) continue;
-      const key = day + '_' + country;
-      leadsByDayCountry[key] = (leadsByDayCountry[key] || 0) + 1;
-    }
-    for (const b of buyers) {
-      const day = (b.registeredAt || '').slice(0,10);
-      if (!day || day < fromDate || day > toDate) continue;
-      const country = b.storeCode;
-      if (!countries.includes(country)) continue;
-      const key = day + '_' + country;
-      leadsByDayCountry[key] = (leadsByDayCountry[key] || 0) + 1;
-    }
-
-    // Build daily array
-    const days = [];
-    const start = new Date(fromDate + 'T00:00:00Z');
-    const end = new Date(toDate + 'T00:00:00Z');
-    for (let d = new Date(end); d >= start; d.setDate(d.getDate()-1)) {
-      const ds = d.toISOString().slice(0,10);
-      const row = { date: ds };
-      let totalCalled = 0, totalLeads = 0;
-      for (const c of countries) {
-        const called = calledByDayCountry[ds+'_'+c] || 0;
-        const leads = leadsByDayCountry[ds+'_'+c] || 0;
-        row[c] = { called, leads };
-        totalCalled += called;
-        totalLeads += leads;
-      }
-      row.total = { called: totalCalled, leads: totalLeads };
-      days.push(row);
-    }
-
-    res.json({ success: true, countries, days });
-  } catch(e) {
-    res.status(500).json({ error: e.message });
-  }
-});
 app.get('/statistics', (req, res) => res.sendFile('statistics.html', { root: path.join(__dirname, 'public') }));
 // SSR: inject cached data into HTML so frontend has ZERO fetch delay
 app.get('/', (req, res) => {

@@ -14,23 +14,24 @@
         @media (max-width: 1024px) { .main-content { margin-left: 0; } }
         .pg { padding: 74px 16px 30px; }
 
-        .day-card { background:#fff; border:1px solid #E8E8EC; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.04); margin-bottom:12px; overflow:hidden; }
-        .day-header { padding:10px 16px; border-bottom:1px solid #E8E8EC; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-        .day-header:hover { background:#F9FAFB; }
+        .section-title { font-size:18px; font-weight:700; color:#1A1A2E; margin:24px 0 12px; display:flex; align-items:center; gap:8px; }
+        .section-title:first-child { margin-top:0; }
+        .section-title i { font-size:16px; }
+
+        .day-card { background:#fff; border:1px solid #E8E8EC; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.04); margin-bottom:10px; overflow:hidden; }
+        .day-header { padding:10px 16px; border-bottom:1px solid #E8E8EC; display:flex; align-items:center; justify-content:space-between; }
         .day-date { font-size:14px; font-weight:700; color:#1A1A2E; }
         .day-weekday { font-size:12px; color:#9CA3AF; margin-left:8px; font-weight:400; }
         .day-summary { font-size:12px; color:#6B7280; }
         .day-summary b { color:#1A1A2E; }
 
         .day-tbl { width:100%; border-collapse:collapse; }
-        .day-tbl td { padding:8px 16px; border-bottom:1px solid #F3F4F6; font-size:13px; color:#374151; }
+        .day-tbl td { padding:7px 16px; border-bottom:1px solid #F3F4F6; font-size:13px; color:#374151; }
         .day-tbl tr:last-child td { border-bottom:none; }
         .day-tbl tr:hover td { background:#F9FAFB; }
         .country-cell { font-weight:600; white-space:nowrap; width:100px; }
         .called-val { font-weight:700; color:#1A1A2E; font-size:14px; }
         .leads-val { color:#9CA3AF; font-size:12px; }
-        .zero-row td { color:#D1D5DB; }
-        .zero-row .called-val { color:#D1D5DB; font-weight:400; }
 
         .pills { display:inline-flex; background:#fff; border:1px solid #E0E0E5; border-radius:8px; padding:4px; gap:2px; flex-wrap:wrap; }
         .pill { padding:6px 14px; border-radius:6px; border:1px solid transparent; background:transparent; color:#6B7280; font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; }
@@ -117,7 +118,6 @@ function toggleSidebarCollapse() {
 if (localStorage.getItem("sidebar_collapsed") === "true") document.getElementById("sidebar").classList.add("collapsed");
 
 var flags = { hr:"\u{1F1ED}\u{1F1F7}", cz:"\u{1F1E8}\u{1F1FF}", pl:"\u{1F1F5}\u{1F1F1}", gr:"\u{1F1EC}\u{1F1F7}", sk:"\u{1F1F8}\u{1F1F0}", it:"\u{1F1EE}\u{1F1F9}", si:"\u{1F1F8}\u{1F1EE}", hu:"\u{1F1ED}\u{1F1FA}" };
-var cNames = { hr:"Hungary", cz:"Czech", pl:"Poland", gr:"Greece", sk:"Slovakia", it:"Italy", si:"Slovenia", hu:"Hungary" };
 var dateFrom, dateTo;
 
 (function() {
@@ -138,7 +138,8 @@ var dateFrom, dateTo;
             var m = parseInt(p.dataset.m);
             dateFrom = new Date(2026, m, 1).toISOString().slice(0,10);
             var last = new Date(2026, m+1, 0);
-            if (last > now) last = now;
+            var now2 = new Date();
+            if (last > now2) last = now2;
             dateTo = last.toISOString().slice(0,10);
             loadStats();
         });
@@ -151,22 +152,20 @@ function loadStats() {
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (!data.success) { document.getElementById("statsContent").innerHTML = '<div class="loading">Error: ' + (data.error||"unknown") + '</div>'; return; }
-            renderDays(data);
+            render(data);
         })
         .catch(function(e) { document.getElementById("statsContent").innerHTML = '<div class="loading">Error: ' + e.message + '</div>'; });
 }
 
-function renderDays(data) {
-    var countries = data.countries;
-    var days = data.days;
+function renderDayCards(days, countries) {
     var h = "";
-
     for (var d = 0; d < days.length; d++) {
         var row = days[d];
         var dt = new Date(row.date + "T12:00:00");
         var weekday = dt.toLocaleString("en", { weekday:"long" });
         var dateLabel = row.date.slice(8,10) + "." + row.date.slice(5,7) + ".";
         var tot = row.total || { called:0, leads:0 };
+        if (tot.called === 0 && tot.leads === 0) continue;
 
         h += '<div class="day-card">';
         h += '<div class="day-header">';
@@ -186,12 +185,18 @@ function renderDays(data) {
             h += '</tr>';
         }
 
-        if (tot.called === 0 && tot.leads === 0) {
-            h += '<tr><td colspan="3" style="text-align:center;color:#D1D5DB;padding:16px;">No activity</td></tr>';
-        }
-
         h += '</tbody></table></div>';
     }
+    return h;
+}
+
+function render(data) {
+    var h = '';
+    h += '<div class="section-title"><i class="fas fa-shopping-cart" style="color:#D97706;"></i> Abandoned Carts</div>';
+    h += renderDayCards(data.abandonedCarts, data.countries);
+
+    h += '<div class="section-title"><i class="fas fa-users" style="color:#2563EB;"></i> All Leads</div>';
+    h += renderDayCards(data.allLeads, data.countries);
 
     document.getElementById("statsContent").innerHTML = h;
 }
