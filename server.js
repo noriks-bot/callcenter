@@ -2447,15 +2447,22 @@ app.get('/api/statistics', (req, res) => {
       }
     }
 
-    // New abandoned carts per day
-    const abLeadsByDC = {};
+    // Total abandoned carts per country (full pool, not just new per day)
+    const abLeadsByCountry = {};
     for (const c of carts) {
-      const day = (c.abandonedAt || '').slice(0,10);
-      if (!day || day < fromDate || day > toDate) continue;
       const country = c.storeCode;
       if (!countries.includes(country)) continue;
-      const key = day + '_' + country;
-      abLeadsByDC[key] = (abLeadsByDC[key] || 0) + 1;
+      abLeadsByCountry[country] = (abLeadsByCountry[country] || 0) + 1;
+    }
+    // For each day, leads = total carts available for that country
+    const abLeadsByDC = {};
+    const startD = new Date(fromDate + 'T00:00:00Z');
+    const endD = new Date(toDate + 'T00:00:00Z');
+    for (let dd = new Date(endD); dd >= startD; dd.setDate(dd.getDate()-1)) {
+      const ds = dd.toISOString().slice(0,10);
+      for (const c of countries) {
+        abLeadsByDC[ds + '_' + c] = abLeadsByCountry[c] || 0;
+      }
     }
 
     // One-time buyers leads per day
