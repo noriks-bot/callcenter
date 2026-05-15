@@ -2430,97 +2430,89 @@ app.get('/api/statistics', (req, res) => {
     const fromDate = req.query.from || new Date(Date.now() - 29*86400000).toISOString().slice(0,10);
     const toDate = req.query.to || today;
 
-    // === ABANDONED CARTS DATA ===
+    // === ABANDONED CARTS: per-day analysis ===
 
-    // Build set of cart IDs that belong to this period
+    // Group carts by day + country
+    const cartsByDayCountry = {};
+    for (const c of carts) {
+      const day = (c.abandonedAt || '').slice(0,10);
+      if (!day || day < fromDate || day > toDate) continue;
+      const country = c.storeCode;
+      if (!countries.includes(country)) continue;
+      const key = day + '_' + country;
+      if (!cartsByDayCountry[key]) cartsByDayCountry[key] = [];
+      cartsByDayCountry[key].push(c);
+    }
+
+    // Period cart IDs (for distinguishing called-current vs called-prev)
     const periodCartIds = new Set();
     for (const c of carts) {
       const day = (c.abandonedAt || '').slice(0,10);
       if (day >= fromDate && day <= toDate) periodCartIds.add(c.id);
     }
 
-    // 1. Called per day per country (abandoned cart IDs only), split current vs prev period
-    const abCalledByDC = {};
-    const abCalledPrevByDC = {};
+    // Calls on previous-period carts per day
+    const calledPrevByDC = {};
     for (const [id, data] of Object.entries(callData)) {
       if (!data.callStatus || data.callStatus === 'not_called') continue;
       if (id.includes('_buyer_') || id.includes('_order_')) continue;
+      if (periodCartIds.has(id)) continue; // skip current period
       const day = (data.lastUpdated || '').slice(0,10);
       if (!day || day < fromDate || day > toDate) continue;
       const country = id.split('_')[0];
       if (!countries.includes(country)) continue;
       const key = day + '_' + country;
-      if (periodCartIds.has(id)) {
-        abCalledByDC[key] = (abCalledByDC[key] || 0) + 1;
-      } else {
-        abCalledPrevByDC[key] = (abCalledPrevByDC[key] || 0) + 1;
-      }
+      calledPrevByDC[key] = (calledPrevByDC[key] || 0) + 1;
     }
 
-    // 2. New carts per day per country
-    const newCartsByDC = {};
-    for (const c of carts) {
-      const day = (c.abandonedAt || '').slice(0,10);
-      if (!day || day < fromDate || day > toDate) continue;
-      const country = c.storeCode;
-      if (!countries.includes(country)) continue;
-      const key = day + '_' + country;
-      newCartsByDC[key] = (newCartsByDC[key] || 0) + 1;
-    }
-
-    // 3. Month totals per country: all carts, called, not called (for the selected period)
-    const monthTotalByCountry = {};
-    const monthCalledByCountry = {};
-    const monthNotCalledByCountry = {};
-    for (const c of countries) {
-      monthTotalByCountry[c] = 0;
-      monthCalledByCountry[c] = 0;
-      monthNotCalledByCountry[c] = 0;
-    }
-    for (const c of carts) {
-      const country = c.storeCode;
-      if (!countries.includes(country)) continue;
-      const day = (c.abandonedAt || '').slice(0,10);
-      if (!day || day < fromDate || day > toDate) continue;
-      monthTotalByCountry[country]++;
-      const cd = callData[c.id];
-      if (cd && cd.callStatus && cd.callStatus !== 'not_called') {
-        monthCalledByCountry[country]++;
-      } else {
-        monthNotCalledByCountry[country]++;
-      }
-    }
-
-    // Build daily array for abandoned carts
+    // Build daily rows
     const abDays = [];
     const start = new Date(fromDate + 'T00:00:00Z');
     const end = new Date(toDate + 'T00:00:00Z');
     for (let d = new Date(end); d >= start; d.setDate(d.getDate()-1)) {
       const ds = d.toISOString().slice(0,10);
       const row = { date: ds };
-      let tCalled = 0, tCalledPrev = 0, tNew = 0;
+      let tNew = 0, tCalled = 0, tNotCalled = 0, tCalledPrev = 0;
       for (const c of countries) {
-        const called = abCalledByDC[ds+'_'+c] || 0;
-        const newC = newCartsByDC[ds+'_'+c] || 0;
-        const calledPrev = abCalledPrevByDC[ds+'_'+c] || 0;
-        row[c] = {
-          called,
-          calledPrev,
-          newCarts: newC,
-          monthTotal: monthTotalByCountry[c],
-          monthCalled: monthCalledByCountry[c],
-          monthNotCalled: monthNotCalledByCountry[c]
-        };
+        const key = ds + '_' + c;
+        const dayCarts = cartsByDayCountry[key] || [];
+        let called = 0, notCalled = 0;
+        for (const cart of dayCarts) {
+          const cd = callData[cart.id];
+          if (cd && cd.callStatus && cd.callStatus !== 'not_called') {
+            called++;
+          } else {
+            notCalled++;
+          }
+        }
+        const calledPrev = calledPrevByDC[key] || 0;
+        row[c] = { newCarts: dayCarts.length, called, notCalled, calledPrev };
+        tNew += dayCarts.length;
         tCalled += called;
+        tNotCalled += notCalled;
         tCalledPrev += calledPrev;
-        tNew += newC;
       }
-      row.total = { called: tCalled, calledPrev: tCalledPrev, newCarts: tNew };
-      days = abDays;
+      row.total = { newCarts: tNew, called: tCalled, notCalled: tNotCalled, calledPrev: tCalledPrev };
       abDays.push(row);
     }
 
-    // === ONE-TIME BUYERS DATA ===
+    // Month summary
+    let sumNew = 0, sumCalled = 0, sumNotCalled = 0, sumCalledPrev = 0;
+    const countrySummary = {};
+    for (const c of countries) {
+      let cNew = 0, cCalled = 0, cNotCalled = 0, cCalledPrev = 0;
+      for (const row of abDays) {
+        const cell = row[c] || {};
+        cNew += cell.newCarts || 0;
+        cCalled += cell.called || 0;
+        cNotCalled += cell.notCalled || 0;
+        cCalledPrev += cell.calledPrev || 0;
+      }
+      countrySummary[c] = { newCarts: cNew, called: cCalled, notCalled: cNotCalled, calledPrev: cCalledPrev };
+      sumNew += cNew; sumCalled += cCalled; sumNotCalled += cNotCalled; sumCalledPrev += cCalledPrev;
+    }
+
+    // === ONE-TIME BUYERS ===
     const buyerCalledByDC = {};
     for (const [id, data] of Object.entries(callData)) {
       if (!data.callStatus || data.callStatus === 'not_called') continue;
@@ -2532,7 +2524,6 @@ app.get('/api/statistics', (req, res) => {
       const key = day + '_' + country;
       buyerCalledByDC[key] = (buyerCalledByDC[key] || 0) + 1;
     }
-
     const buyerLeadsByDC = {};
     for (const b of buyers) {
       const day = (b.registeredAt || '').slice(0,10);
@@ -2542,56 +2533,30 @@ app.get('/api/statistics', (req, res) => {
       const key = day + '_' + country;
       buyerLeadsByDC[key] = (buyerLeadsByDC[key] || 0) + 1;
     }
-
-    function buildBuyerDays() {
-      const days = [];
-      for (let d = new Date(end); d >= start; d.setDate(d.getDate()-1)) {
-        const ds = d.toISOString().slice(0,10);
-        const row = { date: ds };
-        let tCalled = 0, tLeads = 0;
-        for (const c of countries) {
-          const called = buyerCalledByDC[ds+'_'+c] || 0;
-          const leads = buyerLeadsByDC[ds+'_'+c] || 0;
-          row[c] = { called, leads };
-          tCalled += called;
-          tLeads += leads;
-        }
-        row.total = { called: tCalled, leads: tLeads };
-        days.push(row);
+    const buyerDays = [];
+    for (let d = new Date(new Date(toDate + 'T00:00:00Z')); d >= new Date(fromDate + 'T00:00:00Z'); d.setDate(d.getDate()-1)) {
+      const ds = d.toISOString().slice(0,10);
+      const row = { date: ds };
+      let tCalled = 0, tLeads = 0;
+      for (const c of countries) {
+        const called = buyerCalledByDC[ds+'_'+c] || 0;
+        const leads = buyerLeadsByDC[ds+'_'+c] || 0;
+        row[c] = { called, leads };
+        tCalled += called; tLeads += leads;
       }
-      return days;
+      row.total = { called: tCalled, leads: tLeads };
+      buyerDays.push(row);
     }
-
-    // Month summary for abandoned carts
-    let sumCalled = 0, sumCalledPrev = 0, sumNew = 0, sumTotal = 0, sumMCalled = 0, sumMNotCalled = 0;
-    for (const c of countries) {
-      sumTotal += monthTotalByCountry[c];
-      sumMCalled += monthCalledByCountry[c];
-      sumMNotCalled += monthNotCalledByCountry[c];
-    }
-    for (const row of abDays) { sumCalled += row.total.called; sumCalledPrev += row.total.calledPrev; sumNew += row.total.newCarts; }
 
     res.json({
       success: true,
       countries,
       abandonedCarts: abDays,
       abMonthSummary: {
-        countries: countries.reduce((acc, c) => {
-          acc[c] = { monthTotal: monthTotalByCountry[c], monthCalled: monthCalledByCountry[c], monthNotCalled: monthNotCalledByCountry[c] };
-          let cCalled = 0, cCalledPrev = 0, cNew = 0;
-          for (const row of abDays) {
-            cCalled += (row[c]?.called || 0);
-            cCalledPrev += (row[c]?.calledPrev || 0);
-            cNew += (row[c]?.newCarts || 0);
-          }
-          acc[c].totalCalled = cCalled;
-          acc[c].totalCalledPrev = cCalledPrev;
-          acc[c].totalNew = cNew;
-          return acc;
-        }, {}),
-        totals: { called: sumCalled, calledPrev: sumCalledPrev, newCarts: sumNew, monthTotal: sumTotal, monthCalled: sumMCalled, monthNotCalled: sumMNotCalled }
+        countries: countrySummary,
+        totals: { newCarts: sumNew, called: sumCalled, notCalled: sumNotCalled, calledPrev: sumCalledPrev }
       },
-      allLeads: buildBuyerDays()
+      allLeads: buyerDays
     });
   } catch(e) {
     res.status(500).json({ error: e.message });

@@ -176,27 +176,39 @@ function renderAbDayCards(days, countries) {
         var weekday = dt.toLocaleString("en", { weekday:"short" });
         var dateLabel = row.date.slice(8,10) + "." + row.date.slice(5,7) + ".";
         var tot = row.total || {};
-        if ((tot.called||0) === 0 && (tot.newCarts||0) === 0) continue;
+        if ((tot.newCarts||0) === 0 && (tot.called||0) === 0 && (tot.calledPrev||0) === 0) continue;
 
         h += '<div class="day-card">';
         h += '<div class="day-header">';
         h += '<div><span class="day-date">' + dateLabel + '</span><span class="day-weekday">' + weekday + '</span></div>';
-        h += '<div class="day-summary"><b>' + (tot.called||0) + '</b> called today &middot; <b>' + (tot.newCarts||0) + '</b> new</div>';
+        h += '<div class="day-summary"><b>' + (tot.newCarts||0) + '</b> new';
+        var tCl = tot.called||0;
+        var tNcl = tot.notCalled||0;
+        var tPct = (tot.newCarts||0) > 0 ? Math.round(tCl/(tot.newCarts||1)*100) : 0;
+        var tPctColor = tPct === 100 ? '#10B981' : tPct >= 50 ? '#D97706' : '#EF4444';
+        if ((tot.newCarts||0) > 0) daySum += ' &middot; <span style="color:#10B981;font-weight:600;">' + tCl + ' called</span> &middot; <span style="color:#EF4444;font-weight:600;">' + tNcl + ' not called</span> &middot; <span style="color:' + tPctColor + ';font-weight:700;">' + tPct + '%</span>';
+        if ((tot.calledPrev||0) > 0) daySum += ' &middot; <span style="color:#8B5CF6;">' + (tot.calledPrev||0) + ' prev</span>';
+        daySum += '</div>';
+        h += daySum;
         h += '</div>';
-        h += '<table class="day-tbl"><thead><tr><th></th><th>Called today</th><th>Called prev.</th><th>New today</th><th>Month total</th><th>Not called</th><th>Called</th></tr></thead><tbody>';
+        h += '<table class="day-tbl"><thead><tr><th></th><th>New</th><th>\u2705 Called</th><th>\u274C Not called</th><th>%</th><th style="color:#8B5CF6;">Prev. carts</th></tr></thead><tbody>';
 
         for (var c = 0; c < countries.length; c++) {
             var cc = countries[c];
             var cell = row[cc] || {};
-            if ((cell.called||0) === 0 && (cell.newCarts||0) === 0 && (cell.monthTotal||0) === 0) continue;
+            if ((cell.newCarts||0) === 0 && (cell.called||0) === 0 && (cell.calledPrev||0) === 0) continue;
             h += '<tr>';
             h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
-            h += '<td>' + fv(cell.called||0, 'v-called') + '</td>';
+            var nc = cell.newCarts||0;
+            var cl = cell.called||0;
+            var ncl = cell.notCalled||0;
+            var pct = nc > 0 ? Math.round(cl/nc*100) : 0;
+            var pctColor = pct === 100 ? '#10B981' : pct >= 50 ? '#D97706' : '#EF4444';
+            h += '<td>' + fv(nc, 'v-new') + '</td>';
+            h += '<td>' + fv(cl, 'v-monthcalled') + '</td>';
+            h += '<td>' + fv(ncl, 'v-notcalled') + '</td>';
+            h += '<td><span style="font-weight:700;color:' + (nc > 0 ? pctColor : '#D1D5DB') + ';">' + (nc > 0 ? pct+'%' : '-') + '</span></td>';
             h += '<td>' + fv(cell.calledPrev||0, 'v-prev') + '</td>';
-            h += '<td>' + fv(cell.newCarts||0, 'v-new') + '</td>';
-            h += '<td>' + fv(cell.monthTotal||0, 'v-total') + '</td>';
-            h += '<td>' + fv(cell.monthNotCalled||0, 'v-notcalled') + '</td>';
-            h += '<td>' + fv(cell.monthCalled||0, 'v-monthcalled') + '</td>';
             h += '</tr>';
         }
 
@@ -242,21 +254,25 @@ function renderAbSummary(data, countries) {
     var h = '<div class="day-card" style="border:2px solid #2563EB;background:linear-gradient(135deg,#EFF6FF,#fff);">';
     h += '<div class="day-header" style="border-bottom:2px solid #DBEAFE;">';
     h += '<div><span class="day-date" style="font-size:15px;">\u{1F4CA} Month Total</span></div>';
-    h += '<div class="day-summary"><b>' + t.called + '</b> called &middot; <b>' + (t.calledPrev||0) + '</b> prev &middot; <b>' + t.newCarts + '</b> new &middot; <b>' + t.monthTotal + '</b> total</div>';
+    h += '<div class="day-summary"><b>' + t.newCarts + '</b> new &middot; <span style="color:#10B981;font-weight:600;">' + t.called + ' called</span> &middot; <span style="color:#EF4444;font-weight:600;">' + t.notCalled + ' not called</span> &middot; <span style="font-weight:700;color:' + (t.newCarts > 0 ? (Math.round(t.called/t.newCarts*100)===100?'#10B981':Math.round(t.called/t.newCarts*100)>=50?'#D97706':'#EF4444') : '#D1D5DB') + ';">' + (t.newCarts > 0 ? Math.round(t.called/t.newCarts*100)+'%' : '-') + '</span></div>';
     h += '</div>';
-    h += '<table class="day-tbl"><thead><tr><th></th><th>Called</th><th>Called prev.</th><th>New</th><th>Month total</th><th>Not called</th><th>Called</th></tr></thead><tbody>';
+    h += '<table class="day-tbl"><thead><tr><th></th><th>New</th><th>\u2705 Called</th><th>\u274C Not called</th><th>%</th><th style="color:#8B5CF6;">Prev. carts</th></tr></thead><tbody>';
     for (var c = 0; c < countries.length; c++) {
         var cc = countries[c];
         var cs = s.countries[cc] || {};
-        if ((cs.monthTotal||0) === 0) continue;
+        if ((cs.newCarts||0) === 0 && (cs.calledPrev||0) === 0) continue;
         h += '<tr>';
         h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
-        h += '<td>' + fv(cs.totalCalled||0, 'v-called') + '</td>';
-        h += '<td>' + fv(cs.totalCalledPrev||0, 'v-prev') + '</td>';
-        h += '<td>' + fv(cs.totalNew||0, 'v-new') + '</td>';
-        h += '<td>' + fv(cs.monthTotal||0, 'v-total') + '</td>';
-        h += '<td>' + fv(cs.monthNotCalled||0, 'v-notcalled') + '</td>';
-        h += '<td>' + fv(cs.monthCalled||0, 'v-monthcalled') + '</td>';
+        var sn = cs.newCarts||0;
+        var scl = cs.called||0;
+        var sncl = cs.notCalled||0;
+        var spct = sn > 0 ? Math.round(scl/sn*100) : 0;
+        var spctC = spct === 100 ? '#10B981' : spct >= 50 ? '#D97706' : '#EF4444';
+        h += '<td>' + fv(sn, 'v-new') + '</td>';
+        h += '<td>' + fv(scl, 'v-monthcalled') + '</td>';
+        h += '<td>' + fv(sncl, 'v-notcalled') + '</td>';
+        h += '<td><span style="font-weight:700;color:' + (sn > 0 ? spctC : '#D1D5DB') + ';">' + (sn > 0 ? spct+'%' : '-') + '</span></td>';
+        h += '<td>' + fv(cs.calledPrev||0, 'v-prev') + '</td>';
         h += '</tr>';
     }
     h += '</tbody></table></div>';
