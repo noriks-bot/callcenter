@@ -181,7 +181,7 @@ function renderAbDayCards(days, countries) {
         h += '<div class="day-card">';
         h += '<div class="day-header">';
         h += '<div><span class="day-date">' + dateLabel + '</span><span class="day-weekday">' + weekday + '</span></div>';
-        h += '<div class="day-summary"><b>' + (tot.newCarts||0) + '</b> new';
+        var daySum = '<div class="day-summary"><b>' + (tot.newCarts||0) + '</b> new';
         var tCl = tot.called||0;
         var tNcl = tot.notCalled||0;
         var tPct = (tot.newCarts||0) > 0 ? Math.round(tCl/(tot.newCarts||1)*100) : 0;
