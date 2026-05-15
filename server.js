@@ -2722,6 +2722,115 @@ app.get('/api/onetime-statistics', (req, res) => {
 });
 
 app.get('/onetime-statistics', (req, res) => res.sendFile('onetime-statistics.html', { root: path.join(__dirname, 'public') }));
+
+// ========== ORDER STATISTICS API ==========
+app.get('/api/order-statistics', (req, res) => {
+  try {
+    const callData = loadCallData();
+    const countries = ['hr','cz','pl','gr','sk','it','si','hu'];
+    const storeNames = { hr:'Croatia', cz:'Czech', pl:'Poland', gr:'Greece', sk:'Slovakia', it:'Italy', si:'Slovenia', hu:'Hungary' };
+    const storeFlags = { hr:'\u{1F1ED}\u{1F1F7}', cz:'\u{1F1E8}\u{1F1FF}', pl:'\u{1F1F5}\u{1F1F1}', gr:'\u{1F1EC}\u{1F1F7}', sk:'\u{1F1F8}\u{1F1F0}', it:'\u{1F1EE}\u{1F1F9}', si:'\u{1F1F8}\u{1F1EE}', hu:'\u{1F1ED}\u{1F1FA}' };
+
+    const today = new Date().toISOString().slice(0,10);
+    const fromDate = req.query.from || new Date(Date.now() - 29*86400000).toISOString().slice(0,10);
+    const toDate = req.query.to || today;
+
+    // Collect all converted orders
+    const orders = [];
+    for (const [id, data] of Object.entries(callData)) {
+      if (data.callStatus !== 'converted') continue;
+      const day = (data.lastUpdated || '').slice(0,10);
+      if (!day || day < fromDate || day > toDate) continue;
+      const country = id.split('_')[0];
+      if (!countries.includes(country)) continue;
+
+      let type = 'abandoned';
+      if (id.includes('_buyer_')) type = 'onetime';
+      else if (id.includes('_order_')) type = 'pending';
+
+      const agentMatch = (data.notes || '').match(/created by (\w+)/);
+      const agent = agentMatch ? agentMatch[1] : 'unknown';
+
+      orders.push({
+        id,
+        date: day,
+        country,
+        countryName: storeNames[country] || country.toUpperCase(),
+        flag: storeFlags[country] || '',
+        type,
+        orderId: data.orderId || null,
+        orderTotal: data.orderTotal || 0,
+        agent,
+        notes: data.notes || ''
+      });
+    }
+
+    orders.sort((a, b) => b.date.localeCompare(a.date));
+
+    // Per-day per-country stats
+    const days = [];
+    const start = new Date(fromDate + 'T00:00:00Z');
+    const end = new Date(toDate + 'T00:00:00Z');
+    for (let d = new Date(end); d >= start; d.setDate(d.getDate()-1)) {
+      const ds = d.toISOString().slice(0,10);
+      const dayOrders = orders.filter(o => o.date === ds);
+      if (dayOrders.length === 0) continue;
+
+      const row = { date: ds };
+      let tAbandoned = 0, tOnetime = 0, tTotal = 0;
+      for (const c of countries) {
+        const co = dayOrders.filter(o => o.country === c);
+        const ab = co.filter(o => o.type === 'abandoned').length;
+        const ot = co.filter(o => o.type === 'onetime').length;
+        const pd = co.filter(o => o.type === 'pending').length;
+        if (ab + ot + pd === 0) continue;
+        row[c] = { abandoned: ab, onetime: ot, pending: pd, total: ab + ot + pd, orders: co };
+        tAbandoned += ab;
+        tOnetime += ot;
+        tTotal += ab + ot + pd;
+      }
+      row.total = { abandoned: tAbandoned, onetime: tOnetime, total: tTotal };
+      row.orders = dayOrders;
+      days.push(row);
+    }
+
+    // Month summary
+    const countrySummary = {};
+    let sumAb = 0, sumOt = 0, sumTotal = 0;
+    for (const c of countries) {
+      const co = orders.filter(o => o.country === c);
+      const ab = co.filter(o => o.type === 'abandoned').length;
+      const ot = co.filter(o => o.type === 'onetime').length;
+      const pd = co.filter(o => o.type === 'pending').length;
+      countrySummary[c] = { abandoned: ab, onetime: ot, pending: pd, total: ab + ot + pd };
+      sumAb += ab; sumOt += ot; sumTotal += ab + ot + pd;
+    }
+
+    // Agent summary
+    const agentSummary = {};
+    for (const o of orders) {
+      if (!agentSummary[o.agent]) agentSummary[o.agent] = { abandoned: 0, onetime: 0, pending: 0, total: 0 };
+      agentSummary[o.agent][o.type]++;
+      agentSummary[o.agent].total++;
+    }
+
+    res.json({
+      success: true,
+      countries,
+      days,
+      orders,
+      monthSummary: {
+        countries: countrySummary,
+        agents: agentSummary,
+        totals: { abandoned: sumAb, onetime: sumOt, total: sumTotal }
+      }
+    });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/order-statistics', (req, res) => res.sendFile('order-statistics.html', { root: path.join(__dirname, 'public') }));
 // SSR: inject cached data into HTML so frontend has ZERO fetch delay
 app.get('/', (req, res) => {
   const htmlPath = path.join(__dirname, 'public', 'index.html');
