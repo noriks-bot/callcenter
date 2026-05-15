@@ -26,12 +26,19 @@
         .day-summary b { color:#1A1A2E; }
 
         .day-tbl { width:100%; border-collapse:collapse; }
-        .day-tbl td { padding:7px 16px; border-bottom:1px solid #F3F4F6; font-size:13px; color:#374151; }
+        .day-tbl th { padding:6px 10px; text-align:center; background:#F9FAFB; border-bottom:2px solid #E5E7EB; font-size:10px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:.3px; white-space:nowrap; }
+        .day-tbl th:first-child { text-align:left; }
+        .day-tbl td { padding:7px 10px; border-bottom:1px solid #F3F4F6; font-size:13px; color:#374151; text-align:center; }
+        .day-tbl td:first-child { text-align:left; }
         .day-tbl tr:last-child td { border-bottom:none; }
         .day-tbl tr:hover td { background:#F9FAFB; }
-        .country-cell { font-weight:600; white-space:nowrap; width:100px; }
-        .called-val { font-weight:700; color:#1A1A2E; font-size:14px; }
-        .leads-val { color:#9CA3AF; font-size:12px; }
+        .country-cell { font-weight:600; white-space:nowrap; }
+        .v-called { font-weight:700; color:#1A1A2E; }
+        .v-new { color:#D97706; font-weight:600; }
+        .v-total { color:#6B7280; }
+        .v-notcalled { color:#EF4444; font-weight:600; }
+        .v-monthcalled { color:#10B981; font-weight:600; }
+        .v-zero { color:#D1D5DB; }
 
         .pills { display:inline-flex; background:#fff; border:1px solid #E0E0E5; border-radius:8px; padding:4px; gap:2px; flex-wrap:wrap; }
         .pill { padding:6px 14px; border-radius:6px; border:1px solid transparent; background:transparent; color:#6B7280; font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; }
@@ -158,12 +165,50 @@ function loadStats() {
         .catch(function(e) { document.getElementById("statsContent").innerHTML = '<div class="loading">Error: ' + e.message + '</div>'; });
 }
 
-function renderDayCards(days, countries) {
+function fv(val, cls) { return val === 0 ? '<span class="v-zero">0</span>' : '<span class="' + cls + '">' + val + '</span>'; }
+
+function renderAbDayCards(days, countries) {
     var h = "";
     for (var d = 0; d < days.length; d++) {
         var row = days[d];
         var dt = new Date(row.date + "T12:00:00");
-        var weekday = dt.toLocaleString("en", { weekday:"long" });
+        var weekday = dt.toLocaleString("en", { weekday:"short" });
+        var dateLabel = row.date.slice(8,10) + "." + row.date.slice(5,7) + ".";
+        var tot = row.total || {};
+        if ((tot.called||0) === 0 && (tot.newCarts||0) === 0) continue;
+
+        h += '<div class="day-card">';
+        h += '<div class="day-header">';
+        h += '<div><span class="day-date">' + dateLabel + '</span><span class="day-weekday">' + weekday + '</span></div>';
+        h += '<div class="day-summary"><b>' + (tot.called||0) + '</b> called today &middot; <b>' + (tot.newCarts||0) + '</b> new</div>';
+        h += '</div>';
+        h += '<table class="day-tbl"><thead><tr><th></th><th>Called today</th><th>New today</th><th>Month total</th><th>Month not called</th><th>Month called</th></tr></thead><tbody>';
+
+        for (var c = 0; c < countries.length; c++) {
+            var cc = countries[c];
+            var cell = row[cc] || {};
+            if ((cell.called||0) === 0 && (cell.newCarts||0) === 0 && (cell.monthTotal||0) === 0) continue;
+            h += '<tr>';
+            h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
+            h += '<td>' + fv(cell.called||0, 'v-called') + '</td>';
+            h += '<td>' + fv(cell.newCarts||0, 'v-new') + '</td>';
+            h += '<td>' + fv(cell.monthTotal||0, 'v-total') + '</td>';
+            h += '<td>' + fv(cell.monthNotCalled||0, 'v-notcalled') + '</td>';
+            h += '<td>' + fv(cell.monthCalled||0, 'v-monthcalled') + '</td>';
+            h += '</tr>';
+        }
+
+        h += '</tbody></table></div>';
+    }
+    return h;
+}
+
+function renderBuyerDayCards(days, countries) {
+    var h = "";
+    for (var d = 0; d < days.length; d++) {
+        var row = days[d];
+        var dt = new Date(row.date + "T12:00:00");
+        var weekday = dt.toLocaleString("en", { weekday:"short" });
         var dateLabel = row.date.slice(8,10) + "." + row.date.slice(5,7) + ".";
         var tot = row.total || { called:0, leads:0 };
         if (tot.called === 0 && tot.leads === 0) continue;
@@ -174,58 +219,41 @@ function renderDayCards(days, countries) {
         h += '<div class="day-summary"><b>' + tot.called + '</b> called / <b>' + tot.leads + '</b> leads</div>';
         h += '</div>';
         h += '<table class="day-tbl"><tbody>';
-
         for (var c = 0; c < countries.length; c++) {
             var cc = countries[c];
             var cell = row[cc] || { called:0, leads:0 };
             if (cell.called === 0 && cell.leads === 0) continue;
             h += '<tr>';
             h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
-            h += '<td><span class="called-val">' + cell.called + '</span> <span class="leads-val">called</span></td>';
-            h += '<td><span class="leads-val">' + cell.leads + ' leads</span></td>';
+            h += '<td><span class="v-called">' + cell.called + '</span> <span style="color:#9CA3AF;font-size:11px;">called</span></td>';
+            h += '<td><span style="color:#9CA3AF;font-size:11px;">' + cell.leads + ' leads</span></td>';
             h += '</tr>';
         }
-
         h += '</tbody></table></div>';
     }
     return h;
 }
 
-function renderSummaryCard(days, countries, label) {
-    var totals = {};
-    var totalCalled = 0, totalLeads = 0;
-    for (var c = 0; c < countries.length; c++) totals[countries[c]] = { called:0, leads:0 };
-    for (var d = 0; d < days.length; d++) {
-        var row = days[d];
-        for (var c = 0; c < countries.length; c++) {
-            var cc = countries[c];
-            var cell = row[cc] || { called:0, leads:0 };
-            totals[cc].called += cell.called;
-        }
-        totalCalled += (row.total || {}).called || 0;
-    }
-    // leads = total pool (same every day, take from first day)
-    if (days.length > 0) {
-        for (var c = 0; c < countries.length; c++) {
-            var cc = countries[c];
-            totals[cc].leads = (days[0][cc] || {}).leads || 0;
-            totalLeads += totals[cc].leads;
-        }
-    }
+function renderAbSummary(data, countries) {
+    var s = data.abMonthSummary;
+    var t = s.totals;
     var h = '<div class="day-card" style="border:2px solid #2563EB;background:linear-gradient(135deg,#EFF6FF,#fff);">';
     h += '<div class="day-header" style="border-bottom:2px solid #DBEAFE;">';
-    h += '<div><span class="day-date" style="font-size:15px;">' + label + '</span></div>';
-    h += '<div class="day-summary"><b>' + totalCalled + '</b> called / <b>' + totalLeads + '</b> leads</div>';
+    h += '<div><span class="day-date" style="font-size:15px;">\u{1F4CA} Month Total</span></div>';
+    h += '<div class="day-summary"><b>' + t.called + '</b> called &middot; <b>' + t.newCarts + '</b> new &middot; <b>' + t.monthTotal + '</b> total &middot; <span style="color:#EF4444;font-weight:600;">' + t.monthNotCalled + '</span> not called &middot; <span style="color:#10B981;font-weight:600;">' + t.monthCalled + '</span> called</div>';
     h += '</div>';
-    h += '<table class="day-tbl"><tbody>';
+    h += '<table class="day-tbl"><thead><tr><th></th><th>Called (period)</th><th>New (period)</th><th>Month total</th><th>Month not called</th><th>Month called</th></tr></thead><tbody>';
     for (var c = 0; c < countries.length; c++) {
         var cc = countries[c];
-        var t = totals[cc];
-        if (t.called === 0 && t.leads === 0) continue;
+        var cs = s.countries[cc] || {};
+        if ((cs.monthTotal||0) === 0) continue;
         h += '<tr>';
         h += '<td class="country-cell">' + flags[cc] + ' ' + cc.toUpperCase() + '</td>';
-        h += '<td><span class="called-val">' + t.called + '</span> <span class="leads-val">called</span></td>';
-        h += '<td><span class="leads-val">' + t.leads + ' leads</span></td>';
+        h += '<td>' + fv(cs.totalCalled||0, 'v-called') + '</td>';
+        h += '<td>' + fv(cs.totalNew||0, 'v-new') + '</td>';
+        h += '<td>' + fv(cs.monthTotal||0, 'v-total') + '</td>';
+        h += '<td>' + fv(cs.monthNotCalled||0, 'v-notcalled') + '</td>';
+        h += '<td>' + fv(cs.monthCalled||0, 'v-monthcalled') + '</td>';
         h += '</tr>';
     }
     h += '</tbody></table></div>';
@@ -235,12 +263,11 @@ function renderSummaryCard(days, countries, label) {
 function render(data) {
     var h = '';
     h += '<div class="section-title"><i class="fas fa-shopping-cart" style="color:#D97706;"></i> Abandoned Carts</div>';
-    h += renderSummaryCard(data.abandonedCarts, data.countries, "\u{1F4CA} Month Total");
-    h += renderDayCards(data.abandonedCarts, data.countries);
+    h += renderAbSummary(data, data.countries);
+    h += renderAbDayCards(data.abandonedCarts, data.countries);
 
     h += '<div class="section-title"><i class="fas fa-user-tag" style="color:#2563EB;"></i> One-time Buyers</div>';
-    h += renderSummaryCard(data.allLeads, data.countries, "\u{1F4CA} Month Total");
-    h += renderDayCards(data.allLeads, data.countries);
+    h += renderBuyerDayCards(data.allLeads, data.countries);
 
     document.getElementById("statsContent").innerHTML = h;
 }
