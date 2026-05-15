@@ -2431,9 +2431,9 @@ app.get('/api/statistics', (req, res) => {
     const toDate = req.query.to || today;
 
     // Called: only abandoned cart leads (id not containing _buyer_ or _order_)
+    // Called: split by type (abandoned carts vs one-time buyers)
     const abCalledByDC = {};
-    // Called: ALL leads
-    const allCalledByDC = {};
+    const buyerCalledByDC = {};
     for (const [id, data] of Object.entries(callData)) {
       if (!data.callStatus || data.callStatus === 'not_called') continue;
       const day = (data.lastUpdated || '').slice(0,10);
@@ -2441,7 +2441,7 @@ app.get('/api/statistics', (req, res) => {
       const country = id.split('_')[0];
       if (!countries.includes(country)) continue;
       const key = day + '_' + country;
-      allCalledByDC[key] = (allCalledByDC[key] || 0) + 1;
+      buyerCalledByDC[key] = (buyerCalledByDC[key] || 0) + 1;
       if (!id.includes('_buyer_') && !id.includes('_order_')) {
         abCalledByDC[key] = (abCalledByDC[key] || 0) + 1;
       }
@@ -2458,23 +2458,15 @@ app.get('/api/statistics', (req, res) => {
       abLeadsByDC[key] = (abLeadsByDC[key] || 0) + 1;
     }
 
-    // All new leads per day (carts + buyers)
-    const allLeadsByDC = {};
-    for (const c of carts) {
-      const day = (c.abandonedAt || '').slice(0,10);
-      if (!day || day < fromDate || day > toDate) continue;
-      const country = c.storeCode;
-      if (!countries.includes(country)) continue;
-      const key = day + '_' + country;
-      allLeadsByDC[key] = (allLeadsByDC[key] || 0) + 1;
-    }
+    // One-time buyers leads per day
+    const buyerLeadsByDC = {};
     for (const b of buyers) {
       const day = (b.registeredAt || '').slice(0,10);
       if (!day || day < fromDate || day > toDate) continue;
       const country = b.storeCode;
       if (!countries.includes(country)) continue;
       const key = day + '_' + country;
-      allLeadsByDC[key] = (allLeadsByDC[key] || 0) + 1;
+      buyerLeadsByDC[key] = (buyerLeadsByDC[key] || 0) + 1;
     }
 
     function buildDays(calledMap, leadsMap) {
@@ -2502,7 +2494,7 @@ app.get('/api/statistics', (req, res) => {
       success: true,
       countries,
       abandonedCarts: buildDays(abCalledByDC, abLeadsByDC),
-      allLeads: buildDays(allCalledByDC, allLeadsByDC)
+      allLeads: buildDays(buyerCalledByDC, buyerLeadsByDC)
     });
   } catch(e) {
     res.status(500).json({ error: e.message });

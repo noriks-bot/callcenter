@@ -196,7 +196,7 @@ function render(data) {
     h += '<div class="section-title"><i class="fas fa-shopping-cart" style="color:#D97706;"></i> Abandoned Carts</div>';
     h += renderDayCards(data.abandonedCarts, data.countries);
 
-    h += '<div class="section-title"><i class="fas fa-users" style="color:#2563EB;"></i> All Leads</div>';
+    h += '<div class="section-title"><i class="fas fa-user-tag" style="color:#2563EB;"></i> One-time Buyers</div>';
     h += renderDayCards(data.allLeads, data.countries);
 
     document.getElementById("statsContent").innerHTML = h;
