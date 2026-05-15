@@ -129,18 +129,19 @@ var dateFrom, dateTo;
     }
     document.getElementById("monthPills").innerHTML = h;
     var cm = now.getMonth();
-    dateFrom = new Date(2026, cm, 1).toISOString().slice(0,10);
-    dateTo = now.toISOString().slice(0,10);
+    dateFrom = 2026 + "-" + String(cm+1).padStart(2,"0") + "-01";
+    dateTo = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0") + "-" + String(now.getDate()).padStart(2,"0");
     document.querySelectorAll(".pill").forEach(function(p) {
         p.addEventListener("click", function() {
             document.querySelectorAll(".pill").forEach(function(x){x.classList.remove("on");});
             p.classList.add("on");
             var m = parseInt(p.dataset.m);
-            dateFrom = new Date(2026, m, 1).toISOString().slice(0,10);
-            var last = new Date(2026, m+1, 0);
+            dateFrom = 2026 + "-" + String(m+1).padStart(2,"0") + "-01";
             var now2 = new Date();
-            if (last > now2) last = now2;
-            dateTo = last.toISOString().slice(0,10);
+            var lastDay = new Date(2026, m+1, 0).getDate();
+            var endD = lastDay;
+            if (2026 === now2.getFullYear() && m === now2.getMonth()) endD = now2.getDate();
+            dateTo = 2026 + "-" + String(m+1).padStart(2,"0") + "-" + String(endD).padStart(2,"0");
             loadStats();
         });
     });
