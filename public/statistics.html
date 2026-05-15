@@ -131,13 +131,14 @@ var dateFrom, dateTo;
 
 (function() {
     var now = new Date(), h = "";
-    for (var i = now.getMonth(); i >= 0; i--) {
+    var cm = now.getMonth();
+    for (var i = 4; i <= 11; i++) {
         var d = new Date(2026, i, 1);
         var lbl = d.toLocaleString("en", { month:"short" }) + " " + d.getFullYear();
-        h += '<button class="pill' + (i === now.getMonth() ? " on" : "") + '" data-m="'+i+'">' + lbl + '</button>';
+        var isFuture = i > cm;
+        h += '<button class="pill' + (i === cm ? " on" : "") + '"' + (isFuture ? ' disabled style="opacity:0.3;cursor:default;"' : '') + ' data-m="'+i+'">' + lbl + '</button>';
     }
     document.getElementById("monthPills").innerHTML = h;
-    var cm = now.getMonth();
     dateFrom = 2026 + "-" + String(cm+1).padStart(2,"0") + "-01";
     dateTo = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0") + "-" + String(now.getDate()).padStart(2,"0");
     document.querySelectorAll(".pill").forEach(function(p) {
