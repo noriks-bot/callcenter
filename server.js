@@ -2451,29 +2451,29 @@ app.get('/api/statistics', (req, res) => {
       if (day >= fromDate && day <= toDate) periodCartIds.add(c.id);
     }
 
-    // Count total previous-period carts per country (abandonedAt < fromDate)
+    // Count previous-period carts + calls from call_data
+    // "Prev carts" = unique old cart IDs that were called in this period
     const prevCartsTotal = {};
-    for (const c of countries) prevCartsTotal[c] = 0;
-    for (const c of carts) {
-      const country = c.storeCode;
-      if (!countries.includes(country)) continue;
-      const day = (c.abandonedAt || '').slice(0,10);
-      if (day < fromDate) prevCartsTotal[country]++;
-    }
-
-    // Calls on previous-period carts per day
     const calledPrevByDC = {};
+    const prevCartIdsByCountry = {};
+    for (const c of countries) { prevCartsTotal[c] = 0; prevCartIdsByCountry[c] = new Set(); }
     for (const [id, data] of Object.entries(callData)) {
-      if (!data.callStatus || data.callStatus === 'not_called') continue;
       if (id.includes('_buyer_') || id.includes('_order_')) continue;
-      if (periodCartIds.has(id)) continue; // skip current period
-      const day = (data.lastUpdated || '').slice(0,10);
-      if (!day || day < fromDate || day > toDate) continue;
+      if (periodCartIds.has(id)) continue; // skip current period carts
       const country = id.split('_')[0];
       if (!countries.includes(country)) continue;
-      const key = day + '_' + country;
-      calledPrevByDC[key] = (calledPrevByDC[key] || 0) + 1;
+      // Count unique prev cart IDs that have any status
+      if (data.callStatus && data.callStatus !== 'not_called') {
+        // Called in this period?
+        const day = (data.lastUpdated || '').slice(0,10);
+        if (day >= fromDate && day <= toDate) {
+          const key = day + '_' + country;
+          calledPrevByDC[key] = (calledPrevByDC[key] || 0) + 1;
+          prevCartIdsByCountry[country].add(id);
+        }
+      }
     }
+    for (const c of countries) prevCartsTotal[c] = prevCartIdsByCountry[c].size;
 
     // Build daily rows
     const abDays = [];
