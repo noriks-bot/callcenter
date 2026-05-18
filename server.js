@@ -2855,64 +2855,175 @@ app.get('/api/order-statistics', (req, res) => {
 });
 
 
-// ========== MONTH ORDERS DETAIL (for order-statistics page bottom table) ==========
-app.get('/api/order-statistics/month-orders', async (req, res) => {
+// ========== CC ORDERS — persistent table + incremental sync ==========
+// Tabela cc_orders shrani vse Call Center orderje (meta _call_center=yes).
+// Sync teče v ozadju (na startup + vsako uro, incremental po modified_after).
+// Endpoint /api/order-statistics/month-orders bere SAMO iz DB → instant odgovor,
+// WooCommerce ni nikoli klican med klikom uporabnika.
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS cc_orders (
+      id INTEGER PRIMARY KEY,
+      number TEXT,
+      store_code TEXT NOT NULL,
+      date_cc TEXT NOT NULL,
+      date_modified TEXT,
+      customer TEXT,
+      phone TEXT,
+      total REAL,
+      currency TEXT,
+      status TEXT,
+      agent TEXT,
+      products TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_cc_orders_date ON cc_orders(date_cc);
+    CREATE INDEX IF NOT EXISTS idx_cc_orders_store_date ON cc_orders(store_code, date_cc);
+  `);
+} catch(e) { console.error('[cc_orders] table init err:', e.message); }
+
+const _ccUpsert = db.prepare(`
+  INSERT INTO cc_orders (id, number, store_code, date_cc, date_modified, customer, phone, total, currency, status, agent, products)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(id) DO UPDATE SET
+    number = excluded.number,
+    store_code = excluded.store_code,
+    date_cc = excluded.date_cc,
+    date_modified = excluded.date_modified,
+    customer = excluded.customer,
+    phone = excluded.phone,
+    total = excluded.total,
+    currency = excluded.currency,
+    status = excluded.status,
+    agent = excluded.agent,
+    products = excluded.products
+`);
+
+const _ccSyncState = path.join(DATA_DIR, 'cc-orders-sync.json');
+function _ccGetLastSync() {
+  try { return JSON.parse(fs.readFileSync(_ccSyncState, 'utf8')); } catch(e) { return {}; }
+}
+function _ccSaveLastSync(st) {
+  try { fs.writeFileSync(_ccSyncState, JSON.stringify(st)); } catch(e) {}
+}
+
+async function syncCcOrdersForStore(storeCode, sinceIso) {
+  let added = 0;
+  for (let page = 1; page <= 20; page++) {
+    const params = {
+      per_page: 100, page,
+      status: 'processing,completed,on-hold,pending,cancelled',
+      orderby: 'modified', order: 'desc'
+    };
+    if (sinceIso) params.modified_after = sinceIso;
+    const orders = await wcApiRequest(storeCode, 'orders', params);
+    if (!Array.isArray(orders) || orders.length === 0) break;
+    const upsertMany = db.transaction((rows) => {
+      for (const order of rows) {
+        const meta = order.meta_data || [];
+        const isCC = meta.find(m => m.key === '_call_center' && m.value === 'yes');
+        if (!isCC) continue;
+        const agentMeta = meta.find(m => m.key === '_call_center_agent');
+        const dateMeta = meta.find(m => m.key === '_call_center_date');
+        const dStr = dateMeta?.value || order.date_created;
+        _ccUpsert.run(
+          order.id,
+          String(order.number || order.id),
+          storeCode,
+          dStr,
+          order.date_modified || order.date_created,
+          ((order.billing?.first_name || '') + ' ' + (order.billing?.last_name || '')).trim() || '-',
+          order.billing?.phone || '',
+          parseFloat(order.total) || 0,
+          order.currency || storeCurrencies[storeCode] || 'EUR',
+          order.status || '',
+          agentMeta?.value || 'unknown',
+          (order.line_items || []).map(i => i.name + ' ×' + i.quantity).join(', ')
+        );
+        added++;
+      }
+    });
+    upsertMany(orders);
+    if (orders.length < 100) break;
+  }
+  return added;
+}
+
+async function syncAllCcOrders(forceFull = false) {
+  const start = Date.now();
+  const state = _ccGetLastSync();
+  const results = await Promise.allSettled(Object.keys(stores).map(async (sc) => {
+    const since = forceFull ? null : (state[sc] || null);
+    try {
+      const n = await syncCcOrdersForStore(sc, since);
+      state[sc] = new Date().toISOString();
+      return { store: sc, added: n };
+    } catch(e) {
+      return { store: sc, error: e.message };
+    }
+  }));
+  _ccSaveLastSync(state);
+  const ok = results.filter(r => r.status === 'fulfilled' && !r.value.error);
+  const totalAdded = ok.reduce((a, r) => a + (r.value.added || 0), 0);
+  console.log('[CC-Orders] Sync done: ' + ok.length + '/' + results.length + ' stores OK, ' + totalAdded + ' upserts in ' + ((Date.now()-start)/1000).toFixed(1) + 's');
+  results.forEach(r => {
+    if (r.status === 'rejected') console.error('[CC-Orders] rejected:', r.reason?.message);
+    else if (r.value.error) console.error('[CC-Orders] ' + r.value.store + ':', r.value.error);
+  });
+  return totalAdded;
+}
+
+// Startup: initial sync after 10s, then incremental every hour
+setTimeout(() => {
+  const state = _ccGetLastSync();
+  const hasAny = Object.keys(state).length > 0;
+  syncAllCcOrders(!hasAny).catch(e => console.error('[CC-Orders] startup sync err:', e.message));
+}, 10000);
+setInterval(() => {
+  syncAllCcOrders(false).catch(e => console.error('[CC-Orders] hourly sync err:', e.message));
+}, 60 * 60 * 1000); // every hour
+
+// ========== MONTH ORDERS DETAIL — INSTANT from DB ==========
+app.get('/api/order-statistics/month-orders', (req, res) => {
   try {
     const today = new Date().toISOString().slice(0,10);
     const fromDate = req.query.from || today.slice(0,7) + '-01';
     const toDate   = req.query.to   || today;
-    const fromTs = new Date(fromDate + 'T00:00:00Z').getTime();
-    const toTs   = new Date(toDate   + 'T23:59:59Z').getTime();
     const flags = { hr:'🇭🇷', cz:'🇨🇿', pl:'🇵🇱', gr:'🇬🇷', sk:'🇸🇰', it:'🇮🇹', si:'🇸🇮', hu:'🇭🇺' };
-    const cacheKey = 'month_orders_' + fromDate + '_' + toDate;
-    const cached = getCache(cacheKey, 180);
-    if (cached) return res.json(cached);
 
-    const allOrders = [];
-    const promises = Object.entries(stores).map(async ([storeCode, config]) => {
-      try {
-        for (let page = 1; page <= 10; page++) {
-          const orders = await wcApiRequest(storeCode, 'orders', {
-            per_page: 100, page,
-            status: 'processing,completed,on-hold,pending,cancelled',
-            orderby: 'date', order: 'desc',
-            after:  fromDate + 'T00:00:00',
-            before: toDate   + 'T23:59:59'
-          });
-          if (!Array.isArray(orders) || orders.length === 0) break;
-          for (const order of orders) {
-            const meta = order.meta_data || [];
-            const isCC = meta.find(m => m.key === '_call_center' && m.value === 'yes');
-            if (!isCC) continue;
-            const agentMeta = meta.find(m => m.key === '_call_center_agent');
-            const dateMeta = meta.find(m => m.key === '_call_center_date');
-            const dStr = dateMeta?.value || order.date_created;
-            const dTs = new Date(dStr).getTime();
-            if (isNaN(dTs) || dTs < fromTs || dTs > toTs) continue;
-            allOrders.push({
-              id: order.id,
-              number: order.number || order.id,
-              storeCode,
-              storeFlag: flags[storeCode] || '',
-              date: dStr,
-              customer: ((order.billing?.first_name || '') + ' ' + (order.billing?.last_name || '')).trim() || '-',
-              phone: order.billing?.phone || '',
-              total: parseFloat(order.total) || 0,
-              currency: order.currency || storeCurrencies[storeCode] || 'EUR',
-              status: order.status,
-              agent: agentMeta?.value || 'unknown',
-              products: (order.line_items || []).map(i => i.name + ' ×' + i.quantity).join(', ')
-            });
-          }
-          if (orders.length < 100) break;
-        }
-      } catch (e) { console.error('[MONTH-ORDERS] ' + storeCode + ': ' + e.message); }
-    });
-    await Promise.all(promises);
-    allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-    const out = { success: true, orders: allOrders, from: fromDate, to: toDate };
-    setCache(cacheKey, out);
-    res.json(out);
+    const rows = db.prepare(`
+      SELECT id, number, store_code, date_cc, customer, phone, total, currency, agent, products
+      FROM cc_orders
+      WHERE date_cc >= ? AND date_cc <= ?
+      ORDER BY date_cc DESC
+      LIMIT 2000
+    `).all(fromDate + 'T00:00:00', toDate + 'T23:59:59');
+
+    const orders = rows.map(r => ({
+      id: r.id,
+      number: r.number,
+      storeCode: r.store_code,
+      storeFlag: flags[r.store_code] || '',
+      date: r.date_cc,
+      customer: r.customer,
+      phone: r.phone,
+      total: r.total,
+      currency: r.currency,
+      agent: r.agent,
+      products: r.products
+    }));
+
+    const state = _ccGetLastSync();
+    const lastSync = Object.values(state).sort().pop() || null;
+    res.json({ success: true, orders, from: fromDate, to: toDate, lastSync, total: orders.length });
+  } catch(e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+// Manual force-sync endpoint (admin trigger)
+app.post('/api/order-statistics/sync-now', async (req, res) => {
+  try {
+    const force = !!req.body?.full;
+    const n = await syncAllCcOrders(force);
+    res.json({ success: true, upserted: n });
   } catch(e) { res.status(500).json({ success: false, error: e.message }); }
 });
 

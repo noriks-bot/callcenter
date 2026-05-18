@@ -343,10 +343,10 @@ function renderMonthOrders(filter) {
     h += '</div>';
     h += '<div>';
     h += '<table class="month-orders-tbl"><thead><tr>';
-    h += '<th>Datum</th><th>Drzava</th><th>#</th><th>Kupec</th><th>Znesek</th><th>Produkti</th><th>Agent</th><th>Status</th>';
+    h += '<th>Datum</th><th>Drzava</th><th>#</th><th>Kupec</th><th>Znesek</th><th>Produkti</th><th>Agent</th>';
     h += '</tr></thead><tbody>';
     if (rows.length === 0) {
-        h += '<tr><td colspan="8" style="text-align:center;color:#9CA3AF;padding:24px;">Ni orderjev v tem obdobju</td></tr>';
+        h += '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:24px;">Ni orderjev v tem obdobju</td></tr>';
     } else {
         rows.forEach(function(o){
             var dt = new Date(o.date);
@@ -360,7 +360,6 @@ function renderMonthOrders(filter) {
             h += '<td class="mo-total">' + sym + ' ' + (o.total||0).toFixed(2) + '</td>';
             h += '<td class="mo-products" title="' + escapeHtml(o.products||'') + '">' + escapeHtml((o.products||'').length > 90 ? o.products.slice(0,88)+'…' : (o.products||'-')) + '</td>';
             h += '<td class="mo-agent">' + escapeHtml(o.agent||'-') + '</td>';
-            h += '<td><span class="mo-status ' + (o.status||'') + '">' + (o.status||'-') + '</span></td>';
             h += '</tr>';
         });
     }
