@@ -2808,11 +2808,14 @@
             document.getElementById('contentCount-pending').textContent = filteredPending.length;
             // Rejected Orders count (filtered by country like other tabs)
             let filteredRejected = Array.isArray(window.rejectedOrders) ? [...window.rejectedOrders] : [];
+            const _rejSc = (r) => String(r.storeCode || r.country || '').toUpperCase();
             if (!hasAllCountries && !isAdmin) {
-              filteredRejected = filteredRejected.filter(r => userCountries.includes(r.storeCode));
+              const uc = userCountries.map(c => String(c).toUpperCase());
+              filteredRejected = filteredRejected.filter(r => uc.includes(_rejSc(r)));
             }
             if (currentStore !== 'all') {
-              filteredRejected = filteredRejected.filter(r => r.storeCode === currentStore);
+              const cs = String(currentStore).toUpperCase();
+              filteredRejected = filteredRejected.filter(r => _rejSc(r) === cs);
             }
             const rejCountEl = document.getElementById('contentCount-rejected');
             if (rejCountEl) rejCountEl.textContent = filteredRejected.length;
@@ -6386,9 +6389,9 @@
 
         async function loadSmsTemplates() {
             try {
-                const res = await fetch('sms-templates.json');
+                const res = await fetch('/api/sms-templates');
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                smsTemplatesData = await res.json();
+                const _t = await res.json(); smsTemplatesData = (_t && _t.templates) ? _t : { templates: _t };
                 console.log('[SMS] ✓ Templates loaded from JSON:', Object.keys(smsTemplatesData.templates || {}).length, 'templates');
 
                 // Populate preview country dropdown
@@ -8251,7 +8254,7 @@
                 </td></tr>
             `;
 
-            const result = await apiFetch(`/api/paketomati&filter=${filter}`, {
+            const result = await apiFetch(`/api/paketomati?filter=${filter}`, {
                 component: 'Paketomati',
                 timeout: 30000, // 30s timeout for MetaKocka
                 retries: 2
@@ -9051,7 +9054,7 @@
                 const userId = user?.id || 'default';
                 const [cartsRes, paketRes] = await Promise.all([
                     fetch('/api/abandoned-carts'),
-                    fetch('/api/paketomati&filter=all')
+                    fetch('/api/paketomati?filter=all')
                 ]);
                 const currentCarts = await cartsRes.json();
                 const currentPaketomati = await paketRes.json();
@@ -9361,15 +9364,14 @@ function renderRejectedTableInline() {
   const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
   let data = [...(window.rejectedOrders || [])];
 
+  const _scOf = (r) => String(r.storeCode || r.country || '').toUpperCase();
   if (!hasAllCountries && !isAdmin) {
-    data = data.filter(r => userCountries.includes(r.storeCode || r.country));
+    const uc = userCountries.map(c => String(c).toUpperCase());
+    data = data.filter(r => uc.includes(_scOf(r)));
   }
   if (typeof currentStore !== 'undefined' && currentStore !== 'all') {
-    const beforeCount = data.length;
-    data = data.filter(r => (r.storeCode || r.country) === currentStore);
-    console.log('[Rejected Filter] currentStore=' + currentStore + ' before=' + beforeCount + ' after=' + data.length);
-  } else {
-    console.log('[Rejected Filter] no country filter (currentStore=' + (typeof currentStore !== 'undefined' ? currentStore : 'undef') + ')');
+    const cs = String(currentStore).toUpperCase();
+    data = data.filter(r => _scOf(r) === cs);
   }
 
   if (search) {
