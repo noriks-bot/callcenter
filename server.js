@@ -3027,6 +3027,229 @@ app.post('/api/order-statistics/sync-now', async (req, res) => {
   } catch(e) { res.status(500).json({ success: false, error: e.message }); }
 });
 
+// =========================================================
+// REJECTED ORDERS (Metakocka "Vračilo paketa" — last 60 days)
+// =========================================================
+// Tabela cc_rejected_orders shrani vsa naročila iz Metakocke s statusom
+// "Vračilo paketa" za zadnjih 60 dni. Sync teče 1x dnevno.
+
+const MK_SECRET = 'ee759602-961d-4431-ac64-0725ae8d9665';
+const MK_COMPANY = '6371';
+const MK_URL = 'https://main.metakocka.si/rest/eshop/v1/search';
+const MK_COUNTRY_MAP = {
+  'Croatia': 'HR', 'Czech Republic': 'CZ', 'Czechia': 'CZ',
+  'Poland': 'PL', 'Greece': 'GR', 'Italy': 'IT',
+  'Hungary': 'HU', 'Slovakia': 'SK', 'Slovenia': 'SI'
+};
+const REJECTED_DAYS = 60;
+const REJECTED_STATUS = 'Vračilo paketa';
+
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS cc_rejected_orders (
+      mk_id TEXT PRIMARY KEY,
+      buyer_order TEXT,
+      country TEXT NOT NULL,
+      customer TEXT,
+      phone TEXT,
+      total REAL,
+      currency TEXT,
+      doc_date TEXT NOT NULL,
+      status TEXT,
+      products TEXT,
+      last_seen TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_cc_rej_date ON cc_rejected_orders(doc_date);
+    CREATE INDEX IF NOT EXISTS idx_cc_rej_country_date ON cc_rejected_orders(country, doc_date);
+  `);
+} catch(e) { console.error('[cc_rejected] table init err:', e.message); }
+
+const REJ_UPSERT = db.prepare(`
+  INSERT INTO cc_rejected_orders (mk_id, buyer_order, country, customer, phone, total, currency, doc_date, status, products, last_seen)
+  VALUES (@mk_id, @buyer_order, @country, @customer, @phone, @total, @currency, @doc_date, @status, @products, @last_seen)
+  ON CONFLICT(mk_id) DO UPDATE SET
+    buyer_order=excluded.buyer_order, country=excluded.country, customer=excluded.customer,
+    phone=excluded.phone, total=excluded.total, currency=excluded.currency, doc_date=excluded.doc_date,
+    status=excluded.status, products=excluded.products, last_seen=excluded.last_seen
+`);
+
+const REJ_STATE_FILE = require('path').join(__dirname, 'data', 'cc-rejected-sync.json');
+function readRejState() {
+  try { return JSON.parse(require('fs').readFileSync(REJ_STATE_FILE, 'utf8')); }
+  catch { return { lastSync: null, lastResult: null }; }
+}
+function writeRejState(s) {
+  try {
+    require('fs').mkdirSync(require('path').dirname(REJ_STATE_FILE), { recursive: true });
+    require('fs').writeFileSync(REJ_STATE_FILE, JSON.stringify(s, null, 2));
+  } catch(e) { console.error('[cc_rejected] state write err:', e.message); }
+}
+
+function mkSearch(dateFrom, dateTo, offset = 0, limit = 100) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({
+      secret_key: MK_SECRET, company_id: MK_COMPANY,
+      doc_type: 'sales_order', result_type: 'doc',
+      limit, offset,
+      query_advance: [
+        { type: 'doc_date_from', value: dateFrom },
+        { type: 'doc_date_to', value: dateTo }
+      ]
+    });
+    const url = new URL(MK_URL);
+    const opts = {
+      hostname: url.hostname, path: url.pathname, method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+    };
+    const req = require('https').request(opts, res => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => { try { resolve(JSON.parse(data)); } catch(e){ reject(new Error('Invalid MK JSON')); } });
+    });
+    req.on('error', reject); req.write(body); req.end();
+  });
+}
+
+function rejProductsFromOrder(o) {
+  // o.product_list = array of { count, code, name, ... }
+  try {
+    const list = (o.product_list || []).map(p => ({
+      code: p.code || p.product_code || '',
+      name: p.name || p.product_name || '',
+      qty: Number(p.count || p.amount || 1)
+    }));
+    return JSON.stringify(list);
+  } catch { return '[]'; }
+}
+
+async function syncRejectedOrders() {
+  const t0 = Date.now();
+  const now = new Date();
+  const since = new Date(now.getTime() - REJECTED_DAYS*24*3600*1000);
+  // Metakocka expects yyyy-mm-dd+TZ
+  const from = since.toISOString().substring(0,10) + '+02:00';
+  const to = now.toISOString().substring(0,10) + '+02:00';
+
+  console.log(`[cc_rejected] sync ${from} → ${to}`);
+  let offset = 0, total = null, scanned = 0, upserts = 0;
+  const seen = new Set();
+
+  while (true) {
+    let r;
+    try { r = await mkSearch(from, to, offset, 100); }
+    catch(e) { console.error('[cc_rejected] mk err:', e.message); break; }
+    if (r.opr_code !== '0' && r.opr_code !== 0) {
+      console.error('[cc_rejected] mk api err:', r.opr_desc);
+      break;
+    }
+    if (total === null) total = parseInt(r.result_all_records || '0');
+    const batch = r.result || [];
+    scanned += batch.length;
+
+    for (const o of batch) {
+      if ((o.status_code || '') !== REJECTED_STATUS) continue;
+      const buyerOrder = String(o.buyer_order || '');
+      // Only Noriks (NORIKS-XX-... or SHOP_SDB_XX-...). Skip TOP_SOFI, SOFI, TOP_SDB, etc.
+      const m = buyerOrder.match(/^NORIKS[-_]([A-Z]{2})[-_]/);
+      let country;
+      if (m) {
+        country = m[1];
+      } else {
+        // Not NORIKS-XX-* → skip (SHOP_SDB, TOP_SOFI, plain digits, etc.)
+        continue;
+      }
+      if (!country) continue;
+
+      const row = {
+        mk_id: String(o.mk_id),
+        buyer_order: buyerOrder,
+        country,
+        customer: (o.partner?.customer || o.receiver?.customer || '').trim().substring(0, 200),
+        phone: (o.partner?.partner_contact?.gsm || o.receiver?.partner_contact?.gsm || o.partner?.partner_contact?.phone || '').trim().substring(0, 60),
+        total: parseFloat(o.sum_all || '0'),
+        currency: o.currency_code || 'EUR',
+        doc_date: (o.doc_date || '').substring(0,10),
+        status: o.status_code || '',
+        products: rejProductsFromOrder(o),
+        last_seen: new Date().toISOString()
+      };
+      try { REJ_UPSERT.run(row); upserts++; seen.add(row.mk_id); }
+      catch(e) { console.error('[cc_rejected] upsert err:', e.message, row.mk_id); }
+    }
+
+    offset += 100;
+    if (offset >= total) break;
+    await new Promise(r => setTimeout(r, 150));
+  }
+
+  // Prune: anything older than 60d
+  const cutoff = since.toISOString().substring(0,10);
+  let pruned = 0;
+  try {
+    const r = db.prepare('DELETE FROM cc_rejected_orders WHERE doc_date < ?').run(cutoff);
+    pruned = r.changes || 0;
+  } catch(e) { console.error('[cc_rejected] prune err:', e.message); }
+
+  const dt = ((Date.now()-t0)/1000).toFixed(1);
+  const result = { ok: true, scanned, upserts, pruned, total, durationSec: dt, ts: new Date().toISOString() };
+  writeRejState({ lastSync: result.ts, lastResult: result });
+  console.log(`[cc_rejected] done: scanned=${scanned} upserts=${upserts} pruned=${pruned} in ${dt}s`);
+  return result;
+}
+
+// Startup sync (20s zamik, da PM2 stabilizira) + 24h interval
+setTimeout(() => {
+  syncRejectedOrders().catch(e => console.error('[cc_rejected] startup err:', e.message));
+}, 20000);
+setInterval(() => {
+  syncRejectedOrders().catch(e => console.error('[cc_rejected] daily err:', e.message));
+}, 24 * 60 * 60 * 1000);
+
+// GET /api/rejected-orders  → branje iz DB (instant)
+app.get('/api/rejected-orders', (req, res) => {
+  try {
+    const cutoff = new Date(Date.now() - REJECTED_DAYS*24*3600*1000).toISOString().substring(0,10);
+    const rows = db.prepare(`
+      SELECT mk_id, buyer_order, country, customer, phone, total, currency, doc_date, status, products
+      FROM cc_rejected_orders
+      WHERE doc_date >= ?
+      ORDER BY doc_date DESC
+      LIMIT 5000
+    `).all(cutoff);
+    const orders = rows.map(r => ({
+      mkId: r.mk_id,
+      buyerOrder: r.buyer_order,
+      country: r.country,
+      storeCode: (r.country || '').toLowerCase(),
+      customer: r.customer,
+      phone: r.phone,
+      total: r.total,
+      currency: r.currency,
+      docDate: r.doc_date,
+      status: r.status,
+      products: (() => { try { return JSON.parse(r.products || '[]'); } catch { return []; } })()
+    }));
+    const state = readRejState();
+    res.json({ success: true, orders, total: orders.length, lastSync: state.lastSync, lastResult: state.lastResult });
+  } catch(e) {
+    console.error('[GET /api/rejected-orders] err:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// POST /api/rejected-orders/sync-now  → ročni trigger
+app.post('/api/rejected-orders/sync-now', async (req, res) => {
+  try {
+    const result = await syncRejectedOrders();
+    res.json({ success: true, ...result });
+  } catch(e) {
+    console.error('[POST sync-now rejected] err:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+
+
 app.get('/order-statistics', (req, res) => res.sendFile('order-statistics.html', { root: path.join(__dirname, 'public') }));
 // SSR: inject cached data into HTML so frontend has ZERO fetch delay
 app.get('/', (req, res) => {

@@ -886,6 +886,11 @@
                 <span>Urgent</span>
                 <span class="count" id="contentCount-urgent">0</span>
             </button>
+            <button class="content-tab" data-content="rejected">
+                <i class="fas fa-undo"></i>
+                <span>Rejected Orders</span>
+                <span class="count" id="contentCount-rejected">0</span>
+            </button>
         </div>
 
         <div class="content">
@@ -2734,7 +2739,8 @@
                         pending: 'Pending Orders',
                         buyers: 'One-time Buyers',
                         paketomati: 'Paketomati',
-                        urgent: 'Urgent'
+                        urgent: 'Urgent',
+                        rejected: 'Rejected Orders'
                     };
                     document.getElementById('pageTitle').textContent = titles[newTab] || newTab;
 
@@ -2758,6 +2764,8 @@
                         renderUrgentTableInline();
                     } else if (newTab === 'paketomati') {
                         renderPaketomatiInline();
+                    } else if (newTab === 'rejected') {
+                        renderRejectedTableInline();
                     } else {
                         renderTable();
                     }
@@ -2798,6 +2806,16 @@
 
             document.getElementById('contentCount-carts').textContent = filteredCarts.length;
             document.getElementById('contentCount-pending').textContent = filteredPending.length;
+            // Rejected Orders count (filtered by country like other tabs)
+            let filteredRejected = Array.isArray(window.rejectedOrders) ? [...window.rejectedOrders] : [];
+            if (!hasAllCountries && !isAdmin) {
+              filteredRejected = filteredRejected.filter(r => userCountries.includes(r.storeCode));
+            }
+            if (currentStore !== 'all') {
+              filteredRejected = filteredRejected.filter(r => r.storeCode === currentStore);
+            }
+            const rejCountEl = document.getElementById('contentCount-rejected');
+            if (rejCountEl) rejCountEl.textContent = filteredRejected.length;
 
             // Buyers: Show spinner if still loading, error icon if failed
             const buyersCountEl = document.getElementById('contentCount-buyers');
@@ -2930,6 +2948,8 @@
                         await renderPaketomatiInline();
                     } else if (currentContentTab === 'urgent') {
                         await renderUrgentTableInline();
+                    } else if (currentContentTab === 'rejected') {
+                        await renderRejectedTableInline();
                     } else {
                         renderTable();
                     }
@@ -3293,7 +3313,7 @@
             const container = document.getElementById('tableContainer');
 
             // Determine effective tab - when in 'leads' view, use currentContentTab
-            const dataTab = ['carts', 'pending', 'buyers', 'paketomati', 'urgent'].includes(currentTab) 
+            const dataTab = ['carts', 'pending', 'buyers', 'paketomati', 'urgent', 'rejected'].includes(currentTab) 
                 ? currentTab 
                 : currentContentTab;
 
@@ -3340,6 +3360,12 @@
             // Handle paketomati tab separately
             if (dataTab === 'paketomati') {
                 renderPaketomatiInline();
+                return;
+            }
+
+            // Handle rejected tab separately
+            if (dataTab === 'rejected') {
+                renderRejectedTableInline();
                 return;
             }
             
@@ -9280,6 +9306,143 @@
         })();
 
         init();
-    </script>
+    
+
+// =====================================================
+// REJECTED ORDERS TAB (Metakocka "Vračilo paketa", 60d)
+// =====================================================
+window.rejectedOrders = [];
+window.rejectedLastSync = null;
+
+async function loadRejectedOrders() {
+  try {
+    const r = await fetch('/api/rejected-orders', { credentials: 'include' });
+    const j = await r.json();
+    if (j.success) {
+      window.rejectedOrders = j.orders || [];
+      window.rejectedLastSync = j.lastSync;
+      console.log('[Rejected] Loaded', window.rejectedOrders.length, 'orders, lastSync:', j.lastSync);
+      if (typeof updateContentTabCounts === 'function') updateContentTabCounts();
+    }
+  } catch(e) { console.error('[Rejected] load err:', e); }
+}
+
+async function syncRejectedNow(btn) {
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sinhroniziram...'; }
+  try {
+    const r = await fetch('/api/rejected-orders/sync-now', { method: 'POST', credentials: 'include' });
+    const j = await r.json();
+    if (j.success) {
+      if (typeof showToast === 'function') showToast('Sync OK: ' + (j.upserts||0) + ' vračil (' + (j.durationSec||0) + 's)');
+      await loadRejectedOrders();
+      renderRejectedTableInline();
+    } else {
+      if (typeof showToast === 'function') showToast('Sync napaka: ' + (j.error||'?'), 'error');
+    }
+  } catch(e) {
+    if (typeof showToast === 'function') showToast('Sync napaka: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync"></i> Sync zdaj'; }
+  }
+}
+
+function renderRejectedTableInline() {
+  const container = document.getElementById('tableContainer');
+  if (!container) return;
+  if (!window.rejectedOrders || window.rejectedOrders.length === 0) {
+    // Try lazy-load if not loaded yet
+    if (window.rejectedOrders.length === 0 && !window._rejectedLoaded) {
+      window._rejectedLoaded = true;
+      loadRejectedOrders().then(() => renderRejectedTableInline());
+      container.innerHTML = '<div class="loading" style="padding:60px;text-align:center;"><div class="spinner" style="width:48px;height:48px;margin:0 auto 20px;"></div><div style="font-size:16px;">Nalagam zavrnjena naročila...</div></div>';
+      return;
+    }
+  }
+
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  let data = [...(window.rejectedOrders || [])];
+
+  // Country filter
+  if (!hasAllCountries && !isAdmin) {
+    data = data.filter(r => userCountries.includes(r.storeCode));
+  }
+  if (currentStore !== 'all') {
+    data = data.filter(r => r.storeCode === currentStore);
+  }
+
+  // Search
+  if (search) {
+    data = data.filter(r => {
+      const hay = ((r.customer||'') + ' ' + (r.phone||'') + ' ' + (r.buyerOrder||'') + ' ' + (r.mkId||'') + ' ' + (r.products||[]).map(p=>p.name+' '+p.code).join(' ')).toLowerCase();
+      return hay.includes(search);
+    });
+  }
+
+  const lastSyncTxt = window.rejectedLastSync
+    ? 'Zadnji sync: ' + new Date(window.rejectedLastSync).toLocaleString('sl-SI')
+    : 'Nikoli sinhronizirano';
+
+  // Per-currency totals
+  const totals = {};
+  data.forEach(r => {
+    const c = r.currency || 'EUR';
+    totals[c] = (totals[c] || 0) + Number(r.total || 0);
+  });
+  const totalsTxt = Object.entries(totals)
+    .map(([c, v]) => v.toFixed(2) + ' ' + c)
+    .join(' · ') || '—';
+
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">'
+    + '<div style="font-size:13px;color:var(--text-muted);">'
+    + '<i class="fas fa-info-circle"></i> Naročila s statusom <b>Vračilo paketa</b> iz Metakocke · zadnjih 60 dni · skupaj: <b>' + data.length + '</b> · <b>' + totalsTxt + '</b>'
+    + '<br><span style="opacity:0.7;">' + lastSyncTxt + '</span>'
+    + '</div>'
+    + '<button class="btn btn-save" onclick="syncRejectedNow(this)" style="padding:8px 16px;font-size:13px;"><i class="fas fa-sync"></i> Sync zdaj</button>'
+    + '</div>';
+
+  if (data.length === 0) {
+    html += '<div class="empty" style="padding:60px;text-align:center;"><i class="fas fa-inbox" style="font-size:48px;color:var(--text-muted);margin-bottom:16px;"></i><p>Ni zavrnjenih naročil v izbranem filtru.</p></div>';
+    container.innerHTML = html;
+    return;
+  }
+
+  html += '<div class="table-wrap"><table class="table"><thead><tr>'
+    + '<th>Datum</th>'
+    + '<th>Država</th>'
+    + '<th># Naročilo</th>'
+    + '<th>Kupec</th>'
+    + '<th>Telefon</th>'
+    + '<th style="text-align:right;">Znesek</th>'
+    + '<th>Produkti</th>'
+    + '<th>MK ID</th>'
+    + '</tr></thead><tbody>';
+
+  data.forEach(r => {
+    const prods = (r.products || []).map(p => (p.qty ? p.qty + '× ' : '') + (p.name || p.code || '')).join(', ');
+    html += '<tr>'
+      + '<td>' + (r.docDate || '—') + '</td>'
+      + '<td><span class="country-pill">' + (r.country || '—') + '</span></td>'
+      + '<td>' + escapeHtml(r.buyerOrder || '—') + '</td>'
+      + '<td>' + escapeHtml(r.customer || '—') + '</td>'
+      + '<td>' + escapeHtml(r.phone || '—') + '</td>'
+      + '<td style="text-align:right;font-weight:600;">' + Number(r.total||0).toFixed(2) + ' ' + (r.currency||'EUR') + '</td>'
+      + '<td style="max-width:280px;font-size:12px;color:var(--text-muted);">' + escapeHtml(prods) + '</td>'
+      + '<td style="font-size:11px;color:var(--text-muted);">' + escapeHtml(r.mkId || '') + '</td>'
+      + '</tr>';
+  });
+  html += '</tbody></table></div>';
+
+  container.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+// Lazy-load when leads page becomes visible (and we have admin/any country)
+setTimeout(() => { loadRejectedOrders(); }, 5000);
+
+
+</script>
 </body>
 </html>
