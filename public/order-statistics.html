@@ -309,6 +309,7 @@ function render(data) {
 }
 
 var _monthOrdersData = [];
+var _monthOrdersLastSync = null;
 
 function loadMonthOrders() {
     fetch('/api/order-statistics/month-orders?from=' + dateFrom + '&to=' + dateTo)
@@ -316,6 +317,7 @@ function loadMonthOrders() {
         .then(function(d){
             if (!d.success) { document.getElementById('monthOrdersWrap').innerHTML = '<div class="month-orders-card"><div class="mo-loading">Error: ' + (d.error||'unknown') + '</div></div>'; return; }
             _monthOrdersData = d.orders || [];
+            _monthOrdersLastSync = d.lastSync || null;
             renderMonthOrders('');
         })
         .catch(function(e){ document.getElementById('monthOrdersWrap').innerHTML = '<div class="month-orders-card"><div class="mo-loading">Error: ' + e.message + '</div></div>'; });
@@ -338,8 +340,16 @@ function renderMonthOrders(filter) {
 
     var h = '<div class="month-orders-card">';
     h += '<div class="month-orders-header">';
-    h += '<div class="month-orders-title"><i class="fas fa-list"></i> Vsi orderji v izbranem obdobju <span class="month-orders-meta">(' + rows.length + ' / ' + _monthOrdersData.length + ' · ' + sumStr + ')</span></div>';
+    var syncStr = '';
+    if (_monthOrdersLastSync) {
+        var sd = new Date(_monthOrdersLastSync);
+        if (!isNaN(sd.getTime())) syncStr = ' · sync ' + String(sd.getHours()).padStart(2,'0') + ':' + String(sd.getMinutes()).padStart(2,'0');
+    }
+    h += '<div class="month-orders-title"><i class="fas fa-list"></i> Vsi orderji v izbranem obdobju <span class="month-orders-meta">(' + rows.length + ' / ' + _monthOrdersData.length + ' · ' + sumStr + syncStr + ')</span></div>';
+    h += '<div style="display:flex;gap:8px;align-items:center;">';
     h += '<input class="month-orders-search" type="text" placeholder="Filter: kupec, produkt, agent, drzava, # order" oninput="renderMonthOrders(this.value)" value="' + (filter||'').replace(/"/g,'&quot;') + '">';
+    h += '<button onclick="forceSyncMonthOrders(this)" style="padding:6px 10px;background:#10B981;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" title="Sync WooCommerce v ozadju"><i class="fas fa-sync"></i> Sync</button>';
+    h += '</div>';
     h += '</div>';
     h += '<div>';
     h += '<table class="month-orders-tbl"><thead><tr>';

@@ -1,6 +1,6 @@
 const express = require('express');
 const compression = require("compression");
-const { dbWrite, dbRead, dbReadData, dbLastRefresh } = require('./db');
+const { db, dbWrite, dbRead, dbReadData, dbLastRefresh } = require('./db');
 
 const cors = require('cors');
 const axios = require('axios');
