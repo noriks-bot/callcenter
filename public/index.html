@@ -9349,14 +9349,13 @@ async function syncRejectedNow(btn) {
 function renderRejectedTableInline() {
   const container = document.getElementById('tableContainer');
   if (!container) return;
-  if (!window.rejectedOrders || window.rejectedOrders.length === 0) {
-    // Try lazy-load if not loaded yet
-    if (window.rejectedOrders.length === 0 && !window._rejectedLoaded) {
-      window._rejectedLoaded = true;
-      loadRejectedOrders().then(() => renderRejectedTableInline());
-      container.innerHTML = '<div class="loading" style="padding:60px;text-align:center;"><div class="spinner" style="width:48px;height:48px;margin:0 auto 20px;"></div><div style="font-size:16px;">Nalagam zavrnjena naročila...</div></div>';
-      return;
-    }
+
+  // Lazy-load if not loaded yet
+  if ((!window.rejectedOrders || window.rejectedOrders.length === 0) && !window._rejectedLoaded) {
+    window._rejectedLoaded = true;
+    container.innerHTML = '<div class="loading" style="padding:60px;text-align:center;"><div class="spinner" style="width:48px;height:48px;margin:0 auto 20px;"></div><div style="font-size:16px;">Nalagam zavrnjena naročila...</div></div>';
+    loadRejectedOrders().then(() => renderRejectedTableInline());
+    return;
   }
 
   const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
@@ -9364,10 +9363,10 @@ function renderRejectedTableInline() {
 
   // Country filter
   if (!hasAllCountries && !isAdmin) {
-    data = data.filter(r => userCountries.includes(r.storeCode));
+    data = data.filter(r => userCountries.includes(r.storeCode || r.country));
   }
-  if (currentStore !== 'all') {
-    data = data.filter(r => r.storeCode === currentStore);
+  if (typeof currentStore !== 'undefined' && currentStore !== 'all') {
+    data = data.filter(r => (r.storeCode || r.country) === currentStore);
   }
 
   // Search
@@ -9377,6 +9376,9 @@ function renderRejectedTableInline() {
       return hay.includes(search);
     });
   }
+
+  // Country flag map
+  const FLAGS = { SI:'🇸🇮', HR:'🇭🇷', HU:'🇭🇺', PL:'🇵🇱', SK:'🇸🇰', CZ:'🇨🇿', RO:'🇷🇴', GR:'🇬🇷', BG:'🇧🇬', IT:'🇮🇹', DE:'🇩🇪' };
 
   const lastSyncTxt = window.rejectedLastSync
     ? 'Zadnji sync: ' + new Date(window.rejectedLastSync).toLocaleString('sl-SI')
@@ -9392,7 +9394,8 @@ function renderRejectedTableInline() {
     .map(([c, v]) => v.toFixed(2) + ' ' + c)
     .join(' · ') || '—';
 
-  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">'
+  // Header bar (sync + totals + info)
+  let header = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">'
     + '<div style="font-size:13px;color:var(--text-muted);">'
     + '<i class="fas fa-info-circle"></i> Naročila s statusom <b>Vračilo paketa</b> iz Metakocke · zadnjih 60 dni · skupaj: <b>' + data.length + '</b> · <b>' + totalsTxt + '</b>'
     + '<br><span style="opacity:0.7;">' + lastSyncTxt + '</span>'
@@ -9401,42 +9404,49 @@ function renderRejectedTableInline() {
     + '</div>';
 
   if (data.length === 0) {
-    html += '<div class="empty" style="padding:60px;text-align:center;"><i class="fas fa-inbox" style="font-size:48px;color:var(--text-muted);margin-bottom:16px;"></i><p>Ni zavrnjenih naročil v izbranem filtru.</p></div>';
-    container.innerHTML = html;
+    container.innerHTML = header + '<div class="empty"><i class="fas fa-inbox"></i><p>Ni zavrnjenih naročil</p><small style="color:var(--text-muted);">Trenutno ni naročil s statusom Vračilo paketa v zadnjih 60 dneh</small></div>';
     return;
   }
 
-  html += '<div class="table-wrap"><table class="table"><thead><tr>'
-    + '<th>Datum</th>'
-    + '<th>Država</th>'
-    + '<th># Naročilo</th>'
-    + '<th>Kupec</th>'
-    + '<th>Telefon</th>'
-    + '<th style="text-align:right;">Znesek</th>'
-    + '<th>Produkti</th>'
-    + '<th>MK ID</th>'
-    + '</tr></thead><tbody>';
+  // Table — same classes/structure as renderBuyersTable for visual consistency
+  const sym = { EUR:'€', CZK:'Kč', PLN:'zł', HUF:'Ft', RON:'lei', BGN:'лв' };
+  const rows = data.map(r => {
+    const cc = r.storeCode || r.country || '';
+    const flag = FLAGS[cc] || '';
+    const curSym = sym[r.currency] || (r.currency || '€');
+    const prodList = (r.products || []);
+    const prodTxt = prodList.map(p => (p.qty ? p.qty + '× ' : '') + (p.name || p.code || '')).join(', ');
+    const dateTxt = r.docDate || '—';
+    return `<tr>
+      <td><div class="customer-cell"><div class="avatar">${initials(r.customer||'?')}</div><div><div class="customer-name">${esc(r.customer || 'Unknown')}</div><div class="customer-email">${esc(r.buyerOrder || '')}</div></div></div></td>
+      <td>${flag} ${cc}</td>
+      <td style="font-size:11px;max-width:280px;color:var(--text-muted);">${esc(prodTxt) || '—'}</td>
+      <td><strong>${curSym}${Number(r.total||0).toFixed(2)}</strong></td>
+      <td>${r.phone ? `<a href="tel:${esc(r.phone)}" class="phone-link"><i class="fas fa-phone"></i> ${esc(r.phone)}</a>` : '-'}</td>
+      <td style="font-size:12px;">${dateTxt}</td>
+      <td style="font-size:11px;color:var(--text-muted);font-family:monospace;">${esc(r.mkId || '')}</td>
+      <td style="white-space:nowrap;">
+        ${r.phone ? `<button class="action-btn call" onclick="call('${esc(r.phone)}')" title="Pokliči"><i class="fas fa-phone"></i></button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
 
-  data.forEach(r => {
-    const prods = (r.products || []).map(p => (p.qty ? p.qty + '× ' : '') + (p.name || p.code || '')).join(', ');
-    html += '<tr>'
-      + '<td>' + (r.docDate || '—') + '</td>'
-      + '<td><span class="country-pill">' + (r.country || '—') + '</span></td>'
-      + '<td>' + escapeHtml(r.buyerOrder || '—') + '</td>'
-      + '<td>' + escapeHtml(r.customer || '—') + '</td>'
-      + '<td>' + escapeHtml(r.phone || '—') + '</td>'
-      + '<td style="text-align:right;font-weight:600;">' + Number(r.total||0).toFixed(2) + ' ' + (r.currency||'EUR') + '</td>'
-      + '<td style="max-width:280px;font-size:12px;color:var(--text-muted);">' + escapeHtml(prods) + '</td>'
-      + '<td style="font-size:11px;color:var(--text-muted);">' + escapeHtml(r.mkId || '') + '</td>'
-      + '</tr>';
-  });
-  html += '</tbody></table></div>';
-
-  container.innerHTML = html;
-}
-
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  container.innerHTML = header + `
+    <div class="table-wrapper">
+    <table class="data-table">
+      <thead><tr>
+        <th>Kupec / Naročilo</th>
+        <th>Država</th>
+        <th>Produkti</th>
+        <th>Znesek</th>
+        <th>Telefon</th>
+        <th>Datum</th>
+        <th>MK ID</th>
+        <th>Akcije</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>`;
 }
 
 // Lazy-load when leads page becomes visible (and we have admin/any country)
