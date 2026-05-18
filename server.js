@@ -3227,12 +3227,13 @@ app.get('/api/rejected-orders', (req, res) => {
   try {
     const cutoff = new Date(Date.now() - REJECTED_DAYS*24*3600*1000).toISOString().substring(0,10);
     const rows = db.prepare(`
-      SELECT mk_id, buyer_order, country, customer, phone, total, currency, doc_date, status, products
+      SELECT mk_id, buyer_order, country, customer, phone, email, address, city, postcode, total, currency, doc_date, status, products
       FROM cc_rejected_orders
       WHERE doc_date >= ?
       ORDER BY doc_date DESC
       LIMIT 5000
     `).all(cutoff);
+    const callData = loadCallData();
     const orders = rows.map(r => {
       const id = 'rej_' + r.mk_id;
       const cd = callData[id] || {};
