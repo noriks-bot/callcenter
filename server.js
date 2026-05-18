@@ -3062,14 +3062,24 @@ try {
     CREATE INDEX IF NOT EXISTS idx_cc_rej_date ON cc_rejected_orders(doc_date);
     CREATE INDEX IF NOT EXISTS idx_cc_rej_country_date ON cc_rejected_orders(country, doc_date);
   `);
+  // MIGRATION: extra columns for full-template rendering (idempotent)
+  for (const col of [
+    'email TEXT DEFAULT ""',
+    'address TEXT DEFAULT ""',
+    'city TEXT DEFAULT ""',
+    'postcode TEXT DEFAULT ""'
+  ]) {
+    try { db.exec('ALTER TABLE cc_rejected_orders ADD COLUMN ' + col); } catch(e) { /* exists */ }
+  }
 } catch(e) { console.error('[cc_rejected] table init err:', e.message); }
 
 const REJ_UPSERT = db.prepare(`
-  INSERT INTO cc_rejected_orders (mk_id, buyer_order, country, customer, phone, total, currency, doc_date, status, products, last_seen)
-  VALUES (@mk_id, @buyer_order, @country, @customer, @phone, @total, @currency, @doc_date, @status, @products, @last_seen)
+  INSERT INTO cc_rejected_orders (mk_id, buyer_order, country, customer, phone, email, address, city, postcode, total, currency, doc_date, status, products, last_seen)
+  VALUES (@mk_id, @buyer_order, @country, @customer, @phone, @email, @address, @city, @postcode, @total, @currency, @doc_date, @status, @products, @last_seen)
   ON CONFLICT(mk_id) DO UPDATE SET
     buyer_order=excluded.buyer_order, country=excluded.country, customer=excluded.customer,
-    phone=excluded.phone, total=excluded.total, currency=excluded.currency, doc_date=excluded.doc_date,
+    phone=excluded.phone, email=excluded.email, address=excluded.address, city=excluded.city, postcode=excluded.postcode,
+    total=excluded.total, currency=excluded.currency, doc_date=excluded.doc_date,
     status=excluded.status, products=excluded.products, last_seen=excluded.last_seen
 `);
 
@@ -3160,12 +3170,19 @@ async function syncRejectedOrders() {
       }
       if (!country) continue;
 
+      const _pa = o.partner || {};
+      const _ra = o.receiver || {};
+      const _pc = _pa.partner_contact || _ra.partner_contact || {};
       const row = {
         mk_id: String(o.mk_id),
         buyer_order: buyerOrder,
         country,
-        customer: (o.partner?.customer || o.receiver?.customer || '').trim().substring(0, 200),
-        phone: (o.partner?.partner_contact?.gsm || o.receiver?.partner_contact?.gsm || o.partner?.partner_contact?.phone || '').trim().substring(0, 60),
+        customer: (_pa.customer || _ra.customer || '').trim().substring(0, 200),
+        phone: (_pc.gsm || _pc.phone || '').trim().substring(0, 60),
+        email: (_pc.email || _pa.email || '').trim().substring(0, 200),
+        address: (_pa.street || _ra.street || '').trim().substring(0, 200),
+        city: (_pa.place || _pa.city || _ra.place || _ra.city || '').trim().substring(0, 100),
+        postcode: (_pa.post_number || _ra.post_number || '').trim().substring(0, 30),
         total: parseFloat(o.sum_all || '0'),
         currency: o.currency_code || 'EUR',
         doc_date: (o.doc_date || '').substring(0,10),
@@ -3216,19 +3233,33 @@ app.get('/api/rejected-orders', (req, res) => {
       ORDER BY doc_date DESC
       LIMIT 5000
     `).all(cutoff);
-    const orders = rows.map(r => ({
-      mkId: r.mk_id,
-      buyerOrder: r.buyer_order,
-      country: r.country,
-      storeCode: (r.country || '').toLowerCase(),
-      customer: r.customer,
-      phone: r.phone,
-      total: r.total,
-      currency: r.currency,
-      docDate: r.doc_date,
-      status: r.status,
-      products: (() => { try { return JSON.parse(r.products || '[]'); } catch { return []; } })()
-    }));
+    const orders = rows.map(r => {
+      const id = 'rej_' + r.mk_id;
+      const cd = callData[id] || {};
+      return {
+        id,
+        mkId: r.mk_id,
+        buyerOrder: r.buyer_order,
+        country: r.country,
+        storeCode: r.country,
+        customer: r.customer,
+        customerName: r.customer,
+        email: r.email || '',
+        address: r.address || '',
+        city: r.city || '',
+        postcode: r.postcode || '',
+        phone: r.phone,
+        total: r.total,
+        orderTotal: r.total,
+        currency: r.currency,
+        docDate: r.doc_date,
+        createdAt: r.doc_date,
+        status: r.status,
+        callStatus: cd.callStatus || 'not_called',
+        notes: cd.notes || '',
+        products: (() => { try { return JSON.parse(r.products || '[]'); } catch { return []; } })()
+      };
+    });
     const state = readRejState();
     res.json({ success: true, orders, total: orders.length, lastSync: state.lastSync, lastResult: state.lastResult });
   } catch(e) {

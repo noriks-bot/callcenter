@@ -4055,6 +4055,7 @@
             if (type === 'cart') item = carts.find(c => c.id === id);
             else if (type === 'pending') item = pending.find(p => p.id === id);
             else if (type === 'buyer') item = buyers.find(b => b.id === id);
+            else if (type === 'rejected') item = (window.rejectedOrders || []).find(r => r.id === id);
 
             const currentNotes = item?.notes || '';
 
@@ -9350,7 +9351,6 @@ function renderRejectedTableInline() {
   const container = document.getElementById('tableContainer');
   if (!container) return;
 
-  // Lazy-load if not loaded yet
   if ((!window.rejectedOrders || window.rejectedOrders.length === 0) && !window._rejectedLoaded) {
     window._rejectedLoaded = true;
     container.innerHTML = '<div class="loading" style="padding:60px;text-align:center;"><div class="spinner" style="width:48px;height:48px;margin:0 auto 20px;"></div><div style="font-size:16px;">Nalagam zavrnjena naročila...</div></div>';
@@ -9361,7 +9361,6 @@ function renderRejectedTableInline() {
   const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
   let data = [...(window.rejectedOrders || [])];
 
-  // Country filter
   if (!hasAllCountries && !isAdmin) {
     data = data.filter(r => userCountries.includes(r.storeCode || r.country));
   }
@@ -9369,7 +9368,6 @@ function renderRejectedTableInline() {
     data = data.filter(r => (r.storeCode || r.country) === currentStore);
   }
 
-  // Search
   if (search) {
     data = data.filter(r => {
       const hay = ((r.customer||'') + ' ' + (r.phone||'') + ' ' + (r.buyerOrder||'') + ' ' + (r.mkId||'') + ' ' + (r.products||[]).map(p=>p.name+' '+p.code).join(' ')).toLowerCase();
@@ -9377,25 +9375,21 @@ function renderRejectedTableInline() {
     });
   }
 
-  // Country flag map
+  // Expose to global for openOrderModalForRejected lookup
+  window.rejected = data;
+
   const FLAGS = { SI:'🇸🇮', HR:'🇭🇷', HU:'🇭🇺', PL:'🇵🇱', SK:'🇸🇰', CZ:'🇨🇿', RO:'🇷🇴', GR:'🇬🇷', BG:'🇧🇬', IT:'🇮🇹', DE:'🇩🇪' };
+  const STORE_NAMES = { SI:'Noriks SI', HR:'Noriks HR', HU:'Noriks HU', PL:'Noriks PL', SK:'Noriks SK', CZ:'Noriks CZ', RO:'Noriks RO', GR:'Noriks GR', BG:'Noriks BG', IT:'Noriks IT', DE:'Noriks DE' };
 
   const lastSyncTxt = window.rejectedLastSync
     ? 'Zadnji sync: ' + new Date(window.rejectedLastSync).toLocaleString('sl-SI')
     : 'Nikoli sinhronizirano';
 
-  // Per-currency totals
   const totals = {};
-  data.forEach(r => {
-    const c = r.currency || 'EUR';
-    totals[c] = (totals[c] || 0) + Number(r.total || 0);
-  });
-  const totalsTxt = Object.entries(totals)
-    .map(([c, v]) => v.toFixed(2) + ' ' + c)
-    .join(' · ') || '—';
+  data.forEach(r => { const c = r.currency || 'EUR'; totals[c] = (totals[c] || 0) + Number(r.total || 0); });
+  const totalsTxt = Object.entries(totals).map(([c, v]) => v.toFixed(2) + ' ' + c).join(' · ') || '—';
 
-  // Header bar (sync + totals + info)
-  let header = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">'
+  const header = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">'
     + '<div style="font-size:13px;color:var(--text-muted);">'
     + '<i class="fas fa-info-circle"></i> Naročila s statusom <b>Vračilo paketa</b> iz Metakocke · zadnjih 60 dni · skupaj: <b>' + data.length + '</b> · <b>' + totalsTxt + '</b>'
     + '<br><span style="opacity:0.7;">' + lastSyncTxt + '</span>'
@@ -9408,25 +9402,48 @@ function renderRejectedTableInline() {
     return;
   }
 
-  // Table — same classes/structure as renderBuyersTable for visual consistency
   const sym = { EUR:'€', CZK:'Kč', PLN:'zł', HUF:'Ft', RON:'lei', BGN:'лв' };
   const rows = data.map(r => {
     const cc = r.storeCode || r.country || '';
     const flag = FLAGS[cc] || '';
+    const storeName = STORE_NAMES[cc] || cc;
     const curSym = sym[r.currency] || (r.currency || '€');
-    const prodList = (r.products || []);
-    const prodTxt = prodList.map(p => (p.qty ? p.qty + '× ' : '') + (p.name || p.code || '')).join(', ');
-    const dateTxt = r.docDate || '—';
+    const items = (r.products || []).map(p => ({ name: p.name || p.code || '', quantity: p.qty || 1 }));
     return `<tr>
-      <td><div class="customer-cell"><div class="avatar">${initials(r.customer||'?')}</div><div><div class="customer-name">${esc(r.customer || 'Unknown')}</div><div class="customer-email">${esc(r.buyerOrder || '')}</div></div></div></td>
-      <td>${flag} ${cc}</td>
-      <td style="font-size:11px;max-width:280px;color:var(--text-muted);">${esc(prodTxt) || '—'}</td>
+      <td><div class="customer-cell"><div class="avatar">${initials(r.customer||'?')}</div><div><div class="customer-name">${esc(r.customer || 'Unknown')}</div><div class="customer-email">${esc(r.email || '')}</div><div style="font-size:10px;color:var(--text-muted);">#${esc(r.buyerOrder || r.mkId || '')}</div></div></div></td>
+      <td>${flag} ${esc(storeName)}</td>
+      <td style="max-width:220px;">${renderItemsCell(items)}</td>
       <td><strong>${curSym}${Number(r.total||0).toFixed(2)}</strong></td>
       <td>${r.phone ? `<a href="tel:${esc(r.phone)}" class="phone-link"><i class="fas fa-phone"></i> ${esc(r.phone)}</a>` : '-'}</td>
-      <td style="font-size:12px;">${dateTxt}</td>
-      <td style="font-size:11px;color:var(--text-muted);font-family:monospace;">${esc(r.mkId || '')}</td>
+      <td style="font-size:12px;">${esc(r.docDate || '—')}</td>
+      <td>
+        <select class="inline-status-select" data-id="${r.id}" data-type="rejected" onchange="inlineStatusChange(this)">
+          <option value="not_called" ${r.callStatus==='not_called'?'selected':''}>⚪ Not Called</option>
+          <option value="no_answer_1" ${r.callStatus==='no_answer_1'||r.callStatus==='called_no_answer'?'selected':''}>📵 No Answer 1</option>
+          <option value="no_answer_2" ${r.callStatus==='no_answer_2'?'selected':''}>📵 No Answer 2</option>
+          <option value="no_answer_3" ${r.callStatus==='no_answer_3'?'selected':''}>📵 No Answer 3</option>
+          <option value="no_answer_4" ${r.callStatus==='no_answer_4'?'selected':''}>📵 No Answer 4+</option>
+          <option value="called_callback" ${r.callStatus==='called_callback'?'selected':''}>🔄 Callback</option>
+          <option value="called_interested" ${r.callStatus==='called_interested'?'selected':''}>💡 Interested</option>
+          <option value="called_not_interested" ${r.callStatus==='called_not_interested'?'selected':''}>👎 Not Interested</option>
+          <option value="invalid_number" ${r.callStatus==='invalid_number'?'selected':''}>🚫 Invalid Number</option>
+        </select>
+      </td>
+      <td>
+        <div class="inline-notes-wrapper">
+          <input type="text" class="inline-notes-input ${r.notes ? 'has-notes' : ''}"
+                 data-id="${r.id}" data-type="rejected"
+                 value="${escAttr(r.notes || '')}"
+                 placeholder="Add notes..."
+                 onchange="markNotesChanged(this)"
+                 onkeypress="if(event.key==='Enter'){saveInlineNotes(this)}">
+          <button class="inline-notes-save" onclick="saveInlineNotes(this.previousElementSibling)" title="Save">💾</button>
+        </div>
+      </td>
       <td style="white-space:nowrap;">
-        ${r.phone ? `<button class="action-btn call" onclick="call('${esc(r.phone)}')" title="Pokliči"><i class="fas fa-phone"></i></button>` : ''}
+        ${r.phone ? `<button class="action-btn call" onclick="call('${esc(r.phone)}')"><i class="fas fa-phone"></i></button>` : ''}
+        ${r.phone ? `<button class="action-btn sms" onclick="openSmsModal('${r.id}','rejected')" title="SMS"><i class="fas fa-comment-sms"></i></button>` : ''}
+        <button class="action-btn-order-large" onclick="openOrderModalForRejected('${r.id}')" title="Create Order"><i class="fas fa-shopping-bag"></i> CREATE ORDER</button>
       </td>
     </tr>`;
   }).join('');
@@ -9435,18 +9452,51 @@ function renderRejectedTableInline() {
     <div class="table-wrapper">
     <table class="data-table">
       <thead><tr>
-        <th>Kupec / Naročilo</th>
-        <th>Država</th>
-        <th>Produkti</th>
-        <th>Znesek</th>
-        <th>Telefon</th>
-        <th>Datum</th>
-        <th>MK ID</th>
-        <th>Akcije</th>
+        <th>Customer</th>
+        <th>Store</th>
+        <th>Items</th>
+        <th>Value</th>
+        <th>Phone</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th>Notes</th>
+        <th>Actions</th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>
     </div>`;
+}
+
+// openOrderModalForRejected — mirrors openOrderModalForPending
+function openOrderModalForRejected(rejId) {
+  const order = (window.rejected || window.rejectedOrders || []).find(o => o.id === rejId);
+  if (!order) { if (typeof showToast === 'function') showToast('Naročilo ni najdeno', false, 'error'); return; }
+
+  orderCartId = rejId;
+  currentOrderStoreCode = order.storeCode || order.country || null;
+  orderCart = { ...order, cartContents: [], currency: order.currency || 'EUR' };
+
+  const nameParts = (order.customer || order.customerName || '').split(' ');
+  document.getElementById('orderFirstName').value = nameParts[0] || '';
+  document.getElementById('orderLastName').value = nameParts.slice(1).join(' ') || '';
+  document.getElementById('orderEmail').value = order.email || '';
+  document.getElementById('orderPhone').value = order.phone || '';
+  document.getElementById('orderAddress').value = order.address || '';
+  document.getElementById('orderCity').value = order.city || '';
+  document.getElementById('orderPostcode').value = order.postcode || '';
+
+  orderItems = [];
+  freeShipping = false;
+  document.getElementById('freeShippingToggle').classList.remove('active');
+
+  const _psi = document.getElementById('productSearchInput'); if (_psi) _psi.value = '';
+  const _psr = document.getElementById('productSearchResults'); if (_psr) { _psr.classList.remove('open'); _psr.innerHTML = ''; }
+  document.getElementById('variationSelector').style.display = 'none';
+  selectedProduct = null;
+  selectedVariation = null;
+
+  renderOrderItems();
+  document.getElementById('orderModal').classList.add('open');
 }
 
 // Lazy-load when leads page becomes visible (and we have admin/any country)
