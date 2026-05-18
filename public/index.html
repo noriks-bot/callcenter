@@ -4764,7 +4764,7 @@
             const resultsContainer = document.getElementById('productSearchResults');
 
             try {
-                const res = await fetch(`/api/search-products&store=${storeCode}&q=${encodeURIComponent(query)}`);
+                const res = await fetch(`/api/search-products?store=${storeCode}&q=${encodeURIComponent(query)}`);
                 const products = await res.json();
 
                 spinner.classList.remove('active');
@@ -9507,7 +9507,8 @@ async function openOrderModalForRejected(rejId) {
   // Pre-fill cart contents from original rejected order products (skip shipping/payment lines)
   const storeCode = (order.storeCode || order.country || '').toLowerCase();
   const prods = Array.isArray(order.products) ? order.products : [];
-  if (!storeCode || !prods.length) return;
+  console.log('[Rejected Prefill] start order=', order.id, 'storeCode=', storeCode, 'products=', prods.length, prods);
+  if (!storeCode || !prods.length) { console.log('[Rejected Prefill] aborted: missing storeCode or no products'); return; }
 
   const SKIP_RE = /(dostava|shipping|placilo|plačilo|payment|gls|pošta|posta|courier|cash on delivery|po povzetju)/i;
   const candidates = prods.filter(p => {
@@ -9526,6 +9527,7 @@ async function openOrderModalForRejected(rejId) {
       const r = await fetch('/api/search-products?store=' + storeCode + '&q=' + encodeURIComponent(sku), { credentials: 'include' });
       if (!r.ok) continue;
       const arr = await r.json();
+      console.log('[Rejected Prefill] lookup', sku, '→', Array.isArray(arr) ? arr.length : 'not-array', arr);
       if (!Array.isArray(arr) || !arr.length) continue;
       // Prefer exact SKU match
       const prod = arr.find(p => String(p.sku || '').toLowerCase() === sku.toLowerCase()) || arr[0];
