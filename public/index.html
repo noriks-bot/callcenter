@@ -9365,7 +9365,11 @@ function renderRejectedTableInline() {
     data = data.filter(r => userCountries.includes(r.storeCode || r.country));
   }
   if (typeof currentStore !== 'undefined' && currentStore !== 'all') {
+    const beforeCount = data.length;
     data = data.filter(r => (r.storeCode || r.country) === currentStore);
+    console.log('[Rejected Filter] currentStore=' + currentStore + ' before=' + beforeCount + ' after=' + data.length);
+  } else {
+    console.log('[Rejected Filter] no country filter (currentStore=' + (typeof currentStore !== 'undefined' ? currentStore : 'undef') + ')');
   }
 
   if (search) {
