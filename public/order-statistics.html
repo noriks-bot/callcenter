@@ -341,7 +341,7 @@ function renderMonthOrders(filter) {
     h += '<div class="month-orders-title"><i class="fas fa-list"></i> Vsi orderji v izbranem obdobju <span class="month-orders-meta">(' + rows.length + ' / ' + _monthOrdersData.length + ' · ' + sumStr + ')</span></div>';
     h += '<input class="month-orders-search" type="text" placeholder="Filter: kupec, produkt, agent, drzava, # order" oninput="renderMonthOrders(this.value)" value="' + (filter||'').replace(/"/g,'&quot;') + '">';
     h += '</div>';
-    h += '<div style="max-height:600px;overflow-y:auto;">';
+    h += '<div>';
     h += '<table class="month-orders-tbl"><thead><tr>';
     h += '<th>Datum</th><th>Drzava</th><th>#</th><th>Kupec</th><th>Znesek</th><th>Produkti</th><th>Agent</th><th>Status</th>';
     h += '</tr></thead><tbody>';
