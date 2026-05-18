@@ -2854,6 +2854,68 @@ app.get('/api/order-statistics', (req, res) => {
   }
 });
 
+
+// ========== MONTH ORDERS DETAIL (for order-statistics page bottom table) ==========
+app.get('/api/order-statistics/month-orders', async (req, res) => {
+  try {
+    const today = new Date().toISOString().slice(0,10);
+    const fromDate = req.query.from || today.slice(0,7) + '-01';
+    const toDate   = req.query.to   || today;
+    const fromTs = new Date(fromDate + 'T00:00:00Z').getTime();
+    const toTs   = new Date(toDate   + 'T23:59:59Z').getTime();
+    const flags = { hr:'🇭🇷', cz:'🇨🇿', pl:'🇵🇱', gr:'🇬🇷', sk:'🇸🇰', it:'🇮🇹', si:'🇸🇮', hu:'🇭🇺' };
+    const cacheKey = 'month_orders_' + fromDate + '_' + toDate;
+    const cached = getCache(cacheKey, 180);
+    if (cached) return res.json(cached);
+
+    const allOrders = [];
+    const promises = Object.entries(stores).map(async ([storeCode, config]) => {
+      try {
+        for (let page = 1; page <= 10; page++) {
+          const orders = await wcApiRequest(storeCode, 'orders', {
+            per_page: 100, page,
+            status: 'processing,completed,on-hold,pending,cancelled',
+            orderby: 'date', order: 'desc',
+            after:  fromDate + 'T00:00:00',
+            before: toDate   + 'T23:59:59'
+          });
+          if (!Array.isArray(orders) || orders.length === 0) break;
+          for (const order of orders) {
+            const meta = order.meta_data || [];
+            const isCC = meta.find(m => m.key === '_call_center' && m.value === 'yes');
+            if (!isCC) continue;
+            const agentMeta = meta.find(m => m.key === '_call_center_agent');
+            const dateMeta = meta.find(m => m.key === '_call_center_date');
+            const dStr = dateMeta?.value || order.date_created;
+            const dTs = new Date(dStr).getTime();
+            if (isNaN(dTs) || dTs < fromTs || dTs > toTs) continue;
+            allOrders.push({
+              id: order.id,
+              number: order.number || order.id,
+              storeCode,
+              storeFlag: flags[storeCode] || '',
+              date: dStr,
+              customer: ((order.billing?.first_name || '') + ' ' + (order.billing?.last_name || '')).trim() || '-',
+              phone: order.billing?.phone || '',
+              total: parseFloat(order.total) || 0,
+              currency: order.currency || storeCurrencies[storeCode] || 'EUR',
+              status: order.status,
+              agent: agentMeta?.value || 'unknown',
+              products: (order.line_items || []).map(i => i.name + ' ×' + i.quantity).join(', ')
+            });
+          }
+          if (orders.length < 100) break;
+        }
+      } catch (e) { console.error('[MONTH-ORDERS] ' + storeCode + ': ' + e.message); }
+    });
+    await Promise.all(promises);
+    allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const out = { success: true, orders: allOrders, from: fromDate, to: toDate };
+    setCache(cacheKey, out);
+    res.json(out);
+  } catch(e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
 app.get('/order-statistics', (req, res) => res.sendFile('order-statistics.html', { root: path.join(__dirname, 'public') }));
 // SSR: inject cached data into HTML so frontend has ZERO fetch delay
 app.get('/', (req, res) => {

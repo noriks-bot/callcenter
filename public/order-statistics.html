@@ -55,7 +55,29 @@
         .loading { text-align:center; padding:60px; color:#9CA3AF; font-size:13px; }
         @keyframes spin { to { transform:rotate(360deg); } }
         .spinner { display:inline-block; width:28px; height:28px; border:3px solid #E8E8EC; border-top-color:#2563EB; border-radius:50%; animation:spin .8s linear infinite; margin-bottom:8px; }
-    </style>
+    
+.month-orders-card{margin-top:24px;background:#fff;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.month-orders-header{padding:14px 16px;border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,#F0FDF4,#fff);}
+.month-orders-title{font-size:14px;font-weight:700;color:#065F46;display:flex;align-items:center;gap:8px;}
+.month-orders-meta{font-size:12px;color:#6B7280;}
+.month-orders-search{padding:6px 10px;border:1px solid #D1D5DB;border-radius:6px;font-size:12px;outline:none;min-width:220px;}
+.month-orders-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.month-orders-tbl thead th{background:#F9FAFB;color:#374151;font-weight:600;padding:8px 10px;text-align:left;border-bottom:1px solid #E5E7EB;font-size:11px;text-transform:uppercase;letter-spacing:.3px;position:sticky;top:0;}
+.month-orders-tbl tbody td{padding:8px 10px;border-bottom:1px solid #F3F4F6;vertical-align:top;}
+.month-orders-tbl tbody tr:hover{background:#F9FAFB;}
+.mo-orderid{font-weight:700;color:#10B981;}
+.mo-total{font-weight:700;color:#111827;white-space:nowrap;}
+.mo-products{max-width:340px;color:#4B5563;font-size:11px;}
+.mo-agent{font-weight:600;color:#2563EB;}
+.mo-date{color:#6B7280;font-size:11px;white-space:nowrap;}
+.mo-status{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;}
+.mo-status.processing{background:#DBEAFE;color:#1D4ED8;}
+.mo-status.completed{background:#D1FAE5;color:#065F46;}
+.mo-status.cancelled{background:#FEE2E2;color:#991B1B;}
+.mo-status.on-hold{background:#FEF3C7;color:#92400E;}
+.mo-status.pending{background:#E5E7EB;color:#374151;}
+.mo-loading{padding:24px;text-align:center;color:#6B7280;font-size:13px;}
+</style>
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -281,7 +303,75 @@ function render(data) {
     h += '<div class="section-title"><i class="fas fa-receipt" style="color:#10B981;"></i> Orders</div>';
     h += renderSummary(data, data.countries);
     h += renderDayCards(data.days, data.countries);
+    h += '<div id="monthOrdersWrap"><div class="month-orders-card"><div class="mo-loading"><i class="fas fa-spinner fa-spin"></i> Loading month orders…</div></div></div>';
     document.getElementById("statsContent").innerHTML = h;
+    loadMonthOrders();
+}
+
+var _monthOrdersData = [];
+
+function loadMonthOrders() {
+    fetch('/api/order-statistics/month-orders?from=' + dateFrom + '&to=' + dateTo)
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            if (!d.success) { document.getElementById('monthOrdersWrap').innerHTML = '<div class="month-orders-card"><div class="mo-loading">Error: ' + (d.error||'unknown') + '</div></div>'; return; }
+            _monthOrdersData = d.orders || [];
+            renderMonthOrders('');
+        })
+        .catch(function(e){ document.getElementById('monthOrdersWrap').innerHTML = '<div class="month-orders-card"><div class="mo-loading">Error: ' + e.message + '</div></div>'; });
+}
+
+function renderMonthOrders(filter) {
+    var f = (filter||'').toLowerCase().trim();
+    var rows = _monthOrdersData.filter(function(o){
+        if (!f) return true;
+        return (o.customer||'').toLowerCase().indexOf(f) >= 0
+            || (o.products||'').toLowerCase().indexOf(f) >= 0
+            || (o.agent||'').toLowerCase().indexOf(f) >= 0
+            || (o.storeCode||'').toLowerCase().indexOf(f) >= 0
+            || String(o.number||'').indexOf(f) >= 0;
+    });
+    var symMap = {EUR:'€', CZK:'Kč', PLN:'zł', HUF:'Ft'};
+    var sumTotal = {};
+    rows.forEach(function(o){ sumTotal[o.currency] = (sumTotal[o.currency]||0) + (o.total||0); });
+    var sumStr = Object.keys(sumTotal).map(function(c){ return (symMap[c]||c) + ' ' + sumTotal[c].toFixed(2); }).join(' · ') || '–';
+
+    var h = '<div class="month-orders-card">';
+    h += '<div class="month-orders-header">';
+    h += '<div class="month-orders-title"><i class="fas fa-list"></i> Vsi orderji v izbranem obdobju <span class="month-orders-meta">(' + rows.length + ' / ' + _monthOrdersData.length + ' · ' + sumStr + ')</span></div>';
+    h += '<input class="month-orders-search" type="text" placeholder="Filter: kupec, produkt, agent, drzava, # order" oninput="renderMonthOrders(this.value)" value="' + (filter||'').replace(/"/g,'&quot;') + '">';
+    h += '</div>';
+    h += '<div style="max-height:600px;overflow-y:auto;">';
+    h += '<table class="month-orders-tbl"><thead><tr>';
+    h += '<th>Datum</th><th>Drzava</th><th>#</th><th>Kupec</th><th>Znesek</th><th>Produkti</th><th>Agent</th><th>Status</th>';
+    h += '</tr></thead><tbody>';
+    if (rows.length === 0) {
+        h += '<tr><td colspan="8" style="text-align:center;color:#9CA3AF;padding:24px;">Ni orderjev v tem obdobju</td></tr>';
+    } else {
+        rows.forEach(function(o){
+            var dt = new Date(o.date);
+            var dStr = isNaN(dt.getTime()) ? (o.date||'-') : (String(dt.getDate()).padStart(2,'0') + '.' + String(dt.getMonth()+1).padStart(2,'0') + '. ' + String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0'));
+            var sym = symMap[o.currency] || (o.currency||'');
+            h += '<tr>';
+            h += '<td class="mo-date">' + dStr + '</td>';
+            h += '<td>' + (o.storeFlag||'') + ' ' + (o.storeCode||'').toUpperCase() + '</td>';
+            h += '<td class="mo-orderid">#' + (o.number||o.id||'-') + '</td>';
+            h += '<td>' + escapeHtml(o.customer||'-') + (o.phone ? '<div style="font-size:10px;color:#9CA3AF;">' + escapeHtml(o.phone) + '</div>' : '') + '</td>';
+            h += '<td class="mo-total">' + sym + ' ' + (o.total||0).toFixed(2) + '</td>';
+            h += '<td class="mo-products" title="' + escapeHtml(o.products||'') + '">' + escapeHtml((o.products||'').length > 90 ? o.products.slice(0,88)+'…' : (o.products||'-')) + '</td>';
+            h += '<td class="mo-agent">' + escapeHtml(o.agent||'-') + '</td>';
+            h += '<td><span class="mo-status ' + (o.status||'') + '">' + (o.status||'-') + '</span></td>';
+            h += '</tr>';
+        });
+    }
+    h += '</tbody></table></div></div>';
+    document.getElementById('monthOrdersWrap').innerHTML = h;
+}
+
+function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
 }
 
 loadStats();
