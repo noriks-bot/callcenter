@@ -45,6 +45,18 @@ const storeCurrencies = { hr: 'EUR', cz: 'CZK', pl: 'PLN', sk: 'EUR', hu: 'HUF',
 const storeCountryCodes = { hr: 'HR', cz: 'CZ', pl: 'PL', sk: 'SK', hu: 'HU', gr: 'GR', it: 'IT', si: 'SI' };
 const phoneCountryCodes = { hr: '385', cz: '420', pl: '48', gr: '30', sk: '421', it: '39', hu: '36', si: '386' };
 
+// Shipping rates per store (matches frontend STORE_SHIPPING)
+const STORE_SHIPPING = {
+  hr: { cost: 2.99,  freeMin: 70 },
+  cz: { cost: 69,    freeMin: 1700 },
+  pl: { cost: 11.99, freeMin: 300 },
+  gr: { cost: 2.99,  freeMin: 70 },
+  sk: { cost: 2.99,  freeMin: 70 },
+  it: { cost: 2.99,  freeMin: 70 },
+  hu: { cost: 800,   freeMin: 25000 },
+  si: { cost: 2.99,  freeMin: 70 }
+};
+
 const metakocka = {
   company_id: 6371,
   secret_key: 'ee759602-961d-4431-ac64-0725ae8d9665',
@@ -1124,8 +1136,25 @@ async function createOrderFromCart(input) {
     customer_note: (input.notes ? input.notes + ' \u2014 ' : '') + `Order created via Call Center by ${agentName}`
   };
 
-  if (freeShipping) {
-    orderData.shipping_lines = [{ method_id: 'free_shipping', method_title: 'Free Shipping (Call Center)', total: '0.00' }];
+  // Always set shipping_lines explicitly so WC doesn't fall back to default zone
+  const shipCfg = STORE_SHIPPING[storeCode] || { cost: 2.99, freeMin: 70 };
+  const subtotalForFree = lineItems.reduce((sum, li) => {
+    const t = parseFloat(li.total || li.subtotal || 0);
+    return sum + (isNaN(t) ? 0 : t);
+  }, 0);
+  const autoFree = subtotalForFree >= shipCfg.freeMin;
+  if (freeShipping || autoFree) {
+    orderData.shipping_lines = [{
+      method_id: 'free_shipping',
+      method_title: autoFree && !freeShipping ? 'Free Shipping (Auto)' : 'Free Shipping (Call Center)',
+      total: '0.00'
+    }];
+  } else {
+    orderData.shipping_lines = [{
+      method_id: 'flat_rate',
+      method_title: 'Standard Shipping',
+      total: String(shipCfg.cost.toFixed ? shipCfg.cost.toFixed(2) : shipCfg.cost)
+    }];
   }
 
   const result = await wcApiRequest(storeCode, 'orders', {}, 'POST', orderData);
