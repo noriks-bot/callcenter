@@ -9473,8 +9473,8 @@ function renderRejectedTableInline() {
     </div>`;
 }
 
-// openOrderModalForRejected — mirrors openOrderModalForPending
-function openOrderModalForRejected(rejId) {
+// openOrderModalForRejected — mirrors openOrderModalForPending + pre-fills products from original order
+async function openOrderModalForRejected(rejId) {
   const order = (window.rejected || window.rejectedOrders || []).find(o => o.id === rejId);
   if (!order) { if (typeof showToast === 'function') showToast('Naročilo ni najdeno', false, 'error'); return; }
 
@@ -9503,6 +9503,57 @@ function openOrderModalForRejected(rejId) {
 
   renderOrderItems();
   document.getElementById('orderModal').classList.add('open');
+
+  // Pre-fill cart contents from original rejected order products (skip shipping/payment lines)
+  const storeCode = (order.storeCode || order.country || '').toLowerCase();
+  const prods = Array.isArray(order.products) ? order.products : [];
+  if (!storeCode || !prods.length) return;
+
+  const SKIP_RE = /(dostava|shipping|placilo|plačilo|payment|gls|pošta|posta|courier|cash on delivery|po povzetju)/i;
+  const candidates = prods.filter(p => {
+    const code = String(p.code || '').trim();
+    const name = String(p.name || '');
+    if (!code) return false;
+    if (SKIP_RE.test(name)) return false;
+    return true;
+  });
+  if (!candidates.length) return;
+
+  for (const item of candidates) {
+    try {
+      const sku = String(item.code || '').trim();
+      const qty = parseInt(item.qty) || 1;
+      const r = await fetch('/api/search-products?store=' + storeCode + '&q=' + encodeURIComponent(sku), { credentials: 'include' });
+      if (!r.ok) continue;
+      const arr = await r.json();
+      if (!Array.isArray(arr) || !arr.length) continue;
+      // Prefer exact SKU match
+      const prod = arr.find(p => String(p.sku || '').toLowerCase() === sku.toLowerCase()) || arr[0];
+      let variationId = 0;
+      let varName = '';
+      let price = prod.price || 0;
+      if (prod.type === 'variable' && Array.isArray(prod.variations) && prod.variations.length) {
+        // Try to match variation by SKU first (some variants have own SKU containing original code)
+        const vMatch = prod.variations.find(v => String(v.sku || '').toLowerCase() === sku.toLowerCase());
+        const v = vMatch || prod.variations.find(x => x.inStock) || prod.variations[0];
+        variationId = v.id;
+        varName = v.name || '';
+        price = v.price || price;
+      }
+      orderItems.push({
+        productId: prod.id,
+        variationId: variationId,
+        name: prod.name + (varName ? ' — ' + varName : ''),
+        price: price,
+        editPrice: price,
+        quantity: qty,
+        editQty: qty,
+        image: prod.image || null
+      });
+      renderOrderItems();
+    } catch(e) { console.error('[Rejected Prefill] item err:', e); }
+  }
+  if (typeof showToast === 'function' && orderItems.length) showToast('✓ Naložil ' + orderItems.length + ' artikel(ov) iz prvotnega naročila', false, 'info');
 }
 
 // Lazy-load when leads page becomes visible (and we have admin/any country)
