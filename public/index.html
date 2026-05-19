@@ -3412,14 +3412,14 @@
                         return true;
                     }
                     // Auto filter by product type
-                    const isStarter = b.orderItems && b.orderItems.some(i => /starter|startovac/i.test(i.name));
+                    const isStarter = b.orderItems && b.orderItems.some(i => /starter|startov|štartov|kezdő csomag|kezdo csomag|začetni paket|zacetni paket|pacchetto starter|zestaw startow|startovací|startovaci|pakiet startowy|pachet starter|αρχικό πακέτο|starterpaket/i.test(i.name));
                     const minDays = isStarter ? 5 : 10;
                     return daysSince >= minDays;
                 });
                 if (productFilter === 'starter') {
-                    data = data.filter(b => b.orderItems && b.orderItems.some(i => /starter|startovac/i.test(i.name)));
+                    data = data.filter(b => b.orderItems && b.orderItems.some(i => /starter|startov|štartov|kezdő csomag|kezdo csomag|začetni paket|zacetni paket|pacchetto starter|zestaw startow|startovací|startovaci|pakiet startowy|pachet starter|αρχικό πακέτο|starterpaket/i.test(i.name)));
                 } else if (productFilter === 'non-starter') {
-                    data = data.filter(b => !b.orderItems || !b.orderItems.some(i => /starter|startovac/i.test(i.name)));
+                    data = data.filter(b => !b.orderItems || !b.orderItems.some(i => /starter|startov|štartov|kezdő csomag|kezdo csomag|začetni paket|zacetni paket|pacchetto starter|zestaw startow|startovací|startovaci|pakiet startowy|pachet starter|αρχικό πακέτο|starterpaket/i.test(i.name)));
                 }
             }
             if (search) data = data.filter(d =>
@@ -3772,6 +3772,7 @@
                         <th class="sortable ${getSortClass('storeCode')}" onclick="sortTable('storeCode')">Store</th>
                         <th>Items</th>
                         <th class="sortable ${getSortClass('cartValue')}" onclick="sortTable('cartValue')">Value</th>
+                        <th title="Facebook / UTM atribucija — kampanja, ad, ad-set">FB Campaign</th>
                         <th>Phone</th>
                         <th class="sortable ${getSortClass('callStatus')}" onclick="sortTable('callStatus')">Status</th>
                         <th>Notes</th>
@@ -3791,6 +3792,7 @@
                                 <td>${c.storeFlag} ${c.storeName}</td>
                                 <td style="max-width:220px;">${renderItemsCell(c.cartContents)}</td>
                                 <td><strong>${sym}${(c.cartValue||0).toFixed(2)}</strong>${(isConverted && (c.orderTotal || c.matchedOrderTotal)) ? `<div style="color:#28a745;font-weight:700;font-size:12px;">→ ${sym}${parseFloat(c.orderTotal || c.matchedOrderTotal).toFixed(2)}</div>` : ''}</td>
+                                <td class="fb-campaign-cell" style="max-width:180px;font-size:11px;line-height:1.3;">${(function(){var fb=c.fbCampaign;if(!fb||typeof fb!=='object')return '<span style="color:#bbb;">—</span>';var cid=fb.campaign_id||'';var aid=fb.ad_id||'';var asid=fb.adset_id||'';var src=fb.source||'';var tooltip=Object.entries(fb).filter(function(p){return p[1];}).map(function(p){return p[0]+': '+p[1];}).join('\n');var label='';if(cid){label='<div style=\"color:#1877f2;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;\" title=\"Campaign ID\">'+cid+'</div>';}if(aid){label+='<div style=\"color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;\" title=\"Ad ID\">'+aid+'</div>';}else if(asid){label+='<div style=\"color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;\" title=\"Ad-Set ID\">'+asid+'</div>';}if(!label&&src){label='<div style=\"color:#888;\">'+src+'</div>';}if(!label&&fb.fbclid){label='<div style=\"color:#888;font-size:10px;\" title=\"fbclid only\">fbclid ✓</div>';}return '<div title=\"'+esc(tooltip)+'\">'+(label||'<span style=\"color:#bbb;\">—</span>')+'</div>';})()}</td>
                                 <td>${c.phone ? `<a href="tel:${c.phone}" class="phone-link"><i class="fas fa-phone"></i> ${c.phone}</a>` : '-'}</td>
                                 <td>
                                     ${isConverted ? '<span style="color:#28a745;font-weight:600;">✅ Converted</span>' : `<select class="inline-status-select" data-id="${c.id}" data-type="cart" onchange="inlineStatusChange(this)">

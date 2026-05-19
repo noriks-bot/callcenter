@@ -796,7 +796,9 @@ async function fetchAbandonedCarts() {
           abandonedAt: cart.time || '', status: cart.order_status || '',
           callStatus: savedData.callStatus || 'not_called', notes: savedData.notes || '',
           lastUpdated: savedData.lastUpdated || null, orderId: savedData.orderId || null, orderTotal: savedData.orderTotal || null,
-          converted: isConverted, matchedOrderTotal: matchedOrderTotal || null
+          converted: isConverted, matchedOrderTotal: matchedOrderTotal || null,
+          fbCampaign: cart.fb_campaign || null,
+          otherFieldsRaw: cart.other_fields || {}
         });
       }
     } catch (err) {
@@ -1128,6 +1130,21 @@ async function createOrderFromCart(input) {
       { key: '_call_center', value: 'yes' }, { key: '_call_center_agent', value: agentName },
       { key: '_call_center_date', value: new Date().toISOString() },
       { key: '_abandoned_cart_id', value: String(cart?.cartDbId || cartId) },
+      ...((cart && cart.fbCampaign) ? (() => {
+        const fb = cart.fbCampaign || {};
+        const out = [];
+        if (fb.campaign_id) out.push({ key: '_fb_campaign_id', value: String(fb.campaign_id) });
+        if (fb.ad_id)       out.push({ key: '_fb_ad_id',       value: String(fb.ad_id) });
+        if (fb.adset_id)    out.push({ key: '_fb_adset_id',    value: String(fb.adset_id) });
+        if (fb.fbclid)      out.push({ key: '_fb_fbclid',      value: String(fb.fbclid) });
+        if (fb.fbc)         out.push({ key: '_fb_fbc',         value: String(fb.fbc) });
+        if (fb.fbp)         out.push({ key: '_fb_fbp',         value: String(fb.fbp) });
+        if (fb.source)      out.push({ key: '_fb_utm_source',  value: String(fb.source) });
+        if (fb.medium)      out.push({ key: '_fb_utm_medium',  value: String(fb.medium) });
+        if (fb.landing_url) out.push({ key: '_fb_landing_url', value: String(fb.landing_url) });
+        if (fb.referrer)    out.push({ key: '_fb_referrer',    value: String(fb.referrer) });
+        return out;
+      })() : []),
       { key: '_free_shipping', value: freeShipping ? 'yes' : 'no' },
       { key: '_wc_order_attribution_source_type', value: 'referral' },
       { key: '_wc_order_attribution_utm_source', value: 'callcenter' },
