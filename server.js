@@ -616,6 +616,17 @@ async function getRecentOrderContacts(storeCode) {
   return contacts;
 }
 
+// Tip kosa iz ORTO atribut kljucev (npr. "barva-majice-1" -> Majica, "velikost-boxerek-2" -> Bokserica).
+// Tip MORA biti v meta zapisu ("Tip: Barva - Velikost", enako kot web konfigurator), sicer
+// downstream (MK sync + packing app) ne ve, kateri kos je majica in kateri bokserica.
+function ortoTypeFromKeys(keyStrings) {
+  const s = (keyStrings || []).join(' ').toLowerCase();
+  if (/boxer|bokser|boksar/.test(s)) return 'Bokserica';
+  if (/majic|trick|koszulk|tricou|magliet|shirt|polo/.test(s)) return 'Majica';
+  if (/nogavic|ponozk|skarpet|zokni|calzin|sock|sosete|carap/.test(s)) return 'Nogavice';
+  return '';
+}
+
 // ========== FETCH ABANDONED CARTS ==========
 async function fetchAbandonedCarts() {
   const cached = getCache('abandoned_carts_filtered', 300);
@@ -729,14 +740,19 @@ async function fetchAbandonedCarts() {
                       const vals = Object.values(attrs).filter(Boolean);
                       const size = vals.find(v => sizePattern.test(v)) || '';
                       const color = vals.find(v => v !== size) || '';
-                      if (color || size) pairList.push((color && size) ? color + ' - ' + size : (color || size));
+                      // Tip iz group/atribut kljucev -> "Majica: Bijela - 4XL" (web format)
+                      const itemType = ortoTypeFromKeys([grp, ...Object.keys(attrs)]);
+                      const typePrefix = itemType ? itemType + ': ' : '';
+                      if (color || size) pairList.push(typePrefix + ((color && size) ? color + ' - ' + size : (color || size)));
                     }
                   } else {
                     // Simple pair (2 attrs: color + size)
                     const allVals = Object.values(decoded).filter(Boolean);
                     const size = allVals.find(v => sizePattern.test(v)) || '';
                     const color = allVals.find(v => v !== size) || '';
-                    pairList.push((color && size) ? color + ' - ' + size : (color || size || 'Unknown'));
+                    const itemType = ortoTypeFromKeys(Object.keys(decoded));
+                    const typePrefix = itemType ? itemType + ': ' : '';
+                    pairList.push(typePrefix + ((color && size) ? color + ' - ' + size : (color || size || 'Unknown')));
                   }
                 }
                 
